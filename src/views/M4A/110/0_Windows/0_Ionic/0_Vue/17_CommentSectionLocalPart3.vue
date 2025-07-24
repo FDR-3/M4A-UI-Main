@@ -20,7 +20,7 @@
         <a href="https://www.youtube.com/watch?v=C2xFnKWSxdQ" target="_blank">South Park: Ladder to Heaven</a><br>
       </p>
       <div align="left">
-        <span>Extra Video/SFX Lessons 5/5</span><br>
+        <span>Extra Video/SFX Lessons 5/6</span><br>
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Making Gifs</span>
         </button>

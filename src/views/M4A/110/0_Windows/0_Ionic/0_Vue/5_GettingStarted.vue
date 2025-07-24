@@ -27,7 +27,7 @@
         <a href="https://www.youtube.com/watch?v=ymqh7vy3Qk8" target="_blank">Family Guy</a><br>
       </p>
 
-      <p align="left">Extra Video/SFX Lessons 1/5<br>
+      <p align="left">Extra Video/SFX Lessons 1/6<br>
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">VSDC Outtros (Plus missing Metal Gear number 4)</span>
         </button>

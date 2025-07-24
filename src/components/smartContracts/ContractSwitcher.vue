@@ -160,7 +160,7 @@
   var createdHospitalAndInsuranceCompanyRecordsCount = 0 */
   
   onMounted(async() =>
-  {console.log("contract switcher mounted")
+  {
     selectedM4AContractIndex = parseInt(localStorage.getItem("ContractSelectM4A") || "0")
     localStorage.setItem("ContractSelectM4A", selectedM4AContractIndex.toString())//Set value in local storage incase it isn't already
 

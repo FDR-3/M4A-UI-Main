@@ -113,12 +113,11 @@
 
   var firstOnMountedDataGrab = false
 
-  onMounted(async() =>
-  {console.log("wallet button mounted")
+  onMounted(() =>
+  {
     //Keeps code from running again when switching between menus/ not sure why wallet button gets remounted
     if(connectedWallet.addressString != "")
       return
-    console.log("wallet button mounted and doing stuff")
 
     if(publicKey.value == null || publicKey.value.toBase58() == SYSTEM_PROGRAM_ADDRESS_STRING)
     {

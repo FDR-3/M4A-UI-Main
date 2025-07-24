@@ -20,7 +20,7 @@
       </p>
 
       <div align="left">
-        <span>Extra Video/SFX Lessons 4/5</span><br>
+        <span>Extra Video/SFX Lessons 4/6</span><br>
         <button id="videoFlipButton"  @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Thumbnails And Captioning Techniques</span>
         </button>

@@ -29,7 +29,7 @@
         <a href="https://www.youtube.com/watch?v=Kp7eSUU9oy8" target="_blank">Donald Glover</a><br>
       </p>
 
-      <p align="left">Extra Video/SFX Lessons 3/5<br>
+      <p align="left">Extra Video/SFX Lessons 3/6<br>
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Advanced Movement Techniques</span>
         </button>

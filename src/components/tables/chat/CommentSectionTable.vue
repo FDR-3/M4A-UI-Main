@@ -230,13 +230,11 @@
 </template>
   
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
+  import { ref, onMounted, watch, inject } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonInput, IonPopover} from '@ionic/vue'
-  import { navigation } from '/src/assets/globalStates/Navigation.vue'
-  import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
   import { search, download } from 'ionicons/icons'
   import { commentSections } from '/src/assets/globalStates/chat/CommentSections.vue'
-  import { commentSectionPreFixNameHashTable, commentSectionNameHashTable } from '/src/components/comments/hashtables.ts'
+  import { jumpToCommentSection } from '/src/components/comments/hashtables.ts'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
   import RainbowStarWolf from '/src/components/fancy/RainbowStarWolf.vue'
@@ -245,7 +243,6 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { trimAddress, copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   const colorHexValue = inject('colorHexValue') as string
 
@@ -260,19 +257,12 @@
 
   var copyFullAddressButtonText = ref("Copy Full Address")
 
-  var allCommentSectionsWatchId: any
-
   onMounted(async() =>
   {
     if(commentSections.data)
       tableData.value = commentSections.data
 
     isLoading.value = false
-  })
-
-  onUnmounted(() =>
-  {
-    anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(allCommentSectionsWatchId)
   })
 
   watch(commentSections, () =>
@@ -326,61 +316,6 @@
   {
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
   })
-
-  function jumpToCommentSection(rowData: any)
-  {
-    const menuValue = commentSectionPreFixNameHashTable.get(rowData.commentSectionNamePrefix)
-
-    //Set menu value to jump to
-    if(menuValue)
-    {
-      navigation.menuIndex = menuValue
-      localStorage.setItem("navigationMenuIndex", navigation.menuIndex)
-    }
-
-    //Jump to Map comment section
-    if(rowData.commentSectionName.includes("Country: "))
-    {
-      const countryAndStateIndex = rowData.commentSectionName.match(/\d+/g)
-
-      if(countryAndStateIndex)
-      {
-        const COUNTRY_INDEX = 0
-        const STATE_INDEX = 1
-        const M4A_MAP_NAV_BAR_INDEX = 3
-
-        mapSelection.countryIndex = countryAndStateIndex[COUNTRY_INDEX]
-        mapSelection.stateIndex = countryAndStateIndex[STATE_INDEX]
-        mapSelection.isStateSelected = true
-        mapSelection.selectedStateName = rowData.stateName
-        mapSelection.zoomLong = rowData.zoomLong
-        mapSelection.zoomLat = rowData.zoomLat
-        localStorage.setItem("mapCountryIndex", mapSelection.countryIndex)
-        localStorage.setItem("mapStateIndex", mapSelection.stateIndex)
-        localStorage.setItem("mapIsStateSelected", mapSelection.isStateSelected)
-        localStorage.setItem("mapSelectedStateName", mapSelection.selectedStateName)
-        localStorage.setItem("mapDefaultLongitude", mapSelection.zoomLong)
-        localStorage.setItem("mapDefaultLatitude", mapSelection.zoomLat)
-
-        navigation.navBarIndex = M4A_MAP_NAV_BAR_INDEX
-        navigation.pageIndex = 0
-        localStorage.setItem("navigationNavbarIndex", M4A_MAP_NAV_BAR_INDEX.toString())
-        localStorage.setItem("navigationPageIndex", "0")
-      }
-    }
-    //Jump regular comment section
-    else
-    {
-      const navbarAndPageValues = commentSectionNameHashTable.get(rowData.commentSectionName)
-      if(navbarAndPageValues)
-      {
-        navigation.navBarIndex = navbarAndPageValues[0]
-        navigation.pageIndex = navbarAndPageValues[1]
-        localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex)
-        localStorage.setItem("navigationPageIndex", navigation.pageIndex)
-      }
-    }
-  }
 </script>
 
 <style scoped>

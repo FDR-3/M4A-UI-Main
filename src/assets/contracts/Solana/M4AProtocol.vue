@@ -40,7 +40,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -64,7 +64,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -88,7 +88,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -112,7 +112,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -137,7 +137,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -162,7 +162,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -187,7 +187,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -211,7 +211,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -235,7 +235,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -259,7 +259,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -283,7 +283,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -323,7 +323,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -347,7 +347,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -372,7 +372,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -396,7 +396,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -420,7 +420,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -529,7 +529,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -554,7 +554,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -751,7 +751,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -892,7 +892,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -1012,7 +1012,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -1124,7 +1124,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -1227,7 +1227,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -1348,7 +1348,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }
@@ -1534,7 +1534,7 @@
         }
         else
         {
-          console.log(RETRY_MESSAGE)
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
           await sleep(RETRY_TIME_OUT*i*2)
         }
       }

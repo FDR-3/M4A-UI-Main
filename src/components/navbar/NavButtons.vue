@@ -84,13 +84,13 @@
   {
     if(navigation.navBarIndex == 0)
     {
-      lilNavText.value = props.navButtons[navigation.navBarIndex].lilNavText
+      lilNavText.value = props.navButtons[navigation.navBarIndex]?.lilNavText
       lilNavClass = "rainbowText"
       lilNavTextColor.value = ""
     }
     else
     {
-      lilNavText.value = props.navButtons[navigation.navBarIndex].lilNavText
+      lilNavText.value = props.navButtons[navigation.navBarIndex]?.lilNavText
       lilNavClass = ""
       lilNavTextColor.value = "dark"
     }

@@ -33,7 +33,7 @@
         <a href="https://www.freepik.com/free-psd/view-nature-mountain-landscape_269375113.htm#fromView=search&page=1&position=11&uuid=60aa5941-3a14-4893-9255-2b554177b284&query=giant+Mountain" target="_blank">Freepik Mountain</a><br>
       </p>
 
-      <p align="left">Extra Video/SFX Lessons 2/5<br>
+      <p align="left">Extra Video/SFX Lessons 2/6<br>
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Isolating Voices</span>
         </button>

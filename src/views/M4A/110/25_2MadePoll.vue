@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>M4A Protocol<br>Scientific Poll</h1>
+    <h1>M4A Protocol<br>Highly Scientific Poll</h1>
     <div>
       <PrevPageButton/>
       <Poll

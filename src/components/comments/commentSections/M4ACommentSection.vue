@@ -90,7 +90,7 @@
     M4A110PathSelectionCommentSectionNames,
     ["Markets"],
     ["Treasury"],
-    ["Map"],
+    ["Road Map"],
     ["Queue"]
   ]
 

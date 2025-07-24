@@ -169,8 +169,7 @@
 <script setup lang="ts">
   import { ref, onMounted, inject, watch } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonInput, IonPopover, IonText, IonTextarea } from '@ionic/vue'
-  import { navigation } from '/src/assets/globalStates/Navigation.vue'
-  import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
+  import { jumpToCommentSection } from '/src/components/comments/hashtables.ts'
   import { search, download } from 'ionicons/icons'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -267,62 +266,6 @@
   {
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
   })
-
-  function jumpToCommentSection(rowData: any)
-  {
-    const menuValue = commentSectionPreFixNameHashTable.get(rowData.commentSectionNamePrefix)
-
-    //Set menu value to jump to
-    if(menuValue)
-    {
-      navigation.menuIndex = menuValue
-      localStorage.setItem("navigationMenuIndex", navigation.menuIndex)
-    }
-
-    //Jump to Map comment section
-    if(rowData.commentSectionName.includes("Country: "))
-    {
-      const countryAndStateIndex = rowData.commentSectionName.match(/\d+/g)
-
-      if(countryAndStateIndex)
-      {
-        const COUNTRY_INDEX = 0
-        const STATE_INDEX = 1
-        const M4A_MAP_NAV_BAR_INDEX = 3
-
-        mapSelection.countryIndex = countryAndStateIndex[COUNTRY_INDEX]
-        mapSelection.stateIndex = countryAndStateIndex[STATE_INDEX]
-        mapSelection.isStateSelected = true
-        mapSelection.selectedStateName = rowData.stateName
-        mapSelection.zoomLong = rowData.zoomLong
-        mapSelection.zoomLat = rowData.zoomLat
-        localStorage.setItem("mapCountryIndex", mapSelection.countryIndex)
-        localStorage.setItem("mapStateIndex", mapSelection.stateIndex)
-        localStorage.setItem("mapIsStateSelected", mapSelection.isStateSelected)
-        localStorage.setItem("mapSelectedStateName", mapSelection.selectedStateName)
-        localStorage.setItem("mapDefaultLongitude", mapSelection.zoomLong)
-        localStorage.setItem("mapDefaultLatitude", mapSelection.zoomLat)
-
-        navigation.navBarIndex = M4A_MAP_NAV_BAR_INDEX
-        navigation.pageIndex = 0
-        localStorage.setItem("navigationNavbarIndex", M4A_MAP_NAV_BAR_INDEX.toString())
-        localStorage.setItem("navigationPageIndex", "0")
-      }
-    }
-    //Jump regular comment section
-    else
-    {
-      const navbarAndPageValues = commentSectionNameHashTable.get(rowData.commentSectionName)
-
-      if(navbarAndPageValues)
-      {
-        navigation.navBarIndex = navbarAndPageValues[0]
-        navigation.pageIndex = navbarAndPageValues[1]
-        localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex)
-        localStorage.setItem("navigationPageIndex", navigation.pageIndex)
-      }
-    }
-  }
 
   async function updateIdea()
   {
