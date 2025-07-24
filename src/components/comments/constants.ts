@@ -1,0 +1,4 @@
+export const MAX_COMMENT_LENGTH = 444
+export const MAX_USERNAME_LENGTH = 144
+export const REPLY_LIST_INDEX = 0
+export const REMAINING_REPLIES_INDEX = 1

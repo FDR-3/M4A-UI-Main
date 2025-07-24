@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "types": [ "vidstack/vue" ],
+    "target": "ESNext",
+    "allowJs": true,
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": [ "ESNext", "DOM" ],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "paths": {
+      "@/*": [ "./src/*" ]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*.json", "src/**/*.ChatProtocol.json"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

@@ -1,0 +1,299 @@
+:root
+{
+  --p-form-field-float-label-invalid-color: var(--ion-color-red) !important;
+  --p-inputtext-invalid-border-color: var(--ion-color-red) !important
+}
+
+.copyAddressButton
+{
+  width: 90%;
+  font-weight: bold
+}
+
+.copyAddressButton:hover
+{
+  text-decoration: underline;
+  text-decoration-color: var(--ion-color-light);
+  text-decoration-thickness: 2px;
+  opacity: 1
+}
+
+.showRecordsButton
+{
+  width: 90%;
+  font-weight: bold
+}
+
+.showRecordsButton:hover
+{
+  text-decoration: underline;
+  text-decoration-color: var(--ion-color-light);
+  text-decoration-thickness: 2px;
+  opacity: 1
+}
+
+.toggleVoteRecordsButton
+{
+  margin-bottom: 35px
+}
+
+.voteRecordSubTitle
+{
+  margin-top: -10px
+}
+
+.statSpacingTop
+{
+  margin-top: -10px
+}
+
+.statSpacing
+{
+  margin-top: -25px
+}
+
+.stateStatSpacing
+{
+  margin-top: -10px
+}
+
+.statTopHospitalSpacing
+{
+  margin-top: -25px
+}
+
+.statHospitalSpacing
+{
+  margin-top: -15px
+}
+
+.tableToggleSelect
+{
+  border-radius: 12px;
+  box-shadow: 0px 0px 5px 8px light-dark(gray, lightgray)
+}
+
+.tableToggleButtonContainer
+{
+  display: flex;
+  justify-content: center;
+  gap: 25px
+}
+
+/*This CSS wouldn't work within scope*/
+.p-select.p-invalid > .p-select-label
+{
+  color: var(--ion-color-red) !important
+}
+
+.tableContainer
+{
+  border: thick solid var(--ion-color-dark);
+  border-radius: 20px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+  margin-top: 10px;
+  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 100%
+}
+
+.p-datatable-gridlines .p-datatable-header 
+{
+  margin-top: 10px;
+  border-width: 2px !important;
+  border-color: var(--ion-color-dark);
+  border-radius: 30px
+}
+
+.p-datatable-table-container
+{
+  margin-top: 10px;
+  overflow: visible !important
+}
+
+.p-datatable-header-cell
+{
+  border-color: var(--ion-color-dark) !important;
+  border-width: 2px !important
+}
+
+.p-datatable-header-cell.p-datatable-sortable-column
+{
+  z-index:2;
+  border-width: 2px !important;
+  border-color: var(--ion-color-dark) !important
+}
+
+/*Fixes Table header border for Fire Fox specifically*/
+.p-datatable-thead > tr > th
+{
+  background-clip: padding-box
+}
+
+.p-datatable-thead:hover > tr > th
+{
+  background-clip: padding-box
+}
+
+.p-datatable-tbody > tr > td 
+{
+  border-width: 2px !important;
+  border-color: var(--ion-color-dark) !important
+}
+
+.p-datatable-paginator-bottom 
+{
+  border-width: 2px !important;
+  border-color: var(--ion-color-dark) !important
+}
+
+.p-select 
+{
+  border-color: var(--ion-color-dark) !important
+}
+
+.p-select-dropdown 
+{
+  color: var(--ion-color-dark) !important
+}
+
+.p-paginator-first-icon
+{
+  color: var(--ion-color-dark) !important
+}
+
+.p-paginator-prev-icon
+{
+  color: var(--ion-color-dark) !important
+}
+
+.p-paginator-next-icon
+{
+  color: var(--ion-color-dark) !important
+}
+
+.p-paginator-last-icon
+{
+  color: var(--ion-color-dark) !important
+}
+
+.p-select-empty-message
+{
+  text-align: center !important
+}
+
+.p-select-list-container
+{
+  display: flex !important;
+  justify-content: center !important
+}
+
+.submitterButton
+{
+  height: 40px;
+  margin-left: -14px;
+  margin-right: -10px;
+}
+
+.starWolfButton
+{
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  
+  margin-left: -14px
+}
+
+.hospitalButton
+{
+  margin-left: -20px;
+}
+
+.hospitalButtonLabel
+{
+  margin-left: 10px
+
+}
+
+.tableButton
+{
+  margin: 0px;
+  margin-left: -20px;
+}
+
+.tableButtonEmoji
+{
+  font-size: 30px;
+}
+
+.p-datatable-row-editor-save
+{
+  color: var(--ion-color-green) !important
+}
+
+.p-datatable-row-editor-cancel
+{
+  color: var(--ion-color-red) !important
+}
+
+.voterTableUtilityBar
+{
+  margin-top: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center
+}
+
+.chatTablePopupContainer
+{
+  padding-top: 2px;
+  text-align: center;
+  padding: 7px;
+  border-radius: 4px;
+  overflow: hidden !important
+}
+
+.m4aTablePopupContainer
+{
+  padding: 2px;
+  padding-bottom: 8px;
+  background: clear;
+  text-align: center;
+  overflow: hidden !important;
+  border-radius: 4px
+}
+
+.tablePopupUnderLine
+{
+  text-decoration: underline;
+  margin-top: 10px
+}
+
+.p-toast-message 
+{
+  text-align: center !important;
+}
+
+.p-toast-message-error
+{
+  background-color: light-dark(rgb(247, 211, 211, 1), rgb(129, 1, 1, 1)) !important;
+  border-color: light-dark(rgb(247, 211, 211, 1), rgb(129, 1, 1, 1)) !important;
+  color: light-dark(rgb(129, 1, 1, 1), rgb(247, 211, 211)) !important;
+  filter: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale
+}
+
+.toastIcon
+{
+  margin-bottom: 75px
+}
+
+.toastMessageContainer
+{
+  margin-left: 37px
+}

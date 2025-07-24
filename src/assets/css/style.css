@@ -1,0 +1,92 @@
+.invalid
+{
+  color: var(--ion-color-red) !important
+}
+
+.negative 
+{
+  color: var(--ion-color-red) !important
+}
+
+.positive 
+{
+  color: var(--ion-color-green) !important
+}
+
+.selfVoteBackground > ion-button > ion-label
+{
+  color: var(--ion-color-black) !important
+}
+
+td:has(.selfVoteBackground) 
+{
+  background-color: var(--ion-color-gray) !important
+}
+
+iframe 
+{
+  border: none;
+  border-radius: 10px
+}
+
+.thinBorder
+{
+  /*border: thin, solid*/
+  border: thin solid
+}
+
+.thickBorder
+{
+  /*border: thick, solid*/
+  border: thick solid
+}
+
+div
+{
+  border-radius: 17px
+}
+
+.underLine
+{
+  text-decoration: underline
+}
+
+.thickUnderLine
+{
+  text-decoration: underline;
+  text-decoration-thickness: 4px
+}
+
+ion-textarea
+{
+  padding-top: 20px;
+}
+
+.emojiButton
+{
+  font-size: 30px;
+  margin: 0px;
+  padding: 0px;
+  width: 51px
+}
+
+.kaomojiButton
+{
+  font-size: 27px
+}
+
+.alert-button
+{
+  color: var(--ion-color-green) !important
+}
+
+.alert-input.sc-ion-alert-md:focus 
+{
+  margin-bottom: 4px !important;
+  border-bottom: 2px solid var(--ion-color-green) !important
+}
+
+#videoFlipButton
+{
+  background: none
+}

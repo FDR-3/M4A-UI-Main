@@ -1,0 +1,79 @@
+:root 
+{
+  --ion-color-yellow: #ffd700;
+  --ion-color-green: #39bd39;
+  --ion-color-blue: #557fcc;
+  --ion-color-red: #ff0000;
+  --ion-color-gray: #b5bbcad3;
+  --ion-color-purple: #8a2be2;
+  --ion-color-black: #000000;
+  --ion-color-white: #ffffff;
+  --ion-color-off-white: #eeeeee;
+  --ion-background-color: light-dark(#eeeeee, #000000) !important;
+  --ion-background-color-light: light-dark(#000000, #eeeeee) !important;
+  --ion-color-dark: light-dark(#000000, #ffffff) !important;
+  --ion-color-light: light-dark(#ffffff, #000000) !important;
+  --ion-item-background: light-dark(#eeeeee, #000000) !important
+}
+
+/*Used for h1 elements on About-Stats page*/
+.yellow
+{
+  color: var(--ion-color-yellow)
+}
+
+.purple
+{
+  color: var(--ion-color-purple)
+}
+
+.ion-color-yellow
+{
+  --ion-color-base: var(--ion-color-yellow)
+}
+
+.ion-color-green 
+{
+  --ion-color-base: var(--ion-color-green)
+}
+
+.ion-color-blue 
+{
+  --ion-color-base: var(--ion-color-blue)
+}
+
+.ion-color-red 
+{
+  --ion-color-base: var(--ion-color-red)
+}
+
+.ion-color-gray 
+{
+  --ion-color-base: var(--ion-color-gray)
+}
+
+.ion-color-purple
+{
+  --ion-color-base: var(--ion-color-purple)
+}
+
+.ion-color-black 
+{
+  --ion-color-base: var(--ion-color-black)
+}
+
+.ion-color-white 
+{
+  --ion-color-base: var(--ion-color-white)
+}
+
+a
+{
+  text-decoration:none;
+  color: #79a2ee
+}
+
+ion-popover
+{
+  --background: light-dark(var(--ion-color-off-white), var(--ion-color-black));
+}

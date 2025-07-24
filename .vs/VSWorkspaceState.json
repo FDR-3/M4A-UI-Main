@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\assets",
+    "\\src\\assets\\video",
+    "\\src\\router",
+    "\\src\\theme",
+    "\\src\\views",
+    "\\tests",
+    "\\tests\\unit"
+  ],
+  "SelectedNode": "\\vite.config.ts",
+  "PreviewInSolutionExplorer": false
+}

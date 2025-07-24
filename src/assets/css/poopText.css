@@ -1,0 +1,17 @@
+.poopText 
+{
+  background: repeating-linear-gradient(90deg, #851717 0%, #0f8332 25%,  #851717 50.0%);
+  background-size: 150% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: rainbow_animation 1.8s linear infinite
+}
+
+@keyframes rainbow_animation 
+{
+  to 
+  {
+    background-position: 150% center
+  }
+}

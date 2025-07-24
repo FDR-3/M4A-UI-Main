@@ -1,0 +1,16 @@
+.rainbowText 
+{
+  background: repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
+  background-size: 150% auto;
+  background-clip: text;
+  color: transparent;
+  animation: rainbowAnimation 1.8s linear infinite
+}
+
+@keyframes rainbowAnimation 
+{
+  to 
+  {
+    background-position: 150% center
+  }
+}

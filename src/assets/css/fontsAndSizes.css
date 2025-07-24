@@ -1,0 +1,104 @@
+* 
+{
+  font-family: Lucida Console;
+  text-transform: none
+}
+
+@font-face 
+{
+  font-family: 'SansPlate';
+  font-style: normal;
+  font-weight: normal;
+  src: url('https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNyKneWxk1DwzQoq92jgSYiWLcApxTKlkFJ65R')
+}  
+
+@font-face 
+{
+  font-family: 'MetalGear';
+  font-style: normal;
+  font-weight: normal;
+  src: url('https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNEXupPTrKustIf5Q7FrS3ZqMDd6eahcUy8ni0')
+}
+
+@font-face 
+{
+  font-family: 'SuperMagic';
+  font-style: normal;
+  font-weight: normal;
+  src: url('https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNcIQAgHeG7KCJSLN0BH1upErbVeQaWMq2oIdX')
+}  
+
+.content 
+{
+  font-size: min(5vw, 20px)
+}
+
+.standardFontSize
+{
+  font-size: min(4vw, 17px)
+}
+
+.metal 
+{
+  font-family: MetalGear;
+  font-size: 17px
+}
+
+.super 
+{
+  font-family: SuperMagic;
+  font-size: 17px
+}
+
+h1 
+{
+  font-size: min(7vw, 42px);
+  text-decoration: underline;
+  font-weight: bold
+}
+
+h2 
+{
+  font-size: min(5vw, 30px);
+  font-weight: bold;
+  margin-bottom: 20px
+}
+
+h3
+{
+  font-size: min(4vw, 27px);
+  font-weight: bold;
+  margin-bottom: 25px
+}
+
+h4
+{
+  font-size: min(4vw, 25px);
+  font-weight: bold;
+  margin-bottom: 25px
+}
+
+p, a, button, ion-text, ion-label
+{
+  font-size: min(4vw, 15px)
+}
+
+td, th
+{
+  font-size: min(4vw, 15px)
+}
+
+ion-textarea, ion-input
+{
+  font-size: min(5vw, 15px) !important
+}
+
+.emojiText
+{
+  font-size: min(8vw, 27px) !important
+}
+
+.emojiTextSmaller
+{
+  font-size: min(5vw, 22px) !important
+}

@@ -1,0 +1,360 @@
+.contentWidth
+{
+  width: 90vw
+}
+
+h1
+{
+  margin-top: 5px
+}
+
+h2 
+{
+  margin-bottom: 20px
+}
+
+h3, h4
+{
+  margin-bottom: 25px
+}
+
+.singleLineHeaderLineHeight
+{
+  line-height: 1px
+}
+
+.multiLineHeaderLineHeight
+{
+  line-height: 35px;
+  margin-top: -10px;
+  margin-bottom: 5px
+}
+
+.longMultiLineHeaderLineHeight
+{
+  line-height: 35px
+}
+
+.marginZero
+{
+  margin: 0 !important
+}
+
+.tinyMarginTop
+{
+  margin-top: 5px
+}
+
+.nTinyMarginTop
+{
+  margin-top: -5px
+}
+
+.tinyMarginLeft
+{
+  margin-left: 5px
+}
+
+.nTinyMarginLeft
+{
+  margin-left: -5px
+}
+
+.tinyMarginBottom
+{
+  margin-bottom: 5px
+}
+
+.nTinyMarginBottom
+{
+  margin-bottom: -5px
+}
+
+.smallMarginTop
+{
+  margin-top: 10px
+}
+
+.nSmallMarginTop
+{
+  margin-top: -10px
+}
+
+.smallMarginLeft
+{
+  margin-left: 10px
+}
+
+.smallMarginBottom
+{
+  margin-bottom: 10px
+}
+
+.nSmallMarginBottom
+{
+  margin-bottom: -10px
+}
+
+.mediumSmallMarginTop
+{
+  margin-top: 15px
+}
+
+.nMediumSmallMarginTop
+{
+  margin-top: -15px
+}
+
+.mediumSmallMarginLeft
+{
+  margin-left: 15px
+}
+
+.mediumSmallMarginBottom
+{
+  margin-bottom: 15px
+}
+
+.nMediumSmallMarginBottom
+{
+  margin-bottom: -15px
+}
+
+.mediumMarginTop
+{
+  margin-top: 20px
+}
+
+.nMediumMarginTop
+{
+  margin-top: -20px
+}
+
+.mediumMarginLeft
+{
+  margin-left: 20px
+}
+
+.mediumMarginBottom
+{
+  margin-bottom: 20px
+}
+
+.nMediumMarginBottom
+{
+  margin-bottom: -20px
+}
+
+.mediumLargeMarginTop
+{
+  margin-top: 25px
+}
+
+.nMediumLargeMarginTop
+{
+  margin-top: -25px
+}
+
+.mediumLargeMarginLeft
+{
+  margin-left: 25px
+}
+
+.nMediumLargeMarginLeft
+{
+  margin-left: -25px
+}
+
+.mediumLargeMarginBottom
+{
+  margin-bottom: 25px
+}
+
+.nMediumLargeMarginBottom
+{
+  margin-bottom: -25px
+}
+
+.largeMarginTop
+{
+  margin-top: 30px
+}
+
+.nLargeMarginTop
+{
+  margin-top: -30px
+}
+
+.smallMarginLeft
+{
+  margin-left: 10px !important
+}
+
+.nSmallMarginLeft
+{
+  margin-left: -10px !important
+}
+
+.mediumMarginLeft
+{
+  margin-left: 20px
+}
+
+.nMediumMarginLeft
+{
+  margin-left: -20px
+}
+
+.largeMarginLeft
+{
+  margin-left: 30px
+}
+
+.nLargeMarginLeft
+{
+  margin-left: -30px
+}
+
+.largeMarginBottom
+{
+  margin-bottom: 30px
+}
+
+.nLargeMarginBottom
+{
+  margin-bottom: -30px
+}
+
+.nMediumSmallMarginRight
+{
+  margin-right: -15px !important
+}
+
+/* The "show" class is added to the filtered elements */
+.show 
+{
+  display:inline-block !important
+}
+
+/* The "hide" class is added to the filtered elements */
+.hide 
+{
+  display: none !important
+}
+
+.center
+{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)
+}
+
+.flexCenterRow
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center !important
+}
+
+.flexCenterRowWidth
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: center !important
+}
+
+.flexCenterRowHeight
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center
+}
+
+.flexCenterColumn
+{
+  display: flex;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center;
+  text-align: center
+}
+
+.flexCenterColumnHeight
+{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center
+}
+
+.flexCenterColumnWidth
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center
+}
+
+/*.flexCenterSelfHorizontally
+{
+  display: flex;
+  flex-direction: row;
+  align-self: center
+}
+
+.flexCenterSelfVertically
+{
+  display: flex;
+  flex-direction: column !important;
+  justify-self: center !important
+} */
+
+.spaceRowEvenly
+{
+  display: flex;
+  justify-content: space-evenly
+}
+
+.videoContainer
+{
+  max-width: min(60vw, 1920px);
+  width: min(60vw, 1920px)
+}
+
+.horizontalPostVideoContainer
+{
+  width: 100%; 
+  height: 20vw
+}
+
+.sources
+{
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-left: 10px;
+  border: solid thick
+}
+
+.patchSelectionContainer
+{
+  gap: 20px
+}
+
+.pathSelectionIcon
+{
+  width: 100px;
+  height: 100px
+}
+
+.chainIcon
+{
+  width: 25px;
+  height: 25px
+}
+
+.tocButton
+{
+  width: 100px
+}

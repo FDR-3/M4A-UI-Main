@@ -1,0 +1,7 @@
+{
+  "name": "M4A",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}

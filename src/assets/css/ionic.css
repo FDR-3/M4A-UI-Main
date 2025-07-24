@@ -1,0 +1,48 @@
+button, ion-button, ion-menu-button
+{
+  --background-hover-opacity: 0
+}
+
+button:hover, ion-menu-button:hover, ion-button:hover, a:hover   
+{
+  opacity: 0.61;
+  transition: opacity 0.1s ease-in-out 
+}
+
+ion-popover::part(backdrop) 
+{
+  background-color: transparent
+}
+
+.popOverButton
+{
+  text-align: center !important;
+  width: 100% !important;
+  margin: 0;
+  border-width: thin;
+  border-style: solid
+}
+
+.popOverButton:hover
+{
+  text-decoration: underline;
+  text-decoration-color: var(--ion-color-light);
+  text-decoration-thickness: 2px;
+  opacity: 1
+}
+
+.popOverDropDown
+{
+  height: fit-content
+}
+
+.pop-over-style .popover-content 
+{
+  border-radius: 20px !important
+}
+
+/*This centers the place holder labels inside of ion-textareas*/
+.sc-ion-textarea-md-h
+{
+  --padding-top: 32px
+}

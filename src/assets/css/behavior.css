@@ -1,0 +1,24 @@
+.noClickEvent
+{
+  pointer-events: none
+}
+
+.preserveWhiteSpace
+{
+  white-space: pre
+}
+
+.wrapText
+{
+  white-space: wrap !important
+}
+
+.noWrapText
+{
+  white-space: nowrap !important
+}
+
+.horizontalScroll
+{
+  overflow-x: auto
+}
