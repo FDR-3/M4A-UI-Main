@@ -1,4 +1,8 @@
 <script lang="ts">
+  import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
+  import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
+  import { sourceUSDC, sourceSOL} from '/src/assets/helperFunctions/sources.ts'
+
   export const StableCoins = [
   /*{
     asset: 
@@ -23,10 +27,10 @@
   {
     asset: 
     {
-      image: "usdc.svg",
       name: "USDC",
       type: "Stable Coin",
-      url: "https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNennCnoHYvGazNyBXWLJ8f2QUITcrVm6e9CiF"
+      svg: USDCSVG,
+      source: () => {sourceUSDC()}
     },
     price: "$1.00",
     apy: "4.84%",
@@ -37,9 +41,9 @@
     },
     chain:
     {
-      image: "sol.svg",
       name: "Solana",
-      url: "https://logowik.com/solana-logo-vector-svg-pdf-ai-eps-cdr-free-download-19832.html"
+      svg: SOLSVG,
+      source: () => {sourceSOL()}
     }
   }/*,
   {

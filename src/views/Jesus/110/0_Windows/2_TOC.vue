@@ -8,16 +8,17 @@
     <NextPageButton/>
   </div>
   <div class="flexCenterColumnWidth">
-    <ion-button color="dark" @click="nextPage()">1-OBS Video Capture Software</ion-button>
-    <ion-button color="dark" @click="pageSelect(4)">2-AI Voice Change Client</ion-button>
-    <ion-button color="dark" @click="pageSelect(5)">3-Train A Custom RVC Voice Model</ion-button>
-    <ion-button color="dark" @click="pageSelect(6)">4-YT-DLP</ion-button>
-    <ion-button color="dark" @click="pageSelect(7)">5-Whisper-AI</ion-button>
-    <ion-button color="dark" @click="pageSelect(8)">6-Radiant-Media-Player-Thumbnails</ion-button>
-    <ion-button color="dark" @click="pageSelect(9)">7-Manual Youtube Scraping</ion-button>
-    <ion-button color="dark" @click="pageSelect(10)">8-Selenium Youtube Scraping</ion-button>
-    <ion-button color="dark" @click="pageSelect(11)">9-API Youtube Scraping</ion-button>
-    <ion-button color="dark" @click="pageSelect(12)">10-VSDC Video Editing Software</ion-button>
+    <ion-button color="dark" @click="pageSelect(0)">1-Overview</ion-button>
+    <ion-button color="dark" @click="nextPage()">2-OBS Video Capture Software</ion-button>
+    <ion-button color="dark" @click="pageSelect(4)">3-AI Voice Change Client</ion-button>
+    <ion-button color="dark" @click="pageSelect(5)">4-Train A Custom RVC Voice Model</ion-button>
+    <ion-button color="dark" @click="pageSelect(6)">5-YT-DLP</ion-button>
+    <ion-button color="dark" @click="pageSelect(7)">6-Whisper-AI</ion-button>
+    <ion-button color="dark" @click="pageSelect(8)">7-Radiant-Media-Player-Thumbnails</ion-button>
+    <ion-button color="dark" @click="pageSelect(9)">8-Manual Youtube Scraping</ion-button>
+    <ion-button color="dark" @click="pageSelect(10)">9-Selenium Youtube Scraping</ion-button>
+    <ion-button color="dark" @click="pageSelect(11)">10-API Youtube Scraping</ion-button>
+    <ion-button color="dark" @click="pageSelect(12)">11-VSDC Video Editing Software</ion-button>
   </div>
 </template>
 

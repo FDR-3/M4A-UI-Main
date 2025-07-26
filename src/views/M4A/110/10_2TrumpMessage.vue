@@ -1,13 +1,17 @@
 <template>
   <div>
-    <h1>💚 A Message to President Trump 💚</h1>
+    <h1>💚 A Message To President trump 💚</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
       <!--<media-player class="videoContainer" src="src\assets\video\M4A\110\10_2TrumpMessage/Trump Lolipop.mp4">
         <media-provider><track src="" kind="subtitles" label="English" lang="en-US" default/></media-provider>
         <media-plyr-layout thumbnails=""></media-plyr-layout>
       </media-player>-->
+      <iframe class="videoContainer"
+        src="https://www.youtube.com/embed/gvuskhvhqrU"
+        allowfullscreen
+        allowtransparency
+      ></iframe>
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -40,5 +44,4 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 </script>

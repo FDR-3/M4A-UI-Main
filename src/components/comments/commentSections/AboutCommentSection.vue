@@ -92,7 +92,7 @@
   [
     [
       "",
-      "",
+      "https://www.youtube.com/watch?v=QR889fO4Osk", //Palestine
       "https://youtu.be/zPh16BCtB_I?t=379", //Warsaw
       "https://www.youtube.com/shorts/0AQUYaXnHZk", //TheObvious
       "https://www.youtube.com/shorts/Ib_E5rqyBIg", //TheEvenMoreObvious
@@ -102,7 +102,8 @@
       "https://www.youtube.com/watch?v=wyM52KT7V3A", //USI
       "https://www.youtube.com/watch?v=mgxmDFG0ZGw", //Handful
       "",
-      ""],
+      "https://www.youtube.com/watch?v=nVmrSbGjQcA", //LegalFrameWork
+    ],
     [""],
     [""]
   ]

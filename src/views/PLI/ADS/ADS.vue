@@ -1,11 +1,14 @@
 <template>
   <div>
     <h1>Hype Song: Through My Blood</h1>
-    <Uploading/>
       <!--<media-player class="videoContainer" src="src/assets/video/PLI/Ads/Season 2 Hype Song.mp4">
-      <media-provider><track src="" kind="subtitles" label="English" lang="en-US" default/></media-provider>
-      <media-plyr-layout thumbnails=""></media-plyr-layout>
-    </media-player>-->
+        <media-provider><track src="" kind="subtitles" label="English" lang="en-US" default/></media-provider>
+        <media-plyr-layout thumbnails=""></media-plyr-layout>
+      </media-player>-->
+      <iframe class="videoContainer"
+        src="https://www.youtube.com/embed/jrgh4FM4Kn0?cc_load_policy=1&cc_lang_pref=en"
+        allowfullscreen
+      ></iframe>
   </div>
   <VideoVoter/>
   <div class="sources">
@@ -27,5 +30,4 @@
 
 <script setup lang="ts">
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 </script>

@@ -16,7 +16,7 @@
             slot="icon-only"
           />
         </ion-button>
-        <AnchorFlashing v-if="isAnchorFlashing" />
+        <AnchorFlashing v-if="isAnchorFlashing"/>
         <div class="flexCenterRow">
           <ion-button fill="clear" @click="giveUXWingSolanaCredit()">
             <SolanaSVG class="chainIcon" slot="icon-only"/>

@@ -1,14 +1,13 @@
 <template>
   <div id="topOfPage">
-    <h1>Video Flipper 7/30</h1>
+    <h1>Video Flipper 8/31</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
-      <!--<VideoFlipper
+      <VideoFlipper
         ref="videoFlipper"
-        frontVideo="src/assets/video/M4A/110/11_1VideoFlipper/VideoFlipper.mp4"
-        backVideo="src/assets/video/M4A/110/Extra Editing Lessons/Extra Editing Lesson 4 - Thumbnails And Captions/Thumbnails And Captions.mp4"
-      />-->
+        frontVideo="https://www.youtube.com/embed/h0hnb-maWw4?cc_load_policy=1&cc_lang_pref=en"
+        backVideo="https://www.youtube.com/embed/oBUzbfxJS7A?cc_load_policy=1&cc_lang_pref=en"
+      />
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -20,7 +19,7 @@
       </p>
 
       <div align="left">
-        <span>Extra Video/SFX Lessons 4/6</span><br>
+        <strong>Extra Video/SFX Lessons 4/6</strong><br>
         <button id="videoFlipButton"  @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Thumbnails And Captioning Techniques</span>
         </button>
@@ -38,7 +37,6 @@
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoFlipper from '/src/components/fancy/VideoFlipper.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 
   var videoFlipper = ref()
 </script>

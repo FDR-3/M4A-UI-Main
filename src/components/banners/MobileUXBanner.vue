@@ -12,6 +12,7 @@
       <ion-text>Straight browser phone apps may not curently be able to connect to the site properly or call contract functions.</ion-text>
       <div class="nSmallMarginBottom">
         <ion-text >Use a computer for the best user experience currently (The tables definitely need to be reworked for phones).</ion-text>
+        <ion-text >Full screen doesn't work in the phantom wallet browser for videos.</ion-text>
       </div>
     </div>
   </div>

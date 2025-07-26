@@ -15,7 +15,7 @@
     <div class="sources">
       <h1>Sources</h1>
       <p align="left">Links<br>
-        <a href="https://www.youtube.com/watch?v=ksjzI-8Rz2w" target="_blank">Louis Rossman</a><br>
+        <a href="https://www.youtube.com/watch?v=ksjzI-8Rz2w" target="_blank">Louis Rossmann</a><br>
       </p>
     </div>
   </div>

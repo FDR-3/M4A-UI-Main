@@ -1,14 +1,13 @@
 <template>
   <div>
-    <h1>Chat Contract Walk Through 30/30</h1>
+    <h1>Chat Contract Walk Through 31/31</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
-      <!--<VideoFlipper
+      <VideoFlipper
         ref="videoFlipper"
-        frontVideo="src/assets/video/M4A/110/17_1CommentSectionLocalStoragePart3/Comment Section - Local Storage Part 3.mp4"
-        backVideo="src/assets/video/M4A/110/Extra Editing Lessons/Extra Editing Lesson 5 - Making GIFS/Making GIFS.mp4"
-      />-->
+        frontVideo="https://www.youtube.com/embed/m_ZWiSUjym4?cc_load_policy=1&cc_lang_pref=en"
+        backVideo="https://www.youtube.com/embed/gVvLOn_yHjY?cc_load_policy=1&cc_lang_pref=en"
+      />
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -28,7 +27,7 @@
         <a href="https://www.youtube.com/watch?v=RT-1Zywrse8" target="_blank">What Make Art: Configure your "user.name" and "user.email" in git</a><br>
       </p>
       <div align="left">
-        <span>Extra Video/SFX Lessons 6/6</span><br>
+        <strong>Extra Video/SFX Lessons 6/6</strong><br>
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Editing Fonts</span>
         </button>
@@ -47,7 +46,6 @@
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoFlipper from '/src/components/fancy/VideoFlipper.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 
   var videoFlipper = ref()
 </script>

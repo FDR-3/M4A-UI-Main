@@ -1,13 +1,16 @@
 <template>
   <div>
-    <h1>Overview</h1>
+    <h1>Overview 1/31</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
       <!--<media-player class="videoContainer" src="src/assets/video/M4A/110/0_Overview/M4A Overview.mp4">
         <media-provider><track src="" kind="subtitles" label="English" lang="en-US" default/></media-provider>
         <media-plyr-layout thumbnails=""></media-plyr-layout>
       </media-player>-->
+      <iframe class="videoContainer"
+        src="https://www.youtube.com/embed/wfwfSHvQJNU?cc_load_policy=1&cc_lang_pref=en"
+        allowfullscreen
+      ></iframe>
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -17,7 +20,7 @@
         <a href="https://www.youtube.com/watch?v=B7h1MGdfuHA" target="_blank">DrakeKaizoku: All Kaito Bad Rolls [Hunter X Hunter][CRAZY SLOTS]</a><br>
         <a href="https://www.pngfind.com/mpng/ibRhbho_memes-para-stickers-png-png-download-surprised-pikachu/" target="_blank">pngfind: suprised pikachu</a><br>
         <a href="https://hianime.to/watch/hunter-x-hunter-2?ep=146" target="_blank">Hunter x Hunter(popups are worse on this site on the phone, it's better on the computer)</a><br>
-        <a href="https://www.youtube.com/watch?v=4To-F6W1NT0" target="_blank">Louis Rossman 1</a><br>
+        <a href="https://www.youtube.com/watch?v=4To-F6W1NT0" target="_blank">Louis Rossmann 1</a><br>
         <a href="https://www.youtube.com/watch?v=GQhNwlibeP8" target="_blank">Green Screen: Shia Labeouf</a><br>
         <a href="https://www.youtube.com/watch?v=QH5tDLHsgiI" target="_blank">Kevin Hart</a><br>
         <a href="https://www.youtube.com/watch?v=TFfa8pcv--k" target="_blank">Team Four Star: Attack on Titan Abridged</a><br>
@@ -40,7 +43,7 @@
         <a href="https://www.youtube.com/watch?v=j0resz19wUk" target="_blank">Sugar</a><br>
         <a href="https://tenor.com/view/wow-surprised-oh-my-gif-12557782" target="_blank">Suprised Gif</a><br>
         <a href="https://www.youtube.com/watch?v=HNcmo-K5Xsg" target="_blank">John Stewart</a><br>
-        <a href="https://www.youtube.com/watch?v=8PDxvIxeH3Q" target="_blank">Louis Rossman 2</a><br>
+        <a href="https://www.youtube.com/watch?v=8PDxvIxeH3Q" target="_blank">Louis Rossmann 2</a><br>
       </p>
 
       <p align="left">Extra Links<br>
@@ -57,5 +60,4 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 </script>

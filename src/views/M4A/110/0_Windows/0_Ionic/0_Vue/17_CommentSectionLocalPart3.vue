@@ -1,14 +1,13 @@
 <template>
   <div id="topOfPage">
-    <h1>Comment Section - Local Storage Part3 13/30</h1>
+    <h1>Comment Section - Local Storage Part3 14/31</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
-      <!--<VideoFlipper
+      <VideoFlipper
         ref="videoFlipper"
-        frontVideo="src/assets/video/M4A/110/17_1CommentSectionLocalStoragePart3/Comment Section - Local Storage Part 3.mp4"
-        backVideo="src/assets/video/M4A/110/Extra Editing Lessons/Extra Editing Lesson 5 - Making GIFS/Making GIFS.mp4"
-      />-->
+        frontVideo="https://www.youtube.com/embed/qBndkrNAt4U?cc_load_policy=1&cc_lang_pref=en"
+        backVideo="https://www.youtube.com/embed/5kw1UCapkOs?cc_load_policy=1&cc_lang_pref=en"
+      />
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -20,7 +19,7 @@
         <a href="https://www.youtube.com/watch?v=C2xFnKWSxdQ" target="_blank">South Park: Ladder to Heaven</a><br>
       </p>
       <div align="left">
-        <span>Extra Video/SFX Lessons 5/6</span><br>
+        <strong>Extra Video/SFX Lessons 5/6</strong><br>
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Making Gifs</span>
         </button>
@@ -39,7 +38,6 @@
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoFlipper from '/src/components/fancy/VideoFlipper.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 
   var videoFlipper = ref()
 </script>

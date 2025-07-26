@@ -9,6 +9,10 @@
         <media-provider><track src="src/assets/video/Jesus Debate/FAQs/FAQs1/FAQs1.vtt" kind="subtitles" label="English" lang="en-US" default/></media-provider>
         <media-plyr-layout thumbnails="src/assets/video/Jesus Debate/FAQs/FAQs1/FAQs1-thumbnails.vtt"></media-plyr-layout>
       </media-player>-->
+      <iframe class="videoContainer"
+        src="https://www.youtube.com/embed/cSXJ09tDR9Q?cc_load_policy=1&cc_lang_pref=en"
+        allowfullscreen
+      ></iframe>
       <NextPageButton/>
     </div>
     <div class="sources">
@@ -51,5 +55,4 @@
 <script setup lang="ts">
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 </script>

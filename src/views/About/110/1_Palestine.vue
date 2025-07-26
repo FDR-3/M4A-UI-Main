@@ -3,11 +3,14 @@
     <h1>Speaking Up For Palestine!!!!</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
-      <!--<media-player class="videoContainer" src="src/assets/video/About/110/1_Palestine/Palestine.mp4">
+      <!--<media-player class="videoContainer" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNKm7CDvl1PJwYXusWpUSNEyfCRGd6HjzKB489">
         <media-provider><track src="" kind="subtitles" label="English" lang="en-US" default/></media-provider>
         <media-plyr-layout thumbnails=""></media-plyr-layout>
       </media-player>-->
+      <iframe class="videoContainer"
+        src="https://www.youtube.com/embed/QR889fO4Osk?cc_load_policy=1&cc_lang_pref=en"
+        allowfullscreen
+      ></iframe>
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -75,7 +78,6 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 </script>
 
 <style scoped>

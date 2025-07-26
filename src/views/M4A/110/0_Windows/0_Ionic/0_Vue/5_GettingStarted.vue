@@ -1,14 +1,13 @@
 <template>
   <div id="topOfPage">
-    <h1>Getting Started 1/30</h1>
+    <h1>Getting Started 2/31</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
-      <!--<VideoFlipper
+      <VideoFlipper
         ref="videoFlipper"
-        frontVideo="src/assets/video/M4A/110/5_1GettingStarted/M4A Protocol Getting Started.mp4"
-        backVideo="src/assets/video/M4A/110/Extra Editing Lessons/Extra Editing Lesson 1 - Outtros/Outtros.mp4"
-      />-->
+        frontVideo="https://www.youtube.com/embed/W9OmCqkHIbo?cc_load_policy=1&cc_lang_pref=en"
+        backVideo="https://www.youtube.com/embed/BWR7apurQy0?cc_load_policy=1&cc_lang_pref=en"
+      />
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -27,7 +26,8 @@
         <a href="https://www.youtube.com/watch?v=ymqh7vy3Qk8" target="_blank">Family Guy</a><br>
       </p>
 
-      <p align="left">Extra Video/SFX Lessons 1/6<br>
+      <p align="left">
+        <strong>Extra Video/SFX Lessons 1/6</strong><br>
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">VSDC Outtros (Plus missing Metal Gear number 4)</span>
         </button>
@@ -47,7 +47,6 @@
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoFlipper from '/src/components/fancy/VideoFlipper.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 
   var videoFlipper = ref()
 </script>

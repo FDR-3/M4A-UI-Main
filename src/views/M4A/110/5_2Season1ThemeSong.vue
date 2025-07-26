@@ -3,12 +3,11 @@
     <h1>Season 1 Theme Song</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
-      <!--<VideoFlipper
+      <VideoFlipper
         ref="videoFlipper"
-        frontVideo="src/assets/video/M4A/110/5_2Season1ThemeSong/Season 1 Theme Song.mp4"
-        backVideo="src/assets/video/M4A/110/Extra Editing Lessons/Extra Editing Lesson 2 - UVR/Voice Isolation.mp4"
-      />-->
+        frontVideo="https://www.youtube.com/embed/VdEr0DvuGhk"
+        backVideo="https://www.youtube.com/embed/S6wwQle7-5g?cc_load_policy=1&cc_lang_pref=en"
+      />
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -33,7 +32,8 @@
         <a href="https://www.freepik.com/free-psd/view-nature-mountain-landscape_269375113.htm#fromView=search&page=1&position=11&uuid=60aa5941-3a14-4893-9255-2b554177b284&query=giant+Mountain" target="_blank">Freepik Mountain</a><br>
       </p>
 
-      <p align="left">Extra Video/SFX Lessons 2/6<br>
+      <p align="left"><br>
+        <strong>Extra Video/SFX Lessons 2/6</strong><br>
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Isolating Voices</span>
         </button>
@@ -51,7 +51,6 @@
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoFlipper from '/src/components/fancy/VideoFlipper.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 
   var videoFlipper = ref()
 </script>

@@ -24,16 +24,20 @@
       <Column field="asset" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flex">
-              <img :src="`/src/assets/cryptoIcons/${slotProps.data.asset.image}`" style="width: 24px" />
-              <span>{{ slotProps.data.asset.name }}</span>
+            <ion-button fill="clear" @click="slotProps.data.asset.source()">
+              <component :is="slotProps.data.asset.svg" style="width: 24px"></component>
+            </ion-button>
+            <span>{{ slotProps.data.asset.name }}</span>
           </div>
         </template>
       </Column>
       <Column field="chain.name" header="Chain" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flex">
-              <img :src="`/src/assets/cryptoIcons/${slotProps.data.chain.image}`" style="width: 35px" />
-              <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
+            <ion-button fill="clear" @click="slotProps.data.chain.source()">
+              <component :is="slotProps.data.chain.svg" style="width: 35px"></component>
+            </ion-button>
+            <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
           </div>
         </template>
       </Column>
@@ -91,7 +95,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { IonLabel, IonIcon, IonTextarea } from '@ionic/vue'
+  import { IonLabel, IonIcon, IonTextarea, IonButton } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'

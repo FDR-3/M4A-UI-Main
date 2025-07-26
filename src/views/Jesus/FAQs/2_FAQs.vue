@@ -3,11 +3,14 @@
     <h1>FAQs:2</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/FAQs/FAQs2/FAQs2.mp4">
         <media-provider><track src="src/assets/video/Jesus Debate/FAQs/FAQs2/FAQs2.vtt" kind="subtitles" label="English" lang="en-US" default/></media-provider>
         <media-plyr-layout thumbnails="src/assets/video/Jesus Debate/FAQs/FAQs2/FAQs2-thumbnails.vtt"></media-plyr-layout>
       </media-player>-->
+      <iframe class="videoContainer"
+        src="https://www.youtube.com/embed/zAKNg4bOUgE?cc_load_policy=1&cc_lang_pref=en"
+        allowfullscreen
+      ></iframe>
       <NextPageButton :lastPage="true"/>
     </div>
     <div class="sources">
@@ -38,7 +41,7 @@
       <p align="left">Boon Docks:<br> 
         <a href="https://ia800501.us.archive.org/0/items/the-boondocks-4k-season-2-complete-singecku/The%20Boondocks%20%284K%29%20S2%20E07%20-%20Shinin%27.mp4" target="_blank">Source</a>
       </p>
-      <p align="left">Louis Rossman:<br> 
+      <p align="left">Louis Rossmann:<br> 
         <a href="https://www.youtube.com/watch?v=f1DvOF-giJQ" target="_blank">Source</a>
       </p>
     </div>
@@ -57,5 +60,4 @@
 <script setup lang="ts">
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 </script>

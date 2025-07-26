@@ -3,7 +3,7 @@
   import GettingStarted_5_0_0_0 from "./5_GettingStarted.vue"
   import Season1ThemeSong from "/src/views/M4A/110/5_2Season1ThemeSong.vue"
   import MenuAndTheming_6_0_0_0 from "./6_MenuAndTheming.vue"
-  import MinorSetBack from "/src/views/M4A/110/6_2MinorSetBack.vue"
+  import MinorSetback from "/src/views/M4A/110/6_2MinorSetback.vue"
   import Footer_7_0_0_0 from "./7_Footer.vue"
   import LostPlot from "/src/views/M4A/110/7_2LostPlot.vue"
   import NavBar_8_0_0_0 from "./8_NavBar.vue"
@@ -71,7 +71,7 @@
     GettingStarted_5_0_0_0,
     Season1ThemeSong, 
     MenuAndTheming_6_0_0_0,
-    MinorSetBack,
+    MinorSetback,
     Footer_7_0_0_0,
     LostPlot,
     NavBar_8_0_0_0,
@@ -140,7 +140,7 @@
     "GettingStarted_5_0_0_0",
     "Season1ThemeSong",
     "MenuAndTheming_6_0_0_0",
-    "MinorSetBack",
+    "MinorSetback",
     "Footer_7_0_0_0",
     "LostPlot",
     "NavBar_8_0_0_0",
@@ -206,67 +206,67 @@
   export const M4A110WindowsIonicVueLinks = 
   [ 
     "",//"TOC_4_0_0_0"
-    "",//"GettingStarted_5_0_0_0"
-    "",//"Season1ThemeSong_5_2"
-    "",//"MenuAndTheming_6_0_0_0"
-    "",//"MinorSetBack_6_2",
-    "",//"Footer_7_0_0_0"
-    "",//"LostPlot_7_2"
-    "",//"NavBar_8_0_0_0"
+    "https://www.youtube.com/watch?v=W9OmCqkHIbo",//"GettingStarted_5_0_0_0"
+    "https://www.youtube.com/watch?v=VdEr0DvuGhk",//"Season1ThemeSong_5_2"
+    "https://www.youtube.com/watch?v=w8z5Rqd---w",//"MenuAndTheming_6_0_0_0"
+    "https://www.youtube.com/watch?v=RruaW_Ubjg4",//"MinorSetback_6_2",
+    "https://www.youtube.com/watch?v=olL70Jb4A1I",//"Footer_7_0_0_0"
+    "https://www.youtube.com/watch?v=Y2dfqbqfbgI",//"LostPlot_7_2"
+    "https://www.youtube.com/watch?v=GKm6XzfioXY",//"NavBar_8_0_0_0"
     "https://www.youtube.com/watch?v=9IJsiBHYTFg",//"RomneyCare_8_2"
-    "",//"LilNavBar_9_0_0_0"
+    "https://www.youtube.com/watch?v=v56J4sux4qg",//"LilNavBar_9_0_0_0"
     "https://www.youtube.com/watch?v=lsAIZu-haSk",//"LuigiUntold_9_2
-    "",//"PagingSystem_10_0_0_0"
-    "",//"TrumpMessage_10_2"
-    "",//"VideoFlipper_11_0_0_0"
+    "https://www.youtube.com/watch?v=hpXOKwIRA00",//"PagingSystem_10_0_0_0"
+    "https://www.youtube.com/watch?v=gvuskhvhqrU",//"TrumpMessage_10_2"
+    "https://www.youtube.com/watch?v=h0hnb-maWw4",//"VideoFlipper_11_0_0_0"
     "https://www.youtube.com/watch?v=Ocy2mXuD3AQ",//"Legs_11_2"
-    "",//"EmbeddedVideos_12_0_0_0"
+    "https://www.youtube.com/watch?v=rfR4wt0J7q0",//"EmbeddedVideos_12_0_0_0"
     "https://www.youtube.com/watch?v=Ss-hcXms0nU",//"CanadaWantsUSCare_12_2"
-    "",//"SVGAnimation_13_0_0_0"
+    "https://www.youtube.com/watch?v=bn1OU5lQabw",//"SVGAnimation_13_0_0_0"
     "https://www.youtube.com/watch?v=cQR67WRcVUg",//"Advantage_13_2"
-    "",//"AudioFlashingSVGsAndTOC_14_0_0_0"
+    "https://www.youtube.com/watch?v=4DYIRTotjs0",//"AudioFlashingSVGsAndTOC_14_0_0_0"
     "https://www.youtube.com/watch?v=hJbzkwGkZ3E",//"Vice_14_2"
-    "",//"CommentSectionLocal1_15_0_0_0"
-    "",//"PSA_15_2"
-    "",//"CommentSectionLocal2_16_0_0_0"
+    "https://www.youtube.com/watch?v=EO1Zx5TK7E0",//"CommentSectionLocal1_15_0_0_0"
+    "https://www.youtube.com/watch?v=Q9nNYGOB47U",//"PSA_15_2"
+    "https://www.youtube.com/watch?v=5YadHiv5vaU",//"CommentSectionLocal2_16_0_0_0"
     "https://www.youtube.com/watch?v=eBMxvWBvfYA",//"Gangs_16_2"
-    "",//"CommentSectionLocal3_17_0_0_0"
+    "https://www.youtube.com/watch?v=qBndkrNAt4U",//"CommentSectionLocal3_17_0_0_0"
     "https://www.youtube.com/watch?v=UcaDoq44Lag",//"GOPJesus1_17_2"
-    "",//"WalletButton_18_0_0_0"
+    "https://www.youtube.com/watch?v=_ulpILmkMNc",//"WalletButton_18_0_0_0"_ulpILmkMNc
     "https://www.youtube.com/watch?v=j5v8D-alAKE",//"Bulbs_18_2"
-    "",//"LocalStorageEnd_19_0_0_0"
+    "https://www.youtube.com/watch?v=sFM0LCJII-E",//"LocalStorageEnd_19_0_0_0"
     "https://www.youtube.com/watch?v=SC2eSujzrUY",//"PFAs_19_2"
     "",//"ContractFrameWork_20_2"
-    "",//"SolanaCLIAnchor_21_0_0_0"
+    "https://www.youtube.com/watch?v=IvMiTlhApIM",//"SolanaCLIAnchor_21_0_0_0"
     "https://www.youtube.com/watch?v=IV3dnLzthDA",//"Killer_21_2"
-    "",//"BadContractExamplePart1_22_0_0_0"
+    "https://www.youtube.com/watch?v=lCLKcjEidHo",//"BadContractExamplePart1_22_0_0_0"
     "https://www.youtube.com/watch?v=SZ2L-R8NgrA",//"GOPJesus2_22_2"
-    "",//"BadContractExamplePart2_23_0_0_0"
+    "https://www.youtube.com/watch?v=WXKA1f0njks",//"BadContractExamplePart2_23_0_0_0"
     "https://www.youtube.com/watch?v=9ZOEtgUkpBM",//"DeepSeek_23_2"
-    "",//"CommentSectionContract_24_0_0_0"
+    "https://www.youtube.com/watch?v=KuSCVlUV6Gc",//"CommentSectionContract_24_0_0_0"
     "https://www.youtube.com/watch?v=j6uJkI9DE14",//"Lorax_24_2"
-    "",//"ProgressBarAndToast_25_0_0_0"
+    "https://www.youtube.com/watch?v=a6C7vcB2vFI",//"ProgressBarAndToast_25_0_0_0"
     "",//"MadePoll_25_2"
-    "",//"BTContractExamplePart1_26_0_0_0"
+    "https://www.youtube.com/watch?v=LIyuVgJY5qU",//"BTContractExamplePart1_26_0_0_0"
     "https://www.youtube.com/watch?v=ksjzI-8Rz2w",//"Influencer_26_2"
-    "",//BTContractExamplePart2_27_0_0_0
+    "https://www.youtube.com/watch?v=tH8ec22qElA",//BTContractExamplePart2_27_0_0_0
     "https://www.youtube.com/watch?v=UDWwxNDnPoU",//"GOPJesus3_27_2"
-    "",//"BTContractExamplePart3_28_0_0_0"
+    "https://www.youtube.com/watch?v=X7ahpWeGQ9Y",//"BTContractExamplePart3_28_0_0_0"
     "https://www.youtube.com/watch?v=25LUF8GmbFU",//"TacoBell_28_2"
-    "",//"BTContractExamplePart4_29_0_0_0"
-    "https://www.youtube.com/watch?v=mVBLLnDnt9A",//"Shrinkflation_29_2"
-    "",//"E2ETesting_30_0_0_0"
+    "https://www.youtube.com/watch?v=UfM1Stlfd6Q",//"BTContractExamplePart4_29_0_0_0"
+    "https://www.youtube.com/watch?v=H2Z-FQtezCc",//"Shrinkflation_29_2"
+    "https://www.youtube.com/watch?v=CbHuHqKdoNQ",//"E2ETesting_30_0_0_0"
     "https://www.youtube.com/watch?v=sWHxKD27XKk",//"Centrism_30_2"
-    "",//"Production_31_0_0_0"
-    "",//"Security_31_2"
+    "https://www.youtube.com/watch?v=rbFMMQce3m8",//"Production_31_0_0_0"
+    "https://www.youtube.com/watch?v=O9yIdsmaLdo",//"Security_31_2"
     "https://www.youtube.com/watch?v=wQPWdzFfPXY",//"Secure24_31_3"
-    "",//"DevnetAndFees_32_0_0_0"
+    "https://www.youtube.com/watch?v=06Qb71OtVZE",//"DevnetAndFees_32_0_0_0"
     "https://www.youtube.com/watch?v=mVBLLnDnt9A",//"JustifyCare_32_2",
-    "",//"CleanUpAndMarginFi_33_0_0_0"
+    "https://www.youtube.com/watch?v=02rvn1PvHRc",//"CleanUpAndMarginFi_33_0_0_0"
     "https://www.youtube.com/watch?v=onE2JvU6M98",//"ShareHolderMessage_33_2"
-    "",//"M4AContractWalkThrough_34_0_0_0"
-    "",//"SneakPeak_34_2"
-    "",//"ChatContractWalkThrough_35_0_0_0"
+    "https://www.youtube.com/watch?v=GUaYCxV6BIA",//"M4AContractWalkThrough_34_0_0_0"
+    "https://www.youtube.com/watch?v=X6WmJKm2vnQ",//"SneakPeak_34_2"
+    "https://www.youtube.com/watch?v=m_ZWiSUjym4",//"ChatContractWalkThrough_35_0_0_0"
     "https://www.youtube.com/watch?v=-KuztwCLaeE",//"Fascism_35_2"
     "https://www.youtube.com/watch?v=V6D5vBzDu18",//"HeavenUpThere_36_2"
     ""//"EndGame_37_2"

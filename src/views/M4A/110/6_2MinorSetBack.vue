@@ -1,14 +1,13 @@
 <template>
-  <div>
-    <h1>Minor Set Back</h1>
+  <div id="topOfPage">
+    <h1>Minor Setback</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
-      <!--<VideoFlipper
+      <VideoFlipper
         ref="videoFlipper"
-        frontVideo="src/assets/video/M4A/110/6_2MinorSetBack/Minor Set Back.mp4"
-        backVideo="src/assets/video/M4A/110/6_3MarginFiFollowUp/Margin Fi Follow Up.mp4"
-      />-->
+        frontVideo="https://www.youtube.com/embed/RruaW_Ubjg4?cc_load_policy=1&cc_lang_pref=en"
+        backVideo="https://www.youtube.com/embed/LSJ76d3bNKg?cc_load_policy=1&cc_lang_pref=en"
+      />
       <NextPageButton/>
     </div>
     <VideoVoter/>
@@ -35,7 +34,6 @@
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoFlipper from '/src/components/fancy/VideoFlipper.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-  import Uploading from '/src/components/pages/Uploading.vue'
 
   var videoFlipper = ref()
 </script>

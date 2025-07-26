@@ -2,17 +2,25 @@
   <div class="videoFlipContainer">
     <div class="videoCard" :class="flipped">
       <div class="frontVideo" :style="{display: display1stVideo}">
-        <media-player class="videoContainer" :src="frontVideo">
+        <!--<media-player class="videoContainer" :src="frontVideo">
           <media-provider><track src="" kind="subtitles" label="English" lang="en-US" default/></media-provider>
           <media-plyr-layout thumbnails=""></media-plyr-layout>
-        </media-player>
+        </media-player>-->
+          <iframe class="videoContainer"
+            :src="frontVideo"
+            allowfullscreen
+          ></iframe>
       </div>
 
       <div class="backVideo" :style="{display: display2ndVideo}">
-        <media-player class="videoContainer" :src="backVideo">
+        <!--<media-player class="videoContainer" :src="backVideo">
           <media-provider><track src="" kind="subtitles" label="English" lang="en-US" default/></media-provider>
           <media-plyr-layout thumbnails=""></media-plyr-layout>
-        </media-player>
+        </media-player>-->
+          <iframe class="videoContainer"
+            :src="backVideo"
+            allowfullscreen
+          ></iframe>
       </div>
     </div>
   </div>
@@ -69,14 +77,14 @@
   .videoFlipContainer
   {
     position: relative;
-    width: min(55vw, 1920px);
-    height: min(31vw, 1080px)
+    width: min(60vw, 1920px);
+    height: min(34vw, 1080px)
   }
 
   .videoCard
   {
     position: absolute;
-    width: min(55vw, 1920px);
+    width: min(60vw, 1920px);
     transform-style: preserve-3d;
     transition: all 0.5s ease
   }

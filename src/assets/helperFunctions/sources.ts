@@ -22,3 +22,8 @@ export function sourceUSDC()
 {
   window.open("https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNennCnoHYvGazNyBXWLJ8f2QUITcrVm6e9CiF", "_blank")
 }
+
+export function sourceSOL()
+{
+  window.open("https://logowik.com/solana-logo-vector-svg-pdf-ai-eps-cdr-free-download-19832.html", "_blank")
+}

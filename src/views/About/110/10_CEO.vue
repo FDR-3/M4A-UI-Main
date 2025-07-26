@@ -11,9 +11,9 @@
           <p>CEO Name: fdr3</p>
           <p>Ideology: <a href="https://youtu.be/J5LidElyknY?list=PLKRByY3ha6Vx9kb7GT8TQ3CuoaxMt7KIk&t=625"  target="_blank">Social Capitalist</a></p>
           <p>Other CEOs I would slap with that ideology label I just pulled out of my ass: </p>
-          <a href="https://www.youtube.com/watch?v=ikA9KkiTH-c" target="_blank"><p>Louis Rossman 1</p></a>
-          <a href="https://www.youtube.com/watch?v=apMYh0a4qXo" target="_blank"><p>Louis Rossman 2</p></a>
-          <a href="https://www.youtube.com/watch?v=dibEZ9-Psss" target="_blank"><p>Louis Rossman 3</p></a>
+          <a href="https://www.youtube.com/watch?v=ikA9KkiTH-c" target="_blank"><p>Louis Rossmann 1</p></a>
+          <a href="https://www.youtube.com/watch?v=apMYh0a4qXo" target="_blank"><p>Louis Rossmann 2</p></a>
+          <a href="https://www.youtube.com/watch?v=dibEZ9-Psss" target="_blank"><p>Louis Rossmann 3</p></a>
           <a href="https://www.youtube.com/watch?v=qw2nx-I-jAA" target="_blank"><p>Mark Cuban</p></a>
           <a href="https://youtu.be/1SjhXC43Pwk?t=718" target="_blank"><p>Okay, signing up for a nazi party is a bad look Mark<br>I'M A NEED YOU TO LOCK THE FUCK IN!!!!</p></a>
 
