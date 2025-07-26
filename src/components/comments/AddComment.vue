@@ -62,7 +62,7 @@
       <ion-text>Any advice on improving the code or processes for the customer experience would be greatly appreciated. You do not have to be a software developer to have a great idea or to give <b>"constructive"</b> critism.<br> 
         Asking questions not directly derived from the website content may not receive a response
         <ion-button fill="clear" @click="giveSadSadPepeFeelsBadManCredit()">
-          <FeelsBadSVG style="width: min(10vw, 50px); height: min(10vw, 55px)"/>
+          <FeelsBadSVG style="width: min(10vw, 50px); height: min(10vw, 55px)" class="nMediumMarginLeft"/>
         </ion-button>
         <br>ie. Asking how to do something specific to your project that wasn't already done in this one. A random commentor might respond though.
       </ion-text>
@@ -76,7 +76,7 @@
       </ion-text>
  
       <span class="flexCenterRow">$0.01
-        <ion-button fill="clear" @click="sourceUSDC()" class="nMediumMarginLeft">
+        <ion-button fill="clear" @click="sourceUSDC()" class="nSmallMarginLeft">
           <USDCSVG class="svgSize"/>
         </ion-button>
       </span>

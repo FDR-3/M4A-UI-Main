@@ -20,6 +20,12 @@
         <a href="https://www.gyan.dev/ffmpeg/builds/" target="_blank">FFMPEG</a><br>
       </p>
     </div>
+    <div class="sources">
+      <h1>Video Responses</h1>
+      <p align="left">Links<br>
+        <a href="https://www.youtube.com/watch?v=e2HbHq0wmeU" target="_blank" class="rainbowText">Can You Use YT-DLP To Grab LinkedIn Videos?</a><br>
+      </p>
+    </div>
   </div>
 </template>
 

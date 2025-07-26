@@ -14,9 +14,9 @@
       <template #header>
         <div>
           <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ adminAccounts.singlePayerBalance.toLocaleString() }}</span></h2>
-          <ion-textarea color="dark" v-model="filters['global'].value" fill="outline" placeholder="Treasury Search     ">
+          <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Treasury Search     ">
               <ion-icon slot="start" :icon="search"></ion-icon>
-          </ion-textarea>
+          </ion-input>
           <br><ion-label id="tableTitle">Stable Coins</ion-label>
         </div>
       </template>
@@ -95,7 +95,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { IonLabel, IonIcon, IonTextarea, IonButton } from '@ionic/vue'
+  import { IonLabel, IonIcon, IonInput, IonButton } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'

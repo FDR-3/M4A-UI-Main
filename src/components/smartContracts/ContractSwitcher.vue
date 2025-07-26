@@ -233,12 +233,12 @@
     hospitalStats.data = await getHospitalStats()
     hospitals.data = await getAllHospitals() 
     await listenForHospitalStatChanges()
-
+    */
     //M4A Insurance Company Stats
-    insuranceCompanyStats.data = await getInsuranceCompanyStats()
+    //insuranceCompanyStats.data = await getInsuranceCompanyStats()
     insuranceCompanies.data = await getAllInsuranceCompanies()
-    await listenForInsuranceCompanyStatChanges()
-
+    //await listenForInsuranceCompanyStatChanges()
+    /*
     //Used so all processors can listen to when a new state is initialized
     currentStateAccountTotal = anchorPrograms.stateAccountTotal
 
