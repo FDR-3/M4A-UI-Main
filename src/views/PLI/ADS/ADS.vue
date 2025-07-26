@@ -6,7 +6,7 @@
         <media-plyr-layout thumbnails=""></media-plyr-layout>
       </media-player>-->
       <iframe class="videoContainer"
-        src="https://www.youtube.com/embed/jrgh4FM4Kn0?cc_load_policy=1&cc_lang_pref=en"
+        src="https://www.youtube.com/embed/jrgh4FM4Kn0"
         allowfullscreen
       ></iframe>
   </div>

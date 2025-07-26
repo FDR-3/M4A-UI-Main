@@ -1,6 +1,6 @@
 <template>
     <div>
-    <h1>FAQs:2</h1>
+    <h1>FAQs2: Is it wrong to follow Jesus?</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/FAQs/FAQs2/FAQs2.mp4">

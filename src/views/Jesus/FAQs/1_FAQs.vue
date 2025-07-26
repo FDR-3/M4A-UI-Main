@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>FAQs:1</h1>
+    <h1>FAQs1: Should you always honor your mother and father?</h1>
     <h2 style="margin-top: -10px">(And so the lord spake onto thee, and said, "You had-eth, but one job!")</h2>
     <div class="flexCenterRow">
       <PrevPageButton/>
