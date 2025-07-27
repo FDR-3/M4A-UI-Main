@@ -8,7 +8,7 @@
         <media-plyr-layout thumbnails=""></media-plyr-layout>
       </media-player>-->
       <iframe class="videoContainer"
-        src="https://www.youtube.com/embed/zLmZjpQK0Tw?cc_load_policy=1&cc_lang_pref=en"
+        src="https://www.youtube.com/embed/bUPx6rl-fEA?cc_load_policy=1&cc_lang_pref=en"
         allowfullscreen
       ></iframe>
       <NextPageButton/>
@@ -27,6 +27,10 @@
         <a href="https://www.pokemon.com/us/pokedex/jigglypuff" target="_blank">Jigglypuff</a><br>
         <a href="https://www.youtube.com/watch?v=ZXsQAXx_ao0" target="_blank">Shia Labeouf, Just Do It!</a><br>
       </p>
+      <p class="underLine">Selectors</p>
+        <p align="left">Open next thumbnail selector: f":nth-child({nextVideoToCheck}) > #content > .ytd-rich-item-renderer > #dismissible > :nth-child(1) > ytd-thumbnail.style-scope > #thumbnail > yt-image.style-scope > .yt-core-image"</p>
+        <p align="left">Show transcript selector: "#structured-description > :nth-child(2) > ytd-video-description-transcript-section-renderer.style-scope > #button-container > #primary-button > .style-scope > yt-button-shape > .yt-spec-button-shape-next > yt-touch-feedback-shape > .yt-spec-touch-feedback-shape > .yt-spec-touch-feedback-shape__fill"</p>
+      
     </div>
   </div>
 </template>
