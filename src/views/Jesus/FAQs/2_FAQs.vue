@@ -23,7 +23,7 @@
         <a href="https://www.youtube.com/watch?v=aJGz0VX4A04" target="_blank">Why Dave Nimby is a Nimby1</a><br>
         <a href="https://www.youtube.com/watch?v=673Dy9FgyGk" target="_blank">Why Dave Nimby is a Nimby2</a><br>
       </p>
-      <p align="left">Kyle Kulinski Show:<br>
+      <p align="left">The Kyle Kulinski Show:<br>
         <a href="https://www.youtube.com/watch?v=n7mRC4efJdg" target="_blank">Source 1</a><br>
         <a href="https://www.youtube.com/watch?v=TZ0Q5Gnzk2M" target="_blank">Source 2</a><br>
         <a href="https://www.youtube.com/watch?v=jQESa88NIjU" target="_blank">Source 3</a><br>

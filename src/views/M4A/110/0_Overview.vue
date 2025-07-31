@@ -28,10 +28,10 @@
         <a href="https://www.youtube.com/watch?v=ct9MxZHakBQ" target="_blank">RDCworld1</a><br>
         <a href="https://www.youtube.com/watch?v=syzRO9KDQpk" target="_blank">Jet Jet Theh Jet plalq</a><br>
         <a href="https://www.youtube.com/watch?v=4ugz2iViV2E" target="_blank">Kyle Kulinski Show1</a><br>
-        <a href="https://www.youtube.com/watch?v=BYwQW23vnmM" target="_blank">Kyle Kulinski Show 2</a><br>
+        <a href="https://www.youtube.com/watch?v=BYwQW23vnmM" target="_blank">The Kyle Kulinski Show 2</a><br>
         <a href="https://www.youtube.com/watch?v=8WYsrYslG20" target="_blank">Rational National</a><br>
         <a href="https://www.youtube.com/watch?v=2CNbOpOMdak" target="_blank">Majority Report</a><br>
-        <a href="https://www.myinstants.com/en/instant/metal-gear-solid-alert/" target="_blank">Metal Gear Sound Alert</a><br>
+        <a href="https://www.myinstants.com/en/instant/metal-gear-solid-alert/" target="_blank">Myinstants: Metal Gear Sound Alert</a><br>
         <a href="https://www.youtube.com/watch?v=THRx1F_D-Kw" target="_blank">Hasan Piker 1</a><br>
         <a href="https://www.youtube.com/watch?v=BR7CHH0LjUs" target="_blank">Hasan Piker 2</a><br>
         <a href="https://www.youtube.com/watch?v=fiVr34QCF_c" target="_blank">Spaghetti</a><br>

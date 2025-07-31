@@ -10,8 +10,9 @@
   import SeleniumBot_10 from "/src/views/Jesus/110/0_Windows/10_SeleniumBot.vue"
   import APIBot_11 from "/src/views/Jesus/110/0_Windows/11_APIBot.vue"
   import VSDC_12 from "/src/views/Jesus/110/0_Windows/12_VSDC.vue"
-  import PastorDropKick_13 from "/src/views/Jesus/110/0_Windows/13_PastorDropKick.vue"
-  import ThisIsACall_14 from "/src/views/Jesus/110/0_Windows/14_ThisIsACall.vue"
+  import Fired_13 from "/src/views/Jesus/110/0_Windows/13_Fired.vue"
+  import PastorDropKick_14 from "/src/views/Jesus/110/0_Windows/14_PastorDropKick.vue"
+  import ThisIsACall_15 from "/src/views/Jesus/110/0_Windows/15_ThisIsACall.vue"
 
   export const Jesus110WindowsPages = 
   [
@@ -26,8 +27,9 @@
     SeleniumBot_10,
     APIBot_11,
     VSDC_12,
-    PastorDropKick_13,
-    ThisIsACall_14
+    Fired_13,
+    PastorDropKick_14,
+    ThisIsACall_15
   ]
 
   export default Jesus110WindowsPages

@@ -14,7 +14,7 @@
               </ion-label>
 
               <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
-                fdr3
+                fdr-3
               </ion-label>
             </div>
           </ion-button>
@@ -212,7 +212,7 @@
               </ion-label>
 
               <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
-                fdr3
+                fdr-3
               </ion-label>
             </div>
           </ion-button>

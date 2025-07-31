@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Selenium Youtube Scraping 9/11</h1>
+    <h1>Selenium Youtube Scraping 9/12</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/10_SeleniumBot/Selenium Bot.mp4">
@@ -19,7 +19,7 @@
         <a href="https://code.visualstudio.com/" target="_blank">VS Code</a><br>
         <a href="https://googlechromelabs.github.io/chrome-for-testing/#stable" target="_blank">Download Chrome Browser & Web Driver (To download a driver, you can open the zip file link in another browser tab)</a><br>
         <a href="https://www.youtube.com/watch?v=ofw2RsOb7h0" target="_blank">Devil Artemis</a><br>
-        <a href="https://www.youtube.com/watch?v=cPuPqObRQgc" target="_blank">Kyle Kulinski Show</a><br>
+        <a href="https://www.youtube.com/watch?v=cPuPqObRQgc" target="_blank">The Kyle Kulinski Show</a><br>
         <a href="https://ia600508.us.archive.org/4/items/The-Boondocks-Season3-Complete-4K-Singecku/The%20Boondocks%20%284K%29%20S3%20E09%20-%20A%20Date%20With%20the%20Booty%20Warrior.mp4" target="_blank">Boondocks</a><br>
         <a href="https://www.amazon.com/Ketchum-League-Expo-Embroidered-Mesh/dp/B01KIY9T7W/ref=sr_1_29?sr=8-29" target="_blank">Ash Hats</a><br>
         <a href="https://www.youtube.com/watch?v=nyrWAHlqrOE" target="_blank">Jiggly Puff SFX</a><br>

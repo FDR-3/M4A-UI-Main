@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Overview 1/11</h1>
+    <h1>Overview 1/12</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/0_Overview/Just a Debate About Jesus.mp4">
@@ -24,7 +24,7 @@
         <a href="https://www.youtube.com/watch?v=jh76UkE3jB0" target="_blank">Acts</a><br>
         <a href="https://www.youtube.com/watch?v=PIZpD3fMPh0" target="_blank">Romans</a><br>
       </p>
-      <p align="left">Kyle Kulinski Show:<br>
+      <p align="left">The Kyle Kulinski Show:<br>
         <a href="https://www.youtube.com/watch?v=mH3h9K0iAGg" target="_blank">Source 1</a><br>
         <a href="https://www.youtube.com/watch?v=qkl_PefewXc" target="_blank">Source 2/3</a><br>
         <a href="https://www.youtube.com/watch?v=xGCKL4PzNL0" target="_blank">Source 4</a><br>

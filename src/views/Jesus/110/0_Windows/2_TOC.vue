@@ -19,6 +19,7 @@
     <ion-button color="dark" @click="pageSelect(10)">9-Selenium Youtube Scraping</ion-button>
     <ion-button color="dark" @click="pageSelect(11)">10-API Youtube Scraping</ion-button>
     <ion-button color="dark" @click="pageSelect(12)">11-VSDC Video Editing Software</ion-button>
+    <ion-button color="dark" @click="pageSelect(13)">12-Illegally Fired In Retaliation</ion-button>
   </div>
 </template>
 

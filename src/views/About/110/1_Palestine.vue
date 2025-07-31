@@ -24,16 +24,16 @@
         <a href="https://www.google.com/imgres?q=germany%20before%20ww1%20versus%20after%20ww1&imgurl=https%3A%2F%2Fi.ytimg.com%2Fvi%2FulCXA70pYHA%2Fhq720.jpg%3Fsqp%3D-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD%26rs%3DAOn4CLB7Zou6CvaUogXRfNRBe1YGePh0Cg&imgrefurl=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DulCXA70pYHA&docid=XIhUYBNKN08t7M&tbnid=WwicMqbOLl1OqM&vet=12ahUKEwjrwNqE7LeMAxUinokEHTejNwIQM3oECBkQAA..i&w=686&h=386&hcb=2&ved=2ahUKEwjrwNqE7LeMAxUinokEHTejNwIQM3oECBkQAA" target="_blank">Germany Post WWI</a><br>
         <a href="https://imgs.search.brave.com/p5kFt3jV9lTrfseN7W76viMoK7qjFSStMfsV97BJEhM/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bmF0aW9uc29ubGlu/ZS5vcmcvbWFwcy9z/b3ZpZXQtdW5pb24t/bWFwLmpwZw" target="_blank">Soviet Union</a><br>
         <a href="https://imgs.search.brave.com/J-foNXyRYTqYsvyd9MRm9zr2G8ypbBCDyre8FYDqeZo/rs:fit:860:0:0:0/g:ce/aHR0cDovL3lvdXJj/aGlsZGxlYXJucy5j/b20vb25saW5lLWF0/bGFzL2ltYWdlcy9j/b2xkLXdhci1tYXAu/Z2lm.gif" target="_blank">Russia</a><br>
-        <a href="https://www.youtube.com/watch?v=xRAjqJYVB8E" target="_blank">Kyle Kulinski Show 1</a><br>
-        <a href="https://www.youtube.com/watch?v=4RFnyNs9vkM" target="_blank">Kyle Kulinski Show 2</a><br>
+        <a href="https://www.youtube.com/watch?v=xRAjqJYVB8E" target="_blank">The Kyle Kulinski Show 1</a><br>
+        <a href="https://www.youtube.com/watch?v=4RFnyNs9vkM" target="_blank">The Kyle Kulinski Show 2</a><br>
         <a href="https://www.youtube.com/watch?v=jMWAMgw8780" target="_blank">bill maher Being A Dumb Islamaphobic Bigot Like Always</a><br>
         <a href="https://imgs.search.brave.com/9bFM7k5Nwnmj1tDR4jgiks8DXCQjyxBHkWU5HnmuvYU/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTky/ODAxMzg2Mi9waG90/by8xNS1qYW51YXJ5/LTIwMjQtcGFsZXN0/aW5pYW4tdGVycml0/b3JpZXMtZ2F6YS1j/aXR5LWEtZ2VuZXJh/bC12aWV3LW9mLXRo/ZS1kZXN0cnVjdGlv/bi1pbi10aGUuanBn/P3M9NjEyeDYxMiZ3/PTAmaz0yMCZjPVhQ/ekRaall4d1hTamcy/ZkV3QmZuR0FKMUZF/cFUydVJsZkhSNnBf/dUs4elk9" target="_blank">Gaza <span class="emojiText">😢</span></a><br>
         <a href="https://imgs.search.brave.com/y6QVMK4cqzPmMUKJDUCQM15rr1-vy-WeCzir2CE9HmI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvNjEz/NDk2MTQ0L3Bob3Rv/L3RocmVlLWFieXNz/aW5pYW4tc2xhdmVz/LWluLWNoYWlucy5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/MWc0aW1aTmIwVHZ1/TW1sWDV0UjdNZDhH/MS1pVmhvQkhoMFpS/VTJHZERyND0" target="_blank">bill maher Wants Them To Condemn Hummus</a><br>
-        <a href="https://www.youtube.com/watch?v=yrJZ61gwi-Q" target="_blank">Kyle Kulinski Show 3</a><br>
+        <a href="https://www.youtube.com/watch?v=yrJZ61gwi-Q" target="_blank">The Kyle Kulinski Show 3</a><br>
         <a href="https://www.youtube.com/watch?v=N0l9Nuw82Qg" target="_blank">Breaking Points</a><br>
         <a href="https://www.youtube.com/watch?v=jlRKOVBSSi0" target="_blank">King obama's Crown</a><br>
         <a href="https://media.gettyimages.com/id/488089013/photo/us-president-barack-obama-laughs-as-he-listens-performer-joel-mchale-telling-jokes-during-the.jpg?s=612x612&w=0&k=20&c=QH8b7iGhq5oOdmU7jr9zClIP_OBvXXdugDD2p93lw3k=" target="_blank">King obama With His Turkey Ass Neck</a><br>
-        <a href="https://www.youtube.com/watch?v=1HHrJ963MMU" target="_blank">Kyle Kulinski Show 4</a><br>
+        <a href="https://www.youtube.com/watch?v=1HHrJ963MMU" target="_blank">The Kyle Kulinski Show 4</a><br>
         <a href="https://www.youtube.com/shorts/ksAC0iWbqdI" target="_blank">Like a Palestinian</a><br>
         <a href="https://www.youtube.com/watch?v=5oNcHS0c5W8" target="_blank">Let me be clear</a><br>
         <a href="https://gifdb.com/images/high/angry-cat-typing-t5o9zj8q393y1tkc.webp" target="_blank">Angry typing cat gif</a><br>
@@ -56,8 +56,8 @@
       </p>
       <p align="left" class="rainbowText">Extra<br>
         <a href="https://www.youtube.com/watch?v=pHo7hyEczg0" target="_blank">The Grayzone - Leaked AIPAC audio, leaders detail their control over the United Health Hugger Administration</a><br>
-        <a href="https://www.youtube.com/watch?v=OhJLsH1Nzr0" target="_blank">Kyle Kulinski Show - israel's Plan To End Free Speech In The U.S. - Code Named Project Esther</a><br>
-        <a href="https://www.youtube.com/watch?v=xAn59Ml5eM4" target="_blank">Kyle Kulinski Show - israel Funds And Arms I.S.I.S.</a><br>
+        <a href="https://www.youtube.com/watch?v=OhJLsH1Nzr0" target="_blank">The Kyle Kulinski Show - israel's Plan To End Free Speech In The U.S. - Code Named Project Esther</a><br>
+        <a href="https://www.youtube.com/watch?v=xAn59Ml5eM4" target="_blank">The Kyle Kulinski Show - israel Funds And Arms I.S.I.S.</a><br>
         <a href="https://www.youtube.com/watch?v=tSQV2_55IWU" target="_blank">Humanist Report - I FUCKING DARE YOU, YOU LIMP DICK WANNA BE DICTATOR!!!!</a><br>
         <a href="https://www.youtube.com/watch?v=IAa2iym2Wv0" target="_blank">uncivilized - <span class="emojiText">🤡</span>Boycott the shit out of McDonalds and Starbucks<span class="emojiText">🤡</span></a><br>
         <a href="https://www.youtube.com/watch?v=BoYRxZ33E-E" target="_blank">Rathbone - Facts don't give a fuck about Ben Shapiro's feelings 1</a><br>

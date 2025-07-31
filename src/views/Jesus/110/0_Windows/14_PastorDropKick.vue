@@ -14,7 +14,7 @@
     </div>
     <div class="sources">
       <h1>Sources</h1>
-      <p align="left">Kyle Kulinski Show:<br>
+      <p align="left">The Kyle Kulinski Show:<br>
         <a href="https://www.youtube.com/embed/an-KvOdvEB8" target="_blank">Source</a><br>
       </p>
     </div>

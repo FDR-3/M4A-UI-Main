@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Radiant Media Player Thumbnails 7/11</h1>
+    <h1>Radiant Media Player Thumbnails 7/12</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/8_RadiantMediaPlayer/RadiantMediaPlayer.mp4">

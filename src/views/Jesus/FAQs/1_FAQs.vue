@@ -22,7 +22,7 @@
         <a href="https://www.youtube.com/watch?v=QbYzEnYmATM" target="_blank">Matthew</a><br>
         <a href="https://www.youtube.com/watch?v=wrdYjcCVrfw" target="_blank">John</a><br>
       </p>
-      <p align="left">Kyle Kulinski Show:<br>
+      <p align="left">The Kyle Kulinski Show:<br>
         <a href="https://www.youtube.com/watch?v=8Cum8c_jflk" target="_blank">Source 1</a><br>
         <a href="https://www.youtube.com/watch?v=qkl_PefewXc" target="_blank">Source 2</a><br>
         <a href="https://www.youtube.com/watch?v=y5T8CzStTYM" target="_blank">Source 3</a><br>
