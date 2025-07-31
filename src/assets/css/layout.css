@@ -110,6 +110,11 @@ h3, h4
   margin-left: 15px
 }
 
+.nMediumSmallMarginLeft
+{
+  margin-left: -15px
+}
+
 .mediumSmallMarginBottom
 {
   margin-bottom: 15px

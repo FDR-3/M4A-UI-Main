@@ -20,6 +20,7 @@
         <a href="https://icons8.com/icon/YfCbGWCWcuar/x" target="_blank">Icons8 Twitter</a><br>
         <a href="https://www.svgrepo.com/svg/512317/github-142" target="_blank">SVG Repo Github</a><br>
         <a href="https://www.svgrepo.com/svg/508999/youtube" target="_blank">SVG Repo Youtube</a><br>
+        <a href="https://www.svgrepo.com/svg/473806/tiktok" target="_blank">SVG Repo TikTok</a><br>
         <a href="https://c.tenor.com/x8v1oNUOmg4AAAAd/tenor.gif" target="_blank">Rick Roll GIF</a><br>
         <a href="https://www.pngtosvg.com/" target="_blank">Png to SVG</a><br>
       </p>

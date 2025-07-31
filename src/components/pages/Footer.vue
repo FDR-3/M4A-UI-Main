@@ -44,6 +44,9 @@
           <ion-button title="Youtube" fill="clear" @click="openYoutube()">
             <Youtube id="youtubeIcon" class="footerIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
           </ion-button>
+          <ion-button title="TikTok" fill="clear" @click="openTikTok()" class="nMediumSmallMarginLeft">
+            <TikTok id="tikTokIcon" class="footerIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+          </ion-button>
         </div>
       </div>
 
@@ -60,8 +63,8 @@
   import Twitter from '/src/assets/svg/twitter-svg.vue'
   import Github from '/src/assets/svg/github-svg.vue'
   import Youtube from '/src/assets/svg/youtube-link-svg.vue'
+  import TikTok from '/src/assets/svg/tiktok-svg.vue'
   
-
   var memeReady = ref(false)
 
   function openCopyLeftInfo()
@@ -87,6 +90,11 @@
   function openYoutube()
   {
     window.open("https://www.youtube.com/@fdr-3", "_blank")
+  }
+
+  function openTikTok()
+  {
+    window.open("https://www.tiktok.com/@franklin40727", "_blank")
   }
 </script>
 
@@ -117,8 +125,8 @@
 
   #mediaButtonsContainer
   {
-    width: 150px;
-    margin-right: -15px
+    width: 206px;
+    margin-right: -35px
   }
 
   #githhubIcon
@@ -151,7 +159,7 @@
     }
   }
 
-  @media screen and (min-width: 485px) and (max-width: 815.9px)
+  @media screen and (min-width: 506px) and (max-width: 815.9px)
   { 
     #footerContainer
     {
@@ -186,7 +194,7 @@
     
   }
 
-  @media screen and (max-width: 484.9px) 
+  @media screen and (max-width: 505.9px) 
   { 
     #footerContainer
     {
