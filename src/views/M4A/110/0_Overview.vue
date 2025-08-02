@@ -14,6 +14,7 @@
       <NextPageButton/>
     </div>
     <VideoVoter/>
+    <!--<ion-button color="dark" @click="giveMeMyDamnMoneyBack()">Unstake LST From Margin Fi :\</ion-button>-->
     <div class="sources">
       <h1>Sources</h1>
       <p align="left">Links<br>
@@ -60,4 +61,49 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
+
+  import { inject } from 'vue'
+  import { IonButton } from '@ionic/vue'
+  import { PublicKey, StakeProgram, LAMPORTS_PER_SOL, Transaction } from "@solana/web3.js"
+  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { confirmChatTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+
+  const toast = inject('toast')
+
+  async function giveMeMyDamnMoneyBack()
+  {
+    try
+    {
+      const transaction = new Transaction().add(
+        StakeProgram.withdraw({
+          stakePubkey: new PublicKey("AQD4Qb1cSJe6tePsF4bhZ2nzDTYtrj73jjcnrU9MeiN7"),
+          authorizedPubkey: new PublicKey("Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg"),
+          toPubkey: new PublicKey("Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg"),
+          lamports: LAMPORTS_PER_SOL * 2.010029569// Specify the amount of SOL to withdraw (in lamports)
+        })
+      )
+
+      // 4. Fetch the latest blockhash and set it on the transaction.
+      const latestBlockhash = await anchorPrograms.chat.provider.connection.getLatestBlockhash()
+      transaction.recentBlockhash = latestBlockhash.blockhash
+      transaction.feePayer = anchorPrograms.chat.provider.wallet.publicKey
+
+      // 5. Sign the transaction using the wallet provider.
+      // This will open the wallet's UI for the user to approve the transaction.
+      const signedTransaction = await anchorPrograms.chat.provider.wallet.signTransaction(transaction)
+
+      // 6. Send the signed transaction to the network.
+      // We get the signature back, which can be used to track the transaction.
+      const signature = await anchorPrograms.chat.provider.connection.sendRawTransaction(
+        signedTransaction.serialize()
+      )
+
+      // 7. Confirm the transaction to ensure it was processed on-chain.
+      await confirmChatTransaction(signature, toast, "withdraw_stake")
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "withdraw_stake")
+    }
+  }
 </script>
