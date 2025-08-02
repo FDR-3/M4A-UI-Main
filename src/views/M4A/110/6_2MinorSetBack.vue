@@ -22,6 +22,7 @@
         <button id="videoFlipButton" @click="videoFlipper.flipVideo()" :disabled=videoFlipper?.flipping>
           <span class="rainbowText">Follow Up Video</span>
         </button>
+        <br><a href="https://www.youtube.com/watch?v=XTgzRwUYpPI" target="_blank">Conclusion Video</a>
       </p>
 
     </div>
