@@ -1,12 +1,12 @@
 button, ion-button, ion-menu-button
 {
-  --background-hover-opacity: 0
+  --background-hover-opacity: 0 !important
 }
 
 button:hover, ion-menu-button:hover, ion-button:hover, a:hover   
 {
-  opacity: 0.61;
-  transition: opacity 0.1s ease-in-out 
+  opacity: 0.61 !important;
+  transition: opacity 0.1s ease-in-out !important
 }
 
 ion-popover::part(backdrop) 
