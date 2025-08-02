@@ -10,6 +10,7 @@
         <div class="standardFontSize">
           <p>Name: xavier dillard</p>
           <p>CEO Name: fdr-3</p>
+          <p>Email: fdr3@m4a.io</p>
           <a href="https://www.youtube.com/watch?v=7sT6JFPbjPA" target="_blank"><p>How I was illegally fired in retaliation</p></a>
           <p>Ideology: <a href="https://youtu.be/J5LidElyknY?list=PLKRByY3ha6Vx9kb7GT8TQ3CuoaxMt7KIk&t=625"  target="_blank">Social Capitalist</a></p>
           <p>Other CEOs I would slap with that ideology label I just pulled out of my ass: </p>
