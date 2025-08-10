@@ -9,7 +9,7 @@
   font-family: 'SansPlate';
   font-style: normal;
   font-weight: normal;
-  src: url('https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNyKneWxk1DwzQoq92jgSYiWLcApxTKlkFJ65R')
+  src: url('/sans-plate-caps.regular.ttf')
 }  
 
 @font-face 
@@ -17,7 +17,7 @@
   font-family: 'MetalGear';
   font-style: normal;
   font-weight: normal;
-  src: url('https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNEXupPTrKustIf5Q7FrS3ZqMDd6eahcUy8ni0')
+  src: url('/metal-gear.ttf')
 }
 
 @font-face 
@@ -25,7 +25,7 @@
   font-family: 'SuperMagic';
   font-style: normal;
   font-weight: normal;
-  src: url('https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNcIQAgHeG7KCJSLN0BH1upErbVeQaWMq2oIdX')
+  src: url('/SuperMagic.ttf')
 }  
 
 .content 

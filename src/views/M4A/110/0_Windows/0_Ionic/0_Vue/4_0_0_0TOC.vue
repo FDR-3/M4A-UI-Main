@@ -36,7 +36,7 @@
     <ion-button color="dark" @click="pageSelect(50)">24-Better Contract Example Part3</ion-button>
     <ion-button color="dark" @click="pageSelect(52)">25-Better Contract Example Part4</ion-button>
     <ion-button color="dark" @click="pageSelect(54)">26-End to End Testing</ion-button>
-    <ion-button color="dark" @click="pageSelect(57)">27-Production</ion-button>
+    <ion-button color="dark" @click="pageSelect(56)">27-Production</ion-button>
     <ion-button color="dark" @click="pageSelect(59)">28-Devnet & Fees</ion-button>
     <ion-button color="dark" @click="pageSelect(61)">29-Clean Up & MarginFi</ion-button>
     <ion-button color="dark" @click="pageSelect(63)">30-M4A Contract Walk Through</ion-button>

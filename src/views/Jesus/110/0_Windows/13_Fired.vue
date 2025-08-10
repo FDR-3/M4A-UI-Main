@@ -7,10 +7,7 @@
         <media-provider><track src="" kind="subtitles" label="English" lang="en-US" default/></media-provider>
         <media-plyr-layout thumbnails=""></media-plyr-layout>
       </media-player>-->
-      <iframe class="videoContainer"
-        src="https://mega.nz/embed/sAhkTCYB#Hj-5uJzek8ghx1_G2XPIJ3wJyGh3v-7_TuBIdIWs9ZI"
-        allowfullscreen
-      ></iframe>
+      <iframe class="videoContainer" src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2F61578948853626%2Fvideos%2F757643450009117%2F&show_text=false&width=560&t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
       
       <!--<iframe class="videoContainer"
         src="https://www.youtube.com/embed/7sT6JFPbjPA?cc_load_policy=1&cc_lang_pref=en"
@@ -25,6 +22,7 @@
         and had it taken down. I've contacted youtube about how this was a recording of them committing a crime
         to have it put back up, but I've also created this new link in the mean time. Can you imagine a criminal complaining about you recording their illegal activities and wanting the video of their crimes down for privacy? XD Nah
       </p>
+      <p>And of course google doesn't help and doesn't give a reason why, lol. Welp, posted on facebook now.</p>
     </div>
     <div class="sources">
       <h1>Sources</h1>

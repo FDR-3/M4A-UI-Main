@@ -1,17 +1,17 @@
 <template>
   <br id="topOfCountDown">
   <div>
-    <CountDownSVG id="countDownSVG" :fill="darkTheme.value ? '#FFFFFF' : '#000000'" slot="icon-only"/>
-    <!--<ion-text  class="metal countDownLine1">
-      <span class="metal countDownLine1 letterSpace2px">F</span>i<span class="metal countDownLine1 letterSpace7px">n</span><span class="metal countDownLine1 letterSpace2px">a</span>l 
-      Co<span class="metal countDownLine1 letterSpace1px">u</span>nt
+    <!--<CountDownSVG id="countDownSVG" :fill="darkTheme.value ? '#FFFFFF' : '#000000'" slot="icon-only"/>-->
+    <ion-text  class="metal countDownLine1">
+      <span class="metal countDownLine1 letterSpace3px">F</span>i<span class="metal countDownLine1 letterSpace7px">n</span><span class="metal countDownLine1 letterSpace2px">a</span>l 
+      Co<span class="metal countDownLine1 letterSpace1px">u</span>nT
       <span class="metal countDownLine1 letterSpace7px">D</span><span class="metal countDownLine1 letterSpace8px">o</span><span class="metal countDownLine1 letterSpace1px">w</span>n
     </ion-text><br>
     <ion-text class="metal countDownLine2">
-      <span class="metal countDownLine2 letterSpace3px">S</span><span class="metal countDownLine2 letterSpace1px">o</span><span class="metal countDownLine2 letterSpace2px">u</span>th
+      <span class="metal countDownLine2 letterSpace3px">S</span><span class="metal countDownLine2 letterSpace1px">o</span><span class="metal countDownLine2 letterSpace2px">u</span>Th
       <span class="metal countDownLine2 letterSpace11px">C</span><span class="metal countDownLine2 letterSpace2px">a</span>r<span class="metal countDownLine2 letterSpace0px">o</span>li<span class="metal countDownLine2 letterSpace12px">n</span>a
-      <br><span class="metal countDownLine2 letterSpace1px">B</span><span class="metal countDownLine2 letterSpace1px">E</span>TA
-    </ion-text>-->
+      <br><span class="metal countDownLine2 letterSpace8px">B</span><span class="metal countDownLine2 letterSpace1px">E</span>TA
+    </ion-text>
     <br>
     <ion-text class="countDownLine3">
       Days {{ daysLeft }}<br> Hours {{ hoursLeft }}<br> Minutes {{ minutesLeft }}<br> Seconds {{ secondsLeft }}<br> Miliseconds {{ milisecondsLeft }}
