@@ -63,7 +63,8 @@
         <a href="https://www.youtube.com/watch?v=BoYRxZ33E-E" target="_blank">Rathbone - Facts don't give a fuck about Ben Shapiro's feelings 1</a><br>
         <a href="https://www.youtube.com/watch?v=v81Z7Eutbx4" target="_blank">Rathbone - Facts don't give a fuck about Ben Shapiro's feelings 2</a><br>
         
-        <a href="https://www.youtube.com/watch?v=wu1dxQWCoNg" target="_blank">Rathbone - "Leftist" who lost all creditability...<span class="shit">💩</span>David Fucking Pakman<span class="shit">💩</span>!!!!</a><br>
+        <a href="https://www.youtube.com/watch?v=zDCb-8D2ey4" target="_blank">Rathbone - "Leftist" who lost all creditability...<span class="shit">💩</span>David Fucking Pakman<span class="shit">💩</span>!!!!</a><br>
+        <!--https://www.youtube.com/watch?v=wu1dxQWCoNg-->
         <a href="https://www.youtube.com/watch?v=4_S9UATrUeg" target="_blank">Good Politic Guy - joe Raisinette biden's Legacy</a><br>
         <a href="https://www.youtube.com/watch?v=WFmRQS3B66s" target="_blank">Good Politic Guy - The Apartheid state of israel Bombing More Aid Workers!!!!</a><br>
       </p>
