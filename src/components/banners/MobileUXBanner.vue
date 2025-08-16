@@ -9,10 +9,9 @@
     <div align="center" style="padding: 10px; padding-top: 0px;">
       <ion-text>For the current best mobile experience, use the web browser native to your wallet phone app.</ion-text><br>
       <ion-text>IE: Use the phantom app with its web broswer (currently under the search magnifying glass) instead of the Brave or Chrome phone apps.</ion-text><br>
-      <ion-text>Straight browser phone apps may not curently be able to connect to the site properly or call contract functions.</ion-text>
+      <ion-text>Straight browser phone apps may not be able to call contract functions properly.</ion-text>
       <div class="nSmallMarginBottom">
-        <ion-text >Use a computer for the best user experience currently (The tables definitely need to be reworked for phones).</ion-text>
-        <ion-text >Full screen doesn't work in the phantom wallet browser for videos.</ion-text>
+        <ion-text>Use a computer for the best user experience currently (The tables definitely need to be reworked for phones). Full screen doesn't work in the phantom wallet browser for videos.</ion-text>
       </div>
     </div>
   </div>
