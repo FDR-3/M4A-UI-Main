@@ -47,7 +47,7 @@
           <!--<ion-button title="TikTok" fill="clear" @click="openTikTok()" class="nMediumSmallMarginLeft">
             <TikTok id="tikTokIcon" class="footerIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
           </ion-button>-->
-          <ion-button title="TikTok" fill="clear" @click="openFacebook()" class="nMediumSmallMarginLeft">
+          <ion-button title="Facebook" fill="clear" @click="openFacebook()" class="nMediumSmallMarginLeft">
             <Facebook id="facebookIcon" class="footerIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
           </ion-button>
         </div>
