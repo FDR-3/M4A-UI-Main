@@ -129,7 +129,7 @@
     try
     {
       //Get state hospital table data
-      const stateAccount = await getStateAccount(mapSelection.countryIndex, mapSelection.stateIndex)
+      var stateAccount: any //await getStateAccount(mapSelection.countryIndex, mapSelection.stateIndex)
       
       if(stateAccount)
       {
