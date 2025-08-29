@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Train A Custom RVC Voice Model 4/12</h1>
+    <h1>Train A Custom RVC Voice Model 4/13</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/5_TrainAIVoice/TrainAIVoice.mp4">

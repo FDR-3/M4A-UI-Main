@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Manual Youtube Scraping 8/12</h1>
+    <h1>Manual Youtube Scraping 8/13</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/9_ManualScrape/Manual Scrape.mp4">

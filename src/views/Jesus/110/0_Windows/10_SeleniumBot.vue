@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Selenium Youtube Scraping 9/12</h1>
+    <h1>Selenium Youtube Scraping 9/13</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/10_SeleniumBot/Selenium Bot.mp4">
