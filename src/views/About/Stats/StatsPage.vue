@@ -1,6 +1,7 @@
 <template>
   <div class="statContainer">
-    <RainbowStarWolf id="rainbowStarWolf"/>
+    <RIPRainbowStarWolf v-if="adminAccounts.ceoIsDead" id="rainbowStarWolf"/>
+    <RainbowStarWolf v-else id="rainbowStarWolf"/>
     <div class="statsContainer thickBorder">
       <h1 class="yellow">{{ displayName }}</h1>
       <div class="protocolWrapper">
@@ -112,6 +113,8 @@
   import * as anchor from "@coral-xyz/anchor"
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { VOTE_COST } from '/src/assets/contracts/WalletHelper.vue'
+  import RIPRainbowStarWolf from '/src/components/fancy/RIPRainbowStarWolf.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   const colorName = inject('colorName') as string
