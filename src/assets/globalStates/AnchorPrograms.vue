@@ -22,7 +22,7 @@
     pliChatInitiatorAddress: "",
     isAboutChatReady: false,
     aboutChatInitiatorAddress: "",
-    usdcFeeTokenAddress: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
+    usdcFeeTokenAddress: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),//This is to be the correct value for mainnet or dev net for functions that require fees
     isM4AFeeTokenAccountReady: false,
     isChatFeeTokenAccountReady: false
   })

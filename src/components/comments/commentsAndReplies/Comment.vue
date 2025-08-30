@@ -6,8 +6,13 @@
       <div class="flexCenterColumn leftContainer">
         <div class="user">
           <ion-button fill="clear" @click="openUserPopover($event)">
-          <StarWolf id="userIcon" :fill="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress ? colorHexValue : darkTheme.value ? '#FFFFFF' : '#000000'"/>
-        
+            <div v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress">
+              <RIPStarWolf v-if="adminAccounts.ceoIsDead" id="userIcon" :fill="colorHexValue"/>
+              <StarWolf v-else id="userIcon" :fill="colorHexValue"/>
+            </div>
+
+            <StarWolf v-else id="userIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+          
             <div class="flexCenterColumn">
               <ion-label color="dark">
                 {{ displayName }}
@@ -204,8 +209,13 @@
         <!--User-->
         <div class="user">
           <ion-button fill="clear" @click="openUserPopover($event)">
-          <StarWolf id="userIcon" :fill="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress ? colorHexValue : darkTheme.value ? '#FFFFFF' : '#000000'"/>
-        
+            <div v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress">
+              <RIPStarWolf v-if="adminAccounts.ceoIsDead" id="userIcon" :fill="colorHexValue"/>
+              <StarWolf v-else id="userIcon" :fill="colorHexValue"/>
+            </div>
+
+            <StarWolf v-else id="userIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+          
             <div class="flexCenterColumn">
               <ion-label color="dark">
                 {{ displayName }}
@@ -429,6 +439,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
+  import RIPStarWolf from '/src/assets/svg/rip-star-wolf-svg.vue'
   import HStarredComment from '/src/components/fancy/HStarredComment.vue'
   import VStarredComment from '/src/components/fancy/VStarredComment.vue'
   import YoutubeSVG from '/src/assets/svg/youtube-svg.vue'
