@@ -32,7 +32,7 @@
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import AdminPanel  from './AdminPanel.vue'
   import LogoArt  from './LogoArt.vue'
-  import DeadMansBreakClock from './DeadMansBreakClock.vue'
+  import DeadMansBreakClock from '/src/components/smartContracts/DeadMansBreakClock.vue'
   import { confirmM4ATransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
 
   const toast = inject('toast')

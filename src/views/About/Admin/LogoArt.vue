@@ -3,7 +3,8 @@
     <ion-text id="AccessText" class="super" >Access Denied</ion-text>
   </div>
   <div class="rainbowStarWolfBanner mediumMarginBottom">
-    <RainbowStarWolf id="rainbowWolf"/>
+    <RIPRainbowStarWolf v-if="adminAccounts.ceoIsDead" id="rainbowWolf"/>
+    <RainbowStarWolf v-else id="rainbowWolf"/>
     <p class="logoText rainbowText"><span class="logoText">M<span class="logoText" id="logo4A">4A</span></span><span class ="logoText" id="bottomLogo"><br>Prot<span class="logoText" id="logoO">o</span>col</span></p>
   </div>
   <!--<div class="smallMarginTop mediumMarginBottom" >
@@ -14,7 +15,9 @@
 
 <script setup lang="ts">
   import { IonText } from '@ionic/vue'
-  import RainbowStarWolf from '/src/components/fancy/RainbowStarWolf.vue' 
+  import RainbowStarWolf from '/src/components/fancy/RainbowStarWolf.vue'
+  import RIPRainbowStarWolf from '/src/components/fancy/RIPRainbowStarWolf.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
 </script>
 
 <style scoped>

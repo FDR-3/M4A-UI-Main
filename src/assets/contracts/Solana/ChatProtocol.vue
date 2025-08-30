@@ -65,7 +65,7 @@
   }
 
   export async function getDeadMansBreak()
-  {
+  {console.log("Get Dead Man's Break")
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try

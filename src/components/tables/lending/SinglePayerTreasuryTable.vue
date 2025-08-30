@@ -13,9 +13,9 @@
     >
       <template #header>
         <div>
-          <h2>HODL Treasury Value: $<span class="rainbowText">{{ adminAccounts.treasuryBalance.toLocaleString() }}</span></h2>
-          <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="HODL Treasury Search     ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+          <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ adminAccounts.singlePayerBalance.toLocaleString() }}</span></h2>
+          <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Treasury Search     ">
+              <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br><ion-label id="tableTitle">Stable Coins</ion-label>
         </div>
@@ -42,14 +42,15 @@
         </template>
       </Column>
       <Column field="price" header="Price" style="width: 0%" sortable></Column>
+      
       <Column field="quantity" header="Quantity" style="width: 0%" sortable>
         <template #body="slotProps">
-          ${{ adminAccounts.treasuryBalance.toLocaleString() }}
+          {{ adminAccounts.singlePayerBalance.toLocaleString() }}
         </template>
       </Column>
       <Column field="value" header="Value" style="width: 0%" sortable>
         <template #body="slotProps">
-          ${{ adminAccounts.treasuryBalance.toLocaleString() }}
+          ${{ adminAccounts.singlePayerBalance.toLocaleString() }}
         </template>
       </Column>
     </DataTable>
@@ -99,7 +100,7 @@
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
-  import { StableCoins, CryptoCurrency  } from '/src/components/tables/Assets.vue'
+  import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
 
   const filters = ref(

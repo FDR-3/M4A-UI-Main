@@ -16,7 +16,8 @@
     isM4ACEOAccountReady: false,
     isChatCEOAccountReady: false,
     treasuryBalance: "0.00",
-    singlePayerBalance: "0.00"
+    singlePayerBalance: "0.00",
+    ceoIsDead: false
   })
 
   export default adminAccounts

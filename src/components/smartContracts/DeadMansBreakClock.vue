@@ -84,7 +84,7 @@
       const newDate = new Date()/1000 //divide by 1000 since typescript/javascript time stamp is in mili seconds, but Solana time stamp is in seconds
 
       // Subtract the known epoch from the current timestamp to get the difference in milliseconds
-      const differenceSeconds = anchorPrograms.deadMansBreakTimeStamp.toNumber() + anchorPrograms.deadMan45DaysUnixNum - newDate
+      const differenceSeconds = anchorPrograms.deadMansBreakTimeStamp.toNumber() + anchorPrograms.secondsUntilDeadMansBreakTrips - newDate
 
       //Convert seconds to minutes, hours, and days
       //Convert from seconds to days

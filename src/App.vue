@@ -45,6 +45,7 @@
 
             <div :style="{display: navigation.menuIndex==MenuIndex.Jesus ? 'none':'block'}" class="flexCenterColumn">
               <ContractSwitcher :colorName="colorName" :buttonShadow="buttonShadow"/>
+              <DeadMansBreakCheck/>
               <!--<ion-text class="largeMarginTop">Market UI built on top of
                 <br><a class="rainbowText" href="https://app.marginfi.com/" target="_blank">MarginFi</a>
                 <br><a href="https://github.com/mrgnlabs" target="_blank">Repo</a>
@@ -82,6 +83,7 @@
   import { commentSectionNameHashTable } from '/src/components/comments/hashtables.ts'
   import { useToast } from "primevue/usetoast"
   import ContractSwitcher from '/src/components/smartContracts/ContractSwitcher.vue'
+  import DeadMansBreakCheck from '/src/components/smartContracts/DeadMansBreakCheck.vue'
   import WalletButton from '/src/components/navbar/SolanaWalletButton/WalletButton.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import MenuSVG from '/src/assets/svg/menu-svg.vue'

@@ -568,7 +568,7 @@
   function isDeadMansBreakTripped()
   {
     const currentUnixTimeStamp = new Date()/1000 //divide by 1000 since typescript/javascript time stamp is in mili seconds, but Solana time stamp is in seconds
-    return currentUnixTimeStamp - anchorPrograms.deadMansBreakTimeStamp.toNumber() > anchorPrograms.deadMan45DaysUnixNum
+    return currentUnixTimeStamp - anchorPrograms.deadMansBreakTimeStamp.toNumber() > anchorPrograms.secondsUntilDeadMansBreakTrips
   }
 
   async function listenForTreasurerATAChanges()

@@ -6,7 +6,7 @@
   {
     m4a: undefined,
     chat: undefined,
-    deadMan45DaysUnixNum: 3888000, //86,400 seconds/day * 45 days = 3,888,000 seconds.
+    secondsUntilDeadMansBreakTrips: 3888000, //86,400 seconds/day * 45 days = 3,888,000 seconds.
     deadMansBreakTimeStamp: 0,
     isDeadMansBreakTripped: false,
     areM4AProtocolStatsReady: false,
@@ -27,14 +27,8 @@
     isChatFeeTokenAccountReady: false
   })
 
-  //#[cfg(feature = "mainnet")]
-  //pub const USDC_MINT: Pubkey = pubkey!("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"); // USDC on Mainnet-beta
-
-  //#[cfg(feature = "devnet")]
-  //pub const USDC_MINT: Pubkey = pubkey!("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"); // USDC on Devnet
-
-  //#[cfg(feature = "localhost")]
-  //pub const USDC_MINT: Pubkey = pubkey!("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"); // USDC on Localhost
+  //USDC_MINT_ADDRESS on Mainnet-beta "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  //USDC_MINT_ADDRESS on Devnet "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
 
   export const SYSTEM_PROGRAM_ADDRESS_STRING = "11111111111111111111111111111111"
 
