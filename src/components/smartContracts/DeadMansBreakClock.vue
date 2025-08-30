@@ -1,9 +1,9 @@
 <template>
   <br id="topOfCountDown">
   <div>
-    <h1>Dead Man's Break</h1>
+    <h1 class="nMediumMarginBottom">Dead Man's Break</h1>
     <br>
-    <ion-text class="countDownLine3">
+    <ion-text>
       Days {{ daysLeft }}<br> Hours {{ hoursLeft }}<br> Minutes {{ minutesLeft }}<br> Seconds {{ secondsLeft }}<br> Miliseconds {{ milisecondsLeft }}
     </ion-text>
     <br>
@@ -13,7 +13,6 @@
       Clock In
     </ion-button>
 
-    <br>
     <br>
   </div>
 </template>

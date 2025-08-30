@@ -13,11 +13,10 @@
       <br><span class="metal countDownLine2 letterSpace8px">B</span><span class="metal countDownLine2 letterSpace1px">E</span>TA
     </ion-text>
     <br>
-    <ion-text class="countDownLine3">
+    <ion-text>
       Days {{ daysLeft }}<br> Hours {{ hoursLeft }}<br> Minutes {{ minutesLeft }}<br> Seconds {{ secondsLeft }}<br> Miliseconds {{ milisecondsLeft }}
     </ion-text>
-    <br>
-    <br>
+    
     <div v-if="countDownComplete">
       <ion-text class="rainbowText" id="betaStartText">M4A Protocol<br>South Carolina Beta<br></ion-text>
       <span class="emojiText">🥳</span><ion-text class="rainbowText" id="betaStartText">Has Begun</ion-text><span class="emojiText">🥳</span>

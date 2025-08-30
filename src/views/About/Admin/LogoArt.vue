@@ -1,5 +1,5 @@
 <template >
-  <div>
+  <div class="mediumMarginBottom">
     <ion-text id="AccessText" class="super" >Access Denied</ion-text>
   </div>
   <div class="rainbowStarWolfBanner mediumMarginBottom">
@@ -24,7 +24,7 @@
   #rainbowWolf
   {
     width: min(42vw, 550px);
-    height: min(44vw, 577px);
+    height: min(42vw, 500px);
   }
 
   .logoText
@@ -51,7 +51,8 @@
 
   #AccessText
   {
-    font-size: min(15vw, 170px)
+    font-size: min(15vw, 170px);
+    line-height: 11vw
   }
 
   @media screen and (min-width: 201px) 

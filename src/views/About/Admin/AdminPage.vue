@@ -21,7 +21,7 @@
     connectedWallet.isProcessorAccountActive"/>
     <LogoArt v-else/>
   </div>
-  <DeadMansBreakClock/>
+  <DeadMansBreakClock class="nSmallMarginTop"/>
 </template>
 
 <script setup lang="ts">
