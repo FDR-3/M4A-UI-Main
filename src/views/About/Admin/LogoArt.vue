@@ -1,5 +1,5 @@
 <template >
-  <div style="margin-top: -35px">
+  <div>
     <ion-text id="AccessText" class="super" >Access Denied</ion-text>
   </div>
   <div class="rainbowStarWolfBanner mediumMarginBottom">
