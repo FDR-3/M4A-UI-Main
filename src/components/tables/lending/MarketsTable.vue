@@ -19,6 +19,7 @@
         <p>A 3% fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
         <p>IE: If you have $100 of USDC deposited for a year, and the apy remains at exactly 10% for the whole year (Not likely at all)</p>
         <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) = $109.70</p>
+        <!--<a href="https://www.youtube.com/@fdr-3" target="_blank">Where does the money come from that users are earning on their deposits?</a>-->
         <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Market Search     ">
           <ion-icon slot="start" :icon="search"></ion-icon>
         </ion-input>
@@ -28,39 +29,30 @@
     <template #loading> Loading records. Please wait. </template>
     <Column field="asset" header="Asset" style="width: 0%" sortable>
       <template #body="slotProps">
-        <div class="flex">
-            <img :src="`/src/assets/cryptoIcons/${slotProps.data.asset.image}`" style="width: 24px" />
+        <div class="flexCenterRowHeight">
+            <component :is="slotProps.data.asset.svg" style="width: 24px; margin-right: 2px" />
             <span>{{ slotProps.data.asset.name }}</span>
         </div>
       </template>
     </Column>
     <Column field="price" header="Price" style="width: 0%" sortable></Column>
     <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
-    <Column field="app.name" header="App" style="width: 0%" sortable>
+    <Column field="chain.name" header="Chain" style="width: 0%" sortable>
       <template #body="slotProps">
-        <div class="flex">
-            <img v-if="slotProps.data.app.image.includes('.png')" :src="`/src/assets/cryptoIcons/${slotProps.data.app.image}`" style="width: 40px" />
-            <ion-icon v-if="slotProps.data.app.image.includes('.svg')" color="dark" :src="`/src/assets/cryptoIcons/${slotProps.data.app.image}`" style="width: 24px; height: 24px" />
-            <span class="tinyMarginLeft">{{ slotProps.data.app.name }}</span>
+        <div class="flexCenterRowHeight">
+            <component :is="slotProps.data.chain.svg" style="width: 40px" />
+            <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
         </div>
       </template>
-      </Column>
-      <Column field="chain.name" header="Chain" style="width: 0%" sortable>
-        <template #body="slotProps">
-          <div class="flex">
-              <img :src="`/src/assets/cryptoIcons/${slotProps.data.chain.image}`" style="width: 35px" />
-              <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
-          </div>
-        </template>
-      </Column>
-      <Column header="Actions" style="width: 0%">
-        <template #body="slotProps">
-          <div class="flexCenterColumn">
-            <ion-button color="dark">Deposit</ion-button>
-          </div>
-        </template>
-      </Column>
-    </DataTable>
+    </Column>
+    <Column header="Actions" style="width: 0%">
+      <template #body="slotProps">
+        <div class="flexCenterColumn">
+          <ion-button color="dark">Deposit</ion-button>
+        </div>
+      </template>
+    </Column>
+  </DataTable>
 <!--
     <DataTable 
       class="tableMinWidth"
@@ -80,7 +72,7 @@
     <template #loading> Loading records. Please wait. </template>
     <Column field="asset" header="Asset" style="width: 0%" sortable>
       <template #body="slotProps">
-        <div class="flex">
+        <div class="flexCenterRowHeight">
             <img :src="`/src/assets/cryptoIcons/${slotProps.data.asset.image}`" style="width: 24px" />
             <span>{{ slotProps.data.asset.name }}</span>
         </div>
@@ -90,7 +82,7 @@
       <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
       <Column field="app.name" header="App" style="width: 0%" sortable>
       <template #body="slotProps">
-        <div class="flex">
+        <div class="flexCenterRowHeight">
             <img v-if="slotProps.data.app.image.includes('.png')" :src="`/src/assets/cryptoIcons/${slotProps.data.app.image}`" style="width: 24px" />
             <ion-icon v-if="slotProps.data.app.image.includes('.svg')" color="dark" :src="`/src/assets/cryptoIcons/${slotProps.data.app.image}`" style="width: 24px" />
             <span>{{ slotProps.data.app.name }}</span>
@@ -99,7 +91,7 @@
       </Column>
       <Column field="chain.name" header="Chain" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flex">
+          <div class="flexCenterRowHeight">
               <img :src="`/src/assets/cryptoIcons/${slotProps.data.chain.image}`" style="width: 24px" />
               <span>{{ slotProps.data.chain.name }}</span>
           </div>
@@ -117,7 +109,7 @@
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
-  import { StableCoins, CryptoCurrency  } from '/src/components/tables/Assets.vue'
+  import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
 
   const filters = ref(
   {
@@ -129,13 +121,6 @@
   .container
   {
     margin-bottom: 77px
-  }
-  
-  .flex
-  {
-    display: flex;
-    align-items: center;
-    gap: 2px
   }
 
   #tableTitle

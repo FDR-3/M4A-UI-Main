@@ -313,11 +313,6 @@
 
 
 <style scoped>
-  .flex
-  {
-    flex-direction: column;
-    justify-content: center
-  }
   path
   { 
     fill: gray

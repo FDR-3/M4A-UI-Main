@@ -12,6 +12,12 @@
     >
       <ion-label color="dark">Init Chat Admin Accounts</ion-label>
     </ion-button>
+    <ion-button v-if="!adminAccounts.isLendingCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
+      @click="initializeLendingProtocol()"
+      :color=colorName
+    >
+      <ion-label color="dark">Init Lending Admin Accounts</ion-label>
+    </ion-button>
   </div>
   <div>
     <AdminPanel v-if="connectedWallet.addressString==adminAccounts.m4aCEOAddress ||
@@ -21,7 +27,7 @@
     connectedWallet.isProcessorAccountActive"/>
     <LogoArt v-else/>
   </div>
-  <DeadMansBreakClock class="nSmallMarginTop"/>
+  <DeadMansBreakClock/>
 </template>
 
 <script setup lang="ts">
@@ -33,7 +39,7 @@
   import AdminPanel  from './AdminPanel.vue'
   import LogoArt  from './LogoArt.vue'
   import DeadMansBreakClock from '/src/components/smartContracts/DeadMansBreakClock.vue'
-  import { confirmM4ATransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { confirmM4ATransaction, confirmChatTransaction, confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
 
   const toast = inject('toast')
   const colorName = inject('colorName') as string
@@ -56,11 +62,24 @@
     try
     {
       const tx = await anchorPrograms.chat.chatProgram.methods.initializeChatProtocolAdminAccounts().rpc()
-      await confirmM4ATransaction(tx, toast, "initialize_chat_protocol_admin_accounts")
+      await confirmChatTransaction(tx, toast, "initialize_chat_protocol_admin_accounts")
     }
     catch(error)
     {
       toastPreTransactionError(error, toast, "initialize_chat_protocol_admin_accounts")
+    }
+  }
+
+  async function initializeLendingProtocol()
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol().rpc()
+      await confirmLendingTransaction(tx, toast, "initialize_lending_protocol")
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "initialize_lending_protocol")
     }
   }
 </script>

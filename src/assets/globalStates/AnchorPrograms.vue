@@ -6,6 +6,7 @@
   {
     m4a: undefined,
     chat: undefined,
+    lending: undefined,
     secondsUntilDeadMansBreakTrips: 3888000, //86,400 seconds/day * 45 days = 3,888,000 seconds.
     deadMansBreakTimeStamp: 0,
     isDeadMansBreakTripped: false,

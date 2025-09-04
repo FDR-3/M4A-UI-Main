@@ -1,0 +1,55 @@
+<script lang="ts">
+  import { computed } from "vue"
+  import { useAnchorWallet } from 'solana-wallets-vue'
+  import { Connection, clusterApiUrl } from "@solana/web3.js"
+  import { AnchorProvider, Program } from "@coral-xyz/anchor"
+  import idl1 from "/src/assets/contracts/Solana/LendingProtocol.json"
+  //import idl2 from "/src/assets/contracts/Solana/LendingProtocol2.json"
+  import { LendingProtocol } from "./lending.ts"//including the type doesn't seem to help with auto complete/IDE suggestions when programing in the front end, not sure how to fix that
+
+  const preflightCommitment = "processed"
+  const commitment = "confirmed"
+
+  var workspace: any = null
+  export const useLendingWorkspace = () => workspace
+
+  export const initLendingWorkspace = (contractVersion: number) =>
+  { 
+    const wallet = useAnchorWallet()
+
+    //const connection = new Connection('http://127.0.0.1:8899')
+    const connection = new Connection(clusterApiUrl("devnet"), preflightCommitment)
+    //const connection = new Connection(clusterApiUrl("mainnet-beta"), preflightCommitment)
+    //const connection = new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
+    
+    const provider = computed
+    (
+      () =>
+        new AnchorProvider(connection, wallet.value,
+        {
+          preflightCommitment,
+          commitment,
+        },
+      )
+    )
+
+    var idlToUse: any
+
+    if(contractVersion == 0)
+      idlToUse = idl1
+    //if(contractVersion == 1)
+      //idlToUse = idl2
+
+    var lendingProgram = computed(() => new Program(idlToUse, provider.value) as Program<LendingProtocol>) 
+
+    workspace =
+    {
+      wallet,
+      connection,
+      provider,
+      lendingProgram,
+    }
+  }
+
+  export default useLendingWorkspace
+</script>

@@ -175,7 +175,7 @@
   </div>
   <div v-if="connectedWallet.addressString==adminAccounts.m4aCEOAddress && anchorPrograms.areM4AProtocolStatsReady" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
-      <ion-text >Create Processor Account</ion-text>
+      <ion-text>Create Processor Account</ion-text>
     </div>
     <div class=" flexCenterRow">
       <div style="width: 90%">
@@ -187,12 +187,12 @@
 
   <div v-if="connectedWallet.addressString==adminAccounts.m4aCEOAddress" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
-      <ion-text >M4A Fee Token Account</ion-text>
+      <ion-text>M4A Fee Token Account</ion-text>
     </div>
     <div class=" flexCenterRow">
       <div style="width: 90%">
         <ion-input v-model="tokenMintAddressInput" fill="outline" placeholder="Enter The Mint Address For The Fee Token"></ion-input>
-        <ion-input v-model="tokenDecmialCountInput" fill="outline" type="number" placeholder="Enter The Token Decimal Count When Adding" class="tinyMarginTop"></ion-input>
+        <ion-input v-model="tokenDecmialCountInput" fill="outline" type="number" min="0" placeholder="Enter The Token Decimal Count When Adding" class="tinyMarginTop"></ion-input>
          
         <div class="flexCenterRow">
           <ion-button class="smallMarginBottom" color="dark" @click="addM4AFeeTokenAccount()" style="width:77px">Add</ion-button>

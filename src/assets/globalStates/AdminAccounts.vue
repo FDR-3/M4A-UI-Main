@@ -13,8 +13,10 @@
     m4aTreasurerAddress: undefined,
     chatCEOAddress: undefined,
     chatTreasurerAddress: undefined,
+    lendingCEOAddress: undefined,
     isM4ACEOAccountReady: false,
     isChatCEOAccountReady: false,
+    isLendingCEOAccountReady: false,
     treasuryBalance: "0.00",
     singlePayerBalance: "0.00",
     ceoIsDead: false

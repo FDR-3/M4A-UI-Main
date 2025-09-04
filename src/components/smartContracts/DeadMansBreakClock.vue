@@ -28,11 +28,11 @@
 
   const toast = inject('toast')
 
-  var daysLeft = ref(0)
-  var hoursLeft = ref(0)
-  var minutesLeft = ref(0)
-  var secondsLeft = ref(0)
-  var milisecondsLeft = ref("000")
+  var daysLeft = ref()
+  var hoursLeft = ref()
+  var minutesLeft = ref()
+  var secondsLeft = ref()
+  var milisecondsLeft = ref()
   var countDownComplete = ref(false)
 
   var intervalId: any;
@@ -41,6 +41,12 @@
 
   onMounted(() =>
   {
+    daysLeft.value = "-"
+    hoursLeft.value = "-"
+    minutesLeft.value = "-"
+    secondsLeft.value = "-"
+    milisecondsLeft.value = "-"
+
     currentDeadMansBreakTimeStamp = anchorPrograms.deadMansBreakTimeStamp
 
     if(currentDeadMansBreakTimeStamp == 0)

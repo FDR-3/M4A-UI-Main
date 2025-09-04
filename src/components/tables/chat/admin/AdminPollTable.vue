@@ -261,15 +261,15 @@
     </DataTable>
   </div>
 
-    <div v-if="connectedWallet.addressString==adminAccounts.chatCEOAddress" class="thickBorder smallMarginTop">
+  <div v-if="connectedWallet.addressString==adminAccounts.chatCEOAddress" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
-      <ion-text >Chat Fee Token Account</ion-text>
+      <ion-text>Chat Fee Token Account</ion-text>
     </div>
     <div class=" flexCenterRow">
       <div style="width: 90%">
         <ion-input v-model="tokenMintAddressInput" fill="outline" placeholder="Enter The Mint Address For The Fee Token"></ion-input>
-        <ion-input v-model="tokenDecmialCountInput" fill="outline" type="number" placeholder="Enter The Token Decimal Count When Adding" class="tinyMarginTop"></ion-input>
-         
+        <ion-input v-model="tokenDecmialCountInput" fill="outline" type="number" min="0" placeholder="Enter The Token Decimal Count When Adding" class="tinyMarginTop"></ion-input>
+        
         <div class="flexCenterRow">
           <ion-button class="smallMarginBottom" color="dark" @click="addChatFeeTokenAccount()" style="width:77px">Add</ion-button>
           <ion-button class="smallMarginBottom" color="dark" @click="removeChatFeeTokenAccount()" style="width:77px">Remove</ion-button>

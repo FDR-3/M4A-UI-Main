@@ -55,7 +55,7 @@ import PrimeVue from "primevue/config"
 //import ConfirmationService from 'primevue/confirmationservice'
 //import DialogService from 'primevue/dialogservice'
 import ToastService from 'primevue/toastservice'
-import { Noir  }   from '/src/assets/styling/AuraNoir.vue'
+import { Noir } from '/src/assets/styling/AuraNoir.vue'
 import "solana-wallets-vue/styles.css"
 import { initWallet } from "solana-wallets-vue"
 import SolanaWallets from "solana-wallets-vue"
@@ -63,6 +63,7 @@ import { WalletAdapterNetwork } from "@solana/wallet-adapter-base"
 import { PhantomWalletAdapter, SolflareWalletAdapter,  TrezorWalletAdapter, CloverWalletAdapter, Coin98WalletAdapter, CoinbaseWalletAdapter, KeystoneWalletAdapter } from "@solana/wallet-adapter-wallets"
 import { initM4AWorkspace, useM4AWorkspace } from '/src/assets/contracts/Solana/AnchorM4AWorkSpace.vue'
 import { initChatWorkspace, useChatWorkspace } from '/src/assets/contracts/Solana/AnchorChatWorkSpace.vue'
+import { initLendingWorkspace, useLendingWorkspace } from '/src/assets/contracts/Solana/AnchorLendingWorkSpace.vue'
 import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
 const walletOptions = 
@@ -84,12 +85,16 @@ initWallet(walletOptions)
 
 const selectedM4AContractIndex = parseInt(localStorage.getItem("ContractSelectM4A") || "0")
 const selectedChatContractIndex = parseInt(localStorage.getItem("ContractSelectChat") || "0")
+const selectedLendingContractIndex = parseInt(localStorage.getItem("ContractSelectLending") || "0")
 
 initM4AWorkspace(selectedM4AContractIndex)
 anchorPrograms.m4a = useM4AWorkspace()
 
 initChatWorkspace(selectedChatContractIndex)
 anchorPrograms.chat = useChatWorkspace()
+
+initLendingWorkspace(selectedLendingContractIndex)
+anchorPrograms.lending = useLendingWorkspace()
 
 const app = createApp(App)
   .use(IonicVue,

@@ -46,6 +46,7 @@
           <a href="https://www.youtube.com/watch?v=q7wo9ooM6CI" target="_blank"><p>d.o.g.e. Brings In The Guns</p></a>
           <a href="https://www.youtube.com/watch?v=3VJT2JeDCyw" target="_blank"><p>elon Poisons An Entire City<br>(Bitch Made nazi Move My Guy)</p></a>
           <a href="https://www.youtube.com/watch?v=FHMe9fsgVHA" target="_blank"><p>World's Richest Bitch Made nazi Won't Pay His Workers</p></a>
+          <a href="https://www.youtube.com/watch?v=Ug25_Lxf5TA" target="_blank"><p>Piotr Szczerek Steals A Hat From A Kid</p></a>
         </div>
       </div>
     </div>

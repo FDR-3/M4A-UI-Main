@@ -20,6 +20,15 @@
       >
         Toggle Chat Admin Page
       </ion-button>
+      <ion-button
+        v-if="adminAccounts.isLendingCEOAccountReady"
+        :class="adminPanelSelect==2 ? 'tableToggleSelect' : ''"
+        color="dark"
+        @click="setAdminPanelSelect(2)"
+        :disabled="adminPanelSelect==2"
+      >
+        Toggle Lending Admin Page
+      </ion-button>
     </div>
   </div>
   <M4AAdmin v-if="adminPanelSelect==0 && 
@@ -45,6 +54,10 @@
     :isPollTableDataLoading="isPollTableDataLoading"
     :pollTableData="pollTableData"
   />
+
+  <LendingAdmin v-if="adminPanelSelect==2 &&
+    (connectedWallet.addressString==adminAccounts.lendingCEOAddress)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -52,6 +65,7 @@
   import { IonButton } from '@ionic/vue'
   import M4AAdmin from '/src/views/About/Admin/M4AAdmin.vue'
   import ChatAdmin from '/src/views/About/Admin/ChatAdmin.vue'
+  import LendingAdmin from '/src/views/About/Admin/LendingAdmin.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { claimQueue, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'

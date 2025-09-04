@@ -38,7 +38,7 @@
     <ion-button color="dark" @click="pageSelect(54)">26-End to End Testing</ion-button>
     <ion-button color="dark" @click="pageSelect(56)">27-Production</ion-button>
     <ion-button color="dark" @click="pageSelect(59)">28-Devnet & Fees</ion-button>
-    <ion-button color="dark" @click="pageSelect(61)">29-Clean Up & MarginFi</ion-button>
+    <ion-button color="dark" @click="pageSelect(61)">29-Clean Up & Not MarginFi</ion-button>
     <ion-button color="dark" @click="pageSelect(63)">30-M4A Contract Walk Through</ion-button>
     <ion-button color="dark" @click="pageSelect(65)">31-Chat Contract Walk Through</ion-button>
   </div>

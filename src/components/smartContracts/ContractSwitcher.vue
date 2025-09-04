@@ -32,6 +32,22 @@
       </ion-button>
     </div>
   </ion-popover>
+  <h5>Lending Protocol</h5>
+  <ion-button @click="openLendingContractSelectPopover($event)" slot="start" class="contractPickerButton" :color="colorName">
+    <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
+      <ion-label color="dark">{{ lendingContractText }}</ion-label>
+      <div>
+        <ion-icon :src=chevronDown color="black"></ion-icon>
+      </div>
+    </div>
+  </ion-button>
+  <ion-popover :is-open="lendingContractSelectPopoverOpen" :event="event" @didDismiss="lendingContractSelectPopoverOpen = false" side="bottom" size="cover">
+    <div v-for="(contactVersion, index) in lendingContracts">
+      <ion-button class="popOverButton" :color="colorName" @click="setSelectedLendingContract(index)" >
+        <ion-label color="dark">{{ contactVersion }}</ion-label>
+      </ion-button>
+    </div>
+  </ion-popover>
   <M4AChatUpdater/>
   <PLIChatUpdater/>
   <AboutChatUpdater/>
@@ -54,6 +70,7 @@
   import { commentSections } from '/src/assets/globalStates/chat/CommentSections.vue'
   import { postVoteRecords } from '/src/assets/globalStates/chat/PostVoteRecords.vue'
   import { polls, pollVoteRecords } from '/src/assets/globalStates/chat/Polls.vue'
+  import { tokenReserves } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { getM4AProtocol,
     getM4AFeeTokenAccounts,
     areM4AProtocolStatsInitialized,
@@ -107,22 +124,30 @@
     getPollStatsPDA,
     getPollVoteStatsPDA,
     getDeadMansBreakPDA } from '/src/assets/contracts/Solana/ChatProtocol.vue'
+  import { getLendingProtocolCEOAccount,
+    getTokenReserves,
+    getLendingProtocolCEOAccountPDA,
+    getLendingProtocolPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   defineProps(['colorName', 'colorHexValue', 'buttonShadow'])
 
   var m4aContractSelectPopoverOpen = ref()
   var chatContractSelectPopoverOpen = ref()
+  var lendingContractSelectPopoverOpen = ref()
   var event = ref()
 
   var m4aContractText = ref("")
-  var chatContractText = ref("") 
+  var chatContractText = ref("")
+  var lendingContractText = ref("") 
 
   const m4aContracts = ["Version 1 (SC BETA)"/*, "Version 2"*/]
   const chatContracts = ["Version 1 (BETA)"/*, "Version 2"*/]
+  const lendingContracts = ["Version 1 (BETA)"/*, "Version 2"*/]
 
   var selectedM4AContractIndex: number
   var selectedChatContractIndex: number
+  var selectedLendingContractIndex: number
 
   var protocolTreasurerATAWatcherId: any
   var protocolSinglePayerATAWatcherId: any
@@ -141,6 +166,7 @@
   var m4aProtocolTreasurerAccountWatcherId: any
   var chatProtocolCEOAccountWatcherId: any
   var chatProtocolTreasurerAccountWatcherId: any
+  var lendingProtocolCEOAccountWatcherId: any
   var areM4AProtocolStatsReadyWatchId: any
   var isM4AFeeTokenAccountReadyWatchId: any
   var isChatFeeTokenAccountReadyWatchId: any
@@ -150,6 +176,7 @@
   var postVoteStatsWatcherId: any
   var pollStatsWatcherId: any
   var pollVoteStatsWatcherId: any
+  var lendingProtocolWatcherId: any
 
   var currentStateAccountTotal = 0
   var currentClaimQueueCount = 0
@@ -167,8 +194,12 @@
     selectedChatContractIndex = parseInt(localStorage.getItem("ContractSelectChat") || "0")
     localStorage.setItem("ContractSelectChat", selectedChatContractIndex.toString())//Set value in local storage incase it isn't already
 
+    selectedLendingContractIndex = parseInt(localStorage.getItem("ContractSelectLending") || "0")
+    localStorage.setItem("ContractSelectLending", selectedLendingContractIndex.toString())//Set value in local storage incase it isn't already
+
     m4aContractText.value = m4aContracts[selectedM4AContractIndex]
     chatContractText.value = chatContracts[selectedChatContractIndex]
+    lendingContractText.value = lendingContracts[selectedLendingContractIndex]
 
     //console.log(await anchorPrograms.chat.chatProgram.account.videoVoteRecord.all())
 
@@ -340,7 +371,7 @@
     else
     {
       adminAccounts.isM4ACEOAccountReady = false
-      await listenForM4ACEOAccountChanges()
+      await listenForM4ACEOAccountInitialization()
     }
 
     //M4A Protocol Treasurer Account
@@ -348,7 +379,7 @@
     if(m4aTreasurerAccount)
       adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
     else
-      await listenForM4ATreasurerAccountChanges()*/
+      await listenForM4ATreasurerAccountInitialization()*/
 
     //Chat Protocol CEO Account
     const chatCEOAccount = await getChatProtocolCEOAccount()
@@ -360,7 +391,7 @@
     else
     {
       adminAccounts.isChatCEOAccountReady = false
-      await listenForChatCEOAccountChanges()
+      await listenForChatCEOAccountInitialization()
     }
 
     //Chat Protocol Treasurer Account
@@ -368,7 +399,7 @@
     if(chatTreasurerAccount)
       adminAccounts.chatTreasurerAddress = chatTreasurerAccount.address.toBase58()
     else
-      await listenForChatTreasurerAccountChanges()
+      await listenForChatTreasurerAccountInitialization()
 
     //Ideas
     ideas.data = await getIdeas()
@@ -389,6 +420,23 @@
     //Chat Poll Vote Records
     pollVoteRecords.data = await getPollVoteRecords()
     await listenForPollVoteStatChanges()
+
+    //Lending Protocol CEO Account
+    const lendingCEOAccount = await getLendingProtocolCEOAccount()
+    if(lendingCEOAccount)
+    {
+      adminAccounts.isLendingCEOAccountReady = true
+      adminAccounts.lendingCEOAddress = lendingCEOAccount.address.toBase58()
+    }
+    else
+    {
+      adminAccounts.isLendingCEOAccountReady = false
+      await listenForLendingCEOAccountInitialization()
+    }
+
+    //Token Reserves
+    tokenReserves.data = await getTokenReserves()
+    await listenForTokenReserveChanges()
   })
 
   onUnmounted(() => 
@@ -485,7 +533,7 @@
     } 
     if(m4aProtocolTreasurerAccountWatcherId != undefined)
     {
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(m4aProtocolTreasurerAccountWatcherId)
+      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolTreasurerAccountWatcherId)
       m4aProtocolTreasurerAccountWatcherId = undefined
     }
     if(chatProtocolCEOAccountWatcherId != undefined)
@@ -497,6 +545,11 @@
     {
       anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolTreasurerAccountWatcherId)
       chatProtocolTreasurerAccountWatcherId = undefined
+    }
+    if(lendingProtocolCEOAccountWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolCEOAccountWatcherId)
+      lendingProtocolCEOAccountWatcherId = undefined
     }
     if(ideaStatsWatcherId != undefined)
     {
@@ -522,6 +575,11 @@
     {
       anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(pollVoteStatsWatcherId)
       pollVoteStatsWatcherId = undefined
+    }
+    if(lendingProtocolWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolWatcherId)
+      lendingProtocolWatcherId = undefined
     }
   })
 
@@ -553,6 +611,20 @@
     window.location.reload()
   }
 
+  async function setSelectedLendingContract(index: number)
+  {
+    if(index == selectedLendingContractIndex)
+    {
+      lendingContractSelectPopoverOpen.value = false
+      return
+    }
+
+    localStorage.setItem("ContractSelectLending", index.toString())
+    lendingContractSelectPopoverOpen.value = false
+    lendingContractText.value = lendingContracts[index]
+    window.location.reload()
+  }
+
   function openM4AContractSelectPopover(e: Event) 
   {
     event.value = e
@@ -563,6 +635,12 @@
   {
     event.value = e
     chatContractSelectPopoverOpen.value = true
+  }
+
+  function openLendingContractSelectPopover(e: Event) 
+  {
+    event.value = e
+    lendingContractSelectPopoverOpen.value = true
   }
 
   function isDeadMansBreakTripped()
@@ -915,7 +993,7 @@
     }
   }
 
-  async function listenForM4ACEOAccountChanges()
+  async function listenForM4ACEOAccountInitialization()
   {
     //Subscribe to account changes
     m4aProtocolCEOAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolCEOAccountPDA(), async () => 
@@ -924,10 +1002,12 @@
       const m4aCEOAccount = await getM4AProtocolCEOAccount()
       adminAccounts.isM4ACEOAccountReady = true
       adminAccounts.m4aCEOAddress = m4aCEOAccount.address.toBase58()
+      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolCEOAccountWatcherId)
+      m4aProtocolCEOAccountWatcherId = undefined
     })
   }
 
-  async function listenForM4ATreasurerAccountChanges()
+  async function listenForM4ATreasurerAccountInitialization()
   {
     //Subscribe to account changes
     m4aProtocolTreasurerAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolTreasurerAccountPDA(), async () => 
@@ -935,10 +1015,12 @@
       //Handle account change..
       const m4aTreasurerAccount = await getM4AProtocolTreasurerAccount()
       adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
+      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolTreasurerAccountWatcherId)
+      m4aProtocolTreasurerAccountWatcherId = undefined
     })
   }
 
-  async function listenForChatCEOAccountChanges()
+  async function listenForChatCEOAccountInitialization()
   {
     //Subscribe to account changes
     chatProtocolCEOAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolCEOAccountPDA(), async () => 
@@ -947,10 +1029,12 @@
       const chatCEOAccount = await getChatProtocolCEOAccount()
       adminAccounts.isChatCEOAccountReady = true
       adminAccounts.chatCEOAddress = chatCEOAccount.address.toBase58()
+      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolCEOAccountWatcherId)
+      chatProtocolCEOAccountWatcherId = undefined
     })
   }
 
-  async function listenForChatTreasurerAccountChanges()
+  async function listenForChatTreasurerAccountInitialization()
   {
     //Subscribe to account changes
     chatProtocolTreasurerAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolTreasurerAccountPDA(), async () => 
@@ -958,6 +1042,22 @@
       //Handle account change..
       const chatTreasurerAccount = await getChatProtocolTreasurerAccount()
       adminAccounts.chatTreasurerAddress = chatTreasurerAccount.address.toBase58()
+      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolTreasurerAccountWatcherId)
+      chatProtocolTreasurerAccountWatcherId = undefined
+    })
+  }
+
+  async function listenForLendingCEOAccountInitialization()
+  {
+    //Subscribe to account changes
+    lendingProtocolCEOAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolCEOAccountPDA(), async () => 
+    {
+      //Handle account change..
+      const lendingCEOAccount = await getLendingProtocolCEOAccount()
+      adminAccounts.isLendingCEOAccountReady = true
+      adminAccounts.lendingCEOAddress = lendingCEOAccount.address.toBase58()
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolCEOAccountWatcherId)
+      lendingProtocolCEOAccountWatcherId = undefined
     })
   }
     
@@ -1008,6 +1108,16 @@
     {
       //Handle account change..
       pollVoteRecords.data = await getPollVoteRecords()
+    })
+  }
+
+  async function listenForTokenReserveChanges()
+  {
+    //Subscribe to account changes
+    lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(), async () => 
+    {
+      //Handle account change..
+      tokenReserves.data = await getTokenReserves()
     })
   }
 </script>

@@ -23,7 +23,7 @@
       <template #loading> Loading records. Please wait. </template>
       <Column field="asset" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flex">
+          <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="slotProps.data.asset.source()">
               <component :is="slotProps.data.asset.svg" style="width: 24px"></component>
             </ion-button>
@@ -33,7 +33,7 @@
       </Column>
       <Column field="chain.name" header="Chain" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flex">
+          <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="slotProps.data.chain.source()">
               <component :is="slotProps.data.chain.svg" style="width: 35px"></component>
             </ion-button>
@@ -71,7 +71,7 @@
       <template #loading> Loading records. Please wait. </template>
       <Column field="asset" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flex">
+          <div class="flexCenterRowHeight">
               <img :src="`/src/assets/cryptoIcons/${slotProps.data.asset.image}`" style="width: 24px" />
               <span>{{ slotProps.data.asset.name }}</span>
           </div>
@@ -79,7 +79,7 @@
       </Column>
       <Column field="chain.name" header="Chain" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flex">
+          <div class="flexCenterRowHeight">
               <img :src="`/src/assets/cryptoIcons/${slotProps.data.chain.image}`" style="width: 24px" />
               <span>{{ slotProps.data.chain.name }}</span>
           </div>
@@ -114,13 +114,6 @@
     margin-bottom: 77px
   }
   
-  .flex
-  {
-    display: flex;
-    align-items: center;
-    gap: 2px
-  }
-
   #tableTitle
   {
     margin: 20px
@@ -128,6 +121,6 @@
 
   .tableMinWidth
   {
-    min-width: 570px
+    min-width: 970px
   }
 </style>

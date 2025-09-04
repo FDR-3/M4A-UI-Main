@@ -2,6 +2,11 @@
   "compilerOptions": {
     "allowImportingTsExtensions": true,
     "types": [ "vidstack/vue" ],
+    "typeRoots":
+    [
+      "./node_modules/@types",
+      "./typings" // If you have custom declaration files
+    ],
     "target": "ESNext",
     "allowJs": true,
     "useDefineForClassFields": true,
