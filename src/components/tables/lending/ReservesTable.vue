@@ -59,7 +59,7 @@
     class="thickBorder"
 
   >
-    <div id="createSubMarketHeader" class="nTinyMarginTop flexCenterRow">
+    <div id="createSubMarketHeader" class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
       <ion-button fill="clear" @click="sourceSubMarketSVG()">
         <component id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px; margin-right: -20px"></component>
       </ion-button>
