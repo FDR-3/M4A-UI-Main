@@ -96,18 +96,17 @@
       showButtons
       fluid
     />
-    <ion-text style="font-size: 11px" class="noClickEvent">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text>
-    <div>
-      <ion-button
-        id="createSubMarketButton"
-        color="dark"
-        @click="createSubMarket(selectedTokenMintAddress)"
-        class="mediumMarginTop"
-        :disabled="!validPublicKey"
-      >
-        Create SubMarket
-      </ion-button>
-    </div>
+    <ion-text style="font-size: 11px" class="noClickEvent">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text><br>
+
+    <ion-button
+      id="createSubMarketButton"
+      color="dark"
+      @click="createSubMarket(selectedTokenMintAddress)"
+      class="mediumMarginTop"
+      :disabled="!validPublicKey || !connectedWallet.isConnected"
+    >
+      Create SubMarket
+    </ion-button>
   </div>
 </template>
 
@@ -164,7 +163,7 @@
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   window.onclick = function(event: any) 
-  {console.log(event?.target)
+  {
     if(creatingSubMarket.value)
       if((event?.target?.id != "createSubMarketHeader") &&
       (event?.target?.id != "createSubMarketSVG") &&
