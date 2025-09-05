@@ -1,4 +1,5 @@
 const PROXY_URL = 'https://m4a.io/proxyCORS'
+const ORIGIN = 'https://m4a.io'
 
 // Function to handle all requests
 export default
@@ -9,8 +10,13 @@ export default
     {
       if(request.url == PROXY_URL)
       {
+        const origin = request.headers.get("origin")
+
+        if(origin != ORIGIN)
+          return new Response(`Origin: ${origin}\nOnly requests from m4a.io can use this end point.`, { status: 500 })
+
         if (!env.EXTRNODE_API_KEY)
-				  return new Response('API key is missing.', { status: 500 });
+				  return new Response('API key is missing.', { status: 500 })
 
         const RPC_BASE_URL = 'https://solana-mainnet.rpc.extrnode.com/'    
         const RPC_Request_URL = RPC_BASE_URL + env.EXTRNODE_API_KEY
