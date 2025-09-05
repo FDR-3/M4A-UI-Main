@@ -25,7 +25,9 @@
       <Column field="svg" header="svg" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-            <component :is="slotProps.data.svg" style="width: 24px; height: 24px"></component>
+            <ion-button fill="clear" @click="slotProps.data.source()">
+              <component :is="slotProps.data.svg" style="width: 24px"></component>
+            </ion-button>
           </div>
         </template>
       </Column>
@@ -38,6 +40,7 @@
             color="dark"
             @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
             createSubMarketSVG=slotProps.data.svg;
+            sourceSubMarketSVG=slotProps.data.source;
             feeCollectorAddress=connectedWallet.addressString;
             creatingSubMarket=true;
             checkAddress()"
@@ -56,8 +59,20 @@
     class="thickBorder"
 
   >
-    <div class="tinyMarginTop noClickEvent">
-      <ion-text class="flexCenterRow"><component :is="createSubMarketSVG" style="margin-right: 2px"></component>USDC</ion-text><br>
+    <div id="createSubMarketHeader" class="nTinyMarginTop flexCenterRow">
+      <ion-button fill="clear" @click="sourceSubMarketSVG()">
+        <component id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px; margin-right: -20px"></component>
+      </ion-button>
+
+      <ion-text class="noClickEvent">USDC</ion-text><br>
+    </div>
+
+    <p class="nTinyMarginTop noClickEvent">Owner: {{ trimAddress(connectedWallet.addressString) }}</p>
+    <div v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom noClickEvent">
+      <ion-text  style="font-size: 11px"
+      >
+        Connect wallet to create a submarket
+      </ion-text>
     </div>
 
     <ion-input
@@ -68,7 +83,7 @@
       :class="{ 'invalid': !validPublicKey }"
     >
     </ion-input>
-    <ion-text style="font-size: 11px">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
+    <ion-text style="font-size: 11px" class="noClickEvent">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
     <InputNumber
       v-model="feePercentage"
       class="mediumMarginTop"
@@ -81,16 +96,18 @@
       showButtons
       fluid
     />
-    <ion-text style="font-size: 11px">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text>
-    <ion-button
-      id="createSubMarketButton"
-      color="dark"
-      @click="createSubMarket(selectedTokenMintAddress)"
-      class="mediumMarginTop"
-      :disabled="!validPublicKey"
-    >
-      Create SubMarket
-    </ion-button>
+    <ion-text style="font-size: 11px" class="noClickEvent">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text>
+    <div>
+      <ion-button
+        id="createSubMarketButton"
+        color="dark"
+        @click="createSubMarket(selectedTokenMintAddress)"
+        class="mediumMarginTop"
+        :disabled="!validPublicKey"
+      >
+        Create SubMarket
+      </ion-button>
+    </div>
   </div>
 </template>
 
@@ -103,13 +120,15 @@
   import InputNumber from 'primevue/inputnumber'
   import { search } from 'ionicons/icons'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { tokenReserves, tokenReserveSVGsDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserves, tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
   import { isValidSolanaPublicKey } from '/src/assets/contracts/Wallethelper.vue'
+  import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import cloneDeep from 'lodash/cloneDeep'
 
   const toast = inject('toast')
 
@@ -117,6 +136,7 @@
   const isLoading = ref(true)
   const creatingSubMarket = ref(false)
   const createSubMarketSVG = ref()
+  const sourceSubMarketSVG = ref()
   var selectedTokenMintAddress: PublicKey
   const feeCollectorAddress = ref(connectedWallet.addressString)
   const feePercentage = ref(3)
@@ -144,9 +164,11 @@
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   window.onclick = function(event: any) 
-  {
+  {console.log(event?.target)
     if(creatingSubMarket.value)
-      if((event?.target?.id != "createSubMarketModal") &&
+      if((event?.target?.id != "createSubMarketHeader") &&
+      (event?.target?.id != "createSubMarketSVG") &&
+      (event?.target?.id != "createSubMarketModal") &&
       (event?.target?.id != "openCreateSubMarketModal") &&
       (event?.target?.id != "createSubMarketButton") &&
       !event?.target?.classList.contains("native-input") &&
@@ -171,15 +193,20 @@
 
   function processTokenReserveTableData()
   {
-    var newTableData = []
+    var processedTableData = []
+    var newTableData = cloneDeep(tokenReserves)
 
-    for(var i=0; i<tokenReserves.data.length; i++)
+    for(var i=0; i<newTableData.data.length; i++)
     {
-      newTableData.push(tokenReserves.data[i].account)
-      newTableData[i].svg = markRaw(tokenReserveSVGsDevNetMap.get(newTableData[i].tokenMintAddress.toString()))
+      processedTableData.push(newTableData.data[i].account)
+
+      const tokenMapObject = tokenReserveDevNetMap.get(processedTableData[i].tokenMintAddress.toString())
+
+      processedTableData[i].svg = markRaw(tokenMapObject.svg)
+      processedTableData[i].source = tokenMapObject.source
     }
 
-    tableData.value = newTableData
+    tableData.value = processedTableData
   }
 
   function checkAddress()

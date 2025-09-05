@@ -1,7 +1,7 @@
 <template>
   <div class="flexCenterRow">
     <!--Up Vote-->
-    <ion-button :disabled="connectedWallet.addressString==SYSTEM_PROGRAM_ADDRESS_STRING || !anchorPrograms.isChatFeeTokenAccountReady"
+    <ion-button :disabled="!connectedWallet.isConnected || !anchorPrograms.isChatFeeTokenAccountReady"
     @click="openUpVotePopover($event)" fill="clear" color="dark">
       <ion-icon :src="addCircle"></ion-icon>
     </ion-button>
@@ -63,7 +63,7 @@
     </div>
 
     <!--Down Vote-->
-    <ion-button :disabled="connectedWallet.addressString==SYSTEM_PROGRAM_ADDRESS_STRING || !anchorPrograms.isChatFeeTokenAccountReady"
+    <ion-button :disabled="!connectedWallet.isConnected || !anchorPrograms.isChatFeeTokenAccountReady"
     @click="openDownVotePopover($event)" fill="clear" color="dark" class="nSmallMarginLeft">
       <ion-icon :src="removeCircle"></ion-icon>
     </ion-button>

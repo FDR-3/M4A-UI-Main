@@ -1,6 +1,7 @@
 <script lang="ts">
   import { reactive, Component } from 'vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
+  import { sourceUSDC, sourceSOL} from '/src/assets/helperFunctions/sources.ts'
 
   export const tokenReserves = reactive(
   {
@@ -8,18 +9,24 @@
   })
 
   //Dev Net
-  export const tokenReserveSVGsDevNetMap: Map<string, Component> = new Map(
+  export const tokenReserveDevNetMap: Map<string, tokenMapObject> = new Map(
   [ 
     //Key: Token Mint Address, Value: Token SVG
-    ["4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU", USDCSVG]
+    ["4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU", { svg: USDCSVG, source: () => {sourceUSDC()}} ]
   ])
 
   //Mainnet Net
-  export const tokenReserveSVGsMainnetMap: Map<string, number> = new Map(
+  export const tokenReserveMainnetMap: Map<string, tokenMapObject> = new Map(
   [
     //Key: Token Mint Address, Value: Token SVG
-    ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", USDCSVG]
+    ["EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", { svg: USDCSVG, source: () => {sourceUSDC()}} ]
   ])
+
+  type tokenMapObject =
+  {
+    svg: Component;
+    source: () => void;
+  }
 
   export default tokenReserves
 </script>

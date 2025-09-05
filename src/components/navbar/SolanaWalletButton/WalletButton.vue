@@ -130,11 +130,13 @@
       connectedWallet.isProcessorAccountSuperAdmin = false
       connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.addressString = SYSTEM_PROGRAM_ADDRESS_STRING
+      connectedWallet.isConnected = false
     }
     else
     { 
       connectedWallet.publicKey = publicKey.value
       connectedWallet.addressString = publicKey.value.toBase58()
+      connectedWallet.isConnected = true
 
       const chatAccount = chatAccountHashMap.map.get(connectedWallet.addressString)
       if(chatAccount)
@@ -235,11 +237,13 @@
       connectedWallet.isProcessorAccountSuperAdmin = false
       connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.addressString = SYSTEM_PROGRAM_ADDRESS_STRING
+      connectedWallet.isConnected = false
     }
     else
     {
       connectedWallet.publicKey = publicKey.value
       connectedWallet.addressString = publicKey.value.toBase58()
+      connectedWallet.isConnected = true
 
       const chatAccount = chatAccountHashMap.map.get(connectedWallet.addressString)
       if(chatAccount)
@@ -450,6 +454,7 @@
   {
     connectedWallet.publicKey = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
     connectedWallet.addressString = SYSTEM_PROGRAM_ADDRESS_STRING
+    connectedWallet.isConnected = false
     disconnect()
   }
   

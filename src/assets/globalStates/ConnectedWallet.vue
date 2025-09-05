@@ -7,6 +7,7 @@
   {
     publicKey: new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING),
     addressString: "",
+    isConnected: false,
     isChatAccountReady: false,
     hasHadCustomName: false,
     isSubmitterAccountReady: false,

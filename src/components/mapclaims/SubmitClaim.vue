@@ -48,7 +48,7 @@
   <div v-if="!anchorPrograms.areM4AProtocolStatsReady" class="mediumSmallMarginTop mediumSmallMarginBottom">
     <ion-text color="dark">South Carolina BETA hasn't started yet</ion-text>
   </div>
-  <ion-label v-else-if="connectedWallet.addressString == SYSTEM_PROGRAM_ADDRESS_STRING">
+  <ion-label v-else-if="!connectedWallet.isConnected">
     Connect wallet to submit claim for $0.04
   </ion-label>
   <ion-button v-else-if="!anchorPrograms.isM4AProtocolReady" @click="initializeM4AProtocolAndClaimQueue()" color="green">
