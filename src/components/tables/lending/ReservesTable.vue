@@ -36,7 +36,11 @@
           <div class="flexCenterColumn">
             <ion-button id="openCreateSubMarketModal"
             color="dark"
-            @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress; createSubMarketSVG=slotProps.data.svg; creatingSubMarket=true"
+            @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
+            createSubMarketSVG=slotProps.data.svg;
+            feeCollectorAddress=connectedWallet.addressString;
+            creatingSubMarket=true;
+            checkAddress()"
             >
               Create SubMarket
             </ion-button>
@@ -53,10 +57,17 @@
 
   >
     <div class="tinyMarginTop noClickEvent">
-      <ion-text class="flexCenterRow"> <component :is="createSubMarketSVG"></component>USDC</ion-text><br>
+      <ion-text class="flexCenterRow"><component :is="createSubMarketSVG" style="margin-right: 2px"></component>USDC</ion-text><br>
     </div>
 
-    <ion-input v-model="feeCollectorAddress" fill="outline" @ion-input="checkAddress()"></ion-input>
+    <ion-input
+      id="feeCollectorInput"
+      v-model="feeCollectorAddress"
+      fill="outline"
+      @ion-input="checkAddress()"
+      :class="{ 'invalid': !validPublicKey }"
+    >
+    </ion-input>
     <ion-text style="font-size: 11px">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
     <InputNumber
       v-model="feePercentage"
@@ -66,10 +77,20 @@
       inputId="percent"
       :minFractionDigits="2" :maxFractionDigits="2"
       :min="0" :max="100"
+      :step="0.01"
+      showButtons
       fluid
     />
-    <ion-text style="font-size: 11px">Enter fee percentage on interest earned for your sub market between 0%-100%</ion-text>
-    <ion-button color="dark" @click="createSubMarket(selectedTokenMintAddress)" class="mediumMarginTop">Create SubMarket</ion-button>
+    <ion-text style="font-size: 11px">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text>
+    <ion-button
+      id="createSubMarketButton"
+      color="dark"
+      @click="createSubMarket(selectedTokenMintAddress)"
+      class="mediumMarginTop"
+      :disabled="!validPublicKey"
+    >
+      Create SubMarket
+    </ion-button>
   </div>
 </template>
 
@@ -88,6 +109,7 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
   import { isValidSolanaPublicKey } from '/src/assets/contracts/Wallethelper.vue'
+  import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   const toast = inject('toast')
 
@@ -98,6 +120,7 @@
   var selectedTokenMintAddress: PublicKey
   const feeCollectorAddress = ref(connectedWallet.addressString)
   const feePercentage = ref(3)
+  const validPublicKey = ref(false)
   
 
   onMounted(() =>
@@ -121,13 +144,16 @@
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   window.onclick = function(event: any) 
-  {console.log(event?.target)
+  {
     if(creatingSubMarket.value)
       if((event?.target?.id != "createSubMarketModal") &&
       (event?.target?.id != "openCreateSubMarketModal") &&
+      (event?.target?.id != "createSubMarketButton") &&
       !event?.target?.classList.contains("native-input") &&
       !event?.target?.classList.contains("native-wrapper") &&
       !event?.target?.classList.contains("p-inputtext") &&
+      !event?.target?.classList.contains("p-icon") &&
+      !event?.target?.classList.contains("p-inputnumber-button-group") &&
       !event?.target?.classList.contains("p-toast-summary") && //Keep transaction toast from closing modal
       !event?.target?.classList.contains("p-toast-detail") && //Keep transaction toast from closing modal
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast from closing modal
@@ -158,7 +184,12 @@
 
   function checkAddress()
   {
-    isValidSolanaPublicKey()
+    if(feeCollectorAddress.value == SYSTEM_PROGRAM_ADDRESS_STRING)
+      validPublicKey.value = false
+    else if(isValidSolanaPublicKey(feeCollectorAddress.value))
+      validPublicKey.value = true
+    else
+      validPublicKey.value = false
   }
 
   async function createSubMarket(tokenMintAddress: PublicKey)
@@ -175,7 +206,7 @@
   }
 </script>
 
-<style scoped>
+<style>
   #createSubMarketModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
@@ -203,13 +234,23 @@
     min-width: 570px;
   }
 
-  ion-input
+  #feeCollectorInput
   {
-    --highlight-color: var(--ion-color-green)
+    --highlight-color: var(--ion-color-green) !important
   }
 
-  .p-inputtext:focus
+  #feeCollectorInput.invalid
   {
-    --p-inputtext-focus-border-color: #ff0000 !important
+    --border-color: var(--ion-color-red) !important
+  }
+
+  .p-inputnumber:hover .p-inputnumber-input:not(:focus)
+  {
+    border-color: var(--ion-color-gray) !important;
+  }
+
+  .p-inputnumber-input:focus
+  {
+    --p-inputtext-focus-border-color: #6fff7b !important;
   }
 </style>

@@ -203,6 +203,20 @@
 
     //console.log(await anchorPrograms.chat.chatProgram.account.videoVoteRecord.all())
 
+    //Chat Protocol Quality Of Life Accounts
+    const deadMansBreak = await getDeadMansBreak()
+    await listenForChatQualityOfLifeAccountsChanges()
+    if(deadMansBreak)
+    {
+      anchorPrograms.areChatQOLAccountsReady = true
+      anchorPrograms.deadMansBreakTimeStamp = deadMansBreak.unixClockInTimeStamp
+      anchorPrograms.isDeadMansBreakTripped = isDeadMansBreakTripped()
+    }
+    else
+    {
+      anchorPrograms.areChatQOLAccountsReady = false
+    }
+
     //Treasury Account
     try
     {
@@ -226,6 +240,23 @@
     {
       console.log(error)
     }
+
+    //Lending Protocol CEO Account
+    const lendingCEOAccount = await getLendingProtocolCEOAccount()
+    if(lendingCEOAccount)
+    {
+      adminAccounts.isLendingCEOAccountReady = true
+      adminAccounts.lendingCEOAddress = lendingCEOAccount.address.toBase58()
+    }
+    else
+    {
+      adminAccounts.isLendingCEOAccountReady = false
+      await listenForLendingCEOAccountInitialization()
+    }
+
+    //Token Reserves
+    tokenReserves.data = await getTokenReserves()
+    await listenForTokenReserveChanges()
 
     /*//M4AFeeTokenAccount
     const m4aFeeTokenAccounts = await getM4AFeeTokenAccounts()
@@ -298,20 +329,6 @@
     else
     {
       anchorPrograms.isChatProtocolReady = false
-    }
-
-    //Chat Protocol Quality Of Life Accounts
-    const deadMansBreak = await getDeadMansBreak()
-    await listenForChatQualityOfLifeAccountsChanges()
-    if(deadMansBreak)
-    {
-      anchorPrograms.areChatQOLAccountsReady = true
-      anchorPrograms.deadMansBreakTimeStamp = deadMansBreak.unixClockInTimeStamp
-      anchorPrograms.isDeadMansBreakTripped = isDeadMansBreakTripped()
-    }
-    else
-    {
-      anchorPrograms.areChatQOLAccountsReady = false
     }
 
     //M4A Chat
@@ -420,23 +437,6 @@
     //Chat Poll Vote Records
     pollVoteRecords.data = await getPollVoteRecords()
     await listenForPollVoteStatChanges()
-
-    //Lending Protocol CEO Account
-    const lendingCEOAccount = await getLendingProtocolCEOAccount()
-    if(lendingCEOAccount)
-    {
-      adminAccounts.isLendingCEOAccountReady = true
-      adminAccounts.lendingCEOAddress = lendingCEOAccount.address.toBase58()
-    }
-    else
-    {
-      adminAccounts.isLendingCEOAccountReady = false
-      await listenForLendingCEOAccountInitialization()
-    }
-
-    //Token Reserves
-    tokenReserves.data = await getTokenReserves()
-    await listenForTokenReserveChanges()
   })
 
   onUnmounted(() => 
