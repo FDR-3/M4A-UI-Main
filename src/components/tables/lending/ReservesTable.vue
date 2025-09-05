@@ -22,23 +22,23 @@
         </div>
       </template>
       <template #loading> Loading Reserves. Please wait. </template>
-      <Column field="svg" header="svg" style="width: 0%" sortable>
+      <Column field="name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="slotProps.data.source()">
               <component :is="slotProps.data.svg" style="width: 24px"></component>
             </ion-button>
+            <ion-text>USDC</ion-text>
           </div>
         </template>
       </Column>
-      <Column field="tokenMintAddress" header="tokenMintAddress" style="width: 0%" sortable></Column>
-      <Column field="tokenDecimalAmount" header="tokenDecimalAmount" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterColumn">
             <ion-button id="openCreateSubMarketModal"
             color="dark"
             @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
+            subMarketTokenName=slotProps.data.name;
             createSubMarketSVG=slotProps.data.svg;
             sourceSubMarketSVG=slotProps.data.source;
             feeCollectorAddress=connectedWallet.addressString;
@@ -64,7 +64,7 @@
         <component id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px; margin-right: -20px"></component>
       </ion-button>
 
-      <ion-text class="noClickEvent">USDC</ion-text><br>
+      <ion-text class="noClickEvent">{{ subMarketTokenName }}</ion-text><br>
     </div>
 
     <p class="nTinyMarginTop noClickEvent">Owner: {{ trimAddress(connectedWallet.addressString) }}</p>
@@ -136,6 +136,7 @@
   const creatingSubMarket = ref(false)
   const createSubMarketSVG = ref()
   const sourceSubMarketSVG = ref()
+  const subMarketTokenName = ref()
   var selectedTokenMintAddress: PublicKey
   const feeCollectorAddress = ref(connectedWallet.addressString)
   const feePercentage = ref(3)
@@ -165,6 +166,9 @@
   window.onclick = function(event: any) 
   {
     if(creatingSubMarket.value)
+    {
+      const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
+
       if((event?.target?.id != "createSubMarketHeader") &&
       (event?.target?.id != "createSubMarketSVG") &&
       (event?.target?.id != "createSubMarketModal") &&
@@ -175,14 +179,12 @@
       !event?.target?.classList.contains("p-inputtext") &&
       !event?.target?.classList.contains("p-icon") &&
       !event?.target?.classList.contains("p-inputnumber-button-group") &&
-      !event?.target?.classList.contains("p-toast-summary") && //Keep transaction toast from closing modal
-      !event?.target?.classList.contains("p-toast-detail") && //Keep transaction toast from closing modal
-      !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast from closing modal
-      !event?.target?.classList.contains("p-toast-message-text") && //Keep transaction toast from closing modal
-      !event?.target?.classList.contains("p-toast-message-icon") && //Keep transaction toast from closing modal
-      !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast from closing modal
-      !event?.target?.closest('path')) //Keep transaction toast from closing modal
+      !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
+      !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
+      !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
+      !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
         creatingSubMarket.value = false
+    }
   }
 
   const filters = ref(
@@ -201,6 +203,7 @@
 
       const tokenMapObject = tokenReserveDevNetMap.get(processedTableData[i].tokenMintAddress.toString())
 
+      processedTableData[i].name = tokenMapObject.name
       processedTableData[i].svg = markRaw(tokenMapObject.svg)
       processedTableData[i].source = tokenMapObject.source
     }
@@ -236,10 +239,9 @@
   #createSubMarketModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
-    top: 50%;
+    top: 70%;
     left: 50%;
-    transform: translate(-50%, -50%);
-    min-height: 50px;
+    transform: translate(-50%, -70%);
     z-index: 4000; /* Makes sure the modal is on top */
     padding: 20px;
     background-color: var(--ion-background-color)

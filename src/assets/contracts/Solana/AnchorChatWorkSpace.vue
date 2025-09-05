@@ -22,8 +22,6 @@
     //const connection = new Connection(clusterApiUrl("mainnet-beta"), preflightCommitment)
     const connection = new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
 
-    //const connection = new Connection("https://m4a.io/proxyCORS", commitment)
-
     const provider = computed
     (
       () =>

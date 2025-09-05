@@ -2,7 +2,7 @@
   <ion-page>
     <Toast position="center" id="m4aSuccessToast">
       <template #message="slotProps">
-        <div class="flexCenterColumn">
+        <div class="flexCenterColumn noClickEvent">
           <div class="flexCenterRow nSmallMarginBottom">
             <i v-if="slotProps.message.severity == 'success'" class="pi pi-check toastIcon"></i>
             <i v-else-if="slotProps.message.severity == 'error'" class="pi pi-times-circle toastIcon"></i>

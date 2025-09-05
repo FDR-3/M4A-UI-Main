@@ -1,5 +1,5 @@
 {
-  "address": "4NZMVT3pMUSDqXwQnXqfKwgY9pRYUgoAoXX8PUY19wHe",
+  "address": "9yGaDci3e79TskjUZjPBS5HHP9JSetyJbgizgTqWfBRn",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -256,7 +256,7 @@
         },
         {
           "name": "fee_on_interest_earned_rate",
-          "type": "u16"
+          "type": "f32"
         }
       ]
     },
@@ -715,7 +715,7 @@
         },
         {
           "name": "fee_on_interest_earned_rate",
-          "type": "u16"
+          "type": "f32"
         }
       ]
     },
@@ -1620,7 +1620,7 @@
     {
       "code": 6000,
       "name": "InvalidFeeRate",
-      "msg": "The fee on interest earned rate can't be greater than 100%"
+      "msg": "The fee on interest earned rate can't be greater than 100% or less than 0%"
     },
     {
       "code": 6001,
@@ -1682,16 +1682,16 @@
             "type": "pubkey"
           },
           {
+            "name": "token_mint_address",
+            "type": "pubkey"
+          },
+          {
             "name": "fee_collector_address",
             "type": "pubkey"
           },
           {
             "name": "fee_on_interest_earned_rate",
-            "type": "u16"
-          },
-          {
-            "name": "token_mint_address",
-            "type": "pubkey"
+            "type": "f32"
           }
         ]
       }
@@ -1701,6 +1701,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "token_reserve_protocol_index",
+            "type": "u32"
+          },
           {
             "name": "token_mint_address",
             "type": "pubkey"
