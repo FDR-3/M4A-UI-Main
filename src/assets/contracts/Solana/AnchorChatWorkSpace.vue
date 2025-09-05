@@ -21,9 +21,6 @@
     //const connection = new Connection(clusterApiUrl("devnet"), preflightCommitment)
     //const connection = new Connection(clusterApiUrl("mainnet-beta"), preflightCommitment)
     //const connection = new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
-    //const connection = new Connection("https://solana.rpc.grove.city/v1/01fdb492", commitment)
-    //const connection = new Connection('https://solana-mainnet.rpc.extrnode.com/27ac0b99-38bc-46a7-8c92-3bf4aeb463b6')
-    //const connection = new Connection('https://capable-fabled-field.solana-mainnet.quiknode.pro/b364e9f7fa0babd35bd125a11b9d19781483faed/')
 
     const connection = new Connection("https://m4a.io/proxyCORS", commitment)
 

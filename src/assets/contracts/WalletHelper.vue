@@ -204,5 +204,17 @@
     return (amount / 100) // Divide by 100 to convert from fixed 2 point notation to decimal
   }
 
+  export function isValidSolanaPublicKey(address: string)
+  {
+    try 
+    {
+        new PublicKey(address)
+        return true
+    } catch (error)
+    {
+        return false
+    }
+  }
+
   export default toastPreTransactionError
 </script>
