@@ -1,5 +1,5 @@
 {
-  "address": "9yGaDci3e79TskjUZjPBS5HHP9JSetyJbgizgTqWfBRn",
+  "address": "DPuvjRxmijTWvKSnfrVnSQdZ5sKWLcCvrWuHB2b3TtjB",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -142,28 +142,27 @@
       ],
       "accounts": [
         {
-          "name": "lending_protocol",
+          "name": "sub_market_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  80,
+                  115,
+                  117,
+                  98,
+                  77,
+                  97,
                   114,
-                  111,
+                  107,
+                  101,
                   116,
-                  111,
-                  99,
-                  111,
-                  108
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -657,6 +656,33 @@
       ],
       "accounts": [
         {
+          "name": "sub_market_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  77,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "sub_market",
           "writable": true,
           "pda": {
@@ -786,6 +812,33 @@
                   67,
                   69,
                   79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sub_market_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  77,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -1577,6 +1630,19 @@
       ]
     },
     {
+      "name": "SubMarketStats",
+      "discriminator": [
+        214,
+        246,
+        166,
+        81,
+        124,
+        2,
+        88,
+        8
+      ]
+    },
+    {
       "name": "TokenReserve",
       "discriminator": [
         21,
@@ -1652,10 +1718,6 @@
           {
             "name": "token_reserve_count",
             "type": "u32"
-          },
-          {
-            "name": "sub_market_count",
-            "type": "u32"
           }
         ]
       }
@@ -1692,6 +1754,22 @@
           {
             "name": "fee_on_interest_earned_rate",
             "type": "f32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubMarketStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sub_market_creation_count",
+            "type": "u32"
+          },
+          {
+            "name": "sub_market_edit_count",
+            "type": "u32"
           }
         ]
       }
