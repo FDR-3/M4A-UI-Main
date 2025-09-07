@@ -247,7 +247,7 @@
             color="dark"
             @click="openAppealDenialPopover($event, slotProps.data)"
             >
-              Appeal Denial for $0.04
+              Appeal Denial for $0.04 USDC
             </ion-button>
             <ion-popover :is-open="appealDenialPopoverOpen" :event="event" @didDismiss="appealDenialPopoverOpen=false" side="bottom" alignment="center">
               <ion-text class="flexCenterColumn">Enter why your claim should be undenied</ion-text>

@@ -10,28 +10,30 @@
       :value="tableData"
       :loading="isLoading"
       rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'tokenDecimalAmount']"  
+      :globalFilterFields="['name', 'subMarketCount']"  
     >
       <template #header>
         <div>
           <h2>Reserves Value: $<span class="rainbowText">{{ adminAccounts.treasuryBalance.toLocaleString() }}</span></h2>
-          <ion-input v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
+          <ion-input id="reservesSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br><ion-label id="tableTitle">Stable Coins</ion-label>
         </div>
       </template>
       <template #loading> Loading Reserves. Please wait. </template>
-      <Column field="name" header="Asset" style="width: 0%" sortable>
+      <Column field="name" header="Token Reserve" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-            <ion-button fill="clear" @click="slotProps.data.source()">
+            
+            <ion-button style="margin-left: -11px; margin-right: -11px" fill="clear" @click="slotProps.data.source()">
               <component :is="slotProps.data.svg" style="width: 24px"></component>
             </ion-button>
-            <ion-text>USDC</ion-text>
+            <ion-text>{{ slotProps.data.name }}</ion-text>
           </div>
         </template>
       </Column>
+      <Column field="subMarketCount" header="SubMarket Count" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterColumn">
@@ -120,6 +122,7 @@
   import { search } from 'ionicons/icons'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenReserves, tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
@@ -127,6 +130,7 @@
   import { isValidSolanaPublicKey } from '/src/assets/contracts/Wallethelper.vue'
   import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   const toast = inject('toast')
@@ -142,10 +146,9 @@
   const feePercentage = ref(3)
   const validPublicKey = ref(false)
   
-
   onMounted(() =>
   {
-    if(tokenReserves.data)
+    if(tokenReserveHashMap.map)
     {
       processTokenReserveTableData()
       isLoading.value = false
@@ -154,7 +157,7 @@
       isLoading.value = true
   })
 
-  watch(tokenReserves, () => 
+  watch(tokenReserveHashMap, () => 
   {
     processTokenReserveTableData()
 
@@ -194,18 +197,27 @@
 
   function processTokenReserveTableData()
   {
+
     var processedTableData = []
     var newTableData = cloneDeep(tokenReserves)
+
+    if(!newTableData.data)
+      return
 
     for(var i=0; i<newTableData.data.length; i++)
     {
       processedTableData.push(newTableData.data[i].account)
 
-      const tokenMapObject = tokenReserveDevNetMap.get(processedTableData[i].tokenMintAddress.toString())
+      const tokenReserveFrontEndProperties = tokenReserveDevNetMap.get(processedTableData[i].tokenMintAddress.toString())//These are static and don't need to be reactive
+      const tokenReserveSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
 
-      processedTableData[i].name = tokenMapObject.name
-      processedTableData[i].svg = markRaw(tokenMapObject.svg)
-      processedTableData[i].source = tokenMapObject.source
+      processedTableData[i].name = tokenReserveFrontEndProperties.name
+      processedTableData[i].svg = markRaw(tokenReserveFrontEndProperties.svg)
+      processedTableData[i].source = tokenReserveFrontEndProperties.source
+      if(tokenReserveSubMarketList)
+        processedTableData[i].subMarketCount = tokenReserveSubMarketList.length
+      else
+        processedTableData[i].subMarketCount = 0
     }
 
     tableData.value = processedTableData
@@ -225,8 +237,17 @@
   {
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket(tokenMintAddress, 0).rpc()
+      const userNextSubMarketIndex = getUserNextSubMarketIndex(connectedWallet.addressString)
+      
+      const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
+      (
+        tokenMintAddress,
+        userNextSubMarketIndex,
+        new PublicKey(feeCollectorAddress.value),
+        feePercentage.value/100
+      ).rpc()
       await confirmLendingTransaction(tx, toast, "create_sub_market")
+      creatingSubMarket.value = false
     }
     catch(error)
     {
@@ -262,7 +283,7 @@
     min-width: 570px;
   }
 
-  #feeCollectorInput
+  #reservesSearchInput, #feeCollectorInput
   {
     --highlight-color: var(--ion-color-green) !important
   }

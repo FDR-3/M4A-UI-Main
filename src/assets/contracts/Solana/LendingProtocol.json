@@ -1,5 +1,5 @@
 {
-  "address": "DPuvjRxmijTWvKSnfrVnSQdZ5sKWLcCvrWuHB2b3TtjB",
+  "address": "H8ouYcPXMaBttjYsB5BurCdtD4TShxLHxyeAGGYQ6eVy",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -247,7 +247,7 @@
         },
         {
           "name": "sub_market_index",
-          "type": "u8"
+          "type": "u16"
         },
         {
           "name": "fee_collector_address",
@@ -335,7 +335,7 @@
           }
         },
         {
-          "name": "user_account",
+          "name": "user_lending_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -367,22 +367,24 @@
           }
         },
         {
-          "name": "user_token_obligation_account",
+          "name": "lending_user_obligation_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  117,
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
                   115,
                   101,
                   114,
-                  84,
-                  111,
-                  107,
-                  101,
-                  110,
                   79,
                   98,
                   108,
@@ -630,7 +632,7 @@
         },
         {
           "name": "sub_market_index",
-          "type": "u8"
+          "type": "u16"
         },
         {
           "name": "account_index",
@@ -733,7 +735,7 @@
         },
         {
           "name": "sub_market_index",
-          "type": "u8"
+          "type": "u16"
         },
         {
           "name": "fee_collector_address",
@@ -1281,7 +1283,7 @@
           }
         },
         {
-          "name": "user_account",
+          "name": "user_lending_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1313,22 +1315,24 @@
           }
         },
         {
-          "name": "user_token_obligation_account",
+          "name": "lending_user_obligation_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  117,
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
                   115,
                   101,
                   114,
-                  84,
-                  111,
-                  107,
-                  101,
-                  110,
                   79,
                   98,
                   108,
@@ -1617,6 +1621,32 @@
       ]
     },
     {
+      "name": "LendingUserAccount",
+      "discriminator": [
+        149,
+        141,
+        10,
+        3,
+        170,
+        109,
+        186,
+        123
+      ]
+    },
+    {
+      "name": "LendingUserObligationAccount",
+      "discriminator": [
+        99,
+        53,
+        170,
+        115,
+        167,
+        183,
+        89,
+        65
+      ]
+    },
+    {
       "name": "SubMarket",
       "discriminator": [
         8,
@@ -1653,32 +1683,6 @@
         20,
         31,
         12
-      ]
-    },
-    {
-      "name": "UserAccount",
-      "discriminator": [
-        211,
-        33,
-        136,
-        16,
-        186,
-        110,
-        242,
-        127
-      ]
-    },
-    {
-      "name": "UserTokenObligationAccount",
-      "discriminator": [
-        138,
-        229,
-        4,
-        230,
-        6,
-        117,
-        121,
-        21
       ]
     }
   ],
@@ -1735,6 +1739,78 @@
       }
     },
     {
+      "name": "LendingUserAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "account_index",
+            "type": "u8"
+          },
+          {
+            "name": "obligation_account_count",
+            "type": "u32"
+          },
+          {
+            "name": "deposited_value_usd",
+            "type": "u64"
+          },
+          {
+            "name": "borrowed_value_usd",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LendingUserObligationAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "user_account_index",
+            "type": "u8"
+          },
+          {
+            "name": "token_mint_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "sub_market_owner_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "sub_market_index",
+            "type": "u16"
+          },
+          {
+            "name": "user_obligation_account_index",
+            "type": "u32"
+          },
+          {
+            "name": "user_obligation_account_added",
+            "type": "bool"
+          },
+          {
+            "name": "deposited_amount",
+            "type": "u64"
+          },
+          {
+            "name": "borrowed_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "SubMarket",
       "type": {
         "kind": "struct",
@@ -1746,6 +1822,10 @@
           {
             "name": "token_mint_address",
             "type": "pubkey"
+          },
+          {
+            "name": "sub_market_index",
+            "type": "u16"
           },
           {
             "name": "fee_collector_address",
@@ -1793,78 +1873,6 @@
           },
           {
             "name": "deposited_amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UserAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "pubkey"
-          },
-          {
-            "name": "account_index",
-            "type": "u8"
-          },
-          {
-            "name": "obligation_account_count",
-            "type": "u32"
-          },
-          {
-            "name": "deposited_value_usd",
-            "type": "u64"
-          },
-          {
-            "name": "borrowed_value_usd",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UserTokenObligationAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "pubkey"
-          },
-          {
-            "name": "user_account_index",
-            "type": "u8"
-          },
-          {
-            "name": "token_mint_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "sub_market_owner_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "sub_market_index",
-            "type": "u8"
-          },
-          {
-            "name": "user_obligation_account_index",
-            "type": "u32"
-          },
-          {
-            "name": "user_obligation_account_added",
-            "type": "bool"
-          },
-          {
-            "name": "deposited_amount",
-            "type": "u64"
-          },
-          {
-            "name": "borrowed_amount",
             "type": "u64"
           }
         ]

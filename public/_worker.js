@@ -18,7 +18,7 @@ export default
         if (!env.EXTRNODE_API_KEY)
 				  return new Response('API key is missing.', { status: 500 })
 
-        const RPC_BASE_URL = 'https://solana-mainnet.rpc.extrnode.com/'    
+        const RPC_BASE_URL = 'https://solana-devnet.rpc.extrnode.com/'    
         const RPC_Request_URL = RPC_BASE_URL + env.EXTRNODE_API_KEY
 	
         const method = request.method

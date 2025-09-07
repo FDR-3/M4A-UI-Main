@@ -3,7 +3,7 @@
     <div class="tableCard" :class="flipped">
       <div class="frontTable" :style="{display: display1stTable}">
         <h1>Treasury</h1>
-        <h2>Under Construction<br>On Devnet</h2>
+        <h2>Under Construction<br>On Devnet<br>Data will come in slower</h2>
 
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Reserves</ion-button>
         <HODLTreasuryTable/>
@@ -12,9 +12,11 @@
 
       <div class="backTable" :style="{display: display2ndTable}">
         <h1>Reserves</h1>
-        <h2>Under Construction<br>On Devnet</h2>
+        <h2>Under Construction<br>On Devnet<br>Data will come in slower</h2>
+
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Treasuries</ion-button>
         <ReservesTable/>
+        <OwnersTable/>
       </div>
     </div>
   </div>
@@ -26,6 +28,7 @@
   import HODLTreasuryTable from '/src/components/tables/lending/HODLTreasuryTable.vue'
   import SinglePayerTreasuryTable from '/src/components/tables/lending/SinglePayerTreasuryTable.vue'
   import ReservesTable from '/src/components/tables/lending/ReservesTable.vue'
+  import OwnersTable from '/src/components/tables/lending/OwnersTable.vue'
 
   defineProps(['colorName', 'colorHexValue'])//This just keeps a warning from going off since all pages get feed these props
 
@@ -120,18 +123,25 @@
     transform: rotateY(180deg)
   }
 
-  @media screen and (min-width: 1111px)
+  @media screen and (min-width: 717.1px)
   { 
     .tableFlipContainer
     {
-      height: 905px
+      height: 991px
     }
   }
-  @media screen and (max-width: 1110.9px)  
+  @media screen and (min-width: 665.9px) and (max-width: 717px) 
   { 
     .tableFlipContainer
     {
-      height: 935px
+      height: 1005px
+    }
+  }
+  @media screen and (max-width: 665.8px)  
+  { 
+    .tableFlipContainer
+    {
+      height: 1035px
     }
   }
 </style>

@@ -83,6 +83,8 @@
       <ion-text > is sent to the original poster for each up vote they receive.</ion-text> 
     </div>
 
+    <h2>Chat Protocol Currently Switched to Dev Net For Lending Protocol Integration Testing</h2>
+    <h2>Data will come in slower</h2>
     <h2>Comment Section</h2>
 
     <h3 v-if="commentSectionInfo.isCommentSectionReady" class="nMediumMarginTop nSmallMarginBottom "> Initialized By: {{ commentSectionInfo.initiatorDisplayName }}</h3>
@@ -115,7 +117,7 @@
         class="emojiTextSmaller"
         color="dark"
         fill="outline"
-        placeholder="Comment for $1.03, Reply/Edit/Delete/Vote for $0.04"
+        placeholder="Comment for $1.03 USDC, Reply/Edit/Delete/Vote for $0.04 USDC"
         :counter="true"
         :maxlength=MAX_COMMENT_LENGTH
         :counter-formatter="customFormatter"
@@ -145,7 +147,7 @@
       </div>
     </div>
     <div v-else class="largeMarginTop largeMarginBottom">
-      <ion-label >Connect wallet to add a comment<br>Comment for $1.03<br>Reply/Vote/Edit/Delete for $0.04</ion-label>
+      <ion-label >Connect wallet to add a comment<br>Comment for $1.03 USDC<br>Reply/Vote/Edit/Delete for $0.04 USDC</ion-label>
     </div>
   </div>
 </template>

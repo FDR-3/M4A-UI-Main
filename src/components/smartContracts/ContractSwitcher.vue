@@ -71,6 +71,7 @@
   import { postVoteRecords } from '/src/assets/globalStates/chat/PostVoteRecords.vue'
   import { polls, pollVoteRecords } from '/src/assets/globalStates/chat/Polls.vue'
   import { tokenReserves } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarkets } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { getM4AProtocol,
     getM4AFeeTokenAccounts,
     areM4AProtocolStatsInitialized,
@@ -126,8 +127,10 @@
     getDeadMansBreakPDA } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { getLendingProtocolCEOAccount,
     getTokenReserves,
+    getSubMarkets,
     getLendingProtocolCEOAccountPDA,
-    getLendingProtocolPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    getLendingProtocolPDA,
+    getSubMarketStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   defineProps(['colorName', 'colorHexValue', 'buttonShadow'])
@@ -177,6 +180,7 @@
   var pollStatsWatcherId: any
   var pollVoteStatsWatcherId: any
   var lendingProtocolWatcherId: any
+  var subMarketStatsWatcherId: any
 
   var currentStateAccountTotal = 0
   var currentClaimQueueCount = 0
@@ -257,6 +261,27 @@
     //Token Reserves
     tokenReserves.data = await getTokenReserves()
     await listenForTokenReserveChanges()
+
+    //SubMarkets
+    subMarkets.data = await getSubMarkets()
+    await listenForSubMarketChanges()
+
+    //Chat Accounts
+    await setChatAccountAndUserNameHashMap()
+    await listenForChatAccountStatChanges()
+
+    //Chat Protocol CEO Account
+    const chatCEOAccount = await getChatProtocolCEOAccount()
+    if(chatCEOAccount)
+    {
+      adminAccounts.isChatCEOAccountReady = true
+      adminAccounts.chatCEOAddress = chatCEOAccount.address.toBase58()
+    }
+    else
+    {
+      adminAccounts.isChatCEOAccountReady = false
+      await listenForChatCEOAccountInitialization()
+    }
 
     /*//M4AFeeTokenAccount
     const m4aFeeTokenAccounts = await getM4AFeeTokenAccounts()
@@ -370,10 +395,6 @@
       anchorPrograms.isAboutChatReady = false
     }
 
-    //Chat Accounts
-    await setChatAccountAndUserNameHashMap()
-    await listenForChatAccountStatChanges()
-
     //Comment Sections
     commentSections.data = await getCommentSections()
     await listenForCommentSectionStatChanges()
@@ -397,19 +418,6 @@
       adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
     else
       await listenForM4ATreasurerAccountInitialization()*/
-
-    //Chat Protocol CEO Account
-    const chatCEOAccount = await getChatProtocolCEOAccount()
-    if(chatCEOAccount)
-    {
-      adminAccounts.isChatCEOAccountReady = true
-      adminAccounts.chatCEOAddress = chatCEOAccount.address.toBase58()
-    }
-    else
-    {
-      adminAccounts.isChatCEOAccountReady = false
-      await listenForChatCEOAccountInitialization()
-    }
 
     //Chat Protocol Treasurer Account
     const chatTreasurerAccount = await getChatProtocolTreasurerAccount()
@@ -581,6 +589,11 @@
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolWatcherId)
       lendingProtocolWatcherId = undefined
     }
+    if(subMarketStatsWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(subMarketStatsWatcherId)
+      subMarketStatsWatcherId = undefined
+    }  
   })
 
   async function setSelectedM4AContract(index: number)
@@ -1118,6 +1131,16 @@
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
+    })
+  }
+
+  async function listenForSubMarketChanges()
+  {
+    //Subscribe to account changes
+    subMarketStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getSubMarketStatsPDA(), async () => 
+    {
+      //Handle account change..
+      subMarkets.data = await getSubMarkets()
     })
   }
 </script>

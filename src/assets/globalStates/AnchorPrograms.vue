@@ -23,13 +23,12 @@
     pliChatInitiatorAddress: "",
     isAboutChatReady: false,
     aboutChatInitiatorAddress: "",
-    usdcFeeTokenAddress: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),//This is to be the correct value for mainnet or dev net for functions that require fees
+    //The Fee Token Mint Address has to be the correct value for mainnet or dev net for functions that require fees
+    //usdcFeeTokenAddress: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),//Mainnet-beta USDC_MINT_ADDRESS
+    usdcFeeTokenAddress: new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),//Devnet USDC_MINT_ADDRESS
     isM4AFeeTokenAccountReady: false,
     isChatFeeTokenAccountReady: false
   })
-
-  //USDC_MINT_ADDRESS on Mainnet-beta "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-  //USDC_MINT_ADDRESS on Devnet "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
 
   export const SYSTEM_PROGRAM_ADDRESS_STRING = "11111111111111111111111111111111"
 

@@ -378,7 +378,7 @@
         class="postReplyInput emojiTextSmaller"  
         color="dark"
         fill="outline"
-        placeholder="Reply for $0.04"
+        placeholder="Reply for $0.04 USDC"
         :counter="true"
         :maxlength=MAX_COMMENT_LENGTH
         :counter-formatter="replyCustomFormatter"

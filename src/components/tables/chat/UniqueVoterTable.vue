@@ -38,7 +38,13 @@
         <template #body="slotProps">
           <div :class="props.searchAddress == slotProps.data.voterAddress ? 'selfVoteBackground': ''">
             <ion-button fill="clear" @click="openPopover($event, slotProps.data)">
-              <StarWolf class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+              <div v-if="slotProps.data.voterAddress==adminAccounts.chatCEOAddress">
+                <RIPStarWolf v-if="adminAccounts.ceoIsDead" class="starWolfButton" :fill="colorHexValue"/>
+                <StarWolf v-else class="starWolfButton" :fill="colorHexValue"/>
+              </div>
+
+              <StarWolf v-else class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+
               <ion-label color="dark">
                 <span>{{ slotProps.data.displayName }}</span>
               </ion-label>
@@ -83,16 +89,18 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, defineProps } from 'vue'
+  import { ref, defineProps, inject } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonPopover, IonInput } from '@ionic/vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
+  import RIPStarWolf from '/src/assets/svg/rip-star-wolf-svg.vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
   import { download } from 'ionicons/icons'
   import { search } from 'ionicons/icons'
   import { copyFullAddress  } from '/src/assets/contracts/WalletHelper.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import * as anchor from "@coral-xyz/anchor"
 
   const props = defineProps(
@@ -104,8 +112,9 @@
     'displayName'
   ])
 
-
   const emits = defineEmits(['toggleVoterCanidateTable', 'toggleUniqueTable'])
+
+  const colorHexValue = inject('colorHexValue') as string
 
   var popoverOpen = ref(false)
   var event = ref()

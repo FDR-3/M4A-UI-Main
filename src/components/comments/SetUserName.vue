@@ -54,7 +54,7 @@
           v-model="userNameInput"
           fill="outline"
           style="overflow-y: none"
-          placeholder="Set user name for $1.03, Toogle on or off for $0.04"
+          placeholder="Set user name for $1.03 USDC, Toogle on or off for $0.04 USDC"
           :counter="true"
           :maxlength=MAX_USERNAME_LENGTH
           :counter-formatter="customFormatter"

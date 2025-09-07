@@ -25,7 +25,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="slotProps.data.asset.source()">
-              <component :is="slotProps.data.asset.svg" style="width: 24px"></component>
+              <component :is="slotProps.data.asset.svg" style="width: 24px; margin-left: -11px; margin-right: -11px"></component>
             </ion-button>
             <span>{{ slotProps.data.asset.name }}</span>
           </div>
@@ -35,7 +35,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="slotProps.data.chain.source()">
-              <component :is="slotProps.data.chain.svg" style="width: 35px"></component>
+              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
             </ion-button>
             <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
           </div>
@@ -122,5 +122,10 @@
   .tableMinWidth
   {
     min-width: 970px
+  }
+
+  ion-input
+  {
+    --highlight-color: var(--ion-color-green)
   }
 </style>

@@ -49,7 +49,7 @@
     <ion-text color="dark">South Carolina BETA hasn't started yet</ion-text>
   </div>
   <ion-label v-else-if="!connectedWallet.isConnected">
-    Connect wallet to submit claim for $0.04
+    Connect wallet to submit claim for $0.04 USDC
   </ion-label>
   <ion-button v-else-if="!anchorPrograms.isM4AProtocolReady" @click="initializeM4AProtocolAndClaimQueue()" color="green">
     <ion-label color="dark">Init M4A Protocol</ion-label>

@@ -133,7 +133,7 @@
     min-width: 550px
   }
 
-  ion-textarea
+  ion-input
   {
     --highlight-color: var(--ion-color-green)
   }
