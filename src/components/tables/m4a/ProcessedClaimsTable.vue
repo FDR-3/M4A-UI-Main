@@ -347,7 +347,7 @@
     tableDownload.value.exportCSV()
   }
 
-  function openUserPopover(e: Event, rowData: any, ) 
+  function openUserPopover(e: Event, rowData: any) 
   {
     event.value = e
     event.value.submitterApprovedClaimAmountString = rowData.submitterApprovedClaimAmountString

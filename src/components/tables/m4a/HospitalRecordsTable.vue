@@ -432,7 +432,7 @@
     emits('hospitalSelect', hospitalIndex.value, countryIndex.value, stateIndex.value)
   }
 
-  function openUserPopover(e: Event, rowData: any, ) 
+  function openUserPopover(e: Event, rowData: any) 
   {
     event.value = e
     event.value.submitterApprovedClaimAmountString = rowData.submitterApprovedClaimAmountString
@@ -444,7 +444,7 @@
     userPopoverOpen.value = true
   }
 
-  function openInsuranceCompanyPopover(e: Event, rowData: any, ) 
+  function openInsuranceCompanyPopover(e: Event, rowData: any) 
   {
     event.value = e
     event.value.insuranceCompanyApprovedClaimAmountString = rowData.insuranceCompanyApprovedClaimAmountString

@@ -1,22 +1,11 @@
 <script lang="ts">
   import * as anchor from "@coral-xyz/anchor"
-  import { PublicKey } from "@solana/web3.js"
-  import { countryNameArray, 
-    countryStateNameArray,
-    countryStateCoordinatesArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
-  import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
-  import { chatAccountHashMap, customUserNameHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
-  import { commentSectionHashMap } from '/src/assets/globalStates/chat/CommentSections.vue'
-  import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
-  import { subMarkets, subMarketOwnerHashMap, tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
-
-  const PROCESSED_SECTION_NAME_INDEX = 0
-  const STATE_NAME_INDEX = 1
-  const ZOOM_LAT_INDEX = 2
-  const ZOOM_LONG_INDEX = 3
+  import cloneDeep from 'lodash/cloneDeep'
 
   export async function getLendingProtocolCEOAccount()
   {console.log("Getting Lending CEO Account")
@@ -69,6 +58,7 @@
   export async function getSubMarkets()
   {console.log("Getting SubMarkets")
     var subMarketsList: any = []
+    var subMarketsMap = new Map<string, any>()
     var subMarketOwnerMap = new Map<string, any>()
     var tokenReserveMap = new Map<string, any>()
 
@@ -80,13 +70,13 @@
       //Populate Token Reserve hash map
       var ownerTokenReserveList: any = []
 
-      const previousTokenReserveList = tokenReserveMap.get(allSubMarkets[i].account.tokenMintAddress.toString())
+      const previousTokenReserveList = tokenReserveMap.get(allSubMarkets[i].account.tokenMintAddress.toBase58())
       if(previousTokenReserveList)
         ownerTokenReserveList = previousTokenReserveList
 
       ownerTokenReserveList.push(allSubMarkets[i].account)
 
-      tokenReserveMap.set(allSubMarkets[i].account.tokenMintAddress.toString(), ownerTokenReserveList)
+      tokenReserveMap.set(allSubMarkets[i].account.tokenMintAddress.toBase58(), ownerTokenReserveList)
 
       //Populate SubMarket Owner hash map
       var subMarketOwner: SubMarketOwner = 
@@ -95,21 +85,43 @@
         ownerSubMarketList: []
       }
 
-      const previousSubMarketOwnerData = subMarketOwnerMap.get(allSubMarkets[i].account.owner.toString())
+      const previousSubMarketOwnerData = subMarketOwnerMap.get(allSubMarkets[i].account.owner.toBase58())
       if(previousSubMarketOwnerData)
         subMarketOwner = previousSubMarketOwnerData
   
       subMarketOwner.ownerSubMarketList.push(allSubMarkets[i].account)
+
+      const newIndex = subMarketOwner.ownerSubMarketList.length - 1
+
+      const tokenFrontEndProperties = tokenReserveDevNetMap.get(subMarketOwner.ownerSubMarketList[newIndex].tokenMintAddress.toBase58())
+
+      subMarketOwner.ownerSubMarketList[newIndex].feeCollectorAddress = subMarketOwner.ownerSubMarketList[newIndex].feeCollectorAddress.toBase58()
+      //subMarketOwner.ownerSubMarketList[newIndex].tokenSVG = tokenFrontEndProperties.svg//This has to be marked raw in the Owners Table since it is cloned at the end of this fuction. The cloning is for allowing users to edit the table without updating the original hashmap. It was originally marked Raw in the TokenReserves.vue file
+      subMarketOwner.ownerSubMarketList[newIndex].tokenName = tokenFrontEndProperties.name
+      subMarketOwner.ownerSubMarketList[newIndex].svgSource = tokenFrontEndProperties.source
+
       subMarketOwner.subMarketCount = subMarketOwner.ownerSubMarketList.length
 
-      subMarketOwnerMap.set(allSubMarkets[i].account.owner.toString(), subMarketOwner)
+      subMarketOwnerMap.set(allSubMarkets[i].account.owner.toBase58(), subMarketOwner)
+
+      //Populate SubMarket hash map
+      subMarketsMap.set
+      (
+        allSubMarkets[i].account.tokenMintAddress.toBase58() +
+        allSubMarkets[i].account.owner.toBase58() +
+        allSubMarkets[i].account.subMarketIndex.toString(), 
+        allSubMarkets[i].account
+      )
 
       //Add SubMarket to overall list
       subMarketsList.push(allSubMarkets[i].account)
     }
 
-    subMarketOwnerHashMap.map = subMarketOwnerMap
-    tokenReserveHashMap.map = tokenReserveMap
+    console.log("Setting SubMarket Hash Maps")
+
+    tokenReserveHashMap.map = cloneDeep(tokenReserveMap)
+    subMarketsHashMap.map = cloneDeep(subMarketsMap)
+    subMarketOwnerHashMap.map = cloneDeep(subMarketOwnerMap)
 
     subMarkets.ownerCount = subMarketOwnerHashMap.map.size
 

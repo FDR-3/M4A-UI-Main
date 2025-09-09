@@ -3,7 +3,7 @@
     <div class="tableCard" :class="flipped">
       <div class="frontTable" :style="{display: display1stTable}">
         <h1>Treasury</h1>
-        <h2>Under Construction<br>On Devnet<br>Data will come in slower</h2>
+        <h2>Under Construction<br>On Devnet</h2>
 
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Reserves</ion-button>
         <HODLTreasuryTable/>
@@ -12,7 +12,7 @@
 
       <div class="backTable" :style="{display: display2ndTable}">
         <h1>Reserves</h1>
-        <h2>Under Construction<br>On Devnet<br>Data will come in slower</h2>
+        <h2>Under Construction<br>On Devnet</h2>
 
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Treasuries</ion-button>
         <ReservesTable/>
@@ -123,25 +123,18 @@
     transform: rotateY(180deg)
   }
 
-  @media screen and (min-width: 717.1px)
+  @media screen and (min-width: 1110.1px)
   { 
     .tableFlipContainer
     {
-      height: 991px
+      height: 1637px
     }
   }
-  @media screen and (min-width: 665.9px) and (max-width: 717px) 
+  @media screen and (max-width: 1110px) 
   { 
     .tableFlipContainer
     {
-      height: 1005px
-    }
-  }
-  @media screen and (max-width: 665.8px)  
-  { 
-    .tableFlipContainer
-    {
-      height: 1035px
+      height: 1667px
     }
   }
 </style>

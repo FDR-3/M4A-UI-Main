@@ -13,47 +13,57 @@
       groupRowsBy="asset.type"
       :globalFilterFields="['asset.name', 'price', 'apy', 'app.name', 'chain.name']"
     >
-    <template #header>
-      <div>
-        <h2>Earn interest on deposits while helping to push the USA to universal health care like every other fucking first world country not named the United States of America</h2>
-        <p>A 3% fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
-        <p>IE: If you have $100 of USDC deposited for a year, and the apy remains at exactly 10% for the whole year (Not likely at all)</p>
-        <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) = $109.70</p>
-        <!--<a href="https://www.youtube.com/@fdr-3" target="_blank">Where does the money come from that users are earning on their deposits?</a>-->
-        <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Market Search     ">
-          <ion-icon slot="start" :icon="search"></ion-icon>
-        </ion-input>
-        <br><ion-label id="tableTitle">Stable Coins</ion-label>
-      </div>
-    </template>
-    <template #loading> Loading records. Please wait. </template>
-    <Column field="asset" header="Asset" style="width: 0%" sortable>
-      <template #body="slotProps">
-        <div class="flexCenterRowHeight">
-            <component :is="slotProps.data.asset.svg" style="width: 24px; margin-right: 2px" />
+      <template #header>
+        <div>
+          <h2>Earn interest on deposits while helping to push the USA to universal health care like every other fucking first world country not named the United States of America</h2>
+          <p>A 3% fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
+          <p>IE: If you have $100 of USDC deposited for a year, and the apy remains at exactly 10% for the whole year (Not likely at all)</p>
+          <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) = $109.70</p>
+          <!--<a href="https://www.youtube.com/@fdr-3" target="_blank">Where does the money come from that users are earning on their deposits?</a>-->
+          <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Market Search     ">
+            <ion-icon slot="start" :icon="search"></ion-icon>
+          </ion-input>
+          <br><ion-label id="tableTitle">Stable Coins</ion-label>
+        </div>
+      </template>
+      <template #loading> Loading Stable Coins. Please Wait. </template>
+      <Column field="asset.name" header="Asset" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRowHeight">
+            <ion-button fill="clear" @click="slotProps.data.asset.source()">
+              <component :is="slotProps.data.asset.svg" style="width: 24px; margin-left: -11px; margin-right: -11px"></component>
+            </ion-button>
             <span>{{ slotProps.data.asset.name }}</span>
-        </div>
-      </template>
-    </Column>
-    <Column field="price" header="Price" style="width: 0%" sortable></Column>
-    <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
-    <Column field="chain.name" header="Chain" style="width: 0%" sortable>
-      <template #body="slotProps">
-        <div class="flexCenterRowHeight">
-            <component :is="slotProps.data.chain.svg" style="width: 40px" />
+          </div>
+        </template>
+      </Column>
+      <Column field="price" header="Price" style="width: 0%" sortable>
+        <template #body="slotProps">
+          ${{ slotProps.data.price.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })}}
+        </template>
+      </Column>
+      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
+      <Column field="chain.name" header="Chain" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRowHeight">
+            <ion-button fill="clear" @click="slotProps.data.chain.source()">
+              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
+            </ion-button>
             <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
-        </div>
-      </template>
-    </Column>
-    <Column header="Actions" style="width: 0%">
-      <template #body="slotProps">
-        <div class="flexCenterColumn">
-          <ion-button color="dark">Deposit</ion-button>
-        </div>
-      </template>
-    </Column>
-  </DataTable>
-<!--
+          </div>
+        </template>
+      </Column>
+      <Column header="Actions" style="width: 0%">
+        <template #body="slotProps">
+          <div class="flexCenterColumn">
+            <ion-button color="dark">Deposit</ion-button>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+
     <DataTable 
       class="tableMinWidth"
       v-model:filters="filters" 
@@ -69,37 +79,43 @@
         <br><ion-label id="tableTitle">Crypto Currency</ion-label>
       </div>
     </template>
-    <template #loading> Loading records. Please wait. </template>
-    <Column field="asset" header="Asset" style="width: 0%" sortable>
-      <template #body="slotProps">
-        <div class="flexCenterRowHeight">
-            <img :src="`/src/assets/cryptoIcons/${slotProps.data.asset.image}`" style="width: 24px" />
-            <span>{{ slotProps.data.asset.name }}</span>
-        </div>
-      </template>
-    </Column>
-      <Column field="price" header="Price" style="width: 0%" sortable></Column>
-      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
-      <Column field="app.name" header="App" style="width: 0%" sortable>
-      <template #body="slotProps">
-        <div class="flexCenterRowHeight">
-            <img v-if="slotProps.data.app.image.includes('.png')" :src="`/src/assets/cryptoIcons/${slotProps.data.app.image}`" style="width: 24px" />
-            <ion-icon v-if="slotProps.data.app.image.includes('.svg')" color="dark" :src="`/src/assets/cryptoIcons/${slotProps.data.app.image}`" style="width: 24px" />
-            <span>{{ slotProps.data.app.name }}</span>
-        </div>
-      </template>
-      </Column>
-      <Column field="chain.name" header="Chain" style="width: 0%" sortable>
+    <template #loading> Loading Cryto Currencies. Please wait. </template>
+    <Column field="asset.name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-              <img :src="`/src/assets/cryptoIcons/${slotProps.data.chain.image}`" style="width: 24px" />
-              <span>{{ slotProps.data.chain.name }}</span>
+            <ion-button fill="clear" @click="slotProps.data.asset.source()" style="margin-left: -8px; margin-right: -10px">
+              <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; margin-left: -8px; margin-right: -4px" />
+              <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 24px; margin-right: 2px" />
+            </ion-button>
+            <span>{{ slotProps.data.asset.name }}</span>
           </div>
         </template>
       </Column>
-    </DataTable>-->
+      <Column field="price" header="Price" style="width: 0%" sortable>
+        <template #body="slotProps">
+            ${{ slotProps.data.price.toLocaleString() }}
+        </template>
+      </Column>
+      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
+      <Column field="chain.name" header="Chain" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRowHeight">
+            <ion-button fill="clear" @click="slotProps.data.chain.source()">
+              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
+            </ion-button>
+            <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
+          </div>
+        </template>
+      </Column>
+      <Column header="Actions" style="width: 0%">
+        <template #body="slotProps">
+          <div class="flexCenterColumn">
+            <ion-button color="dark">Deposit</ion-button>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
   </div>
-
 </template>
 
 <script setup lang="ts">

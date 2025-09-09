@@ -430,7 +430,7 @@
     }
   }
 
-  const onCellEditSave = async (event: { newData:any; index:any } ) => 
+  const onCellEditSave = (event: { newData:any; index:any } ) => 
   {
     let { newData, index } = event
 
@@ -516,9 +516,9 @@
         rowData.note
       ).rpc()
 
+      await confirmM4ATransaction(tx, toast, "update_hospital")
       savedEditedRow = undefined
       isDataEdited.value = false
-      await confirmM4ATransaction(tx, toast, "update_hospital")
     }
     catch(error)
     {

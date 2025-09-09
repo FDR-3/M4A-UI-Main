@@ -84,7 +84,6 @@
     </div>
 
     <h2>Chat Protocol Currently Switched to Dev Net For Lending Protocol Integration Testing</h2>
-    <h2>Data will come in slower</h2>
     <h2>Comment Section</h2>
 
     <h3 v-if="commentSectionInfo.isCommentSectionReady" class="nMediumMarginTop nSmallMarginBottom "> Initialized By: {{ commentSectionInfo.initiatorDisplayName }}</h3>

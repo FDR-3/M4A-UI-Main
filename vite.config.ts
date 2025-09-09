@@ -36,7 +36,7 @@ export default defineConfig({
       plugins: [
         NodeModulesPolyfillPlugin(),
       ],
-    },
+    }
   },
   //Fixes solana .all() method/buffer issues, and "Reached maximum depth for account resolution" Error in production when contracts are called
   build: {

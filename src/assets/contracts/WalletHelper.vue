@@ -3,6 +3,7 @@
   import { metaMaskWalletConnected } from '/src/assets/globalStates/MetaMaskWalletConnected.vue'
   import { PublicKey } from "@solana/web3.js"
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   export const VOTE_COST = 0.04
   export const TOAST_TIME_LEN_SECONDS = 11
@@ -209,7 +210,11 @@
     try 
     {
         new PublicKey(address)
-        return true
+
+        if(address == SYSTEM_PROGRAM_ADDRESS_STRING)
+          return false
+        else
+          return true
     } catch (error)
     {
         return false

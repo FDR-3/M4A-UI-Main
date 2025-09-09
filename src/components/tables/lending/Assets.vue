@@ -1,177 +1,107 @@
 <script lang="ts">
+  import DAISVG from '/src/assets/cryptoIcons/dai-svg.vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
-  import { sourceUSDC, sourceSOL} from '/src/assets/helperFunctions/sources.ts'
+  import WEthSVG from '/src/assets/cryptoIcons/weth-svg.vue'
+  import WBtcSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
+  import { sourceDAI,
+    sourceUSDC,
+    sourceSOL,
+    sourceWEth,
+    sourceWBtc } from '/src/assets/helperFunctions/sources.ts'
 
-  export const StableCoins = [
-  /*{
-    asset: 
+  export const StableCoins =
+  [
     {
-      image: "pyusd2.webp",
-      name: "PYUSD",
-      type: "Stable Coin" 
+      tokenMintAddress: "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o",
+      asset: 
+      {
+        name: "DAI",
+        svg: DAISVG,
+        source: () => {sourceDAI()}
+      },
+      price: 1.00,
+      apy: "4.44%",
+      chain:
+      {
+        name: "Solana",
+        svg: SOLSVG,
+        source: () => {sourceSOL()}
+      }
     },
-    price: "$1.00",
-    apy: "8.0%",
-    app:
     {
-      image: "marginfi.svg",
-      name: "MarginFi"
-    },
-    chain:
-    {
-      image: "sol.svg",
-      name: "Solana"
+      tokenMintAddress: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      asset: 
+      {
+        name: "USDC",
+        svg: USDCSVG,
+        source: () => {sourceUSDC()}
+      },
+      price: 1.00,
+      apy: "4.44%",
+      chain:
+      {
+        name: "Solana",
+        svg: SOLSVG,
+        source: () => {sourceSOL()}
+      }
     }
-  },*/
-  {
-    asset: 
-    {
-      name: "USDC",
-      type: "Stable Coin",
-      svg: USDCSVG,
-      source: () => {sourceUSDC()}
-    },
-    price: "$1.00",
-    apy: "4.84%",
-    app:
-    {
-      image: "marginfi.svg",
-      name: "MarginFi"
-    },
-    chain:
-    {
-      name: "Solana",
-      svg: SOLSVG,
-      source: () => {sourceSOL()}
-    }
-  }/*,
-  {
-    asset: 
-    {
-      image: "dai.svg",
-      name: "DAI",
-      type: "Stable Coin"  
-    },
-    price: "$1.00",
-    apy: "5.0%",
-    app:
-    {
-      image: "aave.svg",
-      name: "Aave"
-    },
-    chain:
-    {
-      image: "matic.svg",
-      name: "Polygon"
-    }
-  }*/]
+  ]
 
-//Crypto Currencies
-  export const CryptoCurrency = [
-  {
-    asset: 
+  export const CryptoCurrency =
+  [
     {
-      image: "sol.svg",
-      name: "Sol",
-      type: "Crypto Currency",
-      url: "https://logowik.com/solana-logo-vector-svg-pdf-ai-eps-cdr-free-download-19832.html"
+      tokenMintAddress: "So11111111111111111111111111111111111111112",
+      asset: 
+      {
+        name: "Sol",
+        svg: SOLSVG,
+        source: () => {sourceSOL()}
+      },
+      price: 212.98,
+      apy: "4.44%",
+      chain:
+      {
+        name: "Solana",
+        svg: SOLSVG,
+        source: () => {sourceSOL()}
+      }
     },
-    price: "$2,220.00",
-    apy: "5.0%",
-    app:
     {
-      image: "marginfi.svg",
-      name: "MarginFi"
+      tokenMintAddress: "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+      asset: 
+      {
+        name: "WEth",
+        svg: WEthSVG,
+        source: () => {sourceWEth()}
+      },
+      price: 4292.44,
+      apy: "4.44%",
+      chain:
+      {
+        name: "Solana",
+        svg: SOLSVG,
+        source: () => {sourceSOL()}
+      }
     },
-    chain:
     {
-      image: "sol.svg",
-      name: "Solana",
-      url: "https://logowik.com/solana-logo-vector-svg-pdf-ai-eps-cdr-free-download-19832.html"
-    }
-  },
-  {
-    asset: 
-    {
-      image: "eth.svg",
-      name: "ETH",
-      type: "Crypto Currency"  
+      tokenMintAddress: "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+      asset: 
+      {
+        name: "WBtc",
+        svg: WBtcSVG,
+        source: () => {sourceWBtc()}
+      },
+      price: 110645.87,
+      apy: "4.44%",
+      chain:
+      {
+        name: "Solana",
+        svg: SOLSVG,
+        source: () => {sourceSOL()}
+      }
     },
-    price: "$2,220.00",
-    apy: "5.0%",
-    app:
-    {
-      image: "radiant.png",
-      name: "Radiant"
-    },
-    chain:
-    {
-      image: "base.png",
-      name: "Base"
-    }
-  },
-  {
-    asset: 
-    {
-      image: "wbtc.svg",
-      name: "WBTC",
-      type: "Crypto Currency"  
-    },
-    price: "$52,150.00",
-    apy: "0.31%",
-    app:
-    {
-      image: "radiant.png",
-      name: "Radiant"
-    },
-    chain:
-    {
-      image: "base.png",
-      name: "Base"
-    }
-  },
-  {
-    asset: 
-    {
-      image: "maticx.svg",
-      name: "MaticX",
-      type: "Crypto Currency"  
-    },
-    price: "$0.30",
-    apy: "2.0%",
-    app:
-    {
-      image: "mesh.svg",
-      name: "Mesh"
-    },
-    chain:
-    {
-      image: "matic.svg",
-      name: "Polygon"
-    }
-  },
-  {
-    asset: 
-    {
-      image: "avax.svg",
-      name: "Avax",
-      type: "Crypto Currency"  
-    },
-    price: "$31.00",
-    apy: "7.0%",
-    app:
-    {
-      image: "benqi.svg",
-      name: "Benqi"
-    },
-    chain:
-    {
-      image: "avax.svg",
-      name: "Avax"
-    }
-  },
-]
+  ]
 
 export default StableCoins
 </script>

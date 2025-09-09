@@ -1,24 +1,26 @@
 <template>
   <div class="tableContainer">
-    <DataTable 
+    <!--TokenReserveTable-->
+    <DataTable
+      v-if="!showTokenSubMarkets"
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines
       sortField="tokenMintAddress" 
       :sortOrder="-1" 
       size="small" 
-      :value="tableData"
+      :value="tokenReserveTableData"
       :loading="isLoading"
       rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['name', 'subMarketCount']"  
+      :globalFilterFields="['name', 'tokenMintAddress', 'subMarketCount']"  
     >
       <template #header>
         <div>
-          <h2>Reserves Value: $<span class="rainbowText">{{ adminAccounts.treasuryBalance.toLocaleString() }}</span></h2>
+          <h2>Token Reserves</h2>
           <ion-input id="reservesSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
-          <br><ion-label id="tableTitle">Stable Coins</ion-label>
+          <br>
         </div>
       </template>
       <template #loading> Loading Reserves. Please wait. </template>
@@ -33,10 +35,11 @@
           </div>
         </template>
       </Column>
+      <Column field="tokenMintAddress" header="TokenMintAddress" style="width: 0%" sortable></Column>
       <Column field="subMarketCount" header="SubMarket Count" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flexCenterColumn">
+          <div class="flexCenterRow">
             <ion-button id="openCreateSubMarketModal"
             color="dark"
             @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
@@ -45,10 +48,117 @@
             sourceSubMarketSVG=slotProps.data.source;
             feeCollectorAddress=connectedWallet.addressString;
             creatingSubMarket=true;
-            checkAddress()"
+            validPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
             >
               Create SubMarket
             </ion-button>
+            <ion-button v-if="slotProps.data.subMarketCount" color="dark" @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress; showTokenReserveSubMarkets()">
+              View Markets
+            </ion-button>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+
+    <!--TokenReserveSubMarketsTable-->
+    <DataTable
+      v-if="showTokenSubMarkets" 
+      class="tableMinWidth"
+      v-model:filters="filters" 
+      show-gridlines
+      sortField="tokenMintAddress" 
+      :sortOrder="-1" 
+      size="small" 
+      :value="tokenMarketTableData"
+      :loading="isLoading"
+      editMode="cell" 
+      @cell-edit-complete="onCellEditSave($event)"
+      rowGroupMode="subheader" groupRowsBy="asset.type"
+      :globalFilterFields="['owner', 'displayName', 'feeCollectorAddress', 'feeOnInterestEarnedRate']"  
+    >
+      <template #header>
+        <div>
+          <h2>USDC SubMarkets</h2>
+          <ion-button color="dark" class="mediumSmallMarginBottom nSmallMarginTop" @click="showTokenSubMarkets=false">Return</ion-button>
+          <ion-input id="reservesSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
+            <ion-icon slot="start" :icon="search"></ion-icon>
+          </ion-input>
+          <br>
+        </div>
+      </template>
+      <template #loading> Loading Reserves. Please wait. </template>
+      <Column field="owner" header="Owner" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRowHeight">
+            <ion-button fill="clear" @click="openOwnerPopover($event, slotProps.data)">
+
+              <div v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddress">
+                <RIPStarWolf v-if="adminAccounts.ceoIsDead" class="starWolfButton" :fill="colorHexValue"/>
+                <StarWolf v-else class="starWolfButton" :fill="colorHexValue"/>
+              </div>
+              <StarWolf v-else class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+
+              <ion-label color="dark">
+                {{ slotProps.data.displayName }}
+              </ion-label>
+            </ion-button>
+            <ion-popover 
+            :is-open="ownerPopoverOpen" 
+            :event="event" 
+            @didDismiss="ownerPopoverOpen=false"
+            side="top" 
+            alignment="center"
+            >
+              <ion-button id="commentCopyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
+                <ion-label color="dark">{{ copyFullAddressButtonText }}</ion-label>
+              </ion-button>
+            </ion-popover>
+          </div>
+        </template>
+      </Column>
+      <Column field="feeCollectorAddress" header="Fee Collector Address" style="width: 0%" sortable>
+        <template #editor="{ index, data, field }">
+          <InputText
+            v-model="data[field]"
+            fluid
+            @input="isEditing=true; tokenMarketTableData[index].isEditingRow=true; checkAddress(data[field])"
+            :disabled="connectedWallet.addressString!=tokenMarketTableData[index].owner ||
+            (isDataEdited && !tokenMarketTableData[index].isEditingRow && !tokenMarketTableData[index].isRowDataEdited)"
+          />
+        </template>
+      </Column>
+      <Column field="feeOnInterestEarnedRate" header="Fee On Interest Earned Rate" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <ion-text>{{ slotProps.data.feeOnInterestEarnedRate * 100 }}%</ion-text>
+        </template>
+        <template #editor="{ index, data, field }">
+          <InputNumber
+          v-model="data[field]"
+          :min=0
+          :max=100
+          :step=0.01
+          fluid
+          @input="isEditing=true; tokenMarketTableData[index].isEditingRow=true"
+          :disabled="connectedWallet.addressString!=tokenMarketTableData[index].owner ||
+          (isDataEdited && !tokenMarketTableData[index].isEditingRow && !tokenMarketTableData[index].isRowDataEdited)"/>
+        </template>
+      </Column>
+      <Column field="actions" header="Actions" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRow">
+            <div v-if="connectedWallet.addressString==slotProps.data.owner">
+              <ion-button
+              v-if="slotProps.data.isRowDataEdited"
+              color="dark"
+              @click="editSubMarket(slotProps.data)"
+              :disabled="isInvalidPublicKey"
+              >
+                Edit Market
+              </ion-button>
+              <ion-text v-else-if="isDataEdited">Another Row Is Being Edited</ion-text>
+              <ion-text v-else>No edits detected</ion-text>
+            </div>
+            <ion-text v-else align="center">Only the owner can edit their sub market</ion-text>
           </div>
         </template>
       </Column>
@@ -81,7 +191,7 @@
       id="feeCollectorInput"
       v-model="feeCollectorAddress"
       fill="outline"
-      @ion-input="checkAddress()"
+      @ion-input="validPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
       :class="{ 'invalid': !validPublicKey }"
     >
     </ion-input>
@@ -103,7 +213,7 @@
     <ion-button
       id="createSubMarketButton"
       color="dark"
-      @click="createSubMarket(selectedTokenMintAddress)"
+      @click="createSubMarket()"
       class="mediumMarginTop"
       :disabled="!validPublicKey || !connectedWallet.isConnected"
     >
@@ -113,38 +223,56 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, watch, inject, markRaw } from 'vue'
-  import { IonLabel, IonIcon, IonInput, IonButton, IonText } from '@ionic/vue'
+  import { ref, onMounted, watch, inject } from 'vue'
+  import { IonLabel, IonIcon, IonInput, IonButton, IonText, IonPopover } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
   import InputNumber from 'primevue/inputnumber'
+  import InputText from 'primevue/inputtext'
   import { search } from 'ionicons/icons'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { tokenReserves, tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { tokenReserveHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
+  import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
+  import RIPStarWolf from '/src/assets/svg/rip-star-wolf-svg.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
-  import { isValidSolanaPublicKey } from '/src/assets/contracts/Wallethelper.vue'
-  import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
-  import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { trimAddress,
+    copyFullAddress,
+    isValidSolanaPublicKey,
+    confirmLendingTransaction,
+    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   const toast = inject('toast')
+  const colorHexValue = inject('colorHexValue') as string
 
-  const tableData = ref()
+  const tokenReserveTableData = ref()
+  const tokenMarketTableData = ref()
+  const showTokenSubMarkets = ref(false)
   const isLoading = ref(true)
   const creatingSubMarket = ref(false)
   const createSubMarketSVG = ref()
   const sourceSubMarketSVG = ref()
   const subMarketTokenName = ref()
-  var selectedTokenMintAddress: PublicKey
   const feeCollectorAddress = ref(connectedWallet.addressString)
   const feePercentage = ref(3)
   const validPublicKey = ref(false)
+  const ownerPopoverOpen = ref(false)
+  const event = ref()
+
+  var selectedTokenMintAddress: PublicKey
+  var publicKeyCheckColor = ref("#6fff7b")
+  var isInvalidPublicKey = ref(false)
+  var savedEditedRow: any 
+  var isEditing = false
+  const isDataEdited = ref(false)
+  const copyFullAddressButtonText = ref("Copy Full Address")
   
   onMounted(() =>
   {
@@ -157,12 +285,21 @@
       isLoading.value = true
   })
 
-  watch(tokenReserveHashMap, () => 
+  watch(subMarketOwnerHashMap, () => //Watching subMarketOwnerHashMap instead of tokenReserveHashMap to avoid circular updating and watching. The most important thing is keeping the process for updating custom names separate and not causing extra fetches
   {
     processTokenReserveTableData()
 
     if(isLoading.value)
       isLoading.value = false
+
+    //Update inner table if it's already opened
+    if(showTokenSubMarkets.value)
+      showTokenReserveSubMarkets()
+  })
+
+  watch(customUserNameHashMap, () =>
+  {
+    processTokenReserveTableData()
   })
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
@@ -190,6 +327,20 @@
     }
   }
 
+  function openOwnerPopover(e: Event, rowData: any) 
+  {
+    event.value = e
+    event.value.ownerAddress = rowData.owner
+
+    ownerPopoverOpen.value = true
+  }
+
+  function closeOwnerPopover(e: Event) 
+  {
+    event.value = e
+    ownerPopoverOpen.value = false
+  }
+
   const filters = ref(
   {
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
@@ -209,30 +360,106 @@
       processedTableData.push(newTableData.data[i].account)
 
       const tokenReserveFrontEndProperties = tokenReserveDevNetMap.get(processedTableData[i].tokenMintAddress.toString())//These are static and don't need to be reactive
-      const tokenReserveSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
-
       processedTableData[i].name = tokenReserveFrontEndProperties.name
-      processedTableData[i].svg = markRaw(tokenReserveFrontEndProperties.svg)
+      processedTableData[i].svg = tokenReserveFrontEndProperties.svg
       processedTableData[i].source = tokenReserveFrontEndProperties.source
-      if(tokenReserveSubMarketList)
-        processedTableData[i].subMarketCount = tokenReserveSubMarketList.length
+
+      var tokenReserveSubMarketList = []
+      const unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
+      if(unProcessedTokenSubMarketList)
+        processedTableData[i].subMarketCount = unProcessedTokenSubMarketList.length
       else
         processedTableData[i].subMarketCount = 0
+
+      
+      for(var j=0; j<unProcessedTokenSubMarketList.length; j++)
+      {
+        const chatAccount = customUserNameHashMap.map.get(unProcessedTokenSubMarketList[j].owner.toString())
+        var displayName = ""
+
+        if(chatAccount)
+        {
+          if(chatAccount.useCustomName)
+            displayName = chatAccount.userName
+          else
+            displayName = trimAddress(unProcessedTokenSubMarketList[j].owner.toString())
+        }
+        else
+          displayName = trimAddress(unProcessedTokenSubMarketList[j].owner.toString())
+
+        unProcessedTokenSubMarketList[j].displayName = displayName
+        tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
+      }
+
+      tokenReserveHashMap.map.set(processedTableData[i].tokenMintAddress.toString(), tokenReserveSubMarketList)
     }
 
-    tableData.value = processedTableData
+    tokenReserveTableData.value = processedTableData
   }
 
-  function checkAddress()
+  function showTokenReserveSubMarkets()
   {
-    if(feeCollectorAddress.value == SYSTEM_PROGRAM_ADDRESS_STRING)
-      validPublicKey.value = false
-    else if(isValidSolanaPublicKey(feeCollectorAddress.value))
-      validPublicKey.value = true
-    else
-      validPublicKey.value = false
+    tokenMarketTableData.value = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+    showTokenSubMarkets.value = true
   }
 
+  function passByRefWrapperCopyAddress()
+  {
+    copyFullAddress(copyFullAddressButtonText, event.value.ownerAddress)
+  }
+
+  function checkAddress(address: string)
+  {
+    if(isValidSolanaPublicKey(address))
+    {
+      publicKeyCheckColor.value = "#6fff7b"
+      isInvalidPublicKey.value = false
+    }
+    else
+    {
+      publicKeyCheckColor.value = "#ff0000"
+      isInvalidPublicKey.value = true
+    }
+  }
+
+  const onCellEditSave = async (event: { newData:any; index:any } ) => 
+  {
+    let { newData, index } = event
+    
+    tokenMarketTableData.value[index].feeCollectorAddress = newData.feeCollectorAddress
+    tokenMarketTableData.value[index].feeOnInterestEarnedRate = newData.feeOnInterestEarnedRate
+
+    const subMarket = subMarketsHashMap.map.get
+    (
+      tokenMarketTableData.value[index].tokenMintAddress.toBase58() +
+      tokenMarketTableData.value[index].owner.toString() +
+      tokenMarketTableData.value[index].subMarketIndex.toString()
+    )
+
+    if(newData.feeCollectorAddress != subMarket.feeCollectorAddress ||
+    newData.feeOnInterestEarnedRate != subMarket.feeOnInterestEarnedRate)
+    {
+      tokenMarketTableData.value[index].isRowDataEdited = true
+      savedEditedRow = tokenMarketTableData.value[index]
+      isDataEdited.value = true
+    }
+    else
+    {
+      tokenMarketTableData.value[index].isRowDataEdited = false
+
+      //Erase saved row if it exists since the row data matches what's on the block chain
+      if(savedEditedRow != undefined)
+        if(tokenMarketTableData.value[index].subMarketIndex == savedEditedRow.subMarketIndex) //Keeps other rows from erasing the data when you click in them
+        { 
+          savedEditedRow = undefined
+          isDataEdited.value = false
+        }
+    }
+
+    tokenMarketTableData.value[index].isEditingRow = false
+    isEditing = false
+  }
+  
   async function createSubMarket(tokenMintAddress: PublicKey)
   {
     try
@@ -252,6 +479,29 @@
     catch(error)
     {
       toastPreTransactionError(error, toast, "create_sub_market")
+    }
+  }
+
+  async function editSubMarket(subMarketTableRow: any)
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.editSubMarket
+      (
+        new PublicKey(subMarketTableRow.tokenMintAddress),
+        subMarketTableRow.subMarketIndex,
+        new PublicKey(subMarketTableRow.feeCollectorAddress),
+        subMarketTableRow.feeOnInterestEarnedRate
+      ).rpc()
+      await confirmLendingTransaction(tx, toast, "edit_sub_market")
+
+      subMarketTableRow.isRowDataEdited = false
+      savedEditedRow = undefined
+      isDataEdited.value = false
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "edit_sub_market")
     }
   }
 </script>
@@ -280,7 +530,7 @@
 
   .tableMinWidth
   {
-    min-width: 570px;
+    min-width: 1000px
   }
 
   #reservesSearchInput, #feeCollectorInput
@@ -295,11 +545,16 @@
 
   .p-inputnumber:hover .p-inputnumber-input:not(:focus)
   {
-    border-color: var(--ion-color-gray) !important;
+    border-color: var(--ion-color-gray) !important
   }
 
   .p-inputnumber-input:focus
   {
-    --p-inputtext-focus-border-color: #6fff7b !important;
+    --p-inputtext-focus-border-color: #6fff7b !important
+  }
+
+  .p-inputtext:focus-within
+  {
+    --p-inputtext-focus-border-color: v-bind(publicKeyCheckColor) !important
   }
 </style>

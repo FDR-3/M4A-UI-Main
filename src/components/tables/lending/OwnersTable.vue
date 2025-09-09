@@ -1,15 +1,14 @@
 <template>
   <div class="tableContainer">
-    <DataTable 
+    <!--Table of SubMarket Owners-->
+    <DataTable
+      v-if="!showOwnerSubMarkets"
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines
-      sortField="tokenMintAddress" 
-      :sortOrder="-1" 
       size="small" 
-      :value="tableData"
+      :value="OwnerTableData"
       :loading="isLoading"
-      rowGroupMode="subheader" groupRowsBy="asset.type"
       :globalFilterFields="['owner', 'ownerData.displayName', 'ownerData.subMarketCount']"  
     >
       <template #header>
@@ -18,7 +17,7 @@
           <ion-input id="ownerSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Owners Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
-          <br><ion-label id="tableTitle">Stable Coins</ion-label>
+          <br>
         </div>
       </template>
       <template #loading>Loading Owners. Please wait.</template>
@@ -43,11 +42,11 @@
             @didDismiss="ownerPopoverOpen=false"
             side="top" 
             alignment="center"
-          >
-            <ion-button id="commentCopyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
-              <ion-label color="dark">{{copyFullAddressButtonText}}</ion-label>
-            </ion-button>
-          </ion-popover>
+            >
+              <ion-button id="commentCopyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
+                <ion-label color="dark">{{ copyFullAddressButtonText }}</ion-label>
+              </ion-button>
+            </ion-popover>
 
           </div>
         </template>
@@ -58,10 +57,96 @@
           <div class="flexCenterColumn">
             <ion-button id=""
             color="dark"
-            @click=""
+            @click="selectedOwnerAddress=slotProps.data.owner; openOwnerSubMarkets()"
             >
               View Markets
             </ion-button>
+          </div>
+        </template>
+      </Column>
+    </DataTable>
+
+    <!--SubMarkets for a Specific Owner-->
+    <DataTable
+      v-if="showOwnerSubMarkets"
+      class="tableMinWidth"
+      v-model:filters="filters" 
+      show-gridlines
+      size="small" 
+      :value="OwnerSubMarketTableData"
+      :loading="isLoading"
+      editMode="cell" 
+      @cell-edit-complete="onCellEditSave($event)"
+      :globalFilterFields="['tokenMintAddress', 'tokenName', 'feeCollectorAddress', 'feeOnInterestEarnedRate']"  
+    >
+      <template #header>
+        <div>
+          <h2>{{ subMarketsOwnedByUser }} SubMarket{{ subMarketsSText }} Owned By:<br>{{ subMarketOwnerDisplayName }}</h2>
+
+          <ion-button color="dark" class="mediumSmallMarginBottom nSmallMarginTop" @click="showOwnerSubMarkets=false">Return</ion-button>
+          <ion-input id="ownerSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Owners Search     ">
+            <ion-icon slot="start" :icon="search"></ion-icon>
+          </ion-input>
+          <br>
+        </div>
+      </template>
+      <template #loading>Loading Owners. Please wait.</template>
+      <Column field="tokenName" header="Token" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRowHeight">
+            <ion-button style="margin-left: -11px; margin-right: -11px" fill="clear" @click="slotProps.data.svgSource()">
+              <component :is="slotProps.data.tokenSVG" style="width: 24px"></component>
+            </ion-button>
+            <ion-text>{{ slotProps.data.tokenName }}</ion-text>
+          </div>
+        </template>
+      </Column>
+      <Column field="feeCollectorAddress" header="Fee Collector Address" style="width: 0%" sortable>
+        <template #editor="{ index, data, field }">
+          <InputText
+            v-model="data[field]"
+            class="feeRecipientInput"
+            fluid
+            @input="isEditing=true; OwnerSubMarketTableData[index].isEditingRow=true; checkAddress(data[field])"
+            :disabled="connectedWallet.addressString!=OwnerSubMarketTableData[index].owner ||
+            (isDataEdited && !OwnerSubMarketTableData[index].isEditingRow && !OwnerSubMarketTableData[index].isRowDataEdited)"
+          />
+        </template>
+      </Column>
+      <Column field="feeOnInterestEarnedRate" header="Fee On Interest Earned Rate" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <ion-text>{{ slotProps.data.feeOnInterestEarnedRate * 100 }}%</ion-text>
+        </template>
+        <template #editor="{ index, data, field }">
+          <InputNumber
+          v-model="data[field]"
+          class="ownerFeeInput"
+          :min=0
+          :max=100
+          :step=0.01
+          fluid
+          @input="isEditing=true; OwnerSubMarketTableData[index].isEditingRow=true"
+          :disabled="connectedWallet.addressString!=OwnerSubMarketTableData[index].owner ||
+          (isDataEdited && !OwnerSubMarketTableData[index].isEditingRow && !OwnerSubMarketTableData[index].isRowDataEdited)"/>
+        </template>
+      </Column>
+
+      <Column field="actions" header="Actions" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRow">
+            <div v-if="connectedWallet.addressString==slotProps.data.owner">
+              <ion-button
+              v-if="slotProps.data.isRowDataEdited"
+              color="dark"
+              @click="editSubMarket(slotProps.data)"
+              :disabled="isInvalidPublicKey"
+              >
+                Edit Market
+              </ion-button>
+              <ion-text v-else-if="isDataEdited">Another Row Is Being Edited</ion-text>
+              <ion-text v-else>No edits detected</ion-text>
+            </div>
+            <ion-text v-else align="center">Only the owner can edit their sub market</ion-text>
           </div>
         </template>
       </Column>
@@ -70,48 +155,57 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, watch, inject, markRaw } from 'vue'
-  import { IonLabel, IonIcon, IonInput, IonButton, IonText } from '@ionic/vue'
+  import { ref, onMounted, watch, inject, computed } from 'vue'
+  import { IonLabel, IonIcon, IonInput, IonButton, IonText, IonPopover } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
+  import InputText from 'primevue/inputtext'
   import InputNumber from 'primevue/inputnumber'
   import { search } from 'ionicons/icons'
-  import { tokenReserves, tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarkets, tokenReserveHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
   import RIPStarWolf from '/src/assets/svg/rip-star-wolf-svg.vue'
-  import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
-  import { isValidSolanaPublicKey } from '/src/assets/contracts/Wallethelper.vue'
-  import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
-  import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { trimAddress,
+    isValidSolanaPublicKey,
+    copyFullAddress,
+    confirmLendingTransaction,
+    toastPreTransactionError } from '/src/assets/contracts/Wallethelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
-  import { copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
-  import cloneDeep from 'lodash/cloneDeep'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
 
-  const tableData = ref()
+  const OwnerTableData = ref()
+  const OwnerSubMarketTableData = ref()
   const isLoading = ref(true)
-  const creatingSubMarket = ref(false)
-  const createSubMarketSVG = ref()
-  const sourceSubMarketSVG = ref()
-  const subMarketTokenName = ref()
-  var selectedTokenMintAddress: PublicKey
-  const feeCollectorAddress = ref(connectedWallet.addressString)
-  const feePercentage = ref(3)
-  const validPublicKey = ref(false)
-  var ownerPopoverOpen = ref(false)
-  var event = ref()
+  const showOwnerSubMarkets = ref(false)
+  const subMarketsOwnedByUser = ref()
+  const subMarketOwnerDisplayName = ref()
+  const ownerPopoverOpen = ref(false)
+  const event = ref()
 
+  var selectedOwnerAddress: PublicKey
+  var publicKeyCheckColor = ref("#6fff7b")
+  var isInvalidPublicKey = ref(false)
+  var savedEditedRow: any 
+  var isEditing = false
+  const isDataEdited = ref(false)
   var copyFullAddressButtonText = ref("Copy Full Address")
+
+  const subMarketsSText = computed(() =>
+  {
+    if(subMarketsOwnedByUser.value == 1)
+      return ''
+    else
+      return 's'
+  })
   
   onMounted(() =>
   {
@@ -120,7 +214,7 @@
       processOwnersTable()
       isLoading.value = false
     }
-    else if(subMarkets)
+    else if(subMarkets.data)
       isLoading.value = false
     else
       isLoading.value = true
@@ -132,12 +226,27 @@
 
     if(isLoading.value)
       isLoading.value = false
+
+    //Update inner table if it's already opened
+    if(showOwnerSubMarkets.value)
+      openOwnerSubMarkets()
   })
 
   watch(customUserNameHashMap, () =>
   {
     processOwnersTable()
   })
+
+  function openOwnerSubMarkets()
+  {
+    const subMarketOwner = subMarketOwnerHashMap.map.get(selectedOwnerAddress)
+
+    OwnerSubMarketTableData.value = subMarketOwner.ownerSubMarketList
+    subMarketsOwnedByUser.value = subMarketOwner.subMarketCount
+    subMarketOwnerDisplayName.value = subMarketOwner.displayName
+
+    showOwnerSubMarkets.value = true
+  }
 
   function passByRefWrapperCopyAddress()
   {
@@ -164,9 +273,18 @@
       }
       else
         unprocessedData[i].ownerData.displayName = trimAddress(unprocessedData[i].owner)
+
+      //This has to be done here as opposed to in the LendingProtocol.vue file since it has to be after it's deep cloned
+      for(var j=0; j<unprocessedData[i].ownerData.ownerSubMarketList.length; j++)
+      {
+        const tokenReserveFrontEndProperties = tokenReserveDevNetMap.get(unprocessedData[i].ownerData.ownerSubMarketList[j].tokenMintAddress.toString())
+
+        unprocessedData[i].ownerData.ownerSubMarketList[j].tokenSVG = tokenReserveFrontEndProperties.svg
+      }
+
     }
 
-    tableData.value = unprocessedData
+    OwnerTableData.value = unprocessedData
   }
 
   const filters = ref(
@@ -174,7 +292,7 @@
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
   })
 
-  function openOwnerPopover(e: Event, rowData: any, ) 
+  function openOwnerPopover(e: Event, rowData: any) 
   {
     event.value = e
     event.value.ownerAddress = rowData.owner
@@ -188,14 +306,79 @@
     ownerPopoverOpen.value = false
   }
 
-  function checkAddress()
+  function checkAddress(address: string)
   {
-    if(feeCollectorAddress.value == SYSTEM_PROGRAM_ADDRESS_STRING)
-      validPublicKey.value = false
-    else if(isValidSolanaPublicKey(feeCollectorAddress.value))
-      validPublicKey.value = true
+    if(isValidSolanaPublicKey(address))
+    {
+      publicKeyCheckColor.value = "#6fff7b"
+      isInvalidPublicKey.value = false
+    }
     else
-      validPublicKey.value = false
+    {
+      publicKeyCheckColor.value = "#ff0000"
+      isInvalidPublicKey.value = true
+    }
+  }
+
+  const onCellEditSave = async (event: { newData:any; index:any } ) => 
+  {
+    let { newData, index } = event
+    
+    OwnerSubMarketTableData.value[index].feeCollectorAddress = newData.feeCollectorAddress
+    OwnerSubMarketTableData.value[index].feeOnInterestEarnedRate = newData.feeOnInterestEarnedRate
+
+    const subMarket = subMarketsHashMap.map.get
+    (
+      OwnerSubMarketTableData.value[index].tokenMintAddress.toBase58() +
+      OwnerSubMarketTableData.value[index].owner.toString() +
+      OwnerSubMarketTableData.value[index].subMarketIndex.toString()
+    )
+
+    if(newData.feeCollectorAddress != subMarket.feeCollectorAddress ||
+    newData.feeOnInterestEarnedRate != subMarket.feeOnInterestEarnedRate)
+    {
+      OwnerSubMarketTableData.value[index].isRowDataEdited = true
+      savedEditedRow = OwnerSubMarketTableData.value[index]
+      isDataEdited.value = true
+    }
+    else
+    {
+      OwnerSubMarketTableData.value[index].isRowDataEdited = false
+
+      //Erase saved row if it exists since the row data matches what's on the block chain
+      if(savedEditedRow != undefined)
+        if(OwnerSubMarketTableData.value[index].subMarketIndex == savedEditedRow.subMarketIndex) //Keeps other rows from erasing the data when you click in them
+        { 
+          savedEditedRow = undefined
+          isDataEdited.value = false
+        }
+    }
+
+    OwnerSubMarketTableData.value[index].isEditingRow = false
+    isEditing = false
+  }
+
+  async function editSubMarket(subMarketTableRow: any)
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.editSubMarket
+      (
+        new PublicKey(subMarketTableRow.tokenMintAddress),
+        subMarketTableRow.subMarketIndex,
+        new PublicKey(subMarketTableRow.feeCollectorAddress),
+        subMarketTableRow.feeOnInterestEarnedRate
+      ).rpc()
+      await confirmLendingTransaction(tx, toast, "edit_sub_market")
+
+      subMarketTableRow.isRowDataEdited = false
+      savedEditedRow = undefined
+      isDataEdited.value = false
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "edit_sub_market")
+    }
   }
 </script>
 
@@ -223,7 +406,7 @@
 
   .tableMinWidth
   {
-    min-width: 570px;
+    min-width: 1000px
   }
 
   #ownerSearchInput
@@ -231,13 +414,13 @@
     --highlight-color: var(--ion-color-green) !important
   }
 
-  .p-inputnumber:hover .p-inputnumber-input:not(:focus)
-  {
-    border-color: var(--ion-color-gray) !important;
-  }
-
   .p-inputnumber-input:focus
   {
-    --p-inputtext-focus-border-color: #6fff7b !important;
+    --p-inputtext-focus-border-color: #6fff7b !important
+  }
+
+  .feeRecipientInput:focus-within
+  {
+    --p-inputtext-focus-border-color: v-bind(publicKeyCheckColor) !important
   }
 </style>

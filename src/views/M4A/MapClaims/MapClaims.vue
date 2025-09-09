@@ -1,7 +1,8 @@
 <template>
   <h1 v-if="!mapSelection.isStateSelected">Universal Health Care Road Map</h1>
   <div v-if="mapSelection.isStateSelected" class="smallMarginTop">
-    <BETACountDown/>
+    <!--<BETACountDown/>-->
+    <BETADelayExcuse/>
     <h1>{{ mapSelection.selectedStateName }} Hospitals</h1>
   </div>
   <div >
@@ -51,7 +52,8 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, watch } from 'vue'
   import { IonButton, IonLabel } from '@ionic/vue'
-  import BETACountDown from '/src/components/mapclaims/BETACountDown.vue' 
+  import BETACountDown from '/src/components/mapclaims/BETACountDown.vue'
+  import BETADelayExcuse from '/src/components/mapclaims/BETADelayExcuse.vue' 
   import USMap from '/src/components/mapclaims/USMap.vue'
   import WorldMap from '/src/components/mapclaims/WorldMap.vue'
   import StateHospitalListTable from '/src/components/tables/m4a/StateHospitalListTable.vue'

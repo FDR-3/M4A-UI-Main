@@ -57,7 +57,7 @@
   import { ref, onMounted, onUnmounted } from 'vue'
   import { IonButton, IonPopover, IonLabel, IonIcon } from '@ionic/vue'
   import { chevronDown } from 'ionicons/icons'
-  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { adminAccounts, devNetTreasury, hodlTreasuryBalancesDevNetHashMap, singlePayerTreasuryBalancesDevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
   import { claimQueue, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'
   import { hospitalStats, hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { insuranceCompanyStats, insuranceCompanies } from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
@@ -132,6 +132,8 @@
     getLendingProtocolPDA,
     getSubMarketStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { PublicKey } from "@solana/web3.js"
+  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 
   defineProps(['colorName', 'colorHexValue', 'buttonShadow'])
 
@@ -152,8 +154,8 @@
   var selectedChatContractIndex: number
   var selectedLendingContractIndex: number
 
-  var protocolTreasurerATAWatcherId: any
-  var protocolSinglePayerATAWatcherId: any
+  var hodlUSDCATAWatcherId: any
+  var singlePayerUSDCATAWatcherId: any
   var claimQueueWatchId: any
   var hospitalStatsWatchId: any
   var insuranceCompanyStatsWatchId: any
@@ -189,6 +191,9 @@
   var setOrUnsetProcessorOnClaimCount = 0
   var createdPatientRecordCount = 0
   var createdHospitalAndInsuranceCompanyRecordsCount = 0 */
+
+  var hodlTreasuryUSDCATA: PublicKey
+  var singlePayerTreasuryUSDCATA: PublicKey
   
   onMounted(async() =>
   {
@@ -222,11 +227,18 @@
     }
 
     //Treasury Account
+    hodlTreasuryUSDCATA = await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      devNetTreasury.USDCTokenMintAddress, //Token Mint Address
+      adminAccounts.hodlTreasuryAddress //Wallet Public Key
+    )
     try
     {
-      const treasurerUDSCAccount = await anchorPrograms.chat.chatProgram.provider.connection.getTokenAccountBalance(adminAccounts.treasurerUSDCATA)
-      adminAccounts.treasuryBalance = treasurerUDSCAccount.value.uiAmount.toFixed(2)
-      await listenForTreasurerATAChanges()
+      const hodlUDSCAccount = await anchorPrograms.chat.chatProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCATA)
+      hodlTreasuryBalancesDevNetHashMap.map.set(devNetTreasury.USDCTokenMintAddress.toString(), hodlUDSCAccount.value.uiAmount.toFixed(2))
+      await listenForHODLTreasuryUSDCChanges()
     }
     catch(error)
     {
@@ -234,11 +246,18 @@
     }
 
     //Single Payer Account
+    singlePayerTreasuryUSDCATA = await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      devNetTreasury.USDCTokenMintAddress, //Token Mint Address
+      adminAccounts.singlePayerTreasuryAddress //Wallet Public Key
+    )
     try
     {
-      const singlePayerUSDCAccount = await anchorPrograms.chat.chatProgram.provider.connection.getTokenAccountBalance(adminAccounts.singlePayerUSDCATA)
-      adminAccounts.singlePayerBalance = singlePayerUSDCAccount.value.uiAmount.toFixed(2)
-      await listenForSinglePayerAccountChanges()
+      const singlePayerUSDCAccount = await anchorPrograms.chat.chatProgram.provider.connection.getTokenAccountBalance(singlePayerTreasuryUSDCATA)
+      singlePayerTreasuryBalancesDevNetHashMap.map.set(devNetTreasury.USDCTokenMintAddress.toString(), singlePayerUSDCAccount.value.uiAmount.toFixed(2))
+      await listenForSinglePayerTreasuryChanges()
     }
     catch(error)
     {
@@ -449,15 +468,15 @@
 
   onUnmounted(() => 
   {
-    if(protocolTreasurerATAWatcherId != undefined)
+    if(hodlUSDCATAWatcherId != undefined)
     {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(protocolTreasurerATAWatcherId)
-      protocolTreasurerATAWatcherId = undefined
+      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(hodlUSDCATAWatcherId)
+      hodlUSDCATAWatcherId = undefined
     }
-    if(protocolSinglePayerATAWatcherId != undefined)
+    if(singlePayerUSDCATAWatcherId != undefined)
     {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(protocolSinglePayerATAWatcherId)
-      protocolSinglePayerATAWatcherId = undefined
+      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(singlePayerUSDCATAWatcherId)
+      singlePayerUSDCATAWatcherId = undefined
     }
     if(isM4AProtocolReadyWatchId != undefined)
     {
@@ -662,16 +681,16 @@
     return currentUnixTimeStamp - anchorPrograms.deadMansBreakTimeStamp.toNumber() > anchorPrograms.secondsUntilDeadMansBreakTrips
   }
 
-  async function listenForTreasurerATAChanges()
+  async function listenForHODLTreasuryUSDCChanges()
   {
     try
     {
       //Subscribe to account changes
-      protocolTreasurerATAWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(adminAccounts.treasurerUSDCATA, async() => 
+      hodlUSDCATAWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(hodlTreasuryUSDCATA, async() => 
       {
         //Handle account change...
-        const treasurerUDSCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(adminAccounts.treasurerUSDCATA)
-        adminAccounts.treasuryBalance = treasurerUDSCAccount.value.uiAmount.toFixed(2)
+        const hodlUDSCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCATA)
+        hodlTreasuryBalancesDevNetHashMap.map.set(devNetTreasury.USDCTokenMintAddress.toString(), hodlUDSCAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)
@@ -680,16 +699,16 @@
     }
   }
 
-  async function listenForSinglePayerAccountChanges()
+  async function listenForSinglePayerTreasuryChanges()
   {
     try
     {
       //Subscribe to account changes
-      protocolSinglePayerATAWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(adminAccounts.singlePayerUSDCATA, async() => 
+      singlePayerUSDCATAWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(singlePayerTreasuryUSDCATA, async() => 
       {
         //Handle account change...
-        const singlePayerUDSCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(adminAccounts.singlePayerUSDCATA)
-        adminAccounts.singlePayerBalance = singlePayerUDSCAccount.value.uiAmount.toFixed(2)
+        const singlePayerUSDCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(singlePayerTreasuryUSDCATA)
+        singlePayerTreasuryBalancesDevNetHashMap.map.set(devNetTreasury.USDCTokenMintAddress.toString(), singlePayerUSDCAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)

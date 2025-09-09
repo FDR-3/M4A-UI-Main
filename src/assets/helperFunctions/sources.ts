@@ -18,6 +18,11 @@ export function sourceCautionLight()
   window.open("https://areyoujustwatching.com/ayjw108-tenet/", "_blank")
 }
 
+export function sourceDAI()
+{
+  window.open("https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNIP0QAj6hX6oDb3lTs4OzcP0kKieMHpjavxfE", "_blank")
+}
+
 export function sourceUSDC()
 {
   window.open("https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNennCnoHYvGazNyBXWLJ8f2QUITcrVm6e9CiF", "_blank")
@@ -26,4 +31,14 @@ export function sourceUSDC()
 export function sourceSOL()
 {
   window.open("https://logowik.com/solana-logo-vector-svg-pdf-ai-eps-cdr-free-download-19832.html", "_blank")
+}
+
+export function sourceWEth()
+{
+  window.open("https://logotic.me/item/9052/weth/", "_blank")
+}
+
+export function sourceWBtc()
+{
+  window.open("https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNo6wMmFxnq7PQtHBfhDIxkbGsT6ljuegzWAyL", "_blank")
 }
