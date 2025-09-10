@@ -58,7 +58,7 @@
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
-            <ion-button color="dark">Deposit</ion-button>
+            <ion-button color="dark" :disabled="true">Deposit</ion-button>
           </div>
         </template>
       </Column>
@@ -110,7 +110,7 @@
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
-            <ion-button color="dark">Deposit</ion-button>
+            <ion-button color="dark" :disabled="true">Deposit</ion-button>
           </div>
         </template>
       </Column>
