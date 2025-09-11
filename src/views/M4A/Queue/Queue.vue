@@ -1,4 +1,5 @@
 <template>
+  <h2 id="tableTop">Under Construction<br>On Devnet</h2>
   <div>
     <ClaimQueueTable 
       v-if="tableSelect == 0"

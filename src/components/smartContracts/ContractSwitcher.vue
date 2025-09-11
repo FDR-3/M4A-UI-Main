@@ -302,12 +302,12 @@
       await listenForChatCEOAccountInitialization()
     }
 
-    /*//M4AFeeTokenAccount
+    //M4AFeeTokenAccount
     const m4aFeeTokenAccounts = await getM4AFeeTokenAccounts()
     if(m4aFeeTokenAccounts.length > 0)
       anchorPrograms.isM4AFeeTokenAccountReady = true
     else
-      listenForM4AFeeTokenAccount()*/
+      listenForM4AFeeTokenAccount()
 
     //ChatFeeTokenAccount
     const chatFeeTokenAccounts = await getChatFeeTokenAccounts()
@@ -316,7 +316,6 @@
     else
       listenForChatFeeTokenAccount()
 
-    /*
     //M4A Protocol Account
     const m4aProtocol = await getM4AProtocol()
     await listenForM4AProtocolChanges()
@@ -339,12 +338,12 @@
     hospitalStats.data = await getHospitalStats()
     hospitals.data = await getAllHospitals() 
     await listenForHospitalStatChanges()
-    */
+    
     //M4A Insurance Company Stats
-    //insuranceCompanyStats.data = await getInsuranceCompanyStats()
+    insuranceCompanyStats.data = await getInsuranceCompanyStats()
     insuranceCompanies.data = await getAllInsuranceCompanies()
-    //await listenForInsuranceCompanyStatChanges()
-    /*
+    await listenForInsuranceCompanyStatChanges()
+    
     //Used so all processors can listen to when a new state is initialized
     currentStateAccountTotal = anchorPrograms.stateAccountTotal
 
@@ -360,7 +359,7 @@
     //M4A Processor Stats
     processorStats.data = await getProcessorStats()
     processors.data = await getProcessors()
-    await listenForProcessorStatChanges() */
+    await listenForProcessorStatChanges()
 
     //Chat Protocol Account
     const chatProtocol = await getChatProtocol()
@@ -417,7 +416,7 @@
     //Comment Sections
     commentSections.data = await getCommentSections()
     await listenForCommentSectionStatChanges()
-/*
+
     //M4A Protocol CEO Account
     const m4aCEOAccount = await getM4AProtocolCEOAccount()
     if(m4aCEOAccount)
@@ -436,7 +435,7 @@
     if(m4aTreasurerAccount)
       adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
     else
-      await listenForM4ATreasurerAccountInitialization()*/
+      await listenForM4ATreasurerAccountInitialization()
 
     //Chat Protocol Treasurer Account
     const chatTreasurerAccount = await getChatProtocolTreasurerAccount()

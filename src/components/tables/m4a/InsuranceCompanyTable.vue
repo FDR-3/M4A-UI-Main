@@ -1,6 +1,5 @@
 <template>
-
-  <div id="tableTop" class="flexCenterRow" style="font-size: 77px; margin-bottom: 10px">
+  <div class="flexCenterRow" style="font-size: 77px; margin-bottom: 10px">
     <span>💩</span>
     <h1 style="padding-top: 22px">Insurance Companies</h1>
   </div>

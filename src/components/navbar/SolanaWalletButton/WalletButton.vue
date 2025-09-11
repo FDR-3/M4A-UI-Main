@@ -113,7 +113,7 @@
 
   var firstOnMountedDataGrab = false
 
-  onMounted(() =>
+  onMounted(async() =>
   {
     //Keeps code from running again when switching between menus/ not sure why wallet button gets remounted
     if(connectedWallet.addressString != "")
@@ -166,7 +166,7 @@
           (anchorPrograms.pliChatInitiatorAddress == connectedWallet.addressString) ||
           (anchorPrograms.aboutChatInitiatorAddress == connectedWallet.addressString) 
       }
-      /*
+      
       connectedWallet.isSubmitterAccountReady = await isSubmitterAccountInitialized(publicKey.value.toBase58())
       if(!connectedWallet.isSubmitterAccountReady)
         listenForSubmitterAccountReady()
@@ -188,8 +188,8 @@
         connectedWallet.isProcessorWorkingAClaim = false
         connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       }
+
       await listenForProcessorAccountChanges()
-      */
     }
 
     //Keeps a 2nd grab from happening from the watch function on refresh
@@ -273,7 +273,7 @@
           (anchorPrograms.pliChatInitiatorAddress == connectedWallet.addressString) ||
           (anchorPrograms.aboutChatInitiatorAddress == connectedWallet.addressString) 
       }
-      /*
+
       connectedWallet.isSubmitterAccountReady = await isSubmitterAccountInitialized(publicKey.value.toBase58())
       if(!connectedWallet.isSubmitterAccountReady)
         listenForSubmitterAccountReady()
@@ -295,7 +295,8 @@
         connectedWallet.isProcessorWorkingAClaim = false
         connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       }
-      await listenForProcessorAccountChanges()*/
+      
+      await listenForProcessorAccountChanges()
     }
   })
 

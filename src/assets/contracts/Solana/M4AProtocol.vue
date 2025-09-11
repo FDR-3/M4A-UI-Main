@@ -549,7 +549,7 @@
       {
         if(!error.message.includes(ERROR_429))
         {
-          console.log("Claim Not Initialized")
+          console.log("Claim Not Submitted")
           return false
         }
         else
@@ -930,7 +930,7 @@
     var insuranceCompanies = []
     var hashMap = new Map<string, any>()
 
-    var rawInsuranceCompanies: any[] = []//await getAllInsuranceCompaniesWrapper()
+    var rawInsuranceCompanies: any[] = await getAllInsuranceCompaniesWrapper()
 
     //Create insurance company hashmap
     for(var i=0; i<rawInsuranceCompanies.length; i++)

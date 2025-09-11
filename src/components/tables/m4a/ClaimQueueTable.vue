@@ -1,5 +1,5 @@
 <template>
-  <h1 id="tableTop">Claim Queue</h1>
+  <h1>Claim Queue</h1>
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>
   
   <div v-if="isClaimQueueOn">

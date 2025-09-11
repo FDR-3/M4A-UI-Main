@@ -1,4 +1,5 @@
 <template>
+  <h2>Under Construction<br>On Devnet</h2>
   <h1 v-if="!mapSelection.isStateSelected">Universal Health Care Road Map</h1>
   <div v-if="mapSelection.isStateSelected" class="smallMarginTop">
     <!--<BETACountDown/>-->
@@ -131,7 +132,7 @@
     try
     {
       //Get state hospital table data
-      var stateAccount: any //await getStateAccount(mapSelection.countryIndex, mapSelection.stateIndex)
+      var stateAccount = await getStateAccount(mapSelection.countryIndex, mapSelection.stateIndex)
       
       if(stateAccount)
       {

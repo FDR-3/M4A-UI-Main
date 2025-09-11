@@ -1,5 +1,6 @@
 <template>
-  <div class="flexCenterRow smallMarginTop" style="font-size: 50px">
+  <!--This tableTop id ensures that the top of the table and hospital svg are visible when opening records from the state hospital list table-->
+  <div id="tableTop" class="flexCenterRow smallMarginTop" style="font-size: 50px">
     <ion-button v-if="hospitalType==HospitalTypes.General" style="margin-top:20px; margin-bottom: -15px; margin-right: -10px" fill="clear" @click="givePokemonCenterCreatorCredit()">
       <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNVb4n4DEhW7MqHDNnjQlr4SsC0pORAEcIoe2B" width="150"/>
     </ion-button>
@@ -12,7 +13,7 @@
     <ion-button v-else-if="hospitalType==HospitalTypes.Mental" style="margin-top: 20px; margin-bottom: -10px" fill="clear" @click="givePokemonCenterCreatorCredit()">
       <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNCnJgmUjrdlPMfOjk8zL1aoRbyDWUGc9mQ0ew" width="150"/>
     </ion-button>
-    <h1 id="tableTop" class="mediumMarginTop">{{ hospitalName }}</h1>
+    <h1 class="mediumMarginTop">{{ hospitalName }}</h1>
   </div>
   <h2>{{ hospitalTypeName }} Hospital Records</h2>
 

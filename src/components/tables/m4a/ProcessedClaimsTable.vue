@@ -1,5 +1,5 @@
 <template>
-  <h1 id="tableTop">Processed Claims</h1>
+  <h1>Processed Claims</h1>
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>
   <h2 class="statSpacing">Total Approved Claims: {{ protocolApprovedClaimCount }}</h2>
   <h2 class="statSpacing">Total Denied Claims: {{ protocolDeniedClaimCount }}</h2>

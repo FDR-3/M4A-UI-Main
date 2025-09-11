@@ -323,16 +323,16 @@
       isClaimQueueOn.value = false; //Semicolon needed because tuple line follows after this one
 
     //Get Patients
-    /*[patientList.value, activePatientList.value] = await getPatientLists(connectedWallet.publicKey)
-    await listenForAdditionalPatients(connectedWallet.publicKey)*/
+    [patientList.value, activePatientList.value] = await getPatientLists(connectedWallet.publicKey)
+    await listenForAdditionalPatients(connectedWallet.publicKey)
 
     //Get Insurance Companies
     if(insuranceCompanies.data)
       insuranceCompanyList.value = insuranceCompanies.data
 
     //Get Claim
-    /*isClaimAlreadySubmitted.value = await isClaimSubmitted(connectedWallet.publicKey)
-    await listenForClaimChanges()*/
+    isClaimAlreadySubmitted.value = await isClaimSubmitted(connectedWallet.publicKey)
+    await listenForClaimChanges()
   })
 
   onUnmounted(() =>
@@ -380,11 +380,10 @@
     patientList.value = []
     activePatientList.value = []
     
-    /*if(connectedWallet.isSubmitterAccountReady)
+    if(connectedWallet.isSubmitterAccountReady)
       [patientList.value, activePatientList.value] = await getPatientLists(connectedWallet.publicKey)
 
-    console.log(patientList.value)
-    await listenForAdditionalPatients(connectedWallet.publicKey)*/
+    await listenForAdditionalPatients(connectedWallet.publicKey)
   })
 
   watch(claimQueue, async() => 
@@ -397,7 +396,7 @@
     insuranceCompanyList.value = insuranceCompanies.data
   })
 
-  // When the user clicks anywhere outside of the edit patient list modal, close it, not when closing toast alert though
+  //When the user clicks anywhere outside of the edit patient list modal, close it, not when closing toast alert though
   window.onclick = function(event: any) 
   {
     if(isEditingPatientList.value)

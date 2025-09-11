@@ -1,5 +1,5 @@
 <template>
-  <h1 id="tableTop">Hospitals</h1>
+  <h1>Hospitals</h1>
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>
   <h2 class="statSpacing">Total Hospitals: {{ totalHospitalCount }}</h2>
   <div>

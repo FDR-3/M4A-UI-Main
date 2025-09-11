@@ -118,37 +118,40 @@
       const getDirectionsButtonContainer = document.createElement("div")
       const submitClaimButtonContainer = document.createElement("div")
 
+      //Set background color on main popup container
+      popUpContainer.style.cssText = "background: var(--ion-color-light)"
+
       //Add HTML content
       popUpContainer.innerHTML = 
-      `<div class="thinBorder" style="height: auto">
+      `<div class="thinBorder" style="height: auto; background: var(--ion-color-light)">
         <div style="line-height: 10px">
-            <p class="underLine" "><b>Name</b></p>
-            <p style="margin-top: -10px">${hospitalName}</p>
+          <p class="underLine" style="color: var(--ion-color-dark)"><b>Name</b></p>
+          <p style="margin-top: -10px; color: var(--ion-color-dark)">${hospitalName}</p>
         </div>
         <div style="line-height: 10px">
-          <p class="underLine"><b>Address</b></p> 
-          <p style="margin-top: -10px">${hospitalAddress}</p>
+          <p class="underLine" style="color: var(--ion-color-dark)"><b>Address</b></p> 
+          <p style="margin-top: -8px; color: var(--ion-color-dark)">${hospitalAddress}</p>
         </div>
         <div style="line-height: 10px">
-          <p class="underLine"><b>Phone Number</b></p>
-          <p style="margin-top: -10px">${hospitalPhoneNumber}</p>
+          <p class="underLine" style="color: var(--ion-color-dark)"><b>Phone Number</b></p>
+          <p style="margin-top: -8px; color: var(--ion-color-dark)">${hospitalPhoneNumber}</p>
         </div>
         <div style="line-height: 10px">
-          <p class="underLine "><b>City</b></p>
-          <p style="margin-top: -10px">${hospitalCity}</p>
+          <p class="underLine" style="color: var(--ion-color-dark)"><b>City</b></p>
+          <p style="margin-top: -12px; color: var(--ion-color-dark); line-height: 17px">${hospitalCity}</p>
         </div>
         <div style="line-height: 10px">
-          <p class="underLine "><b>Info</b></p>
-          <p style="margin-top: -10px margin-left: 5px margin-right: 5px">${hospitalNote}</p> 
+          <p class="underLine" style="color: var(--ion-color-dark)"><b>Info</b></p>
+          <p style="margin-top: -12px; margin-left: 5px; margin-right: 5px; line-height: 17px; color: var(--ion-color-dark)">${hospitalNote}</p> 
         </div>
       </div>`
 
       getDirectionsButtonContainer.innerHTML = 
-      `<ion-button color="green" class="smallMarginTop">
+      `<ion-button color="green" class="smallMarginTop" style="color: var(--ion-color-dark)">
         Get Directions
       </ion-button>`
 
-      submitClaimButtonContainer.innerHTML = `<ion-button style="color: var(--ion-color-black) height: 20px margin-bottom: -2px" color="green">Submit Claim</ion-button>`
+      submitClaimButtonContainer.innerHTML = `<ion-button color="green" style="margin-bottom: -2px; color: var(--ion-color-dark)">Submit Claim</ion-button>`
       submitClaimButtonContainer.id = hospitalIndex.toString()
 
       popUpContainer.appendChild(getDirectionsButtonContainer)
@@ -189,7 +192,7 @@
   }
 </script>
 
-<style scoped>
+<style>
   #map 
   { 
     display: flex;
@@ -198,5 +201,10 @@
     height: 700px;
     width: 90%;
     color: black
+  }
+
+  .maplibregl-popup-content
+  {
+    background: var(--ion-color-light)
   }
 </style>

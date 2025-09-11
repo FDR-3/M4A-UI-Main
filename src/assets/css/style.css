@@ -32,7 +32,7 @@ iframe
 .thinBorder
 {
   /*border: thin, solid*/
-  border: thin solid
+  border: thin solid var(--ion-color-dark) /*Color specified here for map hospital note popup border*/
 }
 
 .thickBorder
