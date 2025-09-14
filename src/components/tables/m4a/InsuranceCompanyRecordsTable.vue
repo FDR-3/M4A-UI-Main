@@ -269,9 +269,8 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { insuranceCompanies} from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
-  import { M4A_MAX_NOTE_LENGTH,
-    getInsuranceCompany,
-    getInsuranceCompanyRecords } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { insuranceCompanyRecordsHashMap } from '/src/assets/globalStates/m4a/Records.vue'
+  import { M4A_MAX_NOTE_LENGTH, getInsuranceCompany } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { statusTypes } from '/src/types/statusTypes.ts'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { parseDollarAmountStringFromFixed2PointNotationNoDollarSign,
@@ -282,7 +281,6 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { sleep } from '/src/assets/helperFunctions/sleep.ts'
 
   defineEmits(['showInsuranceCompanyList'])
 
@@ -309,9 +307,7 @@
   var insuranceCompanyDeniedAppealCount = ref(0)
   var insuranceCompanyRevokedApprovalCount = ref(0)
 
-  var isOnMountPassThroughDone = false
-
-  onMounted(async() =>
+  onMounted(() =>
   {
     document.getElementById("tableTop")?.scrollIntoView()
 
@@ -330,17 +326,44 @@
       insuranceCompanyRevokedApprovalCount.value = insuranceCompany.revokedApprovalCount
     }
 
-    tableData.value = await getInsuranceCompanyRecords(insuranceCompanyIndex.value)
+    if(insuranceCompanyRecordsHashMap.map)
+        getInsuranceCompanyRecords()
+
     isLoading.value = false
-    isOnMountPassThroughDone = true
   })
 
-  watch(hospitals, async() => 
+  watch(hospitals, () => 
   {
-    //Prevents fetching the records twice on a refresh when you hit refresh on records table page
-    if(!isOnMountPassThroughDone)
-      return
+    /*const insuranceCompany = getInsuranceCompany(insuranceCompanyIndex.value)
+    insuranceCompanyName.value = insuranceCompany.insuranceCompanyName
+    insuranceCompanyApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(insuranceCompany.approvedClaimAmount)
+    insuranceCompanyApprovedClaimCount = insuranceCompany.approvedClaimCount
+    insuranceCompanyDeniedClaimCount = insuranceCompany.deniedClaimCount
+    insuranceCompanyUndeniedClaimCount = insuranceCompany.undeniedClaimCount
+    insuranceCompanySubmittedAppealCount = insuranceCompany.submittedAppealCount 
+    insuranceCompanyDeniedAppealCount = insuranceCompany.deniedAppealCount
+    insuranceCompanyRevokedApprovalCount = insuranceCompany.revokedApprovalCount
 
+    getInsuranceCompanyRecords()*/
+  })
+
+  watch(insuranceCompanies, () => 
+  {
+    /*const insuranceCompany = getInsuranceCompany(insuranceCompanyIndex.value)
+    insuranceCompanyName.value = insuranceCompany.insuranceCompanyName
+    insuranceCompanyApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(insuranceCompany.approvedClaimAmount)
+    insuranceCompanyApprovedClaimCount = insuranceCompany.approvedClaimCount
+    insuranceCompanyDeniedClaimCount = insuranceCompany.deniedClaimCount
+    insuranceCompanyUndeniedClaimCount = insuranceCompany.undeniedClaimCount
+    insuranceCompanySubmittedAppealCount = insuranceCompany.submittedAppealCount 
+    insuranceCompanyDeniedAppealCount = insuranceCompany.deniedAppealCount
+    insuranceCompanyRevokedApprovalCount = insuranceCompany.revokedApprovalCount
+
+    getInsuranceCompanyRecords()*/
+  })
+
+  watch(insuranceCompanyRecordsHashMap, () => 
+  {
     const insuranceCompany = getInsuranceCompany(insuranceCompanyIndex.value)
     insuranceCompanyName.value = insuranceCompany.insuranceCompanyName
     insuranceCompanyApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(insuranceCompany.approvedClaimAmount)
@@ -351,28 +374,7 @@
     insuranceCompanyDeniedAppealCount = insuranceCompany.deniedAppealCount
     insuranceCompanyRevokedApprovalCount = insuranceCompany.revokedApprovalCount
 
-    //await sleep(5000)
-    tableData.value = await getInsuranceCompanyRecords(insuranceCompanyIndex.value)
-  })
-
-  watch(insuranceCompanies, async() => 
-  {
-    //Prevents fetching the records twice on a refresh when you hit refresh on records table page
-    if(!isOnMountPassThroughDone)
-      return
-
-    const insuranceCompany = getInsuranceCompany(insuranceCompanyIndex.value)
-    insuranceCompanyName.value = insuranceCompany.insuranceCompanyName
-    insuranceCompanyApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(insuranceCompany.approvedClaimAmount)
-    insuranceCompanyApprovedClaimCount = insuranceCompany.approvedClaimCount
-    insuranceCompanyDeniedClaimCount = insuranceCompany.deniedClaimCount
-    insuranceCompanyUndeniedClaimCount = insuranceCompany.undeniedClaimCount
-    insuranceCompanySubmittedAppealCount = insuranceCompany.submittedAppealCount 
-    insuranceCompanyDeniedAppealCount = insuranceCompany.deniedAppealCount
-    insuranceCompanyRevokedApprovalCount = insuranceCompany.revokedApprovalCount
-
-    //await sleep(5000)
-    tableData.value = await getInsuranceCompanyRecords(insuranceCompanyIndex.value)
+    getInsuranceCompanyRecords()
   })
 
   watch(customUserNameHashMap, () =>
@@ -390,6 +392,15 @@
         }
       }
   })
+
+  function getInsuranceCompanyRecords()
+  {
+    const insuranceCompanyRecords = insuranceCompanyRecordsHashMap.map.get(insuranceCompanyIndex.value.toString())
+    if(insuranceCompanyRecords)
+      tableData.value = insuranceCompanyRecords
+    else
+      tableData.value = insuranceCompanyRecords
+  }
 
   const filters = ref(
   {

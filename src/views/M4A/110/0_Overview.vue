@@ -74,7 +74,9 @@
   {
     try
     {
+      //2. Wrap instructions into a transaction, only 1 instruction in this case
       const transaction = new Transaction().add(
+        //1. Create instructions that you want to add to transaction
         StakeProgram.withdraw({
           stakePubkey: new PublicKey("AQD4Qb1cSJe6tePsF4bhZ2nzDTYtrj73jjcnrU9MeiN7"),
           authorizedPubkey: new PublicKey("Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg"),
@@ -83,22 +85,22 @@
         })
       )
 
-      // 4. Fetch the latest blockhash and set it on the transaction.
+      //3. Fetch the latest blockhash and set it on the transaction.
       const latestBlockhash = await anchorPrograms.chat.provider.connection.getLatestBlockhash()
       transaction.recentBlockhash = latestBlockhash.blockhash
       transaction.feePayer = anchorPrograms.chat.provider.wallet.publicKey
 
-      // 5. Sign the transaction using the wallet provider.
-      // This will open the wallet's UI for the user to approve the transaction.
+      //4. Sign the transaction using the wallet provider.
+      //This will open the wallet's UI for the user to approve the transaction.
       const signedTransaction = await anchorPrograms.chat.provider.wallet.signTransaction(transaction)
 
-      // 6. Send the signed transaction to the network.
-      // We get the signature back, which can be used to track the transaction.
+      //5. Send the signed transaction to the network.
+      //We get the signature back, which can be used to track the transaction.
       const signature = await anchorPrograms.chat.provider.connection.sendRawTransaction(
         signedTransaction.serialize()
       )
 
-      // 7. Confirm the transaction to ensure it was processed on-chain.
+      //6. Confirm the transaction to ensure it was processed on-chain.
       await confirmChatTransaction(signature, toast, "withdraw_stake")
     }
     catch(error)

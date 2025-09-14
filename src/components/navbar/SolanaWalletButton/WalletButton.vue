@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, toRefs, onMounted, onUnmounted, watch } from "vue"
+  import { computed, ref, toRefs, onMounted, watch } from "vue"
   import { onClickOutside, useClipboard } from "@vueuse/core"
   import { IonButton, IonLabel, IonPopover, IonText } from '@ionic/vue'
   import { PublicKey } from "@solana/web3.js"
@@ -90,7 +90,9 @@
   import WalletConnectButton from '/src/components/navbar/SolanaWalletButton/WalletConnectButton.vue'
   import WalletIcon from './WalletIcon.vue'
   import WalletModalProvider from '/src/components/navbar/SolanaWalletButton/WalletModalProvider.vue'
-  import { isSubmitterAccountInitialized, getSubmitterAccountPDA, getProcessorAccount, getProcessorAccountPDA } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { isSubmitterAccountInitialized, getProcessorAccount } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { submitterHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
+  import { processorHashMap } from '/src/assets/globalStates/m4a/Processors.vue'
   import { chatAccountHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { commentSections } from '/src/assets/globalStates/chat/CommentSections.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
@@ -108,12 +110,7 @@
   const popoverOpen = ref()
   const event = ref()
 
-  var submitterAccountWatchId: any
-  var processorAccountWatchId: any
-
-  var firstOnMountedDataGrab = false
-
-  onMounted(async() =>
+  onMounted(() =>
   {
     //Keeps code from running again when switching between menus/ not sure why wallet button gets remounted
     if(connectedWallet.addressString != "")
@@ -167,11 +164,9 @@
           (anchorPrograms.aboutChatInitiatorAddress == connectedWallet.addressString) 
       }
       
-      connectedWallet.isSubmitterAccountReady = await isSubmitterAccountInitialized(publicKey.value.toBase58())
-      if(!connectedWallet.isSubmitterAccountReady)
-        listenForSubmitterAccountReady()
+      connectedWallet.isSubmitterAccountReady = isSubmitterAccountInitialized(publicKey.value.toBase58())
 
-      const processorAccount = await getProcessorAccount(publicKey.value)
+      const processorAccount = getProcessorAccount(publicKey.value)
       if(processorAccount)
       {
         connectedWallet.isProcessorAccountReady = true
@@ -188,44 +183,11 @@
         connectedWallet.isProcessorWorkingAClaim = false
         connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       }
-
-      await listenForProcessorAccountChanges()
-    }
-
-    //Keeps a 2nd grab from happening from the watch function on refresh
-    firstOnMountedDataGrab = true
-  })
-
-  onUnmounted(() =>
-  {
-    if(submitterAccountWatchId != undefined)
-    {
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
-      submitterAccountWatchId = undefined
-    }
-    if(processorAccountWatchId != undefined)
-    {
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(processorAccountWatchId)
-      processorAccountWatchId = undefined
     }
   })
 
-  watch(publicKey, async() =>
+  watch(publicKey, () =>
   {
-    if(!firstOnMountedDataGrab)
-      return
-
-    if(submitterAccountWatchId != undefined)
-    {
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
-      submitterAccountWatchId = undefined
-    }
-    if(processorAccountWatchId != undefined)
-    {
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(processorAccountWatchId)
-      processorAccountWatchId = undefined
-    }
-
     if(publicKey.value == null || publicKey.value.toBase58() == SYSTEM_PROGRAM_ADDRESS_STRING)
     {
       connectedWallet.isChatAccountReady = false
@@ -274,11 +236,9 @@
           (anchorPrograms.aboutChatInitiatorAddress == connectedWallet.addressString) 
       }
 
-      connectedWallet.isSubmitterAccountReady = await isSubmitterAccountInitialized(publicKey.value.toBase58())
-      if(!connectedWallet.isSubmitterAccountReady)
-        listenForSubmitterAccountReady()
+      connectedWallet.isSubmitterAccountReady = isSubmitterAccountInitialized(publicKey.value.toBase58())
 
-      const processorAccount = await getProcessorAccount(publicKey.value)
+      const processorAccount = getProcessorAccount(publicKey.value)
       if(processorAccount)
       {
         connectedWallet.isProcessorAccountReady = true
@@ -295,43 +255,50 @@
         connectedWallet.isProcessorWorkingAClaim = false
         connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       }
-      
-      await listenForProcessorAccountChanges()
     }
   })
 
-  watch(chatAccountHashMap, () =>
+  watch(submitterHashMap, () =>
   {
-    const chatAccount = chatAccountHashMap.map.get(connectedWallet.addressString)
-    if(chatAccount)
+    if(publicKey.value == null || publicKey.value.toBase58() == SYSTEM_PROGRAM_ADDRESS_STRING)
+      connectedWallet.isSubmitterAccountReady = false
+    else
+      connectedWallet.isSubmitterAccountReady = isSubmitterAccountInitialized(publicKey.value.toBase58())
+  })
+
+  watch(processorHashMap, () =>
+  {
+    if(publicKey.value == null || publicKey.value.toBase58() == SYSTEM_PROGRAM_ADDRESS_STRING)
     {
-      connectedWallet.isChatAccountReady = true
-      connectedWallet.hasHadCustomName = chatAccount.hasHadCustomName
-      connectedWallet.hasGoodEnding = chatAccount.commentAndReplyCount.gt(new anchor.BN(0)) ||
-        chatAccount.postVoteCastedCount.gt(new anchor.BN(0)) ||
-        chatAccount.pollVoteCount.gt(new anchor.BN(0)) ||
-        chatAccount.hasGoodEnding ||
-        //These can be initialized before the user has a chat account (plus M4AProtocol is a different program), so need extra checks
-        (anchorPrograms.m4aProtocolInitiatorAddress == connectedWallet.addressString) ||
-        (anchorPrograms.chatProtocolInitiatorAddress == connectedWallet.addressString) ||
-        (anchorPrograms.m4aChatInitiatorAddress == connectedWallet.addressString) ||
-        (anchorPrograms.pliChatInitiatorAddress == connectedWallet.addressString) ||
-        (anchorPrograms.aboutChatInitiatorAddress == connectedWallet.addressString) 
+      connectedWallet.isProcessorAccountReady = false
+      connectedWallet.isProcessorAccountActive = false
+      connectedWallet.isProcessorAccountSuperAdmin = false
+      connectedWallet.isProcessorWorkingAClaim = false
+      connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
     }
     else
     {
-      connectedWallet.isChatAccountReady = false
-      connectedWallet.hasHadCustomName = false
-      connectedWallet.hasGoodEnding = 
-        //These can be initialized before the user has a chat account (plus M4AProtocol is a different program), so need extra checks
-        (anchorPrograms.m4aProtocolInitiatorAddress == connectedWallet.addressString) ||
-        (anchorPrograms.chatProtocolInitiatorAddress == connectedWallet.addressString) ||
-        (anchorPrograms.m4aChatInitiatorAddress == connectedWallet.addressString) ||
-        (anchorPrograms.pliChatInitiatorAddress == connectedWallet.addressString) ||
-        (anchorPrograms.aboutChatInitiatorAddress == connectedWallet.addressString) 
+      const processorAccount = getProcessorAccount(publicKey.value)
+
+      if(processorAccount)
+      {
+        connectedWallet.isProcessorAccountReady = true
+        connectedWallet.isProcessorAccountActive = processorAccount.isActive
+        connectedWallet.isProcessorAccountSuperAdmin = processorAccount.isSuperAdmin
+        connectedWallet.isProcessorWorkingAClaim = processorAccount.isProcessingClaim
+        connectedWallet.submitterAddressOfClaimBeingProcessed = processorAccount.submitterAddressOfClaimBeingProcessed
+      }
+      else
+      {
+        connectedWallet.isProcessorAccountReady = false
+        connectedWallet.isProcessorAccountActive = false
+        connectedWallet.isProcessorAccountSuperAdmin = false
+        connectedWallet.isProcessorWorkingAClaim = false
+        connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
+      }
     }
   })
-
+  
   watch(chatAccountHashMap, () =>
   {
     const chatAccount = chatAccountHashMap.map.get(connectedWallet.addressString)
@@ -486,54 +453,6 @@
     closeDropdown,
     copyAddress,
     disconnect,
-  }
-
-  function listenForSubmitterAccountReady()
-  {
-    try
-    {
-      //Subscribe to account changes
-      submitterAccountWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getSubmitterAccountPDA(connectedWallet.publicKey), () => 
-      {
-        //Handle account change...
-        anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
-        submitterAccountWatchId = undefined
-        connectedWallet.isSubmitterAccountReady = true
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-      connectedWallet.isSubmitterAccountReady = false
-    }
-  }
-
-  async function listenForProcessorAccountChanges()
-  {
-    try
-    {
-      //Subscribe to account changes
-      processorAccountWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getProcessorAccountPDA(connectedWallet.publicKey), async() => 
-      {
-        //Handle account change...
-        const processorAccount = await getProcessorAccount(connectedWallet.publicKey)
-
-        connectedWallet.isProcessorAccountReady= true
-        connectedWallet.isProcessorAccountActive = processorAccount.isActive
-        connectedWallet.isProcessorAccountSuperAdmin = processorAccount.isSuperAdmin
-        connectedWallet.isProcessorWorkingAClaim = processorAccount.isProcessingClaim
-        connectedWallet.submitterAddressOfClaimBeingProcessed = processorAccount.submitterAddressOfClaimBeingProcessed.toBase58()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-      connectedWallet.isProcessorAccountReady = false
-      connectedWallet.isProcessorAccountActive = false
-      connectedWallet.isProcessorAccountSuperAdmin = false
-      connectedWallet.isProcessorWorkingAClaim = false
-      connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
-    }
   }
 </script>
 

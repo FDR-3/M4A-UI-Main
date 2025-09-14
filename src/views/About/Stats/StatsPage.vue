@@ -106,14 +106,14 @@
     parseDollarAmountStringFromDecimalNoDollarSign,
     parseDollarAmountStringFromFixed2PointNotationNoDollarSign } from '/src/assets/contracts/WalletHelper.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
-  import { getSubmitterAccount, getSubmitterAccountPDA } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { submitterHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
   import { getUserDisplayName, getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { chatAccountHashMap, customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { postVoteRecords } from '/src/assets/globalStates/chat/PostVoteRecords.vue'
   import * as anchor from "@coral-xyz/anchor"
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { VOTE_COST } from '/src/assets/contracts/WalletHelper.vue'
-  import RIPRainbowStarWolf from '/src/components/fancy/RIPRainbowStarWolf.vue'
+  import RIPRainbowStarWolf from '/src/components/fancy/rip/RIPRainbowStarWolf.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
@@ -173,7 +173,7 @@
   var submitterAccountWatchId: any
   var chatAccountWatchId: any
 
-  onMounted(async() => 
+  onMounted(() => 
   {
     toggleVoterCanidateTable.value = localStorage.getItem("toggleVoterCanidateTable") == "true"
     toggleUniqueTable.value = localStorage.getItem("toggleUniqueTable") == "true"
@@ -187,8 +187,8 @@
 
     if(connectedWallet.addressString != "")
     {
-      //await getSubmitterAccountStats(searchAddress.value)
-      //await listenForSubmitterAccountChanges(searchAddress.value)
+      if(submitterHashMap.map)
+        getSubmitterAccountStats(searchAddress.value)
     }
 
     if(connectedWallet.isChatAccountReady)
@@ -201,9 +201,6 @@
       displayName.value = searchAddress.value
       possiblyTrimmedDisplayName.value = trimAddress(searchAddress.value)
     }
-
-    voterTableIsLoading.value = false
-    canidateTableIsLoading.value = false
   })
 
   onUnmounted(() => 
@@ -212,14 +209,19 @@
      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
   })
 
-  watch(postVoteRecords, () =>
+  watch(submitterHashMap, () =>
   {
-    sortPostVoteRecords(searchAddress.value)
+    getSubmitterAccountStats(searchAddress.value)
   })
 
   watch(chatAccountHashMap, () =>
   {
     getChatAccountStats(searchAddress.value)
+  })
+
+  watch(postVoteRecords, () =>
+  {
+    sortPostVoteRecords(searchAddress.value)
   })
 
   watch(customUserNameHashMap, () =>
@@ -309,13 +311,11 @@
         possiblyTrimmedDisplayName.value = trimAddress(connectedWallet.addressString)
       }
 
-      //await getSubmitterAccountStats(connectedWallet.addressString)
+      getSubmitterAccountStats(connectedWallet.addressString)
       getChatAccountStats(connectedWallet.addressString)
       if(postVoteRecords.data)
         sortPostVoteRecords(connectedWallet.addressString)
       searchAddress.value = connectedWallet.addressString
-
-      //await listenForSubmitterAccountChanges(connectedWallet.addressString)
     }
     catch(error)
     {
@@ -342,21 +342,19 @@
     displayName.value = getUserDisplayName(addressToCheck.value)
     possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(addressToCheck.value)
 
-    //await getSubmitterAccountStats(addressToCheck.value)
+    getSubmitterAccountStats(addressToCheck.value)
     getChatAccountStats(addressToCheck.value)
     if(postVoteRecords.data)
       sortPostVoteRecords(addressToCheck.value)
 
     searchAddress.value = addressToCheck.value
 
-    //await listenForSubmitterAccountChanges(addressToCheck.value)
-
     addressToCheck.value = ""
   }
 
-  async function getSubmitterAccountStats(searchAddress: string)
+  function getSubmitterAccountStats(searchAddress: string)
   {
-    submitterAccount.value = await getSubmitterAccount(searchAddress)
+    submitterAccount.value = submitterHashMap.map.get(searchAddress)
 
     if(submitterAccount.value)
     {
@@ -670,23 +668,6 @@
     }
 
     return castedVoteRecords 
-  }
-
-  async function listenForSubmitterAccountChanges(searchAddressString: string)
-  {
-    try
-    {
-      //Subscribe to submitter account changes
-      submitterAccountWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getSubmitterAccountPDA(searchAddressString), async() => 
-      {
-        //Handle account change...
-        await getSubmitterAccountStats(searchAddress.value)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
   }
 </script>
 

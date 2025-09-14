@@ -111,10 +111,10 @@
   import { download } from 'ionicons/icons'
   import { search } from 'ionicons/icons'
   import { copyFullAddress  } from '/src/assets/contracts/WalletHelper.vue'
-  import * as anchor from "@coral-xyz/anchor"
 
   const props = defineProps(
   [
+    'uniqueVoterCount',
     'tableData',
     'loading',
     'uniqueVoterCount',

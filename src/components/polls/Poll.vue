@@ -113,6 +113,7 @@
   </div>
     <PollRecords
     :uniqueVoterHashMap="uniqueVoterHashMap"
+    :uniqueVoterCount="uniqueVoterCount"
     :pollRecordsTableData="pollRecordsTableData"
     :uniquePollRecordsTableData="uniquePollRecordsTableData"
     :isPollRecordsTableLoading="isPollRecordsTableLoading"
@@ -138,6 +139,7 @@
   const props = defineProps(['pollIndex', 'colorName', 'colorHexValue'])
 
   var uniqueVoterHashMap = ref()
+  var uniqueVoterCount = ref(0)
 
   var pollName = ref("")
   var pollTotalSpentString = ref()
@@ -187,8 +189,6 @@
     }
 
     sortPollVoteRecords(props.pollIndex)
-    isPollRecordsTableLoading.value = false
-    isUniquePollRecordsTableLoading.value =false
   })
 
   watch(polls, () =>
@@ -302,9 +302,9 @@
         var pollVoteRecord = pollVoteRecords.data[i].account
         const pollOption = polls.data[props.pollIndex].pollOptions[pollVoteRecord.pollOptionIndex]
 
-        //Needed to be able to sort properly with Anchor BN numbers, only some id's have that problem for some reason
-        //if(typeof pollVoteRecord.pollRecordId != "number")
-          //pollVoteRecord.pollRecordId = pollVoteRecord.pollRecordId.toNumber()
+        //Convert BN voteAmount to number, not always a BN for some reason
+        if(typeof pollVoteRecord.voteAmount != "number")
+          pollVoteRecord.voteAmount = pollVoteRecord.voteAmount.toNumber()
 
         pollVoteRecord.voterAddress = pollVoteRecord.voterAddress
         pollVoteRecord.displayName = getUserDisplayName(pollVoteRecord.voterAddress)
@@ -315,7 +315,7 @@
         pollVoteRecord.absoluteVoteAmount = Math.abs(pollVoteRecord.voteAmount)
         pollVoteRecord.absoluteVoteAmountString = Math.abs(pollVoteRecord.voteAmount).toLocaleString()
         pollVoteRecord.amountSpentString = parseVoteDollarAmountString(pollVoteRecord.absoluteVoteAmount)
-        //pollVoteRecord.voteAmount = pollVoteRecord.voteAmount.toNumber()//anchor BN's don't sort properly
+        
 
         //Set vote score string
         if(pollVoteRecord.voteAmount > 0)
@@ -400,10 +400,14 @@
       }
     }
 
+    uniqueVoterCount.value = uniqueVoterPollOptionMap.size
     uniqueVoterHashMap.value = uniqueVoterPollOptionMap
 
     pollRecordsTableData.value = pollRecords.sort((a: any, b: any) => b.id - a.id)
     uniquePollRecordsTableData.value = uniqueVoterPollOptionData
+
+    isPollRecordsTableLoading.value = false
+    isUniquePollRecordsTableLoading.value =false
   }
 </script>
 

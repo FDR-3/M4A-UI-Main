@@ -261,9 +261,8 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { insuranceCompanies} from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
-  import { M4A_MAX_NOTE_LENGTH,
-    getHospital,
-    getHospitalRecords } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { hospitalRecordsHashMap } from '/src/assets/globalStates/m4a/Records.vue'
+  import { M4A_MAX_NOTE_LENGTH, getHospital } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
   import { givePokemonCenterCreatorCredit } from '/src/assets/helperFunctions/credits.ts'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
@@ -276,7 +275,6 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { sleep } from '/src/assets/helperFunctions/sleep.ts'
 
   const emits = defineEmits(['hospitalSelect', 'showHospitalList'])
 
@@ -310,9 +308,7 @@
   var event = ref()
   var copyFullAddressButtonText = ref("Copy Full Address")
 
-  var isOnMountPassThroughDone = false
-
-  onMounted(async() =>
+  onMounted(() =>
   {
     document.getElementById("tableTop")?.scrollIntoView()
 
@@ -345,17 +341,48 @@
       hospitalRevokedApprovalCount = hospital.revokedApprovalCount
     }
 
-    tableData.value = await getHospitalRecords(countryIndex.value, stateIndex.value, hospitalIndex.value)
+    if(hospitalRecordsHashMap.map)
+        getHospitalRecords()
+
     isLoading.value = false
-    isOnMountPassThroughDone = true
   })
 
-  watch(hospitals, async() => 
+  watch(hospitals, () => 
   {
-    //Prevents fetching the records twice on a refresh when you hit refresh on records table page
-    if(!isOnMountPassThroughDone)
-      return
+    /*const hospital = getHospital(countryIndex.value, stateIndex.value, hospitalIndex.value)
+    hospitalName.value = hospital.hospitalName
+    hospitalType.value = hospital.hospitalType 
+    hospitalTypeName.value =  hospital.hospitalTypeName
+    hospitalApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(hospital.approvedClaimAmount)
+    hospitalApprovedClaimCount = hospital.approvedClaimCount
+    hospitalDeniedClaimCount = hospital.deniedClaimCount
+    hospitalUndeniedClaimCount = hospital.undeniedClaimCount
+    hospitalSubmittedAppealCount = hospital.submittedAppealCount 
+    hospitalDeniedAppealCount = hospital.deniedAppealCount
+    hospitalRevokedApprovalCount = hospital.revokedApprovalCount
 
+    getHospitalRecords() */
+  })
+
+  watch(insuranceCompanies, () => 
+  {
+    /*const hospital = getHospital(countryIndex.value, stateIndex.value, hospitalIndex.value)
+    hospitalName.value = hospital.hospitalName
+    hospitalType.value = hospital.hospitalType 
+    hospitalTypeName.value =  hospital.hospitalTypeName
+    hospitalApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(hospital.approvedClaimAmount)
+    hospitalApprovedClaimCount = hospital.approvedClaimCount
+    hospitalDeniedClaimCount = hospital.deniedClaimCount
+    hospitalUndeniedClaimCount = hospital.undeniedClaimCount
+    hospitalSubmittedAppealCount = hospital.submittedAppealCount 
+    hospitalDeniedAppealCount = hospital.deniedAppealCount
+    hospitalRevokedApprovalCount = hospital.revokedApprovalCount
+
+    getHospitalRecords()*/
+  })
+
+  watch(hospitalRecordsHashMap, () => 
+  {
     const hospital = getHospital(countryIndex.value, stateIndex.value, hospitalIndex.value)
     hospitalName.value = hospital.hospitalName
     hospitalType.value = hospital.hospitalType 
@@ -368,30 +395,7 @@
     hospitalDeniedAppealCount = hospital.deniedAppealCount
     hospitalRevokedApprovalCount = hospital.revokedApprovalCount
 
-    //await sleep(5000)
-    tableData.value = await getHospitalRecords(countryIndex.value, stateIndex.value, hospitalIndex.value)
-  })
-
-  watch(insuranceCompanies, async() => 
-  {
-    //Prevents fetching the records twice on a refresh when you hit refresh on records table page
-    if(!isOnMountPassThroughDone)
-      return
-
-    const hospital = getHospital(countryIndex.value, stateIndex.value, hospitalIndex.value)
-    hospitalName.value = hospital.hospitalName
-    hospitalType.value = hospital.hospitalType 
-    hospitalTypeName.value =  hospital.hospitalTypeName
-    hospitalApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(hospital.approvedClaimAmount)
-    hospitalApprovedClaimCount = hospital.approvedClaimCount
-    hospitalDeniedClaimCount = hospital.deniedClaimCount
-    hospitalUndeniedClaimCount = hospital.undeniedClaimCount
-    hospitalSubmittedAppealCount = hospital.submittedAppealCount 
-    hospitalDeniedAppealCount = hospital.deniedAppealCount
-    hospitalRevokedApprovalCount = hospital.revokedApprovalCount
-
-    //await sleep(5000)
-    tableData.value = await getHospitalRecords(countryIndex.value, stateIndex.value, hospitalIndex.value)
+    getHospitalRecords()
   })
 
 
@@ -410,6 +414,15 @@
         }
       }
   })
+
+  function getHospitalRecords()
+  {
+    const hospitalRecords = hospitalRecordsHashMap.map.get(countryIndex.value.toString(), stateIndex.value.toString(), hospitalIndex.value.toString())
+    if(hospitalRecords)
+      tableData.value = hospitalRecords
+    else
+      tableData.value = hospitalRecords
+  }
 
   const filters = ref(
   {

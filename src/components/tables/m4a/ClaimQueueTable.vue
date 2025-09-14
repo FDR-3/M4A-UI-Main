@@ -185,7 +185,7 @@
       </Column>
       <Column field="note" header="Claim Note" style="width: 15%" sortable>
         <template #body="slotProps">
-          <span class="emojiText">{{ slotProps.data.note }}</span>
+          <span>{{ slotProps.data.note }}</span>
         </template>
       </Column>
       <Column field="statusMessage" header="Status" style="width: 5%" sortable>

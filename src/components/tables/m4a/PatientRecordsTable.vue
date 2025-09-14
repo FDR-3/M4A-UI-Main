@@ -49,7 +49,7 @@
             v-model="patientSelect" 
             :options="patientList" 
             optionLabel="name" 
-            optionValue="index" 
+            optionValue="submitterPatientIndex" 
             placeholder="Select Patient"
             appendTo="self"
           >
@@ -260,19 +260,17 @@
 </template>
   
 <script setup lang="ts">
-  import { ref, defineProps, onMounted, onUnmounted, watch, inject } from 'vue'
+  import { ref, defineProps, onMounted, watch, inject } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonInput, IonTextarea, IonText, IonPopover } from '@ionic/vue'
   import { search } from 'ionicons/icons'
   import Select from 'primevue/select'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
-  import { M4A_MAX_NOTE_LENGTH, getPatientList, getNewPatient } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { M4A_MAX_NOTE_LENGTH, getSubmitterPatientList } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { FilterMatchMode } from '@primevue/core/api'
-  import { hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
-  import { insuranceCompanies} from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
   import { download } from 'ionicons/icons'
-  import { PublicKey } from "@solana/web3.js"
-  import { getPatientRecords, getSubmitterAccountPDA, getPatientAccountPDA } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { patientHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
+  import { patientRecordsHashMap } from '/src/assets/globalStates/m4a/Records.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { statusTypes } from '/src/types/statusTypes.ts'
   import { parseDollarAmountStringFromFixed2PointNotationNoDollarSign,
@@ -280,7 +278,6 @@
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { sleep } from '/src/assets/helperFunctions/sleep.ts'
   
   const props = defineProps(['searchAddress', 'submitterAccount'])
 
@@ -308,31 +305,14 @@
   var patientMaxDeniedClaimCount = ref()
   var patientRevokedApprovalCount = ref()
 
-  var currentPatientCount: number
-
-  var patientListWatchId: any
-  var patientRecordWatchId: any
-
-  var isOnMountPassThroughDone = false
-
   onMounted(async() =>
   {
     if(props.searchAddress)
     {
-      /*patientList.value = await getPatientList(props.searchAddress)
-      patientRecordTableData.value = await getPatientRecords(props.searchAddress, patientSelect.value)
-
-      //Listen for Patient Account Init
-      await listenForAdditionalPatients(props.searchAddress)
-      
-      //Listen for Patient Record Status Change
-      await listenForPatientRecordStatusUpdates(props.searchAddress, patientSelect.value)*/
+      patientList.value = getSubmitterPatientList(props.searchAddress)
+      if(patientRecordsHashMap.map)
+        getPatientRecords()
     }
-
-    if(props.submitterAccount)
-      currentPatientCount = props.submitterAccount.patientCount
-    else
-    currentPatientCount = 0
 
     if(patientList.value.length != 0)
     {
@@ -346,7 +326,7 @@
       patientMaxDeniedClaimCount.value = patientList.value[0].maxDeniedClaimCount 
       patientRevokedApprovalCount.value = patientList.value[0].revokedApprovalCount
 
-      patientSelect.value = patientList.value[0].index
+      patientSelect.value = patientList.value[0].submitterPatientIndex
     }
     else
     {
@@ -364,66 +344,19 @@
     }
 
     isLoading.value = false
-    isOnMountPassThroughDone = true
   })
 
-  onUnmounted(() => 
-  {
-    if(patientListWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(patientListWatchId)
-      patientListWatchId = undefined
-    }
 
-    if(patientRecordWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(patientRecordWatchId)
-      patientRecordWatchId = undefined
-    }
-  })
-
-  watch(hospitals, async() => 
+  watch(patientRecordsHashMap, async() => 
   {
-    //Prevents fetching the records twice on a refresh when you are the records table
-    if(!isOnMountPassThroughDone)
-      return
-    
-    //await sleep(5000)
-    //patientRecordTableData.value = await getPatientRecords(props.searchAddress, patientSelect.value)
-  })
-
-  watch(insuranceCompanies, async() => 
-  {
-    //Prevents fetching the records twice on a refresh when you are the records table
-    if(!isOnMountPassThroughDone)
-      return
-    
-    //await sleep(5000)
-    //patientRecordTableData.value = await getPatientRecords(props.searchAddress, patientSelect.value)
+    getPatientRecords()
   })
 
   watch(() => props.searchAddress, async() =>  
   {
     isLoading.value = true
-    
-    if(patientListWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(patientListWatchId)
-      patientListWatchId = undefined
-    }
 
-    if(patientRecordWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(patientRecordWatchId)
-      patientRecordWatchId = undefined
-    }
-
-    if(props.submitterAccount)
-      currentPatientCount = props.submitterAccount.patientCount
-    else
-    currentPatientCount = 0
-
-    //patientList.value = await getPatientList(props.searchAddress)
+    patientList.value = getSubmitterPatientList(props.searchAddress)
 
     if(patientList.value.length != 0)
     {
@@ -437,7 +370,7 @@
       patientMaxDeniedClaimCount.value = patientList.value[0].maxDeniedClaimCount 
       patientRevokedApprovalCount.value = patientList.value[0].revokedApprovalCount
 
-      patientSelect.value = patientList.value[0].index
+      patientSelect.value = patientList.value[0].submitterPatientIndex
     }
     else
     {
@@ -454,16 +387,19 @@
       patientSelect.value = 0
     }
 
-    //patientRecordTableData.value = await getPatientRecords(props.searchAddress, patientSelect.value)
+    getPatientRecords()
 
     isLoading.value = false
-
-    //Listen for Patient Account Init
-    //await listenForAdditionalPatients(props.searchAddress)
-    
-    //Listen for Patient Record Status Change
-    //await listenForPatientRecordStatusUpdates(props.searchAddress, patientSelect.value)
   })
+
+  function getPatientRecords()
+  {
+    const patientRecords = patientRecordsHashMap.map.get(props.searchAddress.toString() + patientSelect.value.toString())
+    if(patientRecords)
+      patientRecordTableData.value = patientRecords
+    else
+      patientRecordTableData.value = patientRecords
+  }
 
   const filters = ref(
   {
@@ -579,17 +515,11 @@
     }
   }
 
-  async function loadNewPatientStats()
+  function loadNewPatientStats()
   {
-    if(patientRecordWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(patientRecordWatchId)
-      patientRecordWatchId = undefined
-    }
-
     isLoading.value = true
     
-    /*const patient = await anchorPrograms.m4a.m4aProgram.account.patientAccount.fetch(getPatientAccountPDA(props.searchAddress, patientSelect.value))
+    const patient = patientHashMap.map.get(props.searchAddress.toString() + patientSelect.value.toString())
     patientApprovedClaimAmountString.value =  parseDollarAmountStringFromFixed2PointNotationNoDollarSign(patient.approvedClaimAmount)
     patientSubmittedClaimCount.value = patient.submittedClaimCount
     patientApprovedClaimCount.value = patient.approvedClaimCount
@@ -599,81 +529,10 @@
     patientDeniedAppealCount.value = patient.deniedAppealCount
     patientMaxDeniedClaimCount.value = patient.maxDeniedClaimCount 
     patientRevokedApprovalCount.value = patient.revokedApprovalCount
-    patientRecordTableData.value = await getPatientRecords(props.searchAddress, patientSelect.value)*/
+
+    getPatientRecords()
 
     isLoading.value = false
-
-    //Listen for Patient Record Status Change
-    //await listenForPatientRecordStatusUpdates(props.searchAddress, patientSelect.value)
-  }
-
-  async function listenForAdditionalPatients(submitterAddress: String)
-  {
-    const publicKey = new PublicKey(submitterAddress)
-    try
-    {
-      //Subscribe to account changes
-      patientListWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getSubmitterAccountPDA(publicKey), async() => 
-      {
-        //Handle account change...
-        if(props.submitterAccount.patientCount > currentPatientCount)
-        {
-          const patient = await getNewPatient(submitterAddress)
-
-          //Set stats of new patient
-          patientApprovedClaimAmountString.value =  parseDollarAmountStringFromFixed2PointNotationNoDollarSign(patient.approvedClaimAmount)
-          patientSubmittedClaimCount.value = patient.submittedClaimCount
-          patientApprovedClaimCount.value = patient.approvedClaimCount
-          patientDeniedClaimCount.value = patient.deniedClaimCount
-          patientUndeniedClaimCount.value = patient.undeniedClaimCount
-          patientSubmittedAppealCount.value = patient.submittedAppealCount
-          patientDeniedAppealCount.value = patient.deniedAppealCount
-          patientMaxDeniedClaimCount.value = patient.maxDeniedClaimCount 
-          patientRevokedApprovalCount.value = patient.revokedApprovalCount
-          patientRecordTableData.value = [] //New Patient, so don't bother fetching records
-
-          patientSelect.value = patient.index
-          patientList.value.push(patient)
-          patientList.value = patientList.value.sort((a: any, b: any) => a.patientFirstName.localeCompare(b.patientFirstName))
-          currentPatientCount = props.submitterAccount.patientCount
-        }
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
-  }
-
-  async function listenForPatientRecordStatusUpdates(submitterAddress: String, patientIndex: number)
-  {
-    const publicKey = new PublicKey(submitterAddress)
-    try
-    {
-      //Subscribe to account changes
-      patientRecordWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getPatientAccountPDA(publicKey, patientIndex), async() => 
-      {
-        //Handle account change...
-        const patient = await anchorPrograms.m4a.m4aProgram.account.patientAccount.fetch(getPatientAccountPDA(publicKey, patientIndex))
-
-        patientApprovedClaimAmountString.value =  parseDollarAmountStringFromFixed2PointNotationNoDollarSign(patient.approvedClaimAmount)
-        patientSubmittedClaimCount.value = patient.submittedClaimCount
-        patientApprovedClaimCount.value = patient.approvedClaimCount
-        patientDeniedClaimCount.value = patient.deniedClaimCount
-        patientUndeniedClaimCount.value = patient.undeniedClaimCount
-        patientSubmittedAppealCount.value = patient.submittedAppealCount
-        patientDeniedAppealCount.value = patient.deniedAppealCount
-        patientMaxDeniedClaimCount.value = patient.maxDeniedClaimCount 
-        patientRevokedApprovalCount.value = patient.revokedApprovalCount
-
-        //await sleep(5000)
-        patientRecordTableData.value = await getPatientRecords(submitterAddress, patientIndex)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
   }
 </script>
   

@@ -8,7 +8,9 @@
   import cloneDeep from 'lodash/cloneDeep'
 
   export async function getLendingProtocolCEOAccount()
-  {console.log("Getting Lending CEO Account")
+  {
+    console.log("Getting Lending Protocol CEO Account")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -32,7 +34,9 @@
   }
 
   export async function getTokenReserves()
-  {console.log("Getting Token Reserves")
+  {
+    console.log("Getting Token Reserves")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -56,7 +60,9 @@
   }
 
   export async function getSubMarkets()
-  {console.log("Getting SubMarkets")
+  {
+    console.log("Getting SubMarkets")
+    
     var subMarketsList: any = []
     var subMarketsMap = new Map<string, any>()
     var subMarketOwnerMap = new Map<string, any>()
@@ -156,8 +162,8 @@
   export function getUserNextSubMarketIndex(owner: string)
   {
     const userSubMarketList = subMarketOwnerHashMap.map.get(owner)
-    console.log(userSubMarketList.ownerSubMarketList)
-    if(userSubMarketList.ownerSubMarketList)
+
+    if(userSubMarketList)
       return userSubMarketList.ownerSubMarketList.length
     else
       return 0

@@ -16,7 +16,7 @@
 <script setup lang="ts">
   import { IonText } from '@ionic/vue'
   import RainbowStarWolf from '/src/components/fancy/RainbowStarWolf.vue'
-  import RIPRainbowStarWolf from '/src/components/fancy/RIPRainbowStarWolf.vue'
+  import RIPRainbowStarWolf from '/src/components/fancy/rip/RIPRainbowStarWolf.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
 </script>
 

@@ -57,7 +57,7 @@
             </div>
 
             <div>
-              <h2 class="statSpacingTop">State Approved Claim Amount: $<span class="rainbowText">{{ stateApprovedClaimTotalString }}</span></h2>
+              <h2 class="statSpacingTop">State Approved Claim Amount: <span class="rainbowText">{{ stateApprovedClaimTotalString }}</span></h2>
               <h2 class="stateStatSpacing">State Approved Claims: {{ stateApprovedClaimCount }}</h2>
               <h2 class="stateStatSpacing">State Denied Claims: {{ stateDeniedClaimCount }}</h2>
               <h2 class="stateStatSpacing">State Undenied Claims: {{ stateUndeniedClaimCount }}</h2>

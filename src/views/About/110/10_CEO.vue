@@ -3,8 +3,14 @@
     <h1>Centralized Engineering Organizer....Guy</h1>
     <PrevPageButton/>
     <div class="ceoInfoContainer">
-      <DarkModeStarWolfSignal class="ceoStarWolf" v-if="darkTheme.value"/>
-      <LightModeStarWolfSignal class="ceoStarWolf" v-if="!darkTheme.value"/>
+      <div v-if="darkTheme.value">
+        <RIPDarkModeStarWolfSignal v-if="adminAccounts.ceoIsDead" class="ceoStarWolf"/>
+        <DarkModeStarWolfSignal v-else class="ceoStarWolf"/>
+      </div>
+      <div v-else>
+        <RIPLightModeStarWolfSignal v-if="adminAccounts.ceoIsDead" class="ceoStarWolf"/>
+        <LightModeStarWolfSignal v-else class="ceoStarWolf"/>
+      </div>
       <div class="stats thickBorder">
         <h1>CEO Profile</h1>
         <div class="standardFontSize">
@@ -63,6 +69,9 @@
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import DarkModeStarWolfSignal from '/src/components/fancy/DarkModeStarWolfSignal.vue' 
   import LightModeStarWolfSignal from '/src/components/fancy/LightModeStarWolfSignal.vue'
+  import RIPDarkModeStarWolfSignal from '/src/components/fancy/rip/RIPDarkModeStarWolfSignal.vue'
+  import RIPLightModeStarWolfSignal from '/src/components/fancy/rip/RIPLightModeStarWolfSignal.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import IdeasTable from '/src/components/tables/chat/IdeasTable.vue'
   import FEDsTable from '/src/components/tables/chat/FEDsTable.vue'
   import PriorityList from './PriorityList.vue'

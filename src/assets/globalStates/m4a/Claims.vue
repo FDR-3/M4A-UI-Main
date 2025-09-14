@@ -6,6 +6,11 @@
     data: undefined
   })
 
+  export const processedClaimStats = reactive(
+  {
+    data: undefined
+  })
+
   export const claims = reactive(
   {
     data: undefined

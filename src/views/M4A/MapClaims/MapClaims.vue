@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { IonButton, IonLabel } from '@ionic/vue'
   import BETACountDown from '/src/components/mapclaims/BETACountDown.vue'
   import BETADelayExcuse from '/src/components/mapclaims/BETADelayExcuse.vue' 
@@ -60,13 +60,9 @@
   import StateHospitalListTable from '/src/components/tables/m4a/StateHospitalListTable.vue'
   import HospitalRecordsTable from '/src/components/tables/m4a/HospitalRecordsTable.vue'
   import SubmitClaim from '/src/components/mapclaims/SubmitClaim.vue'
+  import { stateHospitalListHashMap } from '/src/assets/globalStates/m4a/States.vue'
   import { countryStateCoordinatesArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
-  import { hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
-  import { getStateAccount,
-    getStateHospitalList,
-    getStateAccountPDA } from '/src/assets/contracts/Solana/M4AProtocol.vue'
-  import { parseDollarAmountStringFromFixed2PointNotationNoDollarSign } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   defineProps(['colorName', 'colorHexValue'])
@@ -76,7 +72,7 @@
   var stateHospitalList = ref()
   var isLoading = ref()
 
-  var stateApprovedClaimTotalString = ref("0.00")
+  var stateApprovedClaimTotalString = ref("$0.00")
   var stateApprovedClaimCount = ref(0)
   var stateDeniedClaimCount = ref(0)
   var stateUndeniedClaimCount = ref(0)
@@ -89,10 +85,6 @@
   var stateVisionHospitalCount = ref(0)
   var stateMentalHospitalCount = ref(0)
 
-  var stateWatchId: any
-
-  var isOnMountPassThroughDone = false
-
   onMounted(async () => 
   {
     showStateHospitalRecords.value = localStorage.getItem("showStateHospitalRecords") == 'true' ? true:false
@@ -101,43 +93,29 @@
     {
       isLoading.value = true
 
-      if(hospitals.data)
-        await getStateData()
+      if(stateHospitalListHashMap.map)
+        getStateData()
 
       isLoading.value = false
-
-      //Listen for Hospital Changes
-      await listenForChangesToState(mapSelection.countryIndex, mapSelection.stateIndex)
     }
-
-    isOnMountPassThroughDone = true
   })
 
-  onUnmounted(() =>
+  watch(stateHospitalListHashMap, () =>
   {
-    if(stateWatchId != undefined)
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(stateWatchId)
+    getStateData()
   })
 
-  watch(hospitals, async() => 
-  {
-    if(!isOnMountPassThroughDone)
-      return
-
-    await getStateData()
-  })
-
-  async function getStateData()
+  function getStateData()
   {
     try
     {
       //Get state hospital table data
-      var stateAccount = await getStateAccount(mapSelection.countryIndex, mapSelection.stateIndex)
+      var stateAccount = stateHospitalListHashMap.map.get(mapSelection.countryIndex.toString() + mapSelection.stateIndex.toString())
       
       if(stateAccount)
       {
-        stateHospitalList.value = getStateHospitalList(mapSelection.countryIndex, mapSelection.stateIndex, stateAccount.hospitalCount)
-        stateApprovedClaimTotalString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(stateAccount.approvedClaimAmount)
+        stateHospitalList.value = stateAccount.hospitalList
+        stateApprovedClaimTotalString.value = stateAccount.approvedClaimAmountString
         stateApprovedClaimCount.value = stateAccount.approvedClaimCount
         stateDeniedClaimCount.value = stateAccount.deniedClaimCount
         stateUndeniedClaimCount.value = stateAccount.undeniedClaimCount
@@ -152,7 +130,7 @@
       }
       else
       {
-        stateApprovedClaimTotalString.value = "0.00"
+        stateApprovedClaimTotalString.value = "$0.00"
         stateApprovedClaimCount.value = 0
         stateDeniedClaimCount.value = 0
         stateUndeniedClaimCount.value = 0
@@ -172,14 +150,8 @@
     }
   }
 
-  async function showState(countryIndexToShow: number, stateIndexToShow: number, stateNameToShow: string)
+  function showState(countryIndexToShow: number, stateIndexToShow: number, stateNameToShow: string)
   {
-    if(stateWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(stateWatchId)
-      stateWatchId = undefined
-    }
-
     const ZOOM_LAT_INDEX = 0
     const ZOOM_LONG_INDEX = 1
 
@@ -197,20 +169,11 @@
     localStorage.setItem("mapDefaultLatitude", mapSelection.zoomLat.toString())
     localStorage.setItem("mapDefaultLongitude", mapSelection.zoomLong.toString())
 
-    await getStateData()
-
-    //Listen for Hospital Changes
-    await listenForChangesToState(mapSelection.countryIndex, mapSelection.stateIndex)
+    getStateData()
   }
 
   function resetStateSelected()
   {
-    if(stateWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(stateWatchId)
-      stateWatchId = undefined
-    }
-
     mapSelection.countryIndex = -1
     mapSelection.stateIndex = -1
     mapSelection.isStateSelected = false
@@ -239,36 +202,5 @@
   {
     localStorage.setItem('showStateHospitalRecords', "false")
     showStateHospitalRecords.value = false
-  }
-
-  async function listenForChangesToState(countryIndex: number, stateIndex: number)
-  {
-    try
-    {
-      //Subscribe to account changes
-      stateWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getStateAccountPDA(countryIndex, stateIndex), async() => 
-      {
-        //Handle account change... 
-        const stateAccount = await getStateAccount(mapSelection.countryIndex, mapSelection.stateIndex)
-        stateApprovedClaimTotalString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(stateAccount.approvedClaimAmount)
-        stateApprovedClaimCount.value = stateAccount.approvedClaimCount
-        stateDeniedClaimCount.value = stateAccount.deniedClaimCount
-        stateUndeniedClaimCount.value = stateAccount.undeniedClaimCount
-        stateSubmittedAppealCount.value = stateAccount.submittedAppealCount
-        stateDeniedAppealCount.value = stateAccount.deniedAppealCount
-        stateRevokedApprovalCount.value = stateAccount.revokedApprovalCount
-        
-        stateGeneralHospitalCount.value = stateAccount.generalHospitalCount
-        stateDentalHospitalCount.value = stateAccount.dentalHospitalCount
-        stateVisionHospitalCount.value = stateAccount.visionHospitalCount
-        stateMentalHospitalCount.value = stateAccount.mentalHospitalCount
-        
-        stateTotalHospitalCount.value = stateAccount.hospitalCount
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
   }
 </script>

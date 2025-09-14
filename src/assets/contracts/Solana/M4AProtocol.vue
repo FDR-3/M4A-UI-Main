@@ -1,7 +1,11 @@
 <script lang="ts">
   import {  PublicKey } from "@solana/web3.js"
   import { countryNameArray, countryStateNameArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
+  import { submitterHashMap, submitterPatientListHashMap, submitterActivePatientListHashMap, patientHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
   import { claimHashMap, processedClaimHashMap } from '/src/assets/globalStates/m4a/Claims.vue'
+  import { processorHashMap } from '/src/assets/globalStates/m4a/Processors.vue'
+  import { stateAccountReadyHashMap, stateHospitalListHashMap } from '/src/assets/globalStates/m4a/States.vue'
+  import type { State } from '/src/assets/globalStates/m4a/States.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { hospitalHashMap } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { initialInsuranceCompanies } from '/src/types/InitialInsuranceCompanyTypes.ts'
@@ -49,6 +53,8 @@
 
   export async function getM4AFeeTokenAccounts()
   {
+    console.log("Getting M4A Protocol Fee Token Accounts")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -73,6 +79,8 @@
 
   export async function getM4AProtocolCEOAccount()
   {
+    console.log("Getting M4A Protocol CEO Account")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -97,6 +105,8 @@
 
   export async function getM4AProtocolTreasurerAccount()
   {
+    console.log("Getting M4A Protocol Treasurer Account")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -144,21 +154,51 @@
     }
   }
 
-  export async function isSubmitterAccountInitialized(submitterAddress: string)
+  export function isSubmitterAccountInitialized(submitterAddress: string)
+  {
+    if(submitterHashMap.map)
+    {
+      const submitter = submitterHashMap.map.get(submitterAddress)
+      if(submitter)
+        return true
+      else
+        return false
+    }
+    else
+      return false 
+  }
+
+  export async function getAllSubmitters()
+  {
+    console.log("Getting Submitters")
+
+    var tempHashMap = new Map<string, any>()
+
+    const submitters = await getAllSubmittersWrapper()
+
+    for(var i=0; i<submitters.length; i++)
+    {
+      const submitter = submitters[i].account
+      tempHashMap.set(submitter.address.toString(), submitter)
+    }
+
+    submitterHashMap.map = tempHashMap
+  }
+
+  async function getAllSubmittersWrapper()
   {
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
       {
-        await anchorPrograms.m4a.m4aProgram.account.submitterAccount.fetch(getSubmitterAccountPDA(submitterAddress))
-        return true
+        return await anchorPrograms.m4a.m4aProgram.account.submitterAccount.all()
       }
       catch(error: any)
       {
         if(!error.message.includes(ERROR_429))
         {
-          console.log("Submitter Account Not Initialized")
-          return false
+          console.log(error)
+          return []
         }
         else
         {
@@ -169,21 +209,102 @@
     }
   }
 
-  async function isStateInitialized(countryIndex: number, stateIndex: number)
+  export async function getAllPatients()
+  {
+    console.log("Getting Patients")
+
+    var tempPatientMap = new Map<string, any>()
+    var tempSubmitterPatientListMap = new Map<string, any>()
+    var tempSubmitterActivePatientListMap = new Map<string, any>()
+
+    const patients = await getAllPatientsWrapper()
+
+    for(var i=0; i<patients.length; i++)
+    {
+      const patient = patients[i].account
+
+      //Populate Patient HashMap
+      tempPatientMap.set(patient.submitterAddress.toString() + patient.submitterPatientIndex.toString(), patient)
+
+      //Populate Submitter Patient List HashMap
+      const previousList = tempSubmitterPatientListMap.get(patient.submitterAddress.toString())
+      if(previousList)
+      {
+        patient.name = patient.patientFirstName + " " + patient.patientLastName
+        previousList.push(patient)
+        tempSubmitterPatientListMap.set(patient.submitterAddress.toString(), previousList)
+      }
+      else
+      {
+        patient.name = patient.patientFirstName + " " + patient.patientLastName
+        tempSubmitterPatientListMap.set(patient.submitterAddress.toString(), [patient])
+      }
+
+      //Populate Submitter Active Patient List HashMap
+      if(patient.isActive)
+      {
+        const previousListOnlyActive = tempSubmitterActivePatientListMap.get(patient.submitterAddress.toString())
+        if(previousListOnlyActive)
+        {
+          patient.name = patient.patientFirstName + " " + patient.patientLastName
+          previousListOnlyActive.push(patient)
+          tempSubmitterActivePatientListMap.set(patient.submitterAddress.toString(), previousListOnlyActive)
+        }
+        else
+        {
+          patient.name = patient.patientFirstName + " " + patient.patientLastName
+          tempSubmitterActivePatientListMap.set(patient.submitterAddress.toString(), [patient])
+        }
+      }
+    }
+
+    patientHashMap.map = tempPatientMap
+    submitterPatientListHashMap.map = tempSubmitterPatientListMap
+    submitterActivePatientListHashMap.map = tempSubmitterActivePatientListMap
+  }
+
+  export function getSubmitterPatientList(submitterAddress: string)
+  {
+    if(submitterPatientListHashMap.map)
+    {
+      const list = submitterPatientListHashMap.map.get(submitterAddress)
+      if(list)
+        return list
+      else
+        return []
+    }
+    else
+      return []
+  }
+
+  export function getSubmitterActivePatientList(submitterAddress: string)
+  {
+    if(submitterActivePatientListHashMap.map)
+    {
+      const list = submitterActivePatientListHashMap.map.get(submitterAddress)
+      if(list)
+        return list
+      else
+        return []
+    }
+    else
+      return []
+  }
+
+  async function getAllPatientsWrapper()
   {
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
       {
-        await anchorPrograms.m4a.m4aProgram.account.stateAccount.fetch(getStateAccountPDA(countryIndex, stateIndex))
-        return true
+        return await anchorPrograms.m4a.m4aProgram.account.patientAccount.all()
       }
       catch(error: any)
       {
         if(!error.message.includes(ERROR_429))
         {
-          console.log(`State Account at Country Index ${countryIndex} and State Index ${stateIndex} is Not Initialized`)
-          return false
+          console.log(error)
+          return []
         }
         else
         {
@@ -194,28 +315,64 @@
     }
   }
 
-  export async function getProcessorStats()
+  //This is used on the stats page
+  export function getPatientList(submitterAddress: string)
   {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    var patientList: any = []
+    
+    try
     {
-      try
+      var submitterAccount = submitterHashMap.map.get(submitterAddress)
+      
+      for(var i=0; i<submitterAccount.patientCount; i++)
       {
-        return await anchorPrograms.m4a.m4aProgram.account.processorStats.fetch(getProcessorStatsPDA())
+        var patientAccount = patientHashMap.map.get(submitterAddress + i.toString())
+
+        patientAccount.name = patientAccount.patientFirstName + " " + patientAccount.patientLastName
+        patientAccount.index = i
+        patientList.push(patientAccount)
       }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log("Processor Stats Not Initialized")
-          return undefined
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
+
+      patientList = patientList.sort((a: any, b: any) => a.patientFirstName.localeCompare(b.patientFirstName))
     }
+    catch
+    {
+      console.log("Submitter Account Not Initialized")
+      patientList = []
+    }
+
+    return patientList
+  }
+
+  export function getNewPatient(submitterAddress: string)
+  {
+    try
+    {
+      var submitterAccount = submitterHashMap.map.get(submitterAddress)
+      
+      submitterAccount.patientCount
+      var patientAccount = patientHashMap.map.get(submitterAddress + (submitterAccount.patientCount-1).toString())
+
+      patientAccount.name = patientAccount.patientFirstName + " " + patientAccount.patientLastName
+      patientAccount.index = submitterAccount.patientCount-1
+    }
+    catch(error)
+    {
+      console.log(error) //Submitter account should exist at this point, must be a different error
+      return undefined
+    }
+
+    return patientAccount
+  }
+
+  export function getNextSubmitterPatientIndex(submitterAddress: string)
+  {
+    const submitterPatientList = submitterPatientListHashMap.map.get(submitterAddress)
+
+    if(submitterPatientList)
+      return submitterPatientList.length
+    else
+      return 0
   }
 
   export async function getHospitalStats()
@@ -266,43 +423,33 @@
     }
   }
 
-  export async function getProcessorAccount(processorAddress: PublicKey)
+  export function getProcessorAccount(processorAddress: PublicKey)
   {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        return await anchorPrograms.m4a.m4aProgram.account.processorAccount.fetch(getProcessorAccountPDA(processorAddress))
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log("Processor Account Not Initialized")
-          return undefined
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
+    if(processorHashMap.map)
+      return processorHashMap.map.get(processorAddress.toString())
+    else
+      return undefined 
   }
 
   export async function getProcessors()
   {
-    const processors = await getProcessorsWrapper()
-    var processorList = []
+    console.log("Getting Processors")
 
+    var processorList = []
+    var hashMap = new Map<string, any>()
+
+    const processors = await getProcessorsWrapper()
+    
     for(var i=0; i<processors.length; i++)
     {
       //Get processor display name
-      processors[i].account.address = processors[i].account.address
       processors[i].account.processorDisplayName = getCustomOrTrimmedUserDisplayName(processors[i].account.address)
+
+      hashMap.set(processors[i].account.address.toString(), processors[i].account)
       processorList.push(processors[i].account)
     }
 
+    processorHashMap.map = hashMap
     return processorList
   }
 
@@ -313,6 +460,350 @@
       try
       {
         return await anchorPrograms.m4a.m4aProgram.account.processorAccount.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export async function setPatientRecordsHashMap()
+  {
+    var hashMap = new Map<string, any>()
+
+    const patientRecords = await getPatientRecordsWrapper()
+
+    patientRecords.sort((a: any, b: any) => a.account.recordId - b.account.recordId)
+
+    for(var i=0; i<patientRecords.length; i++)
+    {
+      const patientRecord = patientRecords[i].account
+
+      //Parse Int from anchor BN for sorting
+      patientRecord.recordId = parseInt(patientRecord.recordId)
+      patientRecord.claimId = parseInt(patientRecord.claimId)
+      patientRecord.claimAmountString = parseDollarAmountStringFromFixed2PointNotation(patientRecord.claimAmount)
+      patientRecord.claimAmount = convertFromFixed2PointNotationToDecimal(patientRecord.claimAmount)
+      patientRecord.submittedTimeString = convertUnixTimeToLocalTime(patientRecord.submittedTime)
+      patientRecord.submittedDateString = convertUnixTimeToLocalDate(patientRecord.submittedTime)
+      if(patientRecord.processedTime != 0)
+      {
+        patientRecord.processedTimeString = convertUnixTimeToLocalTime(patientRecord.processedTime)
+        patientRecord.processedDateString = convertUnixTimeToLocalDate(patientRecord.processedTime)
+      }
+      
+      const hospital = hospitalHashMap.map.get(patientRecord.countryIndex.toString()+patientRecord.stateIndex.toString()+patientRecord.hospitalIndex.toString())
+      patientRecord.hospitalApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospital.approvedClaimAmount)
+      patientRecord.hospitalType = hospital.hospitalType
+      patientRecord.hospitalName = hospital.hospitalName
+      patientRecord.hospitalAddress = hospital.hospitalAddress
+      patientRecord.hospitalCity = hospital.hospitalCity
+      patientRecord.hospitalZipCode = hospital.hospitalZipCode
+      patientRecord.hospitalPhoneNumber = hospital.hospitalPhoneNumber
+      patientRecord.hospitalNote = hospital.note
+
+      //Set hospital type name
+      if(hospital.hospitalType == HospitalTypes.General)
+        patientRecord.hospitalTypeName = "General"
+      else if(hospital.hospitalType == HospitalTypes.Dental)
+        patientRecord.hospitalTypeName = "Dental"
+      else if(hospital.hospitalType == HospitalTypes.Vision)
+        patientRecord.hospitalTypeName = "Vision"
+      else if(hospital.hospitalType == HospitalTypes.Mental)
+        patientRecord.hospitalTypeName = "Mental"
+
+      const insuranceCompany = insuranceCompanies.data[patientRecord.insuranceCompanyIndex]
+      patientRecord.insuranceCompanyApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(insuranceCompany.approvedClaimAmount)
+      patientRecord.insuranceCompanyName = insuranceCompany.insuranceCompanyName
+      patientRecord.insuranceCompanyNote = insuranceCompany.note
+
+      //Set country name
+      patientRecord.countryName= countryNameArray[patientRecord.countryIndex]
+
+      //Set state name
+      patientRecord.stateName= countryStateNameArray[patientRecord.countryIndex][patientRecord.stateIndex]
+      
+      //Set record status
+      if(patientRecord.status == statusTypes.Processing)
+        patientRecord.statusMessage  = "Processing"
+      else if(patientRecord.status == statusTypes.Approved)
+        patientRecord.statusMessage  = "Approved"
+      else if(patientRecord.status == statusTypes.Denied)
+      {
+        if(patientRecord.appealReason.length != 0)
+        {
+          patientRecord.denialMessage  = "Denied Appeal: " + patientRecord.denialReason
+          patientRecord.appealMessage  = "Previous Appeal Reason: " + patientRecord.appealReason
+        }
+        else
+        {
+          patientRecord.denialMessage  = "Denied: " + patientRecord.denialReason
+          patientRecord.appealMessage  = ""
+        }
+      }
+      else if(patientRecord.status == statusTypes.Appealed)
+      {
+        patientRecord.appealMessage  = "Appealed: " + patientRecord.appealReason
+        patientRecord.denialMessage  = "Previous Denial Reason: " + patientRecord.denialReason
+      }
+
+      const previousList = hashMap.get(patientRecord.submitterAddress.toString() + patientRecord.patientIndex.toString())
+      if(previousList)
+      {
+        previousList.push(patientRecord)
+        hashMap.set(patientRecord.submitterAddress.toString() + patientRecord.patientIndex.toString(), previousList)
+      }
+      else
+        hashMap.set(patientRecord.submitterAddress.toString() + patientRecord.patientIndex.toString(), [patientRecord])
+    }
+
+    return hashMap
+  }
+
+  async function getPatientRecordsWrapper()
+  {  
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.m4a.m4aProgram.account.patientRecord.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export async function setHospitalRecordsHashMap()
+  {
+    var hashMap = new Map<string, any>()
+
+    const hospitalRecords = await getHospitalRecordsWrapper()
+
+    hospitalRecords.sort((a: any, b: any) => a.account.recordId - b.account.recordId)
+
+    for(var i=0; i<hospitalRecords.length; i++)
+    {
+      const hospitalRecord = hospitalRecords[i].account
+
+      //Parse Int from anchor BN for sorting
+      hospitalRecord.recordId = parseInt(hospitalRecord.recordId)
+      hospitalRecord.claimId = parseInt(hospitalRecord.claimId)
+      hospitalRecord.claimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospitalRecord.claimAmount)
+      hospitalRecord.claimAmount = convertFromFixed2PointNotationToDecimal(hospitalRecord.claimAmount)
+      hospitalRecord.submittedTimeString = convertUnixTimeToLocalTime(hospitalRecord.submittedTime)
+      hospitalRecord.submittedDateString = convertUnixTimeToLocalDate(hospitalRecord.submittedTime)
+      if(hospitalRecord.processedTime != 0)
+      {
+        hospitalRecord.processedTimeString = convertUnixTimeToLocalTime(hospitalRecord.processedTime)
+        hospitalRecord.processedDateString = convertUnixTimeToLocalDate(hospitalRecord.processedTime)
+      }
+
+      //Get submitter info
+      const submitter = submitterHashMap.map.get(hospitalRecord.submitterAddress.toString())
+      hospitalRecord.submitterApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(submitter.approvedClaimAmount)
+      //Get submitter display name
+      hospitalRecord.submitterAddress = hospitalRecord.submitterAddress.toBase58()
+      hospitalRecord.submitterDisplayName = getCustomOrTrimmedUserDisplayName(hospitalRecord.submitterAddress)
+
+      //Get patient info
+      const patient = patientHashMap.map.get(hospitalRecord.submitterAddress.toString() + hospitalRecord.patientIndex.toString())
+      hospitalRecord.patientApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(patient.approvedClaimAmount)
+      hospitalRecord.patientFullName = patient.patientFirstName + " " + patient.patientLastName
+
+      //Get insurance company info
+      const insuranceCompany = insuranceCompanies.data[hospitalRecord.insuranceCompanyIndex]
+      hospitalRecord.insuranceCompanyApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(insuranceCompany.approvedClaimAmount)
+      hospitalRecord.insuranceCompanyName = insuranceCompany.insuranceCompanyName
+      hospitalRecord.insuranceCompanyNote = insuranceCompany.note
+
+      //Set record status
+      if(hospitalRecord.status == statusTypes.Processing)
+        hospitalRecord.statusMessage  = "Processing"
+      else if(hospitalRecord.status == statusTypes.Approved)
+        hospitalRecord.statusMessage  = "Approved"
+      else if(hospitalRecord.status == statusTypes.Denied)
+      {
+        if(hospitalRecord.appealReason.length != 0)
+        {
+          hospitalRecord.denialMessage  = "Denied Appeal: " + hospitalRecord.denialReason
+          hospitalRecord.appealMessage  = "Previous Appeal Reason: " + hospitalRecord.appealReason
+        }
+        else
+        {
+          hospitalRecord.denialMessage  = "Denied: " + hospitalRecord.denialReason
+          hospitalRecord.appealMessage  = ""
+        }
+      }
+      else if(hospitalRecord.status == statusTypes.Appealed)
+      {
+        hospitalRecord.appealMessage  = "Appealed: " + hospitalRecord.appealReason
+        hospitalRecord.denialMessage  = "Previous Denial Reason: " + hospitalRecord.denialReason
+      }
+
+      const hospitalRecordKey = hospitalRecord.countryIndex.toString() + hospitalRecord.stateIndex.toString() + hospitalRecord.hospitalIndex.toString()
+      const previousList = hashMap.get(hospitalRecordKey)
+      if(previousList)
+      {
+        previousList.push(hospitalRecord)
+        hashMap.set(hospitalRecordKey, previousList)
+      }
+      else
+        hashMap.set(hospitalRecordKey, [hospitalRecord])
+    }
+
+    return hashMap
+  }
+
+  async function getHospitalRecordsWrapper()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.m4a.m4aProgram.account.hospitalRecord.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export async function setInsuranceCompanyRecordsHashMap()
+  {
+    var hashMap = new Map<string, any>()
+
+    const insuranceCompanyRecords = await getInsuranceCompanyRecordsWrapper()
+
+    insuranceCompanyRecords.sort((a: any, b: any) => a.account.recordId - b.account.recordId)
+
+    for(var i=0; i<insuranceCompanyRecords.length; i++)
+    {
+      const insuranceCompanyRecord = insuranceCompanyRecords[i].account
+
+      //Parse Int from anchor BN for sorting
+      insuranceCompanyRecord.recordId = parseInt(insuranceCompanyRecord.recordId)
+      insuranceCompanyRecord.claimId = parseInt(insuranceCompanyRecord.claimId)
+      insuranceCompanyRecord.claimAmountString = parseDollarAmountStringFromFixed2PointNotation(insuranceCompanyRecord.claimAmount)
+      insuranceCompanyRecord.claimAmount = convertFromFixed2PointNotationToDecimal(insuranceCompanyRecord.claimAmount)
+      insuranceCompanyRecord.submittedTimeString = convertUnixTimeToLocalTime(insuranceCompanyRecord.submittedTime)
+      insuranceCompanyRecord.submittedDateString = convertUnixTimeToLocalDate(insuranceCompanyRecord.submittedTime)
+      if(insuranceCompanyRecord.processedTime != 0)
+      {
+        insuranceCompanyRecord.processedTimeString = convertUnixTimeToLocalTime(insuranceCompanyRecord.processedTime)
+        insuranceCompanyRecord.processedDateString = convertUnixTimeToLocalDate(insuranceCompanyRecord.processedTime)
+      }
+
+      //Get submitter info
+      const submitter = submitterHashMap.map.get(insuranceCompanyRecord.submitterAddress.toString())
+      insuranceCompanyRecord.submitterApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(submitter.approvedClaimAmount)
+      insuranceCompanyRecord.insuranceCompanyName = submitter.insuranceCompanyName
+      //Get submitter display name
+      insuranceCompanyRecord.submitterAddress = insuranceCompanyRecord.submitterAddress.toBase58()
+      insuranceCompanyRecord.submitterDisplayName = getCustomOrTrimmedUserDisplayName(insuranceCompanyRecord.submitterAddress)
+
+      //Get patient info
+      const patient = patientHashMap.map.get(insuranceCompanyRecord.submitterAddress.toString() + insuranceCompanyRecord.patientIndex.toString())
+      insuranceCompanyRecord.patientApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(patient.approvedClaimAmount)
+      insuranceCompanyRecord.patientFullName = patient.patientFirstName + " " + patient.patientLastName
+
+      //Get hospital info
+      const hospital =  hospitalHashMap.map.get(insuranceCompanyRecord.countryIndex.toString()+insuranceCompanyRecord.stateIndex.toString()+insuranceCompanyRecord.hospitalIndex.toString())
+      insuranceCompanyRecord.hospitalApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospital.approvedClaimAmount)
+      insuranceCompanyRecord.hospitalType = hospital.hospitalType
+      insuranceCompanyRecord.hospitalName = hospital.hospitalName
+      insuranceCompanyRecord.hospitalCountryName = countryNameArray[hospital.countryIndex]
+      insuranceCompanyRecord.hospitalStateName = countryStateNameArray[hospital.countryIndex][hospital.stateIndex]
+      insuranceCompanyRecord.hospitalCity = hospital.hospitalCity
+      insuranceCompanyRecord.hospitalAddress = hospital.hospitalAddress
+      insuranceCompanyRecord.hospitalZipCode = hospital.hospitalZipCode
+      insuranceCompanyRecord.hospitalPhoneNumber = hospital.hospitalPhoneNumber
+      insuranceCompanyRecord.hospitalNote = hospital.note
+
+      //Set hospital type name
+      if(hospital.hospitalType == HospitalTypes.General)
+        insuranceCompanyRecord.hospitalTypeName = "General"
+      else if(hospital.hospitalType == HospitalTypes.Dental)
+        insuranceCompanyRecord.hospitalTypeName = "Dental"
+      else if(hospital.hospitalType == HospitalTypes.Vision)
+        insuranceCompanyRecord.hospitalTypeName = "Vision"
+      else if(hospital.hospitalType == HospitalTypes.Mental)
+        insuranceCompanyRecord.hospitalTypeName = "Mental"
+
+      //Set record status
+      if(insuranceCompanyRecord.status == statusTypes.Processing)
+        insuranceCompanyRecord.statusMessage  = "Processing"
+      else if(insuranceCompanyRecord.status == statusTypes.Approved)
+        insuranceCompanyRecord.statusMessage  = "Approved"
+      else if(insuranceCompanyRecord.status == statusTypes.Denied)
+      {
+        if(insuranceCompanyRecord.appealReason.length != 0)
+        {
+          insuranceCompanyRecord.denialMessage  = "Denied Appeal: " + insuranceCompanyRecord.denialReason
+          insuranceCompanyRecord.appealMessage  = "Previous Appeal Reason: " + insuranceCompanyRecord.appealReason
+        }
+        else
+        {
+          insuranceCompanyRecord.denialMessage  = "Denied: " + insuranceCompanyRecord.denialReason
+          insuranceCompanyRecord.appealMessage  = ""
+        }
+      }
+      else if(insuranceCompanyRecord.status == statusTypes.Appealed)
+      {
+        insuranceCompanyRecord.appealMessage  = "Appealed: " + insuranceCompanyRecord.appealReason
+        insuranceCompanyRecord.denialMessage  = "Previous Denial Reason: " + insuranceCompanyRecord.denialReason
+      }
+
+      const previousList = hashMap.get(insuranceCompanyRecord.insuranceCompanyIndex.toString())
+      if(previousList)
+      {
+        previousList.push(insuranceCompanyRecord)
+        hashMap.set(insuranceCompanyRecord.insuranceCompanyIndex.toString(), previousList)
+      }
+      else
+        hashMap.set(insuranceCompanyRecord.insuranceCompanyIndex.toString(), [insuranceCompanyRecord])
+    }
+
+    return hashMap
+  }
+
+  async function getInsuranceCompanyRecordsWrapper()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.m4a.m4aProgram.account.insuranceCompanyRecord.all()
       }
       catch(error: any)
       {
@@ -354,166 +845,20 @@
     }
   }
 
-  export async function getNextHospitalIndex(countryIndex: number, stateIndex: number)
+  function getNextHospitalIndex(countryIndex: string, stateIndex: string)
   {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        const stateAccount = await anchorPrograms.m4a.m4aProgram.account.stateAccount.fetch(getStateAccountPDA(countryIndex, stateIndex))
-        return stateAccount.hospitalCount
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log(`State Not Initialized. Country Index: ${countryIndex} StateIndex: ${stateIndex}`)
-          return 0
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
-  }
+    const state = stateHospitalListHashMap.map.get(countryIndex + stateIndex)
 
-  export async function getSubmitterAccount(searchAddress: string)
-  {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        return await anchorPrograms.m4a.m4aProgram.account.submitterAccount.fetch(getSubmitterAccountPDA(searchAddress))
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log("Submitter Account Not Initialized")
-          return undefined
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
-  }
-
-  export async function getPatientAccount(submitterAddress: string, patientIndex: number)
-  {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        return await anchorPrograms.m4a.m4aProgram.account.patientAccount.fetch(getPatientAccountPDA(submitterAddress, patientIndex))
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log("Patient Account Not Initialized")
-          return undefined
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
-  }
-
-  //This is used on the stats page
-  export async function getPatientList(submitterAddress: string)
-  {
-    var patientList: any = []
-    
-    try
-    {
-      var submitterAccount = await getSubmitterAccount(submitterAddress)
-      
-      for(var i=0; i<submitterAccount.patientCount; i++)
-      {
-        var patientAccount = await getPatientAccount(submitterAddress, i)
-
-        patientAccount.name = patientAccount.patientFirstName + " " + patientAccount.patientLastName
-        patientAccount.index = i
-        patientList.push(patientAccount)
-      }
-
-      patientList = patientList.sort((a: any, b: any) => a.patientFirstName.localeCompare(b.patientFirstName))
-    }
-    catch
-    {
-      console.log("Submitter Account Not Initialized")
-      patientList = []
-    }
-
-    return patientList
-  }
-
-  //This is used on the submit claim page
-  export async function getPatientLists(submitterAddress: string)
-  {
-    var patientList: any = []
-    var activePatientList: any = []
-    
-    try
-    {
-      var submitterAccount = await getSubmitterAccount(submitterAddress)
-      
-      for(var i=0; i<submitterAccount.patientCount; i++)
-      {
-        var patientAccount = await getPatientAccount(submitterAddress, i)
-
-        patientAccount.name = patientAccount.patientFirstName + " " + patientAccount.patientLastName
-        patientAccount.index = i
-        patientList.push(patientAccount)
-
-        if(patientAccount.isActive)
-          activePatientList.push(patientAccount)
-      }
-
-      patientList = patientList.sort((a: any, b: any) => a.patientFirstName.localeCompare(b.patientFirstName))
-      activePatientList = activePatientList.sort((a: any, b: any) => a.patientFirstName.localeCompare(b.patientFirstName))
-    }
-    catch
-    {
-      console.log("Submitter Account Not Initialized")
-      patientList = []
-      activePatientList = []
-    }
-
-    return [patientList, activePatientList]
-  }
-
-  export async function getNewPatient(submitterAddress: string)
-  {
-    try
-    {
-      var submitterAccount = await getSubmitterAccount(submitterAddress)
-      
-      submitterAccount.patientCount
-      var patientAccount = await getPatientAccount(submitterAddress, submitterAccount.patientCount-1)
-
-      patientAccount.name = patientAccount.patientFirstName + " " + patientAccount.patientLastName
-      patientAccount.index = submitterAccount.patientCount-1
-    }
-    catch(error)
-    {
-      console.log(error) //Submitter account should exist at this point, must be a different error
-      return undefined
-    }
-
-    return patientAccount
+    if(state)
+      return state.hospitalCount
+    else
+      return 0  
   }
 
   export async function getClaimQueue()
   {
+    console.log("Getting Claim Queue")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -536,29 +881,14 @@
     }
   }
 
-  export async function isClaimSubmitted(submitterAddress: PublicKey)
+  export function isClaimSubmitted(submitterAddress: PublicKey)
   {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        await anchorPrograms.m4a.m4aProgram.account.claim.fetch(getClaimPDA(submitterAddress))
+    const claim = claimHashMap.map.get(submitterAddress.toString())
+
+    if(claim)
       return true
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log("Claim Not Submitted")
-          return false
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
+    else
+      return false
   }
 
   export function getClaim(submitterAddress: PublicKey | string)
@@ -581,6 +911,8 @@
 
   export async function getQueueClaims()
   {
+    console.log("Getting Claims")
+
     var claimQueueTableData: any = []
     var hashMap = new Map<string, any>()
     
@@ -601,7 +933,11 @@
       claim.stateName = countryStateNameArray[claim.countryIndex][claim.stateIndex]
 
       //Set is state ready
-      claim.isStateReady = await isStateInitialized(claim.countryIndex, claim.stateIndex)
+      const state = stateAccountReadyHashMap.map.get(claim.countryIndex.toString() + claim.stateIndex.toString())
+      if(state)
+        claim.isStateReady = true
+      else
+        claim.isStateReady = false
 
       //Set hospital type name
       if(claim.hospitalType == HospitalTypes.General)
@@ -614,20 +950,20 @@
         claim.hospitalTypeName = "Mental"
 
       //Set submitter approved claim total amount
-      const submitterAccount = await anchorPrograms.m4a.m4aProgram.account.submitterAccount.fetch(getSubmitterAccountPDA(claim.submitterAddress))
+      const submitterAccount = submitterHashMap.map.get(claim.submitterAddress.toString())
       claim.submitterApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(submitterAccount.approvedClaimAmount)
       //Get submitter display name
       claim.submitterDisplayName = getCustomOrTrimmedUserDisplayName(claim.submitterAddress)
 
       //Set patient full name
-      const patient = await anchorPrograms.m4a.m4aProgram.account.patientAccount.fetch(getPatientAccountPDA(claim.submitterAddress, claim.patientIndex))
+      const patient = patientHashMap.map.get(claim.submitterAddress.toString() + claim.patientIndex.toString())
       claim.patientFullName = patient.patientFirstName + " " + patient.patientLastName
 
       //Set patient approved claim total amount
       claim.patientApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(patient.approvedClaimAmount)
 
       //Set next available hospital index
-      const nextAvailableHospitalIndex = await getNextHospitalIndex(claim.countryIndex, claim.stateIndex)
+      const nextAvailableHospitalIndex = getNextHospitalIndex(claim.countryIndex.toString(), claim.stateIndex.toString())
       claim.nextHospitalIndex = nextAvailableHospitalIndex
 
       //Set next available insurance company index for new insurance companies outside of initial list
@@ -758,6 +1094,44 @@
     }
   }
 
+  export async function getStateAccounts()
+  {
+    var hashMap = new Map<string, any>()
+
+    const states = await getStateAccountsWrapper()
+
+    for(var i=0; i<states.length; i++)
+    {
+      hashMap.set(states[i].account.countryIndex.toString() + states[i].account.stateIndex.toString(), states[i].account)
+    }
+
+    stateAccountReadyHashMap.map = hashMap
+  }
+
+  async function getStateAccountsWrapper()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.m4a.m4aProgram.account.stateAccount.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
   export function getHospital(countryIndex: number, stateIndex: number, hospitalIndex: number)
   {
     try
@@ -834,43 +1208,125 @@
     }
   }
 
-  export async function getAllHospitals()
+  export async function getAllHospitalsAndUpdateStateMap()
   {
+    console.log("Getting Hospitals")
+
     var hospitalList: any = []
-    var hashMap = new Map<string, any>()
+    var hospitalTempHashMap = new Map<string, any>()
+    var stateTempHashMap = new Map<string, any>()
 
     const hospitals = await getAllHospitalsWrapper()
 
     for(var i=0; i<hospitals.length; i++)
     {
-      hospitals[i].account.hospitalPhoneNumber = parsePhoneNumberString(hospitals[i].account.hospitalPhoneNumber)
+      const hospital = hospitals[i].account
+      const state = stateTempHashMap.get(hospital.countryIndex.toString() + hospital.stateIndex.toString())
 
-      //Set hospital approved claim total, country name, and state name
-      hospitals[i].account.approvedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospitals[i].account.approvedClaimAmount)
-      hospitals[i].account.hospitalCountryName = countryNameArray[hospitals[i].account.countryIndex]
-      hospitals[i].account.hospitalStateName = countryStateNameArray[hospitals[i].account.countryIndex][ hospitals[i].account.stateIndex]
+      if(state)
+      {
+        //Update State Hash Map Entry
+        state.hospitalList.push(hospital)
+        state.approvedClaimAmount = state.approvedClaimAmount.add(hospital.approvedClaimAmount)
+        state.approvedClaimCount = state.approvedClaimCount.add(hospital.approvedClaimCount)
+        state.deniedClaimCount = state.deniedClaimCount.add(hospital.deniedClaimCount)
+        state.undeniedClaimCount = state.undeniedClaimCount.add(hospital.undeniedClaimCount)
+        state.submittedAppealCount = state.submittedAppealCount.add(hospital.submittedAppealCount)
+        state.deniedAppealCount = state.deniedAppealCount.add(hospital.deniedAppealCount)
+        state.revokedApprovalCount = state.revokedApprovalCount.add(hospital.revokedApprovalCount)
+        state.hospitalCount += 1
 
-      //Set hospital type name
-      if(hospitals[i].account.hospitalType == HospitalTypes.General)
-        hospitals[i].account.hospitalTypeName = "General"
-      else if(hospitals[i].account.hospitalType == HospitalTypes.Dental)
-        hospitals[i].account.hospitalTypeName = "Dental"
-      else if(hospitals[i].account.hospitalType == HospitalTypes.Vision)
-        hospitals[i].account.hospitalTypeName = "Vision"
-      else if(hospitals[i].account.hospitalType == HospitalTypes.Mental)
-        hospitals[i].account.hospitalTypeName = "Mental"
+        state.approvedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(state.approvedClaimAmount)
 
-      hospitals[i].account.isEditingRow = false
-      hospitals[i].account.isDataEdited = false
+        //Set hospital type name and hospital count
+        if(hospital.hospitalType == HospitalTypes.General)
+        {
+          hospital.hospitalTypeName = "General"
+          state.generalHospitalCount += 1
+        }
+        else if(hospital.hospitalType == HospitalTypes.Dental)
+        {
+          hospital.hospitalTypeName = "Dental"
+          state.dentalHospitalCount += 1
+        }
+        else if(hospital.hospitalType == HospitalTypes.Vision)
+        {
+          hospital.hospitalTypeName = "Vision"
+          state.visionHospitalCount += 1
+        }
+        else if(hospital.hospitalType == HospitalTypes.Mental)
+        {
+          hospital.hospitalTypeName = "Mental"
+          state.mentalHospitalCount += 1
+        }
 
-      hashMap.set(hospitals[i].account.countryIndex.toString()+
-      hospitals[i].account.stateIndex.toString()+
-      hospitals[i].account.hospitalIndex.toString(), hospitals[i].account)
+        stateTempHashMap.set(hospital.countryIndex.toString() + hospital.stateIndex.toString(), state)
+      }
+      else
+      {
+        //Create New State Hash Map Entry
+        var newStateEntry: State = 
+        {
+          hospitalList: [hospital],
+          approvedClaimAmountString: parseDollarAmountStringFromFixed2PointNotation(hospital.approvedClaimAmount),
+          approvedClaimAmount: hospital.approvedClaimAmount,
+          approvedClaimCount: hospital.approvedClaimCount,
+          deniedClaimCount: hospital.deniedClaimCount,
+          undeniedClaimCount: hospital.undeniedClaimCount,
+          submittedAppealCount: hospital.submittedAppealCount,
+          deniedAppealCount: hospital.deniedAppealCount,
+          revokedApprovalCount: hospital.revokedApprovalCount,
+          hospitalCount: 1,
+          generalHospitalCount: 0,
+          dentalHospitalCount: 0,
+          visionHospitalCount: 0,
+          mentalHospitalCount: 0
+        }
 
-      hospitalList.push(hospitals[i].account)
+        //Set hospital type name and hospital count
+        if(hospital.hospitalType == HospitalTypes.General)
+        {
+          hospital.hospitalTypeName = "General"
+          newStateEntry.generalHospitalCount += 1
+        }
+        else if(hospital.hospitalType == HospitalTypes.Dental)
+        {
+          hospital.hospitalTypeName = "Dental"
+          newStateEntry.dentalHospitalCount += 1
+        }
+        else if(hospital.hospitalType == HospitalTypes.Vision)
+        {
+          hospital.hospitalTypeName = "Vision"
+          newStateEntry.visionHospitalCount += 1
+        }
+        else if(hospital.hospitalType == HospitalTypes.Mental)
+        {
+          hospital.hospitalTypeName = "Mental"
+          newStateEntry.mentalHospitalCount += 1
+        }
+
+        stateTempHashMap.set(hospital.countryIndex.toString() + hospital.stateIndex.toString(), newStateEntry)
+      }
+
+      //Set hospital phone number, approved claim total, country name, and state name
+      hospital.hospitalPhoneNumber = parsePhoneNumberString(hospital.hospitalPhoneNumber)
+      hospital.approvedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospital.approvedClaimAmount)
+      hospital.hospitalCountryName = countryNameArray[hospital.countryIndex]
+      hospital.hospitalStateName = countryStateNameArray[hospital.countryIndex][ hospital.stateIndex]
+
+      hospital.isEditingRow = false
+      hospital.isDataEdited = false
+
+      hospitalTempHashMap.set(hospital.countryIndex.toString()+
+      hospital.stateIndex.toString()+
+      hospital.hospitalIndex.toString(), hospital)
+
+      hospitalList.push(hospital)
     }
 
-    hospitalHashMap.map = hashMap
+    stateHospitalListHashMap.map = stateTempHashMap
+    hospitalHashMap.map = hospitalTempHashMap
+
     hospitalList.sort((a: any, b: any) => b.id - a.id)
     return hospitalList
   }
@@ -927,6 +1383,8 @@
 
   export async function getAllInsuranceCompanies()
   {
+    console.log("Getting Insurance Companies")
+
     var insuranceCompanies = []
     var hashMap = new Map<string, any>()
 
@@ -1019,342 +1477,6 @@
     }
   }
 
-  export async function getPatientRecords(searchAddress: string, patientIndex: number)
-  {
-    if(!hospitalHashMap.map || !insuranceCompanies.data)
-      return
-
-    var patientRecords = []
-
-    const patient = await getPatientAccount(searchAddress, patientIndex)
-    if(patient)
-      for(var i=0; i<patient.recordCount; i++)
-      {
-        const patientRecord = await getPatientRecordsWrapper(searchAddress, patientIndex, i)
-
-        //Parse Int from anchor BN for sorting
-        patientRecord.recordId = parseInt(patientRecord.recordId)
-        patientRecord.claimId = parseInt(patientRecord.claimId)
-        patientRecord.claimAmountString = parseDollarAmountStringFromFixed2PointNotation(patientRecord.claimAmount)
-        patientRecord.claimAmount = convertFromFixed2PointNotationToDecimal(patientRecord.claimAmount)
-        patientRecord.submittedTimeString = convertUnixTimeToLocalTime(patientRecord.submittedTime)
-        patientRecord.submittedDateString = convertUnixTimeToLocalDate(patientRecord.submittedTime)
-        if(patientRecord.processedTime != 0)
-        {
-          patientRecord.processedTimeString = convertUnixTimeToLocalTime(patientRecord.processedTime)
-          patientRecord.processedDateString = convertUnixTimeToLocalDate(patientRecord.processedTime)
-        }
-        
-        const hospital = hospitalHashMap.map.get(patientRecord.countryIndex.toString()+patientRecord.stateIndex.toString()+patientRecord.hospitalIndex.toString())
-        patientRecord.hospitalApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospital.approvedClaimAmount)
-        patientRecord.hospitalType = hospital.hospitalType
-        patientRecord.hospitalName = hospital.hospitalName
-        patientRecord.hospitalAddress = hospital.hospitalAddress
-        patientRecord.hospitalCity = hospital.hospitalCity
-        patientRecord.hospitalZipCode = hospital.hospitalZipCode
-        patientRecord.hospitalPhoneNumber = hospital.hospitalPhoneNumber
-        patientRecord.hospitalNote = hospital.note
-
-        //Set hospital type name
-        if(hospital.hospitalType == HospitalTypes.General)
-          patientRecord.hospitalTypeName = "General"
-        else if(hospital.hospitalType == HospitalTypes.Dental)
-          patientRecord.hospitalTypeName = "Dental"
-        else if(hospital.hospitalType == HospitalTypes.Vision)
-          patientRecord.hospitalTypeName = "Vision"
-        else if(hospital.hospitalType == HospitalTypes.Mental)
-          patientRecord.hospitalTypeName = "Mental"
-
-        const insuranceCompany = insuranceCompanies.data[patientRecord.insuranceCompanyIndex]
-        patientRecord.insuranceCompanyApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(insuranceCompany.approvedClaimAmount)
-        patientRecord.insuranceCompanyName = insuranceCompany.insuranceCompanyName
-        patientRecord.insuranceCompanyNote = insuranceCompany.note
-
-        //Set country name
-        patientRecord.countryName= countryNameArray[patientRecord.countryIndex]
-
-        //Set state name
-        patientRecord.stateName= countryStateNameArray[patientRecord.countryIndex][patientRecord.stateIndex]
-        
-        //Set record status
-        if(patientRecord.status == statusTypes.Processing)
-          patientRecord.statusMessage  = "Processing"
-        else if(patientRecord.status == statusTypes.Approved)
-          patientRecord.statusMessage  = "Approved"
-        else if(patientRecord.status == statusTypes.Denied)
-        {
-          if(patientRecord.appealReason.length != 0)
-          {
-            patientRecord.denialMessage  = "Denied Appeal: " + patientRecord.denialReason
-            patientRecord.appealMessage  = "Previous Appeal Reason: " + patientRecord.appealReason
-          }
-          else
-          {
-            patientRecord.denialMessage  = "Denied: " + patientRecord.denialReason
-            patientRecord.appealMessage  = ""
-          }
-        }
-        else if(patientRecord.status == statusTypes.Appealed)
-        {
-          patientRecord.appealMessage  = "Appealed: " + patientRecord.appealReason
-          patientRecord.denialMessage  = "Previous Denial Reason: " + patientRecord.denialReason
-        }
-
-        patientRecords.push(patientRecord)
-      }
-    
-    patientRecords = patientRecords.reverse()
-    return patientRecords
-  }
-
-  async function getPatientRecordsWrapper(submitterAddress: PublicKey | string, patientIndex: number, recordIndex: number)
-  {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        return await anchorPrograms.m4a.m4aProgram.account.patientRecord.fetch(getPatientRecordPDA(submitterAddress, patientIndex, recordIndex))
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log("Patient Account Not Initialized")
-          return undefined
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
-  }
-
-  export async function getHospitalRecords(countryIndex: number, stateIndex: number, hospitalIndex: number)
-  {
-    if(!insuranceCompanies.data)
-      return
-
-    const hospital =  hospitalHashMap.map.get(countryIndex.toString()+stateIndex.toString()+hospitalIndex.toString())
-
-    if(!hospital)
-      return
-
-    const recordCount = hospital.recordCount
-    var hospitalRecords = []
-
-    for(var i=0; i<recordCount; i++)
-    { 
-      //Get hospital record
-      const hospitalRecord =  await getHospitalRecordsWrapper(countryIndex, stateIndex, hospitalIndex, i)
-      //Parse Int from anchor BN for sorting
-      hospitalRecord.recordId = parseInt(hospitalRecord.recordId)
-      hospitalRecord.claimId = parseInt(hospitalRecord.claimId)
-      hospitalRecord.claimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospitalRecord.claimAmount)
-      hospitalRecord.claimAmount = convertFromFixed2PointNotationToDecimal(hospitalRecord.claimAmount)
-      hospitalRecord.submittedTimeString = convertUnixTimeToLocalTime(hospitalRecord.submittedTime)
-      hospitalRecord.submittedDateString = convertUnixTimeToLocalDate(hospitalRecord.submittedTime)
-      if(hospitalRecord.processedTime != 0)
-      {
-        hospitalRecord.processedTimeString = convertUnixTimeToLocalTime(hospitalRecord.processedTime)
-        hospitalRecord.processedDateString = convertUnixTimeToLocalDate(hospitalRecord.processedTime)
-      }
-
-      //Get submitter info
-      const submitter = await getSubmitterAccount(hospitalRecord.submitterAddress)
-      hospitalRecord.submitterApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(submitter.approvedClaimAmount)
-      //Get submitter display name
-      hospitalRecord.submitterAddress = hospitalRecord.submitterAddress.toBase58()
-      hospitalRecord.submitterDisplayName = getCustomOrTrimmedUserDisplayName(hospitalRecord.submitterAddress)
-
-      //Get patient info
-      const patient = await getPatientAccount(hospitalRecord.submitterAddress, hospitalRecord.patientIndex)
-      hospitalRecord.patientApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(patient.approvedClaimAmount)
-      hospitalRecord.patientFullName = patient.patientFirstName + " " + patient.patientLastName
-
-      //Get insurance company info
-      const insuranceCompany = insuranceCompanies.data[hospitalRecord.insuranceCompanyIndex]
-      hospitalRecord.insuranceCompanyApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(insuranceCompany.approvedClaimAmount)
-      hospitalRecord.insuranceCompanyName = insuranceCompany.insuranceCompanyName
-      hospitalRecord.insuranceCompanyNote = insuranceCompany.note
-
-      //Set record status
-      if(hospitalRecord.status == statusTypes.Processing)
-        hospitalRecord.statusMessage  = "Processing"
-      else if(hospitalRecord.status == statusTypes.Approved)
-        hospitalRecord.statusMessage  = "Approved"
-      else if(hospitalRecord.status == statusTypes.Denied)
-      {
-        if(hospitalRecord.appealReason.length != 0)
-        {
-          hospitalRecord.denialMessage  = "Denied Appeal: " + hospitalRecord.denialReason
-          hospitalRecord.appealMessage  = "Previous Appeal Reason: " + hospitalRecord.appealReason
-        }
-        else
-        {
-          hospitalRecord.denialMessage  = "Denied: " + hospitalRecord.denialReason
-          hospitalRecord.appealMessage  = ""
-        }
-      }
-      else if(hospitalRecord.status == statusTypes.Appealed)
-      {
-        hospitalRecord.appealMessage  = "Appealed: " + hospitalRecord.appealReason
-        hospitalRecord.denialMessage  = "Previous Denial Reason: " + hospitalRecord.denialReason
-      }
-
-      hospitalRecords.push(hospitalRecord)
-    }
-
-    hospitalRecords = hospitalRecords.reverse()
-    return hospitalRecords
-  }
-
-  async function getHospitalRecordsWrapper(countryIndex: number, stateIndex: number, hospitalIndex: number, recordIndex: number)
-  {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        return await anchorPrograms.m4a.m4aProgram.account.hospitalRecord.fetch(getHospitalRecordPDA(countryIndex, stateIndex, hospitalIndex, recordIndex))
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log(`Hospital Not Initialized. Country Index: ${countryIndex} StateIndex: ${stateIndex} HospitalIndex: ${hospitalIndex}`)
-          return undefined
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
-  }
-
-  export async function getInsuranceCompanyRecords(insuranceCompanyIndex: number)
-  {
-    if(!hospitalHashMap.map)
-      return
-
-    var insuranceCompanyRecords = []
-    
-    if(!insuranceCompanies.data)
-      return
-
-    const insuranceCompany =  insuranceCompanies.data[insuranceCompanyIndex]
-    const recordCount = insuranceCompany.recordCount
-    
-    for(var i=0; i<recordCount; i++)
-    { 
-      //Get insurance company record
-      const insuranceCompanyRecord =  await getInsuranceCompanyRecordsWrapper(insuranceCompanyIndex, i)
-      //Parse Int from anchor BN for sorting
-      insuranceCompanyRecord.recordId = parseInt(insuranceCompanyRecord.recordId)
-      insuranceCompanyRecord.claimId = parseInt(insuranceCompanyRecord.claimId)
-      insuranceCompanyRecord.claimAmountString = parseDollarAmountStringFromFixed2PointNotation(insuranceCompanyRecord.claimAmount)
-      insuranceCompanyRecord.claimAmount = convertFromFixed2PointNotationToDecimal(insuranceCompanyRecord.claimAmount)
-      insuranceCompanyRecord.submittedTimeString = convertUnixTimeToLocalTime(insuranceCompanyRecord.submittedTime)
-      insuranceCompanyRecord.submittedDateString = convertUnixTimeToLocalDate(insuranceCompanyRecord.submittedTime)
-      if(insuranceCompanyRecord.processedTime != 0)
-      {
-        insuranceCompanyRecord.processedTimeString = convertUnixTimeToLocalTime(insuranceCompanyRecord.processedTime)
-        insuranceCompanyRecord.processedDateString = convertUnixTimeToLocalDate(insuranceCompanyRecord.processedTime)
-      }
-
-      //Get submitter info
-      const submitter = await getSubmitterAccount(insuranceCompanyRecord.submitterAddress)
-      insuranceCompanyRecord.submitterApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(submitter.approvedClaimAmount)
-      insuranceCompanyRecord.insuranceCompanyName = submitter.insuranceCompanyName
-      //Get submitter display name
-      insuranceCompanyRecord.submitterAddress = insuranceCompanyRecord.submitterAddress.toBase58()
-      insuranceCompanyRecord.submitterDisplayName = getCustomOrTrimmedUserDisplayName(insuranceCompanyRecord.submitterAddress)
-
-      //Get patient info
-      const patient = await getPatientAccount(insuranceCompanyRecord.submitterAddress, insuranceCompanyRecord.patientIndex)
-      insuranceCompanyRecord.patientApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(patient.approvedClaimAmount)
-      insuranceCompanyRecord.patientFullName = patient.patientFirstName + " " + patient.patientLastName
-
-      //Get hospital info
-      const hospital =  hospitalHashMap.map.get(insuranceCompanyRecord.countryIndex.toString()+insuranceCompanyRecord.stateIndex.toString()+insuranceCompanyRecord.hospitalIndex.toString())
-      insuranceCompanyRecord.hospitalApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospital.approvedClaimAmount)
-      insuranceCompanyRecord.hospitalType = hospital.hospitalType
-      insuranceCompanyRecord.hospitalName = hospital.hospitalName
-      insuranceCompanyRecord.hospitalCountryName = countryNameArray[hospital.countryIndex]
-      insuranceCompanyRecord.hospitalStateName = countryStateNameArray[hospital.countryIndex][hospital.stateIndex]
-      insuranceCompanyRecord.hospitalCity = hospital.hospitalCity
-      insuranceCompanyRecord.hospitalAddress = hospital.hospitalAddress
-      insuranceCompanyRecord.hospitalZipCode = hospital.hospitalZipCode
-      insuranceCompanyRecord.hospitalPhoneNumber = hospital.hospitalPhoneNumber
-      insuranceCompanyRecord.hospitalNote = hospital.note
-
-      //Set hospital type name
-      if(hospital.hospitalType == HospitalTypes.General)
-        insuranceCompanyRecord.hospitalTypeName = "General"
-      else if(hospital.hospitalType == HospitalTypes.Dental)
-        insuranceCompanyRecord.hospitalTypeName = "Dental"
-      else if(hospital.hospitalType == HospitalTypes.Vision)
-        insuranceCompanyRecord.hospitalTypeName = "Vision"
-      else if(hospital.hospitalType == HospitalTypes.Mental)
-        insuranceCompanyRecord.hospitalTypeName = "Mental"
-
-      //Set record status
-      if(insuranceCompanyRecord.status == statusTypes.Processing)
-        insuranceCompanyRecord.statusMessage  = "Processing"
-      else if(insuranceCompanyRecord.status == statusTypes.Approved)
-        insuranceCompanyRecord.statusMessage  = "Approved"
-      else if(insuranceCompanyRecord.status == statusTypes.Denied)
-      {
-        if(insuranceCompanyRecord.appealReason.length != 0)
-        {
-          insuranceCompanyRecord.denialMessage  = "Denied Appeal: " + insuranceCompanyRecord.denialReason
-          insuranceCompanyRecord.appealMessage  = "Previous Appeal Reason: " + insuranceCompanyRecord.appealReason
-        }
-        else
-        {
-          insuranceCompanyRecord.denialMessage  = "Denied: " + insuranceCompanyRecord.denialReason
-          insuranceCompanyRecord.appealMessage  = ""
-        }
-      }
-      else if(insuranceCompanyRecord.status == statusTypes.Appealed)
-      {
-        insuranceCompanyRecord.appealMessage  = "Appealed: " + insuranceCompanyRecord.appealReason
-        insuranceCompanyRecord.denialMessage  = "Previous Denial Reason: " + insuranceCompanyRecord.denialReason
-      }
-
-      insuranceCompanyRecords.push(insuranceCompanyRecord)
-    }
-
-    insuranceCompanyRecords = insuranceCompanyRecords.reverse()
-    return insuranceCompanyRecords
-  }
-
-  async function getInsuranceCompanyRecordsWrapper(insuranceCompanyIndex: number, recordIndex: number)
-  {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        return await anchorPrograms.m4a.m4aProgram.account.insuranceCompanyRecord.fetch(getInsuranceCompanyRecordPDA(insuranceCompanyIndex, recordIndex))
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log(`Insurance Company Not Initialized. InsuranceCompanyIndex: ${insuranceCompanyIndex}`)
-          return undefined
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
-  }
-
   export function getProcessedClaim(submitterAddress: PublicKey | string, processorCountIndex: anchor.BN)
   {
     if(typeof(submitterAddress) === "string")
@@ -1373,8 +1495,36 @@
     }
   }
 
+  export async function getProcessedClaimStats()
+  {
+    console.log("Getting ProcessedClaimStats")
+
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.m4a.m4aProgram.account.processedClaimStats.fetch(getProcessedClaimStatsPDA())
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log("Processed Claim Stats Not Initialized")
+          return undefined
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
   export async function getProcessedClaims()
   {
+    console.log("Getting Processed Claims")
+
     var processedClaimsTableData: any = []
     var hashMap = new Map<string, any>()
     
@@ -1414,13 +1564,13 @@
       processedClaim.hospitalPhoneNumber = parsePhoneNumberString(processedClaim.hospitalPhoneNumber)
 
       //Set submitter claim total decimals from fixed point
-      const submitterAccount = await getSubmitterAccount(processedClaim.submitterAddress)
+      const submitterAccount = submitterHashMap.map.get(processedClaim.submitterAddress.toString())
       processedClaim.submitterApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(submitterAccount.approvedClaimAmount)
       //Get submitter display name
       processedClaim.submitterDisplayName = getCustomOrTrimmedUserDisplayName(processedClaim.submitterAddress)
 
       //Set patient first and last name and set claim total decimals from fixed point
-      const patient = await getPatientAccount(processedClaim.submitterAddress, processedClaim.patientIndex)
+      const patient = patientHashMap.map.get(processedClaim.submitterAddress.toString() + processedClaim.patientIndex.toString())
       processedClaim.patientApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(patient.approvedClaimAmount)
       processedClaim.patientFullName = patient.patientFirstName + " " + patient.patientLastName 
 
@@ -1589,6 +1739,30 @@
     return m4aTokenFeePDA
   }
 
+  export function getSubmitterStatsPDA()
+  {
+    const [submitterStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("submitterStats")
+      ],
+      anchorPrograms.m4a.m4aProgram.programId
+    )
+    return submitterStatsPDA
+  }
+
+  export function getPatientStatsPDA()
+  {
+    const [patientStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("patientStats")
+      ],
+      anchorPrograms.m4a.m4aProgram.programId
+    )
+    return patientStatsPDA
+  }
+
   export function getClaimQueuePDA()
   {
     const [claimQueuePDA] = anchor.web3.PublicKey.findProgramAddressSync
@@ -1611,6 +1785,42 @@
       anchorPrograms.m4a.m4aProgram.programId
     )
     return processorStatsPDA
+  }
+
+  export function getPatientRecordStatsPDA()
+  {
+    const [patientRecordStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("patientRecordStats")
+      ],
+      anchorPrograms.m4a.m4aProgram.programId
+    )
+    return patientRecordStatsPDA
+  }
+
+  export function getHospitalAndInsuranceRecordStatsPDA()
+  {
+    const [hospitalAndInsuranceRecordStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("hospitalAndInsuranceRecordStats")
+      ],
+      anchorPrograms.m4a.m4aProgram.programId
+    )
+    return hospitalAndInsuranceRecordStatsPDA
+  }
+
+  export function getProcessedClaimStatsPDA()
+  {
+    const [processedClaimStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("processedClaimStats")
+      ],
+      anchorPrograms.m4a.m4aProgram.programId
+    )
+    return processedClaimStatsPDA
   }
 
   export function getHospitalStatsPDA()

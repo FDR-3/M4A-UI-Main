@@ -1,5 +1,5 @@
 {
-  "address": "CMfwSRfQB93dAHXvYRUHHARXdU8gTbSjSfFVRQfg5LWe",
+  "address": "95dJrgoyK7cwGT1Tr4W9D8M4KBVTJikTNi5AahHsJC6c",
   "metadata": {
     "name": "m_4_a_protocol",
     "version": "1.0.0",
@@ -111,7 +111,7 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -125,8 +125,13 @@
                   101,
                   115,
                   115,
-                  111,
-                  114,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
                   83,
                   116,
                   97,
@@ -189,34 +194,6 @@
               {
                 "kind": "account",
                 "path": "processed_claim.patient_index",
-                "account": "ProcessedClaim"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.country_index",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.state_index",
                 "account": "ProcessedClaim"
               }
             ]
@@ -493,7 +470,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -584,7 +561,7 @@
           }
         },
         {
-          "name": "treasurer_usdc_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -751,7 +728,7 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -765,8 +742,13 @@
                   101,
                   115,
                   115,
-                  111,
-                  114,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
                   83,
                   116,
                   97,
@@ -829,34 +811,6 @@
               {
                 "kind": "account",
                 "path": "processed_claim.patient_index",
-                "account": "ProcessedClaim"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.country_index",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.state_index",
                 "account": "ProcessedClaim"
               }
             ]
@@ -971,7 +925,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1062,7 +1016,7 @@
           }
         },
         {
-          "name": "treasurer_usdc_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1229,33 +1183,6 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  114,
-                  111,
-                  99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
-              }
-            ]
-          }
-        },
-        {
           "name": "claim_queue",
           "writable": true,
           "pda": {
@@ -1273,6 +1200,38 @@
                   101,
                   117,
                   101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "processed_claim_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  99,
+                  101,
+                  115,
+                  115,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -1357,34 +1316,6 @@
               {
                 "kind": "account",
                 "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "claim.country_index",
-                "account": "Claim"
-              },
-              {
-                "kind": "account",
-                "path": "claim.state_index",
-                "account": "Claim"
               }
             ]
           }
@@ -1681,33 +1612,6 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  114,
-                  111,
-                  99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
-              }
-            ]
-          }
-        },
-        {
           "name": "claim_queue",
           "writable": true,
           "pda": {
@@ -1725,6 +1629,38 @@
                   101,
                   117,
                   101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "processed_claim_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  99,
+                  101,
+                  115,
+                  115,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -1809,56 +1745,6 @@
               {
                 "kind": "account",
                 "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "claim.country_index",
-                "account": "Claim"
-              },
-              {
-                "kind": "account",
-                "path": "claim.state_index",
-                "account": "Claim"
-              }
-            ]
-          }
-        },
-        {
-          "name": "claim",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  108,
-                  97,
-                  105,
-                  109
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "submitter_address"
               }
             ]
           }
@@ -2110,6 +1996,28 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "claim",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  108,
+                  97,
+                  105,
+                  109
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "submitter_address"
+              }
+            ]
+          }
         }
       ],
       "args": [
@@ -2316,6 +2224,32 @@
           }
         },
         {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "country_index"
+              },
+              {
+                "kind": "arg",
+                "path": "state_index"
+              }
+            ]
+          }
+        },
+        {
           "name": "processor",
           "writable": true,
           "pda": {
@@ -2359,32 +2293,6 @@
               {
                 "kind": "arg",
                 "path": "submitter_address"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "country_index"
-              },
-              {
-                "kind": "arg",
-                "path": "state_index"
               }
             ]
           }
@@ -2498,22 +2406,39 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
+          "name": "hospital_and_insurance_record_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
-                  114,
+                  104,
                   111,
+                  115,
+                  112,
+                  105,
+                  116,
+                  97,
+                  108,
+                  65,
+                  110,
+                  100,
+                  73,
+                  110,
+                  115,
+                  117,
+                  114,
+                  97,
+                  110,
                   99,
                   101,
-                  115,
-                  115,
+                  82,
+                  101,
+                  99,
                   111,
                   114,
+                  100,
                   83,
                   116,
                   97,
@@ -2963,24 +2888,25 @@
       ],
       "accounts": [
         {
-          "name": "m4a_protocol",
+          "name": "patient_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  109,
-                  52,
+                  112,
                   97,
-                  80,
-                  114,
-                  111,
                   116,
-                  111,
-                  99,
-                  111,
-                  108
+                  105,
+                  101,
+                  110,
+                  116,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -3034,9 +2960,8 @@
                 "path": "signer"
               },
               {
-                "kind": "account",
-                "path": "submitter.patient_count",
-                "account": "SubmitterAccount"
+                "kind": "arg",
+                "path": "submitter_patient_index"
               }
             ]
           }
@@ -3052,6 +2977,10 @@
         }
       ],
       "args": [
+        {
+          "name": "submitter_patient_index",
+          "type": "u8"
+        },
         {
           "name": "patient_first_name",
           "type": "string"
@@ -3076,7 +3005,7 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
+          "name": "patient_records_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3084,14 +3013,19 @@
                 "kind": "const",
                 "value": [
                   112,
-                  114,
-                  111,
-                  99,
+                  97,
+                  116,
+                  105,
                   101,
-                  115,
-                  115,
+                  110,
+                  116,
+                  82,
+                  101,
+                  99,
                   111,
                   114,
+                  100,
+                  115,
                   83,
                   116,
                   97,
@@ -3252,33 +3186,6 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  114,
-                  111,
-                  99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
-              }
-            ]
-          }
-        },
-        {
           "name": "claim_queue",
           "writable": true,
           "pda": {
@@ -3296,6 +3203,70 @@
                   101,
                   117,
                   101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "patient_records_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  116,
+                  105,
+                  101,
+                  110,
+                  116,
+                  82,
+                  101,
+                  99,
+                  111,
+                  114,
+                  100,
+                  115,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "processed_claim_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  99,
+                  101,
+                  115,
+                  115,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -3380,34 +3351,6 @@
               {
                 "kind": "account",
                 "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "claim.country_index",
-                "account": "Claim"
-              },
-              {
-                "kind": "account",
-                "path": "claim.state_index",
-                "account": "Claim"
               }
             ]
           }
@@ -3679,6 +3622,28 @@
           }
         },
         {
+          "name": "claim",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  108,
+                  97,
+                  105,
+                  109
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "submitter_address"
+              }
+            ]
+          }
+        },
+        {
           "name": "processor",
           "writable": true,
           "pda": {
@@ -3731,28 +3696,6 @@
           }
         },
         {
-          "name": "claim",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  108,
-                  97,
-                  105,
-                  109
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "submitter_address"
-              }
-            ]
-          }
-        },
-        {
           "name": "signer",
           "writable": true,
           "signer": true
@@ -3791,24 +3734,27 @@
       ],
       "accounts": [
         {
-          "name": "m4a_protocol",
+          "name": "submitter_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
+                  115,
+                  117,
+                  98,
                   109,
-                  52,
-                  97,
-                  80,
-                  114,
-                  111,
+                  105,
                   116,
-                  111,
-                  99,
-                  111,
-                  108
+                  116,
+                  101,
+                  114,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -3892,7 +3838,7 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3906,8 +3852,13 @@
                   101,
                   115,
                   115,
-                  111,
-                  114,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
                   83,
                   116,
                   97,
@@ -3997,34 +3948,6 @@
               {
                 "kind": "account",
                 "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.country_index",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.state_index",
-                "account": "ProcessedClaim"
               }
             ]
           }
@@ -4332,7 +4255,7 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -4346,8 +4269,13 @@
                   101,
                   115,
                   115,
-                  111,
-                  114,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
                   83,
                   116,
                   97,
@@ -4437,34 +4365,6 @@
               {
                 "kind": "account",
                 "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.country_index",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.state_index",
-                "account": "ProcessedClaim"
               }
             ]
           }
@@ -4584,6 +4484,29 @@
       ],
       "accounts": [
         {
+          "name": "claim_queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  81,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "processor_stats",
           "writable": true,
           "pda": {
@@ -4611,23 +4534,32 @@
           }
         },
         {
-          "name": "claim_queue",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
+                  112,
+                  114,
+                  111,
                   99,
+                  101,
+                  115,
+                  115,
+                  101,
+                  100,
+                  67,
                   108,
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -4712,34 +4644,6 @@
               {
                 "kind": "account",
                 "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "claim.country_index",
-                "account": "Claim"
-              },
-              {
-                "kind": "account",
-                "path": "claim.state_index",
-                "account": "Claim"
               }
             ]
           }
@@ -5298,32 +5202,6 @@
           }
         },
         {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "country_index"
-              },
-              {
-                "kind": "arg",
-                "path": "state_index"
-              }
-            ]
-          }
-        },
-        {
           "name": "hospital",
           "writable": true,
           "pda": {
@@ -5596,34 +5474,7 @@
           }
         },
         {
-          "name": "processor_stats",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  114,
-                  111,
-                  99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "processed_claim",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -5643,16 +5494,13 @@
                   108,
                   97,
                   105,
-                  109
+                  109,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
-              },
-              {
-                "kind": "arg",
-                "path": "processor_address"
-              },
-              {
-                "kind": "arg",
-                "path": "processor_count_index"
               }
             ]
           }
@@ -5736,34 +5584,6 @@
               {
                 "kind": "account",
                 "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.country_index",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.state_index",
-                "account": "ProcessedClaim"
               }
             ]
           }
@@ -5972,6 +5792,41 @@
           }
         },
         {
+          "name": "processed_claim",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  99,
+                  101,
+                  115,
+                  115,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "processor_address"
+              },
+              {
+                "kind": "arg",
+                "path": "processor_count_index"
+              }
+            ]
+          }
+        },
+        {
           "name": "signer",
           "writable": true,
           "signer": true
@@ -6048,7 +5903,7 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -6062,8 +5917,13 @@
                   101,
                   115,
                   115,
-                  111,
-                  114,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
                   83,
                   116,
                   97,
@@ -6294,6 +6154,188 @@
       ]
     },
     {
+      "name": "initialize_m4a_protocol",
+      "discriminator": [
+        61,
+        64,
+        229,
+        94,
+        164,
+        187,
+        116,
+        4
+      ],
+      "accounts": [
+        {
+          "name": "m4a_protocol",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  52,
+                  97,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "processor_stats",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  99,
+                  101,
+                  115,
+                  115,
+                  111,
+                  114,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "submitter_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  109,
+                  105,
+                  116,
+                  116,
+                  101,
+                  114,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "patient_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  116,
+                  105,
+                  101,
+                  110,
+                  116,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "claim_queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  81,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "processed_claim_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  99,
+                  101,
+                  115,
+                  115,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "initialize_m4a_protocol_admin_accounts",
       "discriminator": [
         228,
@@ -6379,104 +6421,6 @@
       "args": []
     },
     {
-      "name": "initialize_m4a_protocol_and_claim_queue",
-      "discriminator": [
-        23,
-        197,
-        212,
-        129,
-        140,
-        39,
-        194,
-        6
-      ],
-      "accounts": [
-        {
-          "name": "m4a_protocol",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  52,
-                  97,
-                  80,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "processor_stats",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  114,
-                  111,
-                  99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
-                  97,
-                  116,
-                  115
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "claim_queue",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  108,
-                  97,
-                  105,
-                  109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "initialize_protocol_stats",
       "discriminator": [
         103,
@@ -6510,6 +6454,82 @@
                   67,
                   69,
                   79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "patient_records_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  116,
+                  105,
+                  101,
+                  110,
+                  116,
+                  82,
+                  101,
+                  99,
+                  111,
+                  114,
+                  100,
+                  115,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hospital_and_insurance_record_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  112,
+                  105,
+                  116,
+                  97,
+                  108,
+                  65,
+                  110,
+                  100,
+                  73,
+                  110,
+                  115,
+                  117,
+                  114,
+                  97,
+                  110,
+                  99,
+                  101,
+                  82,
+                  101,
+                  99,
+                  111,
+                  114,
+                  100,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -6648,33 +6668,6 @@
                   67,
                   69,
                   79
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "processor_stats",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  114,
-                  111,
-                  99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
-                  97,
-                  116,
-                  115
                 ]
               }
             ]
@@ -6886,33 +6879,6 @@
                   67,
                   69,
                   79
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "processor_stats",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  114,
-                  111,
-                  99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
-                  97,
-                  116,
-                  115
                 ]
               }
             ]
@@ -7197,6 +7163,32 @@
       ],
       "accounts": [
         {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  52,
+                  97,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "processor_stats",
           "writable": true,
           "pda": {
@@ -7218,32 +7210,6 @@
                   97,
                   116,
                   115
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "ceo",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  52,
-                  97,
-                  80,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  67,
-                  69,
-                  79
                 ]
               }
             ]
@@ -7467,7 +7433,7 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -7481,8 +7447,13 @@
                   101,
                   115,
                   115,
-                  111,
-                  114,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
                   83,
                   116,
                   97,
@@ -7571,34 +7542,6 @@
               {
                 "kind": "account",
                 "path": "processed_claim.patient_index",
-                "account": "ProcessedClaim"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.country_index",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.state_index",
                 "account": "ProcessedClaim"
               }
             ]
@@ -7960,27 +7903,26 @@
       ],
       "accounts": [
         {
-          "name": "submitter",
+          "name": "patient_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  115,
-                  117,
-                  98,
-                  109,
+                  112,
+                  97,
+                  116,
                   105,
-                  116,
-                  116,
                   101,
-                  114
+                  110,
+                  116,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "signer"
               }
             ]
           }
@@ -8008,7 +7950,7 @@
               },
               {
                 "kind": "arg",
-                "path": "patient_index"
+                "path": "submitter_patient_index"
               }
             ]
           }
@@ -8025,7 +7967,7 @@
       ],
       "args": [
         {
-          "name": "_patient_index",
+          "name": "_submitter_patient_index",
           "type": "u8"
         },
         {
@@ -8274,6 +8216,32 @@
       ],
       "accounts": [
         {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  52,
+                  97,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "processor_stats",
           "writable": true,
           "pda": {
@@ -8295,32 +8263,6 @@
                   97,
                   116,
                   115
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "ceo",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  52,
-                  97,
-                  80,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  67,
-                  69,
-                  79
                 ]
               }
             ]
@@ -8409,6 +8351,29 @@
       ],
       "accounts": [
         {
+          "name": "claim_queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  81,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "submitter",
           "writable": true,
           "pda": {
@@ -8457,29 +8422,6 @@
               {
                 "kind": "arg",
                 "path": "patient_index"
-              }
-            ]
-          }
-        },
-        {
-          "name": "claim_queue",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  108,
-                  97,
-                  105,
-                  109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
-                ]
               }
             ]
           }
@@ -8539,7 +8481,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -8630,7 +8572,7 @@
           }
         },
         {
-          "name": "treasurer_usdc_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -8849,6 +8791,32 @@
       ],
       "accounts": [
         {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  52,
+                  97,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "processor_stats",
           "writable": true,
           "pda": {
@@ -8870,32 +8838,6 @@
                   97,
                   116,
                   115
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "ceo",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  109,
-                  52,
-                  97,
-                  80,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  67,
-                  69,
-                  79
                 ]
               }
             ]
@@ -9033,7 +8975,7 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9047,8 +8989,57 @@
                   101,
                   115,
                   115,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hospital_and_insurance_record_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  112,
+                  105,
+                  116,
+                  97,
+                  108,
+                  65,
+                  110,
+                  100,
+                  73,
+                  110,
+                  115,
+                  117,
+                  114,
+                  97,
+                  110,
+                  99,
+                  101,
+                  82,
+                  101,
+                  99,
                   111,
                   114,
+                  100,
                   83,
                   116,
                   97,
@@ -9111,34 +9102,6 @@
               {
                 "kind": "account",
                 "path": "processed_claim.patient_index",
-                "account": "ProcessedClaim"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.country_index",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.state_index",
                 "account": "ProcessedClaim"
               }
             ]
@@ -9469,7 +9432,7 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "processed_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9483,8 +9446,13 @@
                   101,
                   115,
                   115,
-                  111,
-                  114,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
                   83,
                   116,
                   97,
@@ -9574,34 +9542,6 @@
               {
                 "kind": "account",
                 "path": "signer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "state",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  116,
-                  97,
-                  116,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.country_index",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.state_index",
-                "account": "ProcessedClaim"
               }
             ]
           }
@@ -9879,27 +9819,23 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
+          "name": "claim_queue",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
-                  114,
-                  111,
                   99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
+                  108,
                   97,
-                  116,
-                  115
+                  105,
+                  109,
+                  81,
+                  117,
+                  101,
+                  117,
+                  101
                 ]
               }
             ]
@@ -9989,27 +9925,23 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
+          "name": "claim_queue",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
-                  114,
-                  111,
                   99,
-                  101,
-                  115,
-                  115,
-                  111,
-                  114,
-                  83,
-                  116,
+                  108,
                   97,
-                  116,
-                  115
+                  105,
+                  109,
+                  81,
+                  117,
+                  101,
+                  117,
+                  101
                 ]
               }
             ]
@@ -10137,6 +10069,19 @@
         234,
         181,
         75
+      ]
+    },
+    {
+      "name": "HospitalAndInsuranceRecordStats",
+      "discriminator": [
+        5,
+        99,
+        220,
+        177,
+        160,
+        1,
+        59,
+        107
       ]
     },
     {
@@ -10270,6 +10215,32 @@
       ]
     },
     {
+      "name": "PatientRecordStats",
+      "discriminator": [
+        48,
+        107,
+        233,
+        252,
+        122,
+        52,
+        83,
+        202
+      ]
+    },
+    {
+      "name": "PatientStats",
+      "discriminator": [
+        10,
+        110,
+        89,
+        21,
+        250,
+        52,
+        243,
+        67
+      ]
+    },
+    {
       "name": "ProcessedClaim",
       "discriminator": [
         248,
@@ -10280,6 +10251,19 @@
         226,
         117,
         157
+      ]
+    },
+    {
+      "name": "ProcessedClaimStats",
+      "discriminator": [
+        102,
+        153,
+        242,
+        107,
+        229,
+        73,
+        132,
+        74
       ]
     },
     {
@@ -10333,13 +10317,91 @@
         79,
         161
       ]
+    },
+    {
+      "name": "SubmitterStats",
+      "discriminator": [
+        12,
+        194,
+        10,
+        237,
+        43,
+        216,
+        47,
+        18
+      ]
     }
   ],
   "errors": [
     {
       "code": 6000,
-      "name": "HospitalTypeInvalid",
-      "msg": "Hospital type must be General, Dental, Vision, or Mental (0,1,2,3)"
+      "name": "NoRatFuckeryAllowed",
+      "msg": "You're doing something the UI never would have allowed"
+    },
+    {
+      "code": 6001,
+      "name": "TooManyClaimsInQueue",
+      "msg": "The Claim Queue is full"
+    },
+    {
+      "code": 6002,
+      "name": "ClaimQueueDisabled",
+      "msg": "Claim Queue is currently disabled"
+    },
+    {
+      "code": 6003,
+      "name": "FlagSameState",
+      "msg": "Can't set flag to the same state"
+    },
+    {
+      "code": 6004,
+      "name": "RecordAlreadyCreated",
+      "msg": "Record has already been created"
+    },
+    {
+      "code": 6005,
+      "name": "RecordNotCreated",
+      "msg": "Record hasn't been created yet"
+    },
+    {
+      "code": 6006,
+      "name": "ClaimAlreadyAssigned",
+      "msg": "Claim must not be assigned to assign it"
+    },
+    {
+      "code": 6007,
+      "name": "ClaimNotAssigned",
+      "msg": "Claim must be assigned to unassign or reassign it"
+    },
+    {
+      "code": 6008,
+      "name": "ClaimNotPending",
+      "msg": "Claim must be being in a pending state to use this Max Deny"
+    },
+    {
+      "code": 6009,
+      "name": "ClaimNotBeingProcessed",
+      "msg": "Claim must be being processed already to need be reassigned, denied, or Max inprogress denied"
+    },
+    {
+      "code": 6010,
+      "name": "ClaimNotDenied",
+      "msg": "Claim must be in a denied state to appeal it"
+    },
+    {
+      "code": 6011,
+      "name": "ClaimNotAppealed",
+      "msg": "Can't deny appeal of a claim that isn't in an appealed state"
+    },
+    {
+      "code": 6012,
+      "name": "ClaimNotDeniedOrAppealed",
+      "msg": "Claim must be in a denied or appealed state to undeny it"
+    },
+    {
+      "code": 6013,
+      "name": "ClaimNotApproved",
+      "msg": "Claim must be in a approved state to revoke approval"
     }
   ],
   "types": [
@@ -10479,6 +10541,18 @@
           {
             "name": "enabled",
             "type": "bool"
+          },
+          {
+            "name": "edited_claim_count",
+            "type": "u64"
+          },
+          {
+            "name": "max_denied_claim_count",
+            "type": "u64"
+          },
+          {
+            "name": "denial_hammer_dropped_count",
+            "type": "u64"
           }
         ]
       }
@@ -10506,7 +10580,7 @@
         "fields": [
           {
             "name": "id",
-            "type": "u32"
+            "type": "u64"
           },
           {
             "name": "is_active",
@@ -10600,10 +10674,34 @@
       }
     },
     {
+      "name": "HospitalAndInsuranceRecordStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "created_hospital_and_insurance_company_records_count",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "HospitalRecord",
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "country_index",
+            "type": "u16"
+          },
+          {
+            "name": "state_index",
+            "type": "u32"
+          },
+          {
+            "name": "hospital_index",
+            "type": "u32"
+          },
           {
             "name": "record_id",
             "type": "u64"
@@ -10639,14 +10737,6 @@
           {
             "name": "processor_count_index",
             "type": "u64"
-          },
-          {
-            "name": "country_index",
-            "type": "u16"
-          },
-          {
-            "name": "state_index",
-            "type": "u32"
           },
           {
             "name": "insurance_company_index",
@@ -10686,7 +10776,7 @@
         "fields": [
           {
             "name": "hospital_count",
-            "type": "u32"
+            "type": "u64"
           },
           {
             "name": "general_hospital_count",
@@ -10706,7 +10796,7 @@
           },
           {
             "name": "edited_hospital_count",
-            "type": "u32"
+            "type": "u64"
           }
         ]
       }
@@ -10780,6 +10870,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "insurance_company_index",
+            "type": "u16"
+          },
           {
             "name": "record_id",
             "type": "u64"
@@ -10885,14 +10979,6 @@
             "type": "pubkey"
           },
           {
-            "name": "submitter_account_total",
-            "type": "u64"
-          },
-          {
-            "name": "patient_account_total",
-            "type": "u64"
-          },
-          {
             "name": "state_account_total",
             "type": "u32"
           }
@@ -10935,6 +11021,10 @@
           {
             "name": "submitter_address",
             "type": "pubkey"
+          },
+          {
+            "name": "submitter_patient_index",
+            "type": "u8"
           },
           {
             "name": "is_active",
@@ -11001,6 +11091,14 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "submitter_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "patient_index",
+            "type": "u8"
+          },
+          {
             "name": "record_id",
             "type": "u32"
           },
@@ -11023,10 +11121,6 @@
           {
             "name": "appeal_reason",
             "type": "string"
-          },
-          {
-            "name": "submitter_address",
-            "type": "pubkey"
           },
           {
             "name": "processor_address",
@@ -11075,6 +11169,34 @@
           {
             "name": "processed_time",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PatientRecordStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "created_patient_record_count",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PatientStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "patient_account_total",
+            "type": "u64"
+          },
+          {
+            "name": "patient_account_edited_count",
+            "type": "u128"
           }
         ]
       }
@@ -11216,6 +11338,50 @@
       }
     },
     {
+      "name": "ProcessedClaimStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "processed_claim_count",
+            "type": "u64"
+          },
+          {
+            "name": "approved_claim_amount",
+            "type": "u64"
+          },
+          {
+            "name": "approved_claim_count",
+            "type": "u64"
+          },
+          {
+            "name": "denied_claim_count",
+            "type": "u64"
+          },
+          {
+            "name": "undenied_claim_count",
+            "type": "u64"
+          },
+          {
+            "name": "submitted_appeal_count",
+            "type": "u64"
+          },
+          {
+            "name": "denied_appeal_count",
+            "type": "u64"
+          },
+          {
+            "name": "revoked_approval_count",
+            "type": "u64"
+          },
+          {
+            "name": "edited_processed_claim_count",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ProcessorAccount",
       "type": {
         "kind": "struct",
@@ -11327,58 +11493,6 @@
           {
             "name": "edited_processor_count",
             "type": "u32"
-          },
-          {
-            "name": "created_patient_record_count",
-            "type": "u64"
-          },
-          {
-            "name": "created_hospital_and_insurance_company_records_count",
-            "type": "u64"
-          },
-          {
-            "name": "processed_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "edited_claim_or_processed_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "approved_claim_amount",
-            "type": "u64"
-          },
-          {
-            "name": "approved_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "max_denied_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "denied_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "undenied_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "submitted_appeal_count",
-            "type": "u64"
-          },
-          {
-            "name": "denied_appeal_count",
-            "type": "u64"
-          },
-          {
-            "name": "revoked_approval_count",
-            "type": "u64"
-          },
-          {
-            "name": "denial_hammer_dropped_count",
-            "type": "u64"
           }
         ]
       }
@@ -11393,59 +11507,15 @@
             "type": "u32"
           },
           {
-            "name": "index",
+            "name": "country_index",
+            "type": "u16"
+          },
+          {
+            "name": "state_index",
             "type": "u32"
-          },
-          {
-            "name": "approved_claim_amount",
-            "type": "u64"
-          },
-          {
-            "name": "approved_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "denied_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "undenied_claim_count",
-            "type": "u64"
-          },
-          {
-            "name": "submitted_appeal_count",
-            "type": "u64"
-          },
-          {
-            "name": "denied_appeal_count",
-            "type": "u64"
-          },
-          {
-            "name": "revoked_approval_count",
-            "type": "u64"
           },
           {
             "name": "hospital_count",
-            "type": "u32"
-          },
-          {
-            "name": "general_hospital_count",
-            "type": "u32"
-          },
-          {
-            "name": "dental_hospital_count",
-            "type": "u32"
-          },
-          {
-            "name": "vision_hospital_count",
-            "type": "u32"
-          },
-          {
-            "name": "mental_hospital_count",
-            "type": "u32"
-          },
-          {
-            "name": "edited_hospital_count",
             "type": "u32"
           }
         ]
@@ -11463,14 +11533,6 @@
           {
             "name": "address",
             "type": "pubkey"
-          },
-          {
-            "name": "active_patient_count",
-            "type": "u8"
-          },
-          {
-            "name": "patient_count",
-            "type": "u8"
           },
           {
             "name": "submitted_claim_count",
@@ -11507,6 +11569,18 @@
           {
             "name": "revoked_approval_count",
             "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubmitterStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "submitter_account_total",
+            "type": "u64"
           }
         ]
       }

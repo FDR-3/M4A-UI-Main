@@ -709,8 +709,6 @@
   {
     let { newData, index } = event
 
-    //const processedClaim = await anchorPrograms.m4a.m4aProgram.account.processedClaim.fetch(getProcessedClaimPDA(currentTableData.value[index].processorAddress, currentTableData.value[index].processorCountIndex))
-
     const processedClaim = getProcessedClaim(currentTableData.value[index].processorAddress, currentTableData.value[index].processorCountIndex)
 
     currentTableData.value[index].hospitalIndex = newData.hospitalIndex

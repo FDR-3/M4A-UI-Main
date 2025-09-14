@@ -27,7 +27,7 @@
           <div v-else class="invisiblePatientCircle noClickEvent"></div>
         </div>
         <ion-text class="editPatientListRowItem">{{patient.name}}</ion-text>
-        <ion-button class="editPatientListRowItem" color="dark" @click="setPatientFlag(patient.index, !patient.isActive)">
+        <ion-button class="editPatientListRowItem" color="dark" @click="setPatientFlag(patient.submitterPatientIndex, !patient.isActive)">
           Toggle<br>{{ patient.isActive ? 'Off' : "On" }}
         </ion-button>
     </div>
@@ -45,18 +45,22 @@
     :isSubmitterAccountReady="connectedWallet.isSubmitterAccountReady"
     :hasPatientList="patientList?.length>0"
   />
-  <div v-if="!anchorPrograms.areM4AProtocolStatsReady" class="mediumSmallMarginTop mediumSmallMarginBottom">
+  <div v-if="!anchorPrograms.isM4AFeeTokenAccountReady">
+    <ion-text color="dark">No token account for fees initialized yet</ion-text>
+  </div>
+  <div v-else-if="!anchorPrograms.areM4AProtocolStatsReady" class="mediumSmallMarginTop mediumSmallMarginBottom">
     <ion-text color="dark">South Carolina BETA hasn't started yet</ion-text>
   </div>
   <ion-label v-else-if="!connectedWallet.isConnected">
     Connect wallet to submit claim for $0.04 USDC
   </ion-label>
-  <ion-button v-else-if="!anchorPrograms.isM4AProtocolReady" @click="initializeM4AProtocolAndClaimQueue()" color="green">
+  <ion-button v-else-if="!anchorPrograms.isM4AProtocolReady" @click="initializeM4AProtocol()" color="green">
     <ion-label color="dark">Init M4A Protocol</ion-label>
   </ion-button>
   <div v-else-if="!isClaimQueueOn">
     <ion-text color="dark">Claim Queue is currently disabled</ion-text>
   </div>
+  
   <ion-button v-else-if="!connectedWallet.isSubmitterAccountReady" @click="initSubmitterAccount()" color="green">
     <ion-label color="dark">Init Submitter Account</ion-label>
   </ion-button>
@@ -81,7 +85,7 @@
         v-model="patientSelect" 
         :options="activePatientList" 
         optionLabel="name" 
-        optionValue="index" 
+        optionValue="submitterPatientIndex" 
         placeholder="Select Patient"
         appendTo="self"
         :invalid="patientSelectInvalid"
@@ -236,23 +240,23 @@
   import Select from 'primevue/select'
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { claimQueue } from '/src/assets/globalStates/m4a/Claims.vue'
+  import { submitterPatientListHashMap, submitterActivePatientListHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
+  import { claimQueue, claimHashMap } from '/src/assets/globalStates/m4a/Claims.vue'
   import { hospitalHashMap} from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { insuranceCompanies} from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
   import SubmitClaimProgressBar from '/src/components/mapclaims/SubmitClaimProgressBar.vue'
   import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
-  import { PublicKey } from "@solana/web3.js"
   import { M4A_MAX_NOTE_LENGTH,
     isClaimSubmitted,
-    getPatientLists,
+    getSubmitterPatientList,
+    getSubmitterActivePatientList,
     getInsuranceCompany,
-    getSubmitterAccountPDA,
-    getClaimPDA } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+    getNextSubmitterPatientIndex } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { hospitalTypeOptions } from '/src/types/HospitalTypes.ts'
   import { confirmM4ATransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
-  import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   const props = defineProps(['stateName', 'countryIndex', 'stateIndex', 'colorHexValue'])
 
@@ -301,11 +305,7 @@
 
   var isClaimAlreadySubmitted = ref()
 
-  var isPatientAccountReadyWatchId: any
-  var additionalInsuranceCompanyWatchId: any
-  var claimWatchId: any
-
-  onMounted(async () => 
+  onMounted(() => 
   {
     if(mapSelection.preSelectedHospitalIndex != -1)
     {
@@ -313,47 +313,30 @@
       setTimeout(() => 
       {
         document.getElementById("submitClaimsHeader")?.scrollIntoView()
-      }, 1000) // 2000 milliseconds = 2 seconds
+      }, 1000) //1000 milliseconds = 1 seconds
     }
 
     //Get Claim Queue data
     if(claimQueue.data)
       isClaimQueueOn.value = claimQueue.data.enabled
     else
-      isClaimQueueOn.value = false; //Semicolon needed because tuple line follows after this one
+      isClaimQueueOn.value = false;
+
+    //Check if Claim Already Submitted
+    isClaimAlreadySubmitted.value = isClaimSubmitted(connectedWallet.publicKey)
 
     //Get Patients
-    [patientList.value, activePatientList.value] = await getPatientLists(connectedWallet.publicKey)
-    await listenForAdditionalPatients(connectedWallet.publicKey)
+    patientList.value = getSubmitterPatientList(connectedWallet.addressString)
+    activePatientList.value = getSubmitterActivePatientList(connectedWallet.addressString)
 
     //Get Insurance Companies
     if(insuranceCompanies.data)
       insuranceCompanyList.value = insuranceCompanies.data
-
-    //Get Claim
-    isClaimAlreadySubmitted.value = await isClaimSubmitted(connectedWallet.publicKey)
-    await listenForClaimChanges()
   })
 
   onUnmounted(() =>
   {
     mapSelection.preSelectedHospitalIndex = -1
-
-    if(isPatientAccountReadyWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(isPatientAccountReadyWatchId)
-      isPatientAccountReadyWatchId = undefined
-    }
-    if(additionalInsuranceCompanyWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(additionalInsuranceCompanyWatchId)
-      additionalInsuranceCompanyWatchId = undefined
-    }
-    if(claimWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(claimWatchId)
-      claimWatchId = undefined
-    }
   })
 
   //Json string of wallet to detect object property changes
@@ -370,25 +353,34 @@
     if(newWallet.addressString == oldWallet.addressString)
       return
 
-    //Patient Account
-    if(isPatientAccountReadyWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(isPatientAccountReadyWatchId)
-      isPatientAccountReadyWatchId = undefined
-    }
+    //Check if Claim Already Submitted
+    isClaimAlreadySubmitted.value = isClaimSubmitted(connectedWallet.publicKey)
 
     patientList.value = []
     activePatientList.value = []
     
-    if(connectedWallet.isSubmitterAccountReady)
-      [patientList.value, activePatientList.value] = await getPatientLists(connectedWallet.publicKey)
-
-    await listenForAdditionalPatients(connectedWallet.publicKey)
+    patientList.value = getSubmitterPatientList(connectedWallet.addressString)
+    activePatientList.value = getSubmitterActivePatientList(connectedWallet.addressString)
   })
 
-  watch(claimQueue, async() => 
+  watch(submitterPatientListHashMap, () => 
+  {
+    patientList.value = getSubmitterPatientList(connectedWallet.addressString)
+  })
+
+  watch(submitterActivePatientListHashMap, () => 
+  {
+    activePatientList.value = getSubmitterActivePatientList(connectedWallet.addressString)
+  })
+
+  watch(claimQueue, () => 
   {
     isClaimQueueOn.value = claimQueue.data.enabled
+  })
+
+  watch(claimHashMap, () =>
+  {
+    isClaimAlreadySubmitted.value = isClaimSubmitted(connectedWallet.publicKey)
   })
 
   watch(insuranceCompanies, () => 
@@ -605,7 +597,9 @@
       {
         try
         {
-          const tx = await anchorPrograms.m4a.m4aProgram.methods.createPatientAccount(alertData.firstName, alertData.lastName).rpc()
+          const nextSubmitterPatientIndex = getNextSubmitterPatientIndex(connectedWallet.addressString)
+
+          const tx = await anchorPrograms.m4a.m4aProgram.methods.createPatientAccount(nextSubmitterPatientIndex, alertData.firstName, alertData.lastName).rpc()
           await confirmM4ATransaction(tx, toast, "create_patient_account")
         }
         catch(error)
@@ -656,16 +650,16 @@
     }
   }
 
-  async function initializeM4AProtocolAndClaimQueue()
+  async function initializeM4AProtocol()
   {
     try
     {
-      const tx = await anchorPrograms.m4a.m4aProgram.methods.initializeM4AProtocolAndClaimQueue().rpc()
-      await confirmM4ATransaction(tx, toast, "initialize_m4a_protocol_and_claim_queue")
+      const tx = await anchorPrograms.m4a.m4aProgram.methods.initializeM4AProtocol().rpc()
+      await confirmM4ATransaction(tx, toast, "initialize_m4a_protocol")
     }
     catch(error)
     {
-      toastPreTransactionError(error, toast, "initialize_m4a_protocol_and_claim_queue")
+      toastPreTransactionError(error, toast, "initialize_m4a_protocol")
     }
   }
 
@@ -763,40 +757,6 @@
     catch(error)
     {
       toastPreTransactionError(error, toast, "submit_claim_to_queue")
-    }
-  }
-
-  async function listenForAdditionalPatients(submitterAddress: PublicKey)
-  {
-    try
-    {
-      //Subscribe to account changes
-      isPatientAccountReadyWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getSubmitterAccountPDA(submitterAddress), async() => 
-      {
-        //Handle account change...
-        [patientList.value, activePatientList.value] = await getPatientLists(submitterAddress)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
-  }
-
-  async function listenForClaimChanges()
-  {
-    try
-    {
-      //Subscribe to account changes
-      claimWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimPDA(connectedWallet.publicKey), async() => 
-      {
-        //Handle account change...
-        isClaimAlreadySubmitted.value = await isClaimSubmitted(connectedWallet.publicKey)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
     }
   }
 </script>

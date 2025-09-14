@@ -300,7 +300,7 @@
   async function toggleProcessorActiveFlag(processorAddress: PublicKey, flag: boolean)
   {
     try
-    {console.log(processorAddress)
+    {
       const tx = await anchorPrograms.m4a.m4aProgram.methods.setProcessorAccountActiveFlag(processorAddress, flag).rpc()
       await confirmM4ATransaction(tx, toast, "toggle_processor_active_flag")
     }

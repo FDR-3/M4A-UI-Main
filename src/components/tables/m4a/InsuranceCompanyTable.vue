@@ -79,7 +79,7 @@
           {{ slotProps.data.approvedClaimAmountString }}
         </template>
       </Column>
-      <Column field="note" header="Insurance Company Note" style="width: 0%" sortable></Column>
+      <Column field="note" header="Insurance Company Note" style="width: 1%" sortable></Column>
       <Column field="isActive" header="Active" style="width: 0%" sortable>
         <template #body="slotProps">
           <div v-if="slotProps.data.isActive">

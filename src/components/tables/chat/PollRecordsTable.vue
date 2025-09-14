@@ -35,7 +35,7 @@
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <div class="voterTableUtilityBar">
-            <ion-label slot="start" color="dark">Unique Voters: {{ "uniqueVoterCount" }}</ion-label>
+            <ion-label slot="start" color="dark">Unique Voters: {{ uniqueVoterCount }}</ion-label>
             <ion-button style="margin-left: 18px" fill="clear" @click="exportCSV($event)">
               <ion-label color="dark">Export</ion-label><ion-icon :src="download" color="dark"></ion-icon>
             </ion-button>
@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, defineProps } from 'vue'
+  import { ref } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonPopover, IonInput } from '@ionic/vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -118,10 +118,9 @@
   import { search } from 'ionicons/icons'
   import { copyFullAddress  } from '/src/assets/contracts/WalletHelper.vue'
 
-  const props = defineProps(['uniqueVoterHashMap', 'tableData', 'isLoading'])
+  const props = defineProps(['uniqueVoterHashMap', 'uniqueVoterCount', 'tableData', 'isLoading'])
 
   const emits = defineEmits(['toggleUniquePollTable'])
-
 
   var popoverOpen = ref(false)
   var event = ref()

@@ -163,62 +163,62 @@
         </template>
       </Column>
     </DataTable>
-  </div>
 
-  <!--Create Sub Market Modal-->
-  <div v-if="creatingSubMarket"
-    id="createSubMarketModal"
-    class="thickBorder"
+    <!--Create Sub Market Modal-->
+    <div v-if="creatingSubMarket"
+      id="createSubMarketModal"
+      class="thickBorder"
 
-  >
-    <div id="createSubMarketHeader" class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
-      <ion-button fill="clear" @click="sourceSubMarketSVG()">
-        <component id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px; margin-right: -20px"></component>
-      </ion-button>
+    >
+      <div id="createSubMarketHeader" class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
+        <ion-button fill="clear" @click="sourceSubMarketSVG()">
+          <component id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px; margin-right: -20px"></component>
+        </ion-button>
 
-      <ion-text class="noClickEvent">{{ subMarketTokenName }}</ion-text><br>
-    </div>
+        <ion-text class="noClickEvent">{{ subMarketTokenName }}</ion-text><br>
+      </div>
 
-    <p class="nTinyMarginTop noClickEvent">Owner: {{ trimAddress(connectedWallet.addressString) }}</p>
-    <div v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom noClickEvent">
-      <ion-text  style="font-size: 11px"
+      <p class="nTinyMarginTop noClickEvent">Owner: {{ trimAddress(connectedWallet.addressString) }}</p>
+      <div v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom noClickEvent">
+        <ion-text  style="font-size: 11px"
+        >
+          Connect wallet to create a submarket
+        </ion-text>
+      </div>
+
+      <ion-input
+        id="feeCollectorInput"
+        v-model="feeCollectorAddress"
+        fill="outline"
+        @ion-input="validPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
+        :class="{ 'invalid': !validPublicKey }"
       >
-        Connect wallet to create a submarket
-      </ion-text>
+      </ion-input>
+      <ion-text style="font-size: 11px" class="noClickEvent">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
+      <InputNumber
+        v-model="feePercentage"
+        class="mediumMarginTop"
+        :inputStyle="{'text-align': 'center'}"
+        suffix="%"
+        inputId="percent"
+        :minFractionDigits="2" :maxFractionDigits="2"
+        :min="0" :max="100"
+        :step="0.01"
+        showButtons
+        fluid
+      />
+      <ion-text style="font-size: 11px" class="noClickEvent">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text><br>
+
+      <ion-button
+        id="createSubMarketButton"
+        color="dark"
+        @click="createSubMarket()"
+        class="mediumMarginTop"
+        :disabled="!validPublicKey || !connectedWallet.isConnected"
+      >
+        Create SubMarket
+      </ion-button>
     </div>
-
-    <ion-input
-      id="feeCollectorInput"
-      v-model="feeCollectorAddress"
-      fill="outline"
-      @ion-input="validPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
-      :class="{ 'invalid': !validPublicKey }"
-    >
-    </ion-input>
-    <ion-text style="font-size: 11px" class="noClickEvent">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
-    <InputNumber
-      v-model="feePercentage"
-      class="mediumMarginTop"
-      :inputStyle="{'text-align': 'center'}"
-      suffix="%"
-      inputId="percent"
-      :minFractionDigits="2" :maxFractionDigits="2"
-      :min="0" :max="100"
-      :step="0.01"
-      showButtons
-      fluid
-    />
-    <ion-text style="font-size: 11px" class="noClickEvent">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text><br>
-
-    <ion-button
-      id="createSubMarketButton"
-      color="dark"
-      @click="createSubMarket()"
-      class="mediumMarginTop"
-      :disabled="!validPublicKey || !connectedWallet.isConnected"
-    >
-      Create SubMarket
-    </ion-button>
   </div>
 </template>
 
@@ -460,15 +460,15 @@
     isEditing = false
   }
   
-  async function createSubMarket(tokenMintAddress: PublicKey)
+  async function createSubMarket()
   {
     try
     {
       const userNextSubMarketIndex = getUserNextSubMarketIndex(connectedWallet.addressString)
-      
+
       const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
       (
-        tokenMintAddress,
+        selectedTokenMintAddress,
         userNextSubMarketIndex,
         new PublicKey(feeCollectorAddress.value),
         feePercentage.value/100

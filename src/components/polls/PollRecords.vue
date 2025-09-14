@@ -1,11 +1,14 @@
 <template>
   <PollRecordsTable
   v-if="!toggleUniquePollTable"
+  :uniqueVoterHashMap="uniqueVoterHashMap"
+  :uniqueVoterCount="uniqueVoterCount"
   :tableData="pollRecordsTableData"
   :isLoading="isPollRecordsTableLoading"
   @toggleUniquePollTable="toggleUniquePollTable = true"/>
   <UniquePollRecordsTable
   v-else
+  :uniqueVoterCount="uniqueVoterCount"
   :tableData="uniquePollRecordsTableData"
   :isLoading="isUniquePollRecordsTableLoading"
   @toggleUniquePollTable="toggleUniquePollTable = false"/>
@@ -16,7 +19,7 @@
   import PollRecordsTable from '/src/components/tables/chat/PollRecordsTable.vue' 
   import UniquePollRecordsTable from '/src/components/tables/chat/UniquePollRecordsTable.vue'
 
-  defineProps(['pollRecordsTableData', 'uniquePollRecordsTableData', 'isPollRecordsTableLoading', 'isUniquePollRecordsTableLoading'])
+  defineProps(['uniqueVoterHashMap', 'uniqueVoterCount', 'pollRecordsTableData', 'uniquePollRecordsTableData', 'isPollRecordsTableLoading', 'isUniquePollRecordsTableLoading'])
 
   var toggleUniquePollTable = ref(false)
 

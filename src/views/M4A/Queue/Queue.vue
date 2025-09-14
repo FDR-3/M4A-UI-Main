@@ -83,12 +83,14 @@
   import { claimQueue, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'
   import { hospitalStats, hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { insuranceCompanyStats, insuranceCompanies} from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
-  import { processorStats } from '/src/assets/globalStates/m4a/Processors.vue'
+  import { processedClaimStats } from '/src/assets/globalStates/m4a/Claims.vue'
   import { countryStateNameArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
   import { countryStateCoordinatesArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
   import { parseDollarAmountStringFromFixed2PointNotationNoDollarSign, trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { INITIAL_INSURANCE_COMPANY_COUNT } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
+
+  defineProps(['colorHexValue'])//Putting this here to silence a warning
 
   var isClaimQueueOn = ref()
   var claimQueueTableData = ref()
@@ -134,17 +136,17 @@
     showQueueTableInsuranceCompanyRecords.value = localStorage.getItem("showQueueTableInsuranceCompanyRecords") == 'true' ? true:false
 
     //Get Processor Stats, there are values here that go above all the tables that we can grab first. I just like to have the stuff at the top of the page loading in faster.
-    if(processorStats.data)
+    if(processedClaimStats.data)
     {
-      approvedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(processorStats.data.approvedClaimAmount)
-      protocolApprovedClaimCount.value = processorStats.data.approvedClaimCount
-      protocolDeniedClaimCount.value = processorStats.data.deniedClaimCount
-      protocolUndeniedClaimCount.value = processorStats.data.undeniedClaimCount
-      protocolMaxDeniedClaimCount.value = processorStats.data.maxDeniedClaimCount
-      protocolSubmittedAppealCount.value = processorStats.data.submittedAppealCount
-      protocolDeniedAppealCount.value = processorStats.data.deniedAppealCount
-      protocolRevokedApprovalCount.value = processorStats.data.revokedApprovalCount
-      protocolDenialHammerDroppedCount.value = processorStats.data.denialHammerDroppedCount
+      approvedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(processedClaimStats.data.approvedClaimAmount)
+      protocolApprovedClaimCount.value = processedClaimStats.data.approvedClaimCount
+      protocolDeniedClaimCount.value = processedClaimStats.data.deniedClaimCount
+      protocolUndeniedClaimCount.value = processedClaimStats.data.undeniedClaimCount
+      protocolMaxDeniedClaimCount.value = processedClaimStats.data.maxDeniedClaimCount
+      protocolSubmittedAppealCount.value = processedClaimStats.data.submittedAppealCount
+      protocolDeniedAppealCount.value = processedClaimStats.data.deniedAppealCount
+      protocolRevokedApprovalCount.value = processedClaimStats.data.revokedApprovalCount
+      protocolDenialHammerDroppedCount.value = processedClaimStats.data.denialHammerDroppedCount
     }
     else
     {
@@ -161,7 +163,13 @@
     processedClaimsTableData.value = processedClaims.data
 
     //Get claim queue table data
-    claimQueueTableData.value = claims.data
+    
+    if(claims.data)
+    {
+      claimQueueTableData.value = claims.data
+      isClaimQueueTableLoading.value = false
+    }
+
     if(claimQueue.data)
     {
       isClaimQueueOn.value = claimQueue.data.enabled
@@ -207,23 +215,22 @@
     else
       totalInsuranceCompanyCount.value = INITIAL_INSURANCE_COMPANY_COUNT
     
-    isClaimQueueTableLoading.value = false
     isHospitalTableLoading.value = false
     isInsuranceCompanyTableLoading.value = false
     isProcessedClaimsTableLoading.value = false
   })
 
-  watch(processorStats, () => 
+  watch(processedClaimStats, () => 
   {
-    approvedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(processorStats.data.approvedClaimAmount)
-    protocolApprovedClaimCount.value = processorStats.data.approvedClaimCount
-    protocolDeniedClaimCount.value = processorStats.data.deniedClaimCount
-    protocolUndeniedClaimCount.value = processorStats.data.undeniedClaimCount
-    protocolMaxDeniedClaimCount.value = processorStats.data.maxDeniedClaimCount
-    protocolSubmittedAppealCount.value = processorStats.data.submittedAppealCount
-    protocolDeniedAppealCount.value = processorStats.data.deniedAppealCount
-    protocolRevokedApprovalCount.value = processorStats.data.revokedApprovalCount
-    protocolDenialHammerDroppedCount.value = processorStats.data.denialHammerDroppedCount
+    approvedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(processedClaimStats.data.approvedClaimAmount)
+    protocolApprovedClaimCount.value = processedClaimStats.data.approvedClaimCount
+    protocolDeniedClaimCount.value = processedClaimStats.data.deniedClaimCount
+    protocolUndeniedClaimCount.value = processedClaimStats.data.undeniedClaimCount
+    protocolMaxDeniedClaimCount.value = processedClaimStats.data.maxDeniedClaimCount
+    protocolSubmittedAppealCount.value = processedClaimStats.data.submittedAppealCount
+    protocolDeniedAppealCount.value = processedClaimStats.data.deniedAppealCount
+    protocolRevokedApprovalCount.value = processedClaimStats.data.revokedApprovalCount
+    protocolDenialHammerDroppedCount.value = processedClaimStats.data.denialHammerDroppedCount
   })
 
   watch(claimQueue, () => 
@@ -246,6 +253,9 @@
   watch(claims, () => 
   {
     claimQueueTableData.value = claims.data
+
+    if(isClaimQueueTableLoading.value)
+      isClaimQueueTableLoading.value = false
   })
 
   watch(hospitalStats, () => 

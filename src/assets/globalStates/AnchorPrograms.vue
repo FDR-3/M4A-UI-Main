@@ -13,7 +13,6 @@
     areM4AProtocolStatsReady: false,
     areChatQOLAccountsReady: false,
     isM4AProtocolReady: false,
-    stateAccountTotal: 0,
     m4aProtocolInitiatorAddress: "",
     isChatProtocolReady: false,
     chatProtocolInitiatorAddress: "",

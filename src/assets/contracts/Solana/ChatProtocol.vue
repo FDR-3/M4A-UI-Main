@@ -18,6 +18,8 @@
 
   export async function getChatProtocol()
   {
+    console.log("Getting Chat Protocol")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -42,6 +44,8 @@
 
   export async function getChatFeeTokenAccounts()
   {
+    console.log("Getting Chat Protocol Fee Token Accounts")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -65,7 +69,9 @@
   }
 
   export async function getDeadMansBreak()
-  {console.log("Get Dead Man's Break")
+  {
+    console.log("Get Dead Man's Break")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -90,6 +96,8 @@
 
   export async function getChatProtocolCEOAccount()
   {
+    console.log("Getting Chat Protocol CEO Account")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -114,6 +122,8 @@
 
   export async function getChatProtocolTreasurerAccount()
   {
+    console.log("Getting Chat Protocol Treasurer Account")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -357,7 +367,9 @@
   }
 
   export async function setChatAccountHashMap()
-  {console.log("Get Chat Account Hash Map")
+  {
+    console.log("Get Chat Account Hash Map")
+
     var userAccountHashMap = new Map<string, any>()
 
     const chatAccounts = await getChatAccountsWrapper()
@@ -369,7 +381,9 @@
   }
 
   export async function setChatAccountAndUserNameHashMap()
-  {console.log("Get Chat Account And User Name Hash Map")
+  {
+    console.log("Get Chat Account And User Name Hash Map")
+
     var userAccountHashMap = new Map<string, any>()
     var userNameHashMap = new Map<string, any>()
 
@@ -416,7 +430,9 @@
   }
   
   export async function getCommentSections()
-  {console.log("Get Comment Sections")
+  {
+    console.log("Getting Comment Sections")
+
     var commentSectionList: any = []
     var hashMap = new Map<string, any>()
 
@@ -557,7 +573,9 @@
   }
 
   export async function getIdeas()
-  {console.log("Getting Ideas")
+  {
+    console.log("Getting Ideas")
+
     var ideasList: any = []
 
     try
@@ -625,7 +643,9 @@
   }
 
   export async function getFEDRecords()
-  {console.log("Getting FEDs")
+  {
+    console.log("Getting FEDs")
+
     var fedRecordsList: any = []
 
     try
@@ -691,7 +711,9 @@
   }
 
   export async function getPostVoteRecords()
-  {console.log("Get Post Vote Records")
+  {
+    console.log("Get Post Vote Records")
+    
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -715,7 +737,9 @@
   }
 
   export async function getAllPolls()
-  {console.log("Getting Polls")
+  {
+    console.log("Getting Polls")
+
     var pollList: any = []
 
     const polls = await getAllPollsWrapper()
@@ -800,7 +824,9 @@
   }
 
   export async function getPollVoteRecords()
-  {console.log("Getting Poll Vote Records")
+  {
+    console.log("Getting Poll Vote Records")
+    
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try

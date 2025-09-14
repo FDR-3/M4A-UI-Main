@@ -72,7 +72,7 @@
           {{ slotProps.data.approvedClaimAmountString }}
         </template>
       </Column>
-      <Column field="note" header="Insurance Company Note" style="width: 0%" sortable>
+      <Column field="note" header="Insurance Company Note" style="width: 1%" sortable>
         <template #editor="{ index, data, field }">
           <InputText 
             v-model="data[field]"
