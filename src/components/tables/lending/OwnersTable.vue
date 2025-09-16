@@ -174,7 +174,7 @@
   import { isValidSolanaPublicKey,
     copyFullAddress,
     confirmLendingTransaction,
-    toastPreTransactionError } from '/src/assets/contracts/Wallethelper.vue'
+    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
