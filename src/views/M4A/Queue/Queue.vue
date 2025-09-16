@@ -134,6 +134,8 @@
     showQueueTableHospitalRecords.value = localStorage.getItem("showQueueTableHospitalRecords") == 'true' ? true:false
     showQueueTableInsuranceCompanyRecords.value = localStorage.getItem("showQueueTableInsuranceCompanyRecords") == 'true' ? true:false
 
+    
+
     //Get Processor Stats, there are values here that go above all the tables that we can grab first. I just like to have the stuff at the top of the page loading in faster.
     if(processedClaimStats.data)
     {
@@ -141,11 +143,9 @@
       protocolApprovedClaimCount.value = processedClaimStats.data.approvedClaimCount
       protocolDeniedClaimCount.value = processedClaimStats.data.deniedClaimCount
       protocolUndeniedClaimCount.value = processedClaimStats.data.undeniedClaimCount
-      protocolMaxDeniedClaimCount.value = processedClaimStats.data.maxDeniedClaimCount
       protocolSubmittedAppealCount.value = processedClaimStats.data.submittedAppealCount
       protocolDeniedAppealCount.value = processedClaimStats.data.deniedAppealCount
       protocolRevokedApprovalCount.value = processedClaimStats.data.revokedApprovalCount
-      protocolDenialHammerDroppedCount.value = processedClaimStats.data.denialHammerDroppedCount
     }
     else
     {
@@ -158,6 +158,13 @@
       protocolDeniedAppealCount.value = 0
       protocolRevokedApprovalCount.value = 0
       protocolDenialHammerDroppedCount.value = 0
+    }
+
+    //See values are also up top but on a different account. It's separating because these values changing means that only the claims need to be updated, not the processed claims
+    if(claimStats.data)
+    {
+      protocolMaxDeniedClaimCount.value = claimStats.data.maxDeniedClaimCount
+      protocolDenialHammerDroppedCount.value = claimStats.data.denialHammerDroppedCount
     }
 
     if(processedClaims.data)
@@ -241,11 +248,9 @@
     protocolApprovedClaimCount.value = processedClaimStats.data.approvedClaimCount
     protocolDeniedClaimCount.value = processedClaimStats.data.deniedClaimCount
     protocolUndeniedClaimCount.value = processedClaimStats.data.undeniedClaimCount
-    protocolMaxDeniedClaimCount.value = processedClaimStats.data.maxDeniedClaimCount
     protocolSubmittedAppealCount.value = processedClaimStats.data.submittedAppealCount
     protocolDeniedAppealCount.value = processedClaimStats.data.deniedAppealCount
     protocolRevokedApprovalCount.value = processedClaimStats.data.revokedApprovalCount
-    protocolDenialHammerDroppedCount.value = processedClaimStats.data.denialHammerDroppedCount
   })
   
   watch(claimStats, () => 
@@ -258,6 +263,9 @@
       nextInLine.value = claimQueueTableData.value[0].id
     else
       nextInLine.value = "Queue Currently Empty"
+
+    protocolMaxDeniedClaimCount.value = claimStats.data.maxDeniedClaimCount
+    protocolDenialHammerDroppedCount.value = claimStats.data.denialHammerDroppedCount
   })
 
   watch(claimQueue, () => 
