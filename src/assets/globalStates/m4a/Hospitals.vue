@@ -13,7 +13,7 @@
 
   export const hospitalHashMap = reactive(
   {
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export default hospitalStats

@@ -49,7 +49,7 @@
   import CommentList from '/src/components/comments/commentsAndReplies/CommentList.vue'
   import { navigation, MenuIndex } from '/src/assets/globalStates/Navigation.vue'
   import { confirmChatTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { sortCommentSectionPostsAndProcessUserNames } from '/src/assets/contracts/Solana/ChatProtocol.vue'
+  import { getCommentSection, sortCommentSectionPostsAndProcessUserNames, getUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
@@ -108,7 +108,7 @@
     getCommentSectionNameAndLinks()
     commentSectionInfo.prefix = commentSectionNamePrefix
 
-    const commentSection = commentSectionHashMap.map.get(commentSectionNamePrefix+commentSectionName.value)
+    const commentSection = getCommentSection(commentSectionNamePrefix, commentSectionName.value)
     if(commentSection)
     {
       commentsDisabled.value = commentSection.isDisabled
@@ -116,13 +116,7 @@
       commentSectionInfo.isCommentSectionReady = true
       commentSectionInfo.initiatorAddress = commentSection.commentSectionInitiatorAddress.toBase58()
       commentSectionInfo.videoVoteScore = commentSection.videoUpVoteScore.sub(commentSection.videoDownVoteScore)
-
-      const chatAccount = customUserNameHashMap.map.get(commentSectionInfo.initiatorAddress)
-      if(chatAccount) //Map may not be populated in time
-        if(chatAccount.useCustomName)
-          commentSectionInfo.initiatorDisplayName = chatAccount.userName
-        else
-          commentSectionInfo.initiatorDisplayName = commentSectionInfo.initiatorAddress
+      commentSectionInfo.initiatorDisplayName = getUserDisplayName(commentSectionInfo.initiatorAddress)
     }
     else
     {
@@ -167,7 +161,7 @@
     //commentSectionLanguageIndex.value = navigation.languageIndex
 
     getCommentSectionNameAndLinks()
-    const commentSection = commentSectionHashMap.map.get(commentSectionNamePrefix+commentSectionName.value)
+    const commentSection = getCommentSection(commentSectionNamePrefix, commentSectionName.value)
     if(commentSection)
     {
       commentsDisabled.value = commentSection.isDisabled
@@ -175,12 +169,7 @@
       commentSectionInfo.isCommentSectionReady = true
       commentSectionInfo.initiatorAddress = commentSection.commentSectionInitiatorAddress.toBase58()
       commentSectionInfo.videoVoteScore = commentSection.videoUpVoteScore.sub(commentSection.videoDownVoteScore)
-
-      const chatAccount = customUserNameHashMap.map.get(commentSectionInfo.initiatorAddress)
-      if(chatAccount.useCustomName)
-        commentSectionInfo.initiatorDisplayName = chatAccount.userName
-      else
-        commentSectionInfo.initiatorDisplayName = commentSectionInfo.initiatorAddress
+      commentSectionInfo.initiatorDisplayName = getUserDisplayName(commentSectionInfo.initiatorAddress)
     }
     else
     {
@@ -206,7 +195,7 @@
 
   watch(commentSectionHashMap, () =>
   {
-    const commentSection = commentSectionHashMap.map.get(commentSectionNamePrefix+commentSectionName.value)
+    const commentSection = getCommentSection(commentSectionNamePrefix, commentSectionName.value)
     if(commentSection)
     {
       commentsDisabled.value = commentSection.isDisabled
@@ -214,12 +203,7 @@
       commentSectionInfo.isCommentSectionReady = true
       commentSectionInfo.initiatorAddress = commentSection.commentSectionInitiatorAddress.toBase58()
       commentSectionInfo.videoVoteScore = commentSection.videoUpVoteScore.sub(commentSection.videoDownVoteScore)
-
-      const chatAccount = customUserNameHashMap.map.get(commentSectionInfo.initiatorAddress)
-      if(chatAccount.useCustomName)
-        commentSectionInfo.initiatorDisplayName = chatAccount.userName
-      else
-        commentSectionInfo.initiatorDisplayName = commentSectionInfo.initiatorAddress
+      commentSectionInfo.initiatorDisplayName = getUserDisplayName(commentSectionInfo.initiatorAddress)
     }
     else
     {
@@ -269,12 +253,7 @@
     if(commentSectionInfo.initiatorAddress == "")
       return
     
-    const chatAccount = customUserNameHashMap.map.get(commentSectionInfo.initiatorAddress)
-    if(chatAccount.useCustomName)
-      commentSectionInfo.initiatorDisplayName = chatAccount.userName
-    else
-      commentSectionInfo.initiatorDisplayName = commentSectionInfo.initiatorAddress
-
+    commentSectionInfo.initiatorDisplayName = getUserDisplayName(commentSectionInfo.initiatorAddress)
     commentSectionComments.value = sortCommentSectionPostsAndProcessUserNames(pliComments.data, commentSectionName.value)
     commentSectionReplies.value = sortCommentSectionPostsAndProcessUserNames(pliReplies.data, commentSectionName.value)
     commentSectionRepliesToReplies.value = sortCommentSectionPostsAndProcessUserNames(pliLv3Replies.data, commentSectionName.value)

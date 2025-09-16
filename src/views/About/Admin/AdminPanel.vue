@@ -73,8 +73,6 @@
   import { insuranceCompanies } from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
   import { processors } from '/src/assets/globalStates/m4a/Processors.vue'
   import { polls } from '/src/assets/globalStates/chat/Polls.vue'
-  import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
-  import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
@@ -165,7 +163,6 @@
   watch(insuranceCompanies, () => 
   {
     //Get insurance company table data
-    //insuranceCompanyTableData.value = JSON.parse(JSON.stringify(insuranceCompanies.data));
     insuranceCompanyTableData.value = cloneDeep(insuranceCompanies.data)
   })
 
@@ -185,48 +182,6 @@
   {
     //Get poll table data
     pollTableData.value = cloneDeep(polls.data)
-  })
-
-  watch(customUserNameHashMap, () =>
-  {
-    if(processorsTableData.value)
-      for(var i=0; i<processorsTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(processorsTableData.value[i].address)
-        if(chatAccount)
-        {
-          if(chatAccount.useCustomName)
-            processorsTableData.value[i].processorDisplayName = chatAccount.userName
-          else
-            processorsTableData.value[i].processorDisplayName = trimAddress(processorsTableData.value[i].address)
-        }
-      }
-
-    if(claimQueueTableData.value)
-      for(var i=0; i<claimQueueTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(claimQueueTableData.value[i].submitterAddress)
-        if(chatAccount)
-        {
-          if(chatAccount.useCustomName)
-            claimQueueTableData.value[i].submitterDisplayName = chatAccount.userName
-          else
-            claimQueueTableData.value[i].submitterDisplayName = trimAddress(claimQueueTableData.value[i].submitterAddress)
-        }
-      }
-
-    if(processedClaimsTableData.value)
-      for(var i=0; i<processedClaimsTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(processedClaimsTableData.value[i].submitterAddress)
-        if(chatAccount)
-        {
-          if(chatAccount.useCustomName)
-            processedClaimsTableData.value[i].submitterDisplayName = chatAccount.userName
-          else
-            processedClaimsTableData.value[i].submitterDisplayName = trimAddress(processedClaimsTableData.value[i].submitterAddress)
-        }
-      }
   })
 
   function setAdminPanelSelect(value: number)

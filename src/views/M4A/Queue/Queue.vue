@@ -1,5 +1,5 @@
 <template>
-  <h2 id="tableTop">Under Construction<br>On Devnet</h2>
+  <h2 id="tableTop">Under Construction On Devnet<br>Monopoly Money</h2>
   <div>
     <ClaimQueueTable 
       v-if="tableSelect == 0"
@@ -80,15 +80,14 @@
   import ProcessedClaimsTable from '/src/components/tables/m4a/ProcessedClaimsTable.vue'
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
-  import { claimQueue, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'
+  import { claimQueue, claimStats, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'
   import { hospitalStats, hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { insuranceCompanyStats, insuranceCompanies} from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
   import { processedClaimStats } from '/src/assets/globalStates/m4a/Claims.vue'
   import { countryStateNameArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
   import { countryStateCoordinatesArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
-  import { parseDollarAmountStringFromFixed2PointNotationNoDollarSign, trimAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { parseDollarAmountStringFromFixed2PointNotationNoDollarSign } from '/src/assets/contracts/WalletHelper.vue'
   import { INITIAL_INSURANCE_COMPANY_COUNT } from '/src/assets/contracts/Solana/M4AProtocol.vue'
-  import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
 
   defineProps(['colorHexValue'])//Putting this here to silence a warning
 
@@ -160,37 +159,46 @@
       protocolRevokedApprovalCount.value = 0
       protocolDenialHammerDroppedCount.value = 0
     }
-    processedClaimsTableData.value = processedClaims.data
 
-    //Get claim queue table data
-    
+    if(processedClaims.data)
+    {
+      processedClaimsTableData.value = processedClaims.data
+      isProcessedClaimsTableLoading.value = false
+    }
+
+    //Get claim queue related data
+    if(claimQueue.data)
+    {
+      isClaimQueueOn.value = claimQueue.data.enabled
+      queueSizeLimit.value = claimQueue.data.queueSizeLimit
+    }
+    else
+    {
+      isClaimQueueOn.value = false
+      queueSizeLimit.value = 100
+    }
+
     if(claims.data)
     {
       claimQueueTableData.value = claims.data
       isClaimQueueTableLoading.value = false
     }
 
-    if(claimQueue.data)
+    if(claimStats.data)
     {
-      isClaimQueueOn.value = claimQueue.data.enabled
-      currentClaimQueueCount.value = claimQueue.data.currentClaimQueueCount
-      queueSizeLimit.value = claimQueue.data.queueSizeLimit
-      
-      if(currentClaimQueueCount.value && claimQueueTableData.value)
-        nextInLine.value = claimQueueTableData.value[0].id
-      else
-        nextInLine.value = "Queue Currently Empty"  
+      currentClaimQueueCount.value = claimStats.data.currentClaimQueueCount
     }
     else
-    {
-      isClaimQueueOn.value = false
       currentClaimQueueCount.value = 0
-      queueSizeLimit.value = 100
-      nextInLine.value = "Queue Not Initialized"  
-    }
 
-    //Get hospital data
-    hospitalTableData.value = hospitals.data
+    if(!claimQueue.data)
+      nextInLine.value = "Queue Not Initialized"
+    else if(currentClaimQueueCount.value && claimQueueTableData.value)
+      nextInLine.value = claimQueueTableData.value[0].id
+    else
+      nextInLine.value = "Queue Currently Empty"
+
+    //Get hospital related data
     if(hospitalStats.data)
     {
       totalHospitalCount.value = hospitalStats.data.hospitalCount
@@ -208,16 +216,23 @@
       mentalHospitalCount.value = 0
     }
 
-    //Get insurance company data
-    insuranceCompanyTableData.value = insuranceCompanies.data
+    if(hospitals.data)
+    {
+      hospitalTableData.value = hospitals.data
+      isHospitalTableLoading.value = false
+    }
+
+    //Get insurance company related data
     if(insuranceCompanyStats.data)
       totalInsuranceCompanyCount.value = insuranceCompanyStats.data.additionalInsuranceCompanyCount + INITIAL_INSURANCE_COMPANY_COUNT
     else
       totalInsuranceCompanyCount.value = INITIAL_INSURANCE_COMPANY_COUNT
     
-    isHospitalTableLoading.value = false
-    isInsuranceCompanyTableLoading.value = false
-    isProcessedClaimsTableLoading.value = false
+    if(insuranceCompanies.data)
+    {
+      insuranceCompanyTableData.value = insuranceCompanies.data
+      isInsuranceCompanyTableLoading.value = false
+    }
   })
 
   watch(processedClaimStats, () => 
@@ -232,22 +247,23 @@
     protocolRevokedApprovalCount.value = processedClaimStats.data.revokedApprovalCount
     protocolDenialHammerDroppedCount.value = processedClaimStats.data.denialHammerDroppedCount
   })
+  
+  watch(claimStats, () => 
+  {
+    currentClaimQueueCount.value = claimStats.data.currentClaimQueueCount
+
+    if(!claimQueue.data)
+      nextInLine.value = "Queue Not Initialized"
+    else if(currentClaimQueueCount.value && claimQueueTableData.value)
+      nextInLine.value = claimQueueTableData.value[0].id
+    else
+      nextInLine.value = "Queue Currently Empty"
+  })
 
   watch(claimQueue, () => 
   {
     isClaimQueueOn.value = claimQueue.data.enabled
-    currentClaimQueueCount.value = claimQueue.data.currentClaimQueueCount
     queueSizeLimit.value = claimQueue.data.queueSizeLimit
-
-    if(currentClaimQueueCount.value)
-    {
-      if(claimQueueTableData.value)
-        nextInLine.value = claimQueueTableData.value[0].id
-      else
-        nextInLine.value = "Queue Currently Empty"
-    }
-    else
-      nextInLine.value = "Queue Currently Empty"
   })
 
   watch(claims, () => 
@@ -270,6 +286,9 @@
   watch(hospitals, () => 
   {
     hospitalTableData.value = hospitals.data
+
+    if(isHospitalTableLoading.value)
+      isHospitalTableLoading.value = false
   })
 
   watch(insuranceCompanyStats, () => 
@@ -280,40 +299,17 @@
   watch(insuranceCompanies, () => 
   {
     insuranceCompanyTableData.value = insuranceCompanies.data
+
+    if(isInsuranceCompanyTableLoading.value)
+      isInsuranceCompanyTableLoading.value = false
   })
 
   watch(processedClaims, () => 
   {
     processedClaimsTableData.value = processedClaims.data
-  })
 
-  watch(customUserNameHashMap, () =>
-  {
-    if(claimQueueTableData.value)
-      for(var i=0; i<claimQueueTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(claimQueueTableData.value[i].submitterAddress)
-        if(chatAccount)
-        {
-          if(chatAccount.useCustomName)
-            claimQueueTableData.value[i].submitterDisplayName = chatAccount.userName
-          else
-            claimQueueTableData.value[i].submitterDisplayName = trimAddress(claimQueueTableData.value[i].submitterAddress)
-        }
-      }
-    
-    if(processedClaimsTableData.value)
-      for(var i=0; i<processedClaimsTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(processedClaimsTableData.value[i].submitterAddress)
-        if(chatAccount)
-        {
-          if(chatAccount.useCustomName)
-            processedClaimsTableData.value[i].submitterDisplayName = chatAccount.userName
-          else
-            processedClaimsTableData.value[i].submitterDisplayName = trimAddress(processedClaimsTableData.value[i].submitterAddress)
-        }
-      }
+    if(isProcessedClaimsTableLoading.value)
+      isProcessedClaimsTableLoading.value = false
   })
 
   function setTableSelect(index: number)

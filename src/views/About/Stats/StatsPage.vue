@@ -50,7 +50,7 @@
       :tableData="voterRecordTableData" 
       :uniqueVoterData="uniqueVoterTableData"
       :uniqueVoterCount="uniqueVoterCount"
-      :isLoading="voterTableIsLoading"
+      :isLoading="voterDataIsLoading"
       :searchAddress="searchAddress"
       :displayName="possiblyTrimmedDisplayName"
       :uniqueVoterHashMap="uniqueVoterHashMap"
@@ -62,7 +62,7 @@
       :tableData="uniqueVoterTableData" 
       :uniqueVoterData="uniqueVoterTableData"
       :uniqueVoterCount="uniqueVoterCount"
-      :isLoading="voterTableIsLoading"
+      :isLoading="voterDataIsLoading"
       :searchAddress="searchAddress"
       :displayName="possiblyTrimmedDisplayName"
     />
@@ -73,7 +73,7 @@
       :tableData="canidateRecordTableData" 
       :uniqueCanidateData="uniqueCanidateTableData"
       :uniqueCanidateCount="uniqueCanidateCount"
-      :isLoading="canidateTableIsLoading"
+      :isLoading="voterDataIsLoading"
       :searchAddress="searchAddress"
       :displayName="possiblyTrimmedDisplayName"
       :uniqueCanidateHashMap="uniqueCanidateHashMap"
@@ -85,7 +85,7 @@
       :tableData="uniqueCanidateTableData" 
       :uniqueCanidateData="uniqueCanidateTableData"
       :uniqueCanidateCount="uniqueCanidateCount"
-      :isLoading="canidateTableIsLoading"
+      :isLoading="voterDataIsLoading"
       :searchAddress="searchAddress"
       :displayName="possiblyTrimmedDisplayName"
     />
@@ -139,8 +139,7 @@
   var toggleVoterCanidateTable = ref(false)
   var toggleUniqueTable = ref(false)
   
-  var voterTableIsLoading = ref(true)
-  var canidateTableIsLoading = ref(true)
+  var voterDataIsLoading = ref(true)
 
   var approvedClaimAmountString = ref("0.00")
   var patientCount = ref(0)
@@ -180,13 +179,15 @@
 
     searchAddress.value = connectedWallet.addressString
 
-    getChatAccountStats(searchAddress.value)
-
-    if(postVoteRecords.data)
-      sortPostVoteRecords(searchAddress.value)
-
-    if(connectedWallet.addressString != "")
+    if(searchAddress.value != "")
     {
+      if(chatAccountHashMap.map)
+        getChatAccountStats(searchAddress.value)
+      if(postVoteRecords.data)
+      {
+        sortPostVoteRecords(searchAddress.value)
+        voterDataIsLoading.value = false
+      }
       if(submitterHashMap.map)
         getSubmitterAccountStats(searchAddress.value)
     }
@@ -222,6 +223,9 @@
   watch(postVoteRecords, () =>
   {
     sortPostVoteRecords(searchAddress.value)
+
+    if(voterDataIsLoading.value)
+      voterDataIsLoading.value = false
   })
 
   watch(customUserNameHashMap, () =>
@@ -231,43 +235,19 @@
 
     if(voterRecordTableData.value)
       for(var i=0; i<voterRecordTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(voterRecordTableData.value[i].voterAddress)
-        if(chatAccount.useCustomName)
-          voterRecordTableData.value[i].displayName = chatAccount.userName
-        else
-          voterRecordTableData.value[i].displayName = trimAddress(voterRecordTableData.value[i].voterAddress)
-      }
+        voterRecordTableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(voterRecordTableData.value[i].voterAddress)
 
     if(uniqueVoterTableData.value)
       for(var i=0; i<uniqueVoterTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(uniqueVoterTableData.value[i].voterAddress)
-        if(chatAccount.useCustomName)
-          uniqueVoterTableData.value[i].displayName = chatAccount.userName
-        else
-          uniqueVoterTableData.value[i].displayName = trimAddress(uniqueVoterTableData.value[i].voterAddress)
-      }
+        uniqueVoterTableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(uniqueVoterTableData.value[i].voterAddress)
 
     if(canidateRecordTableData.value)
       for(var i=0; i<canidateRecordTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(canidateRecordTableData.value[i].canidateAddress)
-        if(chatAccount.useCustomName)
-          canidateRecordTableData.value[i].displayName = chatAccount.userName
-        else
-          canidateRecordTableData.value[i].displayName = trimAddress(canidateRecordTableData.value[i].canidateAddress)
-      }
+        canidateRecordTableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(canidateRecordTableData.value[i].canidateAddress)
 
     if(uniqueCanidateTableData.value)
       for(var i=0; i<uniqueCanidateTableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(uniqueCanidateTableData.value[i].canidateAddress)
-        if(chatAccount.useCustomName)
-          uniqueCanidateTableData.value[i].displayName = chatAccount.userName
-        else
-          uniqueCanidateTableData.value[i].displayName = trimAddress(uniqueCanidateTableData.value[i].canidateAddress)
-      }
+        uniqueCanidateTableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(uniqueCanidateTableData.value[i].canidateAddress)
   })
 
   //Json string of wallet to detect object property changes
@@ -278,56 +258,46 @@
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
-    voterTableIsLoading.value = true
-    canidateTableIsLoading.value = true
-
     let newWallet = JSON.parse(newJSONObjectString)
     let oldWallet= JSON.parse(oldJSONObjectString)
 
     if(newWallet.addressString == oldWallet.addressString)
       return
 
-    try
+    if(submitterAccountWatchId != undefined)
     {
-      if(submitterAccountWatchId != undefined)
-      {
-         anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
-         submitterAccountWatchId = undefined
-      }
-      if(chatAccountWatchId != undefined)
-      {
-        anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatAccountWatchId)
-        chatAccountWatchId != undefined
-      }
+        anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
+        submitterAccountWatchId = undefined
+    }
+    if(chatAccountWatchId != undefined)
+    {
+      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatAccountWatchId)
+      chatAccountWatchId != undefined
+    }
 
-      if(connectedWallet.isChatAccountReady)
-      {
-        displayName.value = getUserDisplayName(connectedWallet.addressString)
-        possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(connectedWallet.addressString)
-      }
-      else
-      {
-        displayName.value = connectedWallet.addressString
-        possiblyTrimmedDisplayName.value = trimAddress(connectedWallet.addressString)
-      }
+    if(connectedWallet.isChatAccountReady)
+    {
+      displayName.value = getUserDisplayName(connectedWallet.addressString)
+      possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(connectedWallet.addressString)
+    }
+    else
+    {
+      displayName.value = connectedWallet.addressString
+      possiblyTrimmedDisplayName.value = trimAddress(connectedWallet.addressString)
+    }
 
-      getSubmitterAccountStats(connectedWallet.addressString)
+    if(chatAccountHashMap.map)
       getChatAccountStats(connectedWallet.addressString)
-      if(postVoteRecords.data)
-        sortPostVoteRecords(connectedWallet.addressString)
-      searchAddress.value = connectedWallet.addressString
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
+    if(submitterHashMap.map)
+      getSubmitterAccountStats(connectedWallet.addressString)
+    if(postVoteRecords.data)
+      sortPostVoteRecords(connectedWallet.addressString)
+
+    searchAddress.value = connectedWallet.addressString
   })
 
   async function checkNewAddress()
   {
-    voterTableIsLoading.value = true
-    canidateTableIsLoading.value = true
-    
     if(submitterAccountWatchId != undefined)
     {
         anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
@@ -345,7 +315,10 @@
     getSubmitterAccountStats(addressToCheck.value)
     getChatAccountStats(addressToCheck.value)
     if(postVoteRecords.data)
+    {
       sortPostVoteRecords(addressToCheck.value)
+      voterDataIsLoading.value = false
+    }
 
     searchAddress.value = addressToCheck.value
 
@@ -639,9 +612,6 @@
 
     uniqueVoterHashMap.value = uniqueVoterMap
     uniqueCanidateHashMap.value = uniqueCanidateMap
-
-    voterTableIsLoading.value = false
-    canidateTableIsLoading.value = false
   }
 
   function getReceivedVoteRecords(searchAddress: String, postVoteRecordsDeepCopy: any)

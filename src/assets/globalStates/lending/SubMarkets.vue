@@ -10,19 +10,19 @@
   //Key: Token Mint Address + Owner Address + SubMarket Index, Value: Specific SubMarket based on seeds
   export const subMarketsHashMap = reactive(
   {
-    map: new Map<string, any>()
+    map: undefined
   })
 
   //Key: SubMarket Owner PublicKey, Value: List of SubMarket Accounts that the owner has
   export const subMarketOwnerHashMap = reactive(
   {
-    map: new Map<string, any>()
+    map: undefined
   })
 
   //Key: Token Mint Address, Value: List of SubMarket Accounts for a specific Token Mint Address
   export const tokenReserveHashMap = reactive(
   {
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export type SubMarketOwner = 

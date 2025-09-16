@@ -75,7 +75,7 @@
 
       <Column field="recordId" header="Record Id" style="width: 0%" sortable></Column>
       <Column field="claimId" header="Claim Id" style="width: 0%" sortable></Column>
-      <Column field="submitterAddress" header="User" style="width: 10%" sortable>
+      <Column field="submitterAddress" header="Submitter" style="width: 20%" sortable>
         <template #body="slotProps">
           <div>
             <ion-button class="submitterButton" fill="clear" @click="openUserPopover($event, slotProps.data)">
@@ -173,7 +173,7 @@
           >
             <div class="thinBorder flexCenterColumn m4aTablePopupContainer">
               <ion-label class="tablePopupUnderLine">Claim Note</ion-label>
-              <span class="emojiText">{{ event.note }}</span>
+              <span>{{ event.note }}</span>
             </div>
           </ion-popover>
         </template>
@@ -279,7 +279,6 @@
     confirmM4ATransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   defineEmits(['showInsuranceCompanyList'])
@@ -327,9 +326,10 @@
     }
 
     if(insuranceCompanyRecordsHashMap.map)
+    {
         getInsuranceCompanyRecords()
-
-    isLoading.value = false
+        isLoading.value = false
+    }
   })
 
   watch(hospitals, () => 
@@ -349,21 +349,6 @@
 
   watch(insuranceCompanies, () => 
   {
-    /*const insuranceCompany = getInsuranceCompany(insuranceCompanyIndex.value)
-    insuranceCompanyName.value = insuranceCompany.insuranceCompanyName
-    insuranceCompanyApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(insuranceCompany.approvedClaimAmount)
-    insuranceCompanyApprovedClaimCount = insuranceCompany.approvedClaimCount
-    insuranceCompanyDeniedClaimCount = insuranceCompany.deniedClaimCount
-    insuranceCompanyUndeniedClaimCount = insuranceCompany.undeniedClaimCount
-    insuranceCompanySubmittedAppealCount = insuranceCompany.submittedAppealCount 
-    insuranceCompanyDeniedAppealCount = insuranceCompany.deniedAppealCount
-    insuranceCompanyRevokedApprovalCount = insuranceCompany.revokedApprovalCount
-
-    getInsuranceCompanyRecords()*/
-  })
-
-  watch(insuranceCompanyRecordsHashMap, () => 
-  {
     const insuranceCompany = getInsuranceCompany(insuranceCompanyIndex.value)
     insuranceCompanyName.value = insuranceCompany.insuranceCompanyName
     insuranceCompanyApprovedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(insuranceCompany.approvedClaimAmount)
@@ -373,33 +358,24 @@
     insuranceCompanySubmittedAppealCount = insuranceCompany.submittedAppealCount 
     insuranceCompanyDeniedAppealCount = insuranceCompany.deniedAppealCount
     insuranceCompanyRevokedApprovalCount = insuranceCompany.revokedApprovalCount
-
-    getInsuranceCompanyRecords()
   })
 
-  watch(customUserNameHashMap, () =>
+  watch(insuranceCompanyRecordsHashMap, () => 
   {
-    if(tableData.value)
-      for(var i=0; i<tableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(tableData.value[i].submitterAddress)
-        if(chatAccount)
-        {
-          if(chatAccount.useCustomName)
-            tableData.value[i].submitterDisplayName = chatAccount.userName
-          else
-            tableData.value[i].submitterDisplayName = trimAddress(tableData.value[i].submitterAddress)
-        }
-      }
+    getInsuranceCompanyRecords()
+
+    if(isLoading.value)
+      isLoading.value = false
   })
 
   function getInsuranceCompanyRecords()
   {
     const insuranceCompanyRecords = insuranceCompanyRecordsHashMap.map.get(insuranceCompanyIndex.value.toString())
+
     if(insuranceCompanyRecords)
       tableData.value = insuranceCompanyRecords
     else
-      tableData.value = insuranceCompanyRecords
+      tableData.value = []
   }
 
   const filters = ref(
@@ -512,7 +488,7 @@
 
   .tableMinWidth
   {
-    min-width: 1470px
+    min-width: 1540px
   }
 
   ion-input, ion-textarea

@@ -1,5 +1,5 @@
 <template>
-  <h2>Under Construction<br>On Devnet</h2>
+  <h2>Under Construction On Devnet<br>Monopoly Money</h2>
   <h1 v-if="!mapSelection.isStateSelected">Universal Health Care Road Map</h1>
   <div v-if="mapSelection.isStateSelected" class="smallMarginTop">
     <!--<BETACountDown/>-->

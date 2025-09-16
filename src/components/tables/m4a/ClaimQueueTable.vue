@@ -71,7 +71,7 @@
       <template #loading>Loading records. Please wait.</template>
 
       <Column field="id" header="Claim Number" style="width: 0%" sortable></Column>
-      <Column field="submitterAddress" header="User" style="width: 15%" sortable>
+      <Column field="submitterAddress" header="Submitter" style="width: 11%" sortable>
         <template #body="slotProps">
           <div>
             <ion-button class="submitterButton" fill="clear" @click="openUserPopover($event, slotProps.data)">
@@ -108,7 +108,7 @@
           </ion-popover>
         </template>
       </Column>
-      <Column field="hospitalName" header="Hospital Name" style="width: 15%" sortable>
+      <Column field="hospitalName" header="Hospital Name" style="width: 0%" sortable>
         <template #body="slotProps">
           <div>
             <ion-button class="hospitalButton" fill="clear" @click="openHospitalPopover($event, slotProps.data)">
@@ -148,11 +148,11 @@
           </div>
         </template>
       </Column>
-      <Column field="countryName" header="Hospital Country" style="width: 5%" sortable></Column>
-      <Column field="stateName" header="Hospital State" style="width: 5%" sortable></Column>
-      <Column field="hospitalCity" header="Hospital City" style="width: 5%" sortable></Column>
-      <Column field="ailment" header="Ailment" style="width: 7%" sortable></Column>
-      <Column field="claimAmount" header="Claim Amount" style="width: 5%" sortable>
+      <Column field="countryName" header="Hospital Country" style="width: 0%" sortable></Column>
+      <Column field="stateName" header="Hospital State" style="width: 0%" sortable></Column>
+      <Column field="hospitalCity" header="Hospital City" style="width: 0%" sortable></Column>
+      <Column field="ailment" header="Ailment" style="width: 0%" sortable></Column>
+      <Column field="claimAmount" header="Claim Amount" style="width: 0%" sortable>
         <template #body="slotProps">
           {{ slotProps.data.claimAmountString }}
         </template>
@@ -183,12 +183,12 @@
             </ion-popover>
         </template>
       </Column>
-      <Column field="note" header="Claim Note" style="width: 15%" sortable>
+      <Column field="note" header="Claim Note" style="width: 0%" sortable>
         <template #body="slotProps">
           <span>{{ slotProps.data.note }}</span>
         </template>
       </Column>
-      <Column field="statusMessage" header="Status" style="width: 5%" sortable>
+      <Column field="statusMessage" header="Status" style="width: 0%" sortable>
         <template #body="slotProps">
           <ion-label v-if="slotProps.data.status == statusTypes.Pending" color="dark">
             {{ slotProps.data.statusMessage }}
@@ -297,7 +297,7 @@
 <style scoped>
   .tableMinWidth
   {
-    min-width: 1600px !important
+    min-width: 1635px !important
   }
 
   ion-input

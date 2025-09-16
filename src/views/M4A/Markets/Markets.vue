@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Under Construction<br>On Devnet</h2>
+    <h2>Under Construction On Devnet<br>Monopoly Money</h2>
     <h1>Markets</h1>
     <MarketsTable/>
     <!--<h1>Under Construction</h1>

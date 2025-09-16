@@ -126,7 +126,7 @@
       `<div class="thinBorder" style="height: auto; background: var(--ion-color-light)">
         <div style="line-height: 10px">
           <p class="underLine" style="color: var(--ion-color-dark)"><b>Name</b></p>
-          <p style="margin-top: -10px; color: var(--ion-color-dark)">${hospitalName}</p>
+          <p style="margin-top: -10px; margin-left: 10px; margin-right: 10px; color: var(--ion-color-dark)">${hospitalName}</p>
         </div>
         <div style="line-height: 10px">
           <p class="underLine" style="color: var(--ion-color-dark)"><b>Address</b></p> 

@@ -91,6 +91,7 @@
   import WalletIcon from './WalletIcon.vue'
   import WalletModalProvider from '/src/components/navbar/SolanaWalletButton/WalletModalProvider.vue'
   import { isSubmitterAccountInitialized, getProcessorAccount } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { getChatAccount } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { submitterHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
   import { processorHashMap } from '/src/assets/globalStates/m4a/Processors.vue'
   import { chatAccountHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
@@ -135,7 +136,7 @@
       connectedWallet.addressString = publicKey.value.toBase58()
       connectedWallet.isConnected = true
 
-      const chatAccount = chatAccountHashMap.map.get(connectedWallet.addressString)
+      const chatAccount = getChatAccount(connectedWallet.addressString)
       if(chatAccount)
       {
         connectedWallet.isChatAccountReady = true
@@ -207,7 +208,7 @@
       connectedWallet.addressString = publicKey.value.toBase58()
       connectedWallet.isConnected = true
 
-      const chatAccount = chatAccountHashMap.map.get(connectedWallet.addressString)
+      const chatAccount = getChatAccount(connectedWallet.addressString)
       if(chatAccount)
       {
         connectedWallet.isChatAccountReady = true
@@ -301,7 +302,7 @@
   
   watch(chatAccountHashMap, () =>
   {
-    const chatAccount = chatAccountHashMap.map.get(connectedWallet.addressString)
+    const chatAccount = getChatAccount(connectedWallet.addressString)
     if(chatAccount)
     {
       connectedWallet.isChatAccountReady = true
@@ -371,7 +372,7 @@
 
   watch(commentSections, () =>
   {
-    const chatAccount = chatAccountHashMap.map.get(connectedWallet.addressString)
+    const chatAccount = getChatAccount(connectedWallet.addressString)
     if(chatAccount)
     {
       if(!connectedWallet.hasGoodEnding)

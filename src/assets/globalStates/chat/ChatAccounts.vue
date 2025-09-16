@@ -8,12 +8,12 @@
 
   export const chatAccountHashMap = reactive(
   {
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export const customUserNameHashMap = reactive(
   {
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export default chatAccounts

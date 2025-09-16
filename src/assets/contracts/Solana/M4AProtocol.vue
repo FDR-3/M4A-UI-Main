@@ -5,11 +5,14 @@
   import { claimHashMap, processedClaimHashMap } from '/src/assets/globalStates/m4a/Claims.vue'
   import { processorHashMap } from '/src/assets/globalStates/m4a/Processors.vue'
   import { stateAccountReadyHashMap, stateHospitalListHashMap } from '/src/assets/globalStates/m4a/States.vue'
+  import { hospitalRecordsHashMap, insuranceCompanyRecordsHashMap } from '/src/assets/globalStates/m4a/Records.vue'
   import type { State } from '/src/assets/globalStates/m4a/States.vue'
+  import { claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { hospitalHashMap } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { initialInsuranceCompanies } from '/src/types/InitialInsuranceCompanyTypes.ts'
   import { insuranceCompanyStats, insuranceCompanies } from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
+  import { processors } from '/src/assets/globalStates/m4a/Processors.vue'
   import { statusTypes } from '/src/types/statusTypes.ts'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { parsePhoneNumberString,
@@ -479,6 +482,8 @@
 
   export async function setPatientRecordsHashMap()
   {
+    console.log("Updating Patient Records Hash Map")
+
     var hashMap = new Map<string, any>()
 
     const patientRecords = await getPatientRecordsWrapper()
@@ -596,6 +601,8 @@
 
   export async function setHospitalRecordsHashMap()
   {
+    console.log("Updating Hospital Records Hash Map")
+
     var hashMap = new Map<string, any>()
 
     const hospitalRecords = await getHospitalRecordsWrapper()
@@ -701,6 +708,8 @@
 
   export async function setInsuranceCompanyRecordsHashMap()
   {
+    console.log("Updating Insurance Company Records Hash Map")
+
     var hashMap = new Map<string, any>()
 
     const insuranceCompanyRecords = await getInsuranceCompanyRecordsWrapper()
@@ -881,12 +890,42 @@
     }
   }
 
+  export async function getClaimStats()
+  {
+    console.log("Getting Claim Stats")
+
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.m4a.m4aProgram.account.claimStats.fetch(getClaimStatsPDA())
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log("Claim Stats Account Not Initialized")
+          return undefined
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
   export function isClaimSubmitted(submitterAddress: PublicKey)
   {
-    const claim = claimHashMap.map.get(submitterAddress.toString())
-
-    if(claim)
-      return true
+    if(claimHashMap.map)
+    {
+      const claim = claimHashMap.map.get(submitterAddress.toString())
+      if(claim)
+        return true
+      else
+        return false
+    }
     else
       return false
   }
@@ -933,21 +972,16 @@
       claim.stateName = countryStateNameArray[claim.countryIndex][claim.stateIndex]
 
       //Set is state ready
-      const state = stateAccountReadyHashMap.map.get(claim.countryIndex.toString() + claim.stateIndex.toString())
-      if(state)
-        claim.isStateReady = true
+      if(stateAccountReadyHashMap.map)
+      {
+        const state = stateAccountReadyHashMap.map.get(claim.countryIndex.toString() + claim.stateIndex.toString())
+        if(state)
+          claim.isStateReady = true
+        else
+          claim.isStateReady = false
+      }
       else
         claim.isStateReady = false
-
-      //Set hospital type name
-      if(claim.hospitalType == HospitalTypes.General)
-        claim.hospitalTypeName = "General"
-      else if(claim.hospitalType == HospitalTypes.Dental)
-        claim.hospitalTypeName = "Dental"
-      else if(claim.hospitalType == HospitalTypes.Vision)
-        claim.hospitalTypeName = "Vision"
-      else if(claim.hospitalType == HospitalTypes.Mental)
-        claim.hospitalTypeName = "Mental"
 
       //Set submitter approved claim total amount
       const submitterAccount = submitterHashMap.map.get(claim.submitterAddress.toString())
@@ -979,19 +1013,59 @@
           //Set is hospital ready, claim total amount, phone number, longitude, and latitude
           claim.isHospitalReady = true
           claim.hospitalApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospital.approvedClaimAmount)
+          claim.hospitalName = hospital.hospitalName
+          claim.hospitalAddress = hospital.hospitalAddress
+          claim.hospitalCity = hospital.hospitalCity
           claim.hospitalPhoneNumber = hospital.hospitalPhoneNumber
+          claim.hospitalzipCode = hospital.hospitalzipCode
           claim.hospitalLongitude = hospital.hospitalLongitude
           claim.hospitalLatitude = hospital.hospitalLatitude
-      
+
           //Set hospital note
           claim.hospitalNote = hospital.note
+
+          //Set hospital type name
+          if(hospital.hospitalType == HospitalTypes.General)
+          {
+            claim.hospitalType = HospitalTypes.General
+            claim.hospitalTypeName = "General"
+          }
+          else if(hospital.hospitalType == HospitalTypes.Dental)
+          {
+            claim.hospitalType = HospitalTypes.Vision
+            claim.hospitalTypeName = "Dental"
+          }
+          else if(hospital.hospitalType == HospitalTypes.Vision)
+          {
+            claim.hospitalType = HospitalTypes.General
+            claim.hospitalTypeName = "Vision"
+          }
+          else if(hospital.hospitalType == HospitalTypes.Mental)
+          {
+            claim.hospitalType = HospitalTypes.Mental
+            claim.hospitalTypeName = "Mental"
+          }
+
         }
         else
         {
           claim.isHospitalReady = false
           claim.hospitalApprovedClaimAmountString = "$0.00"
-          claim.hospitalPhoneNumber = "(000) 000-0000"
+          claim.hospitalPhoneNumber = parsePhoneNumberString(claim.hospitalPhoneNumber)
+          claim.hospitalIndex  = claim.nextHospitalIndex
           claim.hospitalNote = "None"
+          claim.hospitalLongitude = 0.0
+          claim.hospitalLatitude = 0.0
+
+          //Set hospital type name
+          if(claim.hospitalType == HospitalTypes.General)
+            claim.hospitalTypeName = "General"
+          else if(claim.hospitalType == HospitalTypes.Dental)
+            claim.hospitalTypeName = "Dental"
+          else if(claim.hospitalType == HospitalTypes.Vision)
+            claim.hospitalTypeName = "Vision"
+          else if(claim.hospitalType == HospitalTypes.Mental)
+            claim.hospitalTypeName = "Mental"
         }
       }
       else
@@ -1003,13 +1077,22 @@
         claim.hospitalNote = "None"
         claim.hospitalLongitude = 0.0
         claim.hospitalLatitude = 0.0
+
+        //Set hospital type name
+        if(claim.hospitalType == HospitalTypes.General)
+          claim.hospitalTypeName = "General"
+        else if(claim.hospitalType == HospitalTypes.Dental)
+          claim.hospitalTypeName = "Dental"
+        else if(claim.hospitalType == HospitalTypes.Vision)
+          claim.hospitalTypeName = "Vision"
+        else if(claim.hospitalType == HospitalTypes.Mental)
+          claim.hospitalTypeName = "Mental"
       }
 
       //Set isInsuranceCompanyReady, claim total amount, name, and note
       if(claim.insuranceCompanyIndex != -1)
       {
         const insuranceCompany = insuranceCompanies.data[claim.insuranceCompanyIndex]
-
         if(insuranceCompany)
           if(insuranceCompany.isActive)
           {
@@ -1027,17 +1110,21 @@
           else
           {
             claim.isInsuranceCompanyReady = false
-            claim.insuranceCompanyApprovedClaimAmountString = "$0.00"
-            //if(claim.insuranceCompanyIndex >= 0 && claim.insuranceCompanyIndex <= INITIAL_INSURANCE_COMPANY_COUNT) //There are 11 built in insurance company names in the InsuranceCompanyTypes.ts file 
-              //claim.insuranceCompanyName = initialInsuranceCompanies[claim.insuranceCompanyIndex].insuranceCompanyName //And it keeps but holes from causing an error with a -2 or something
-            claim.insuranceCompanyNote = "None"
+            
+            //Set insurance company claim total decimals from fixed point
+            claim.insuranceCompanyApprovedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(insuranceCompany.approvedClaimAmount)
+
+            //Set existing insurance company name
+            claim.insuranceCompanyName = insuranceCompany.insuranceCompanyName
+
+            //Set insurance company note
+            claim.insuranceCompanyNote = insuranceCompany.note
           }
         else
         {
           claim.isInsuranceCompanyReady = false
           claim.insuranceCompanyApprovedClaimAmountString = "$0.00"
-          //if(claim.insuranceCompanyIndex >= 0 && claim.insuranceCompanyIndex <= INITIAL_INSURANCE_COMPANY_COUNT) //There are 11 built in insurance company names in the InsuranceCompanyTypes.ts file 
-            //claim.insuranceCompanyName = initialInsuranceCompanies[claim.insuranceCompanyIndex].insuranceCompanyName //And it keeps but holes from causing an error with a -2 or something
+          claim.insuranceCompanyIndex = claim.nextInsuranceCompanyIndex
           claim.insuranceCompanyNote = "None"
         }
       }
@@ -1691,6 +1778,103 @@
     }
   }
 
+  export function refreshClaimData()
+  {
+    var refreshedData: any = []
+
+    const tableData = claims.data
+    if(tableData)
+      for(var i=0; i<tableData.length; i++)
+      {
+        //Get submitter display name
+        tableData[i].submitterDisplayName = getCustomOrTrimmedUserDisplayName(tableData[i].submitterAddress)
+        refreshedData.push(tableData[i])
+      }
+
+    claims.data = refreshedData
+  }
+
+  export function refreshProcessedClaimData()
+  {
+    var refreshedData: any = []
+
+    const tableData = processedClaims.data
+    if(tableData)
+      for(var i=0; i<tableData.length; i++)
+      {
+        //Get submitter display name
+        tableData[i].submitterDisplayName = getCustomOrTrimmedUserDisplayName(tableData[i].submitterAddress)
+        refreshedData.push(tableData[i])
+      }
+
+    processedClaims.data = refreshedData
+  }
+
+  export function refreshProcessorsData()
+  {
+    var refreshedData: any = []
+
+    const tableData = processors.data
+    if(tableData)
+      for(var i=0; i<tableData.length; i++)
+      {
+        //Get submitter display name
+        tableData[i].processorDisplayName = getCustomOrTrimmedUserDisplayName(tableData[i].address)
+        refreshedData.push(tableData[i])
+      }
+
+    processors.data = refreshedData
+  }
+
+
+  export function refreshHospitalRecordsHashMaps()
+  {
+    var hashMap = new Map<string, any>()
+
+    const tableData = Array.from(hospitalRecordsHashMap.map, ([key, value]) => ({ key, value }))
+
+    if(tableData)
+      for(var i=0; i<tableData.length; i++)
+      {
+        tableData[i].value[0].submitterDisplayName = getCustomOrTrimmedUserDisplayName(tableData[i].value[0].submitterAddress)
+
+        const previousList = hashMap.get(tableData[i].key)
+        if(previousList)
+        {
+          previousList.push(tableData[i].value[0])
+          hashMap.set(tableData[i].key, previousList)
+        }
+        else
+          hashMap.set(tableData[i].key, [tableData[i].value[0]])
+      }
+
+    hospitalRecordsHashMap.map = hashMap
+  }
+
+  export function refreshInsuranceCompanyRecordsHashMaps()
+  {
+    var hashMap = new Map<string, any>()
+
+    const tableData = Array.from(insuranceCompanyRecordsHashMap.map, ([key, value]) => ({ key, value }))
+
+    if(tableData)
+      for(var i=0; i<tableData.length; i++)
+      {
+        tableData[i].value[0].submitterDisplayName = getCustomOrTrimmedUserDisplayName(tableData[i].value[0].submitterAddress)
+
+        const previousList = hashMap.get(tableData[i].key)
+        if(previousList)
+        {
+          previousList.push(tableData[i].value[0])
+          hashMap.set(tableData[i].key, previousList)
+        }
+        else
+          hashMap.set(tableData[i].key, [tableData[i].value[0]])
+      }
+
+    insuranceCompanyRecordsHashMap.map = hashMap
+  }
+
   export function getM4AProtocolCEOAccountPDA()
   {
     const [m4aProtocolCEOPDA] = anchor.web3.PublicKey.findProgramAddressSync
@@ -1773,6 +1957,30 @@
       anchorPrograms.m4a.m4aProgram.programId
     )
     return claimQueuePDA
+  }
+
+  export function getClaimStatsPDA()
+  {
+    const [claimStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("claimStats")
+      ],
+      anchorPrograms.m4a.m4aProgram.programId
+    )
+    return claimStatsPDA
+  }
+
+  export function getClaimAndProcessorStatsPDA()
+  {
+    const [claimAndProcessorStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("claimAndProcessorStats")
+      ],
+      anchorPrograms.m4a.m4aProgram.programId
+    )
+    return claimAndProcessorStatsPDA
   }
 
   export function getProcessorStatsPDA()
@@ -2072,6 +2280,18 @@
       anchorPrograms.m4a.m4aProgram.programId
     )
     return hospitalPDA
+  }
+
+  export function getUnfinishedClaimStatsPDA()
+  {
+    const [unfinishedClaimStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("unfinishedClaimStats")
+      ],
+      anchorPrograms.m4a.m4aProgram.programId
+    )
+    return unfinishedClaimStatsPDA
   }
 
   export default getM4AProtocolCEOAccount

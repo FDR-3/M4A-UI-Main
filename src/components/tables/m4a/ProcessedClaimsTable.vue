@@ -78,7 +78,7 @@
 
       <Column field="processedClaimId" header="Processed Claim Id" style="width: 0%" sortable></Column>
       <Column field="claimId" header="Claim Id" style="width: 0%" sortable></Column>
-      <Column field="submitterAddress" header="User" style="width: 0%" sortable>
+      <Column field="submitterAddress" header="Submitter" style="width: 35%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRow">
             <ion-button class="submitterButton" fill="clear" @click="openUserPopover($event, slotProps.data)">
@@ -119,7 +119,7 @@
           </ion-popover>
         </template>
       </Column>
-      <Column field="hospitalName" header="Hospital Name" style="width: 10%" sortable>
+      <Column field="hospitalName" header="Hospital Name" style="width: 0%" sortable>
         <template #body="slotProps">
           <div>
             <ion-button class="hospitalButton" fill="clear" @click="openHospitalPopover($event, slotProps.data)">
@@ -186,7 +186,7 @@
             </ion-popover>
         </template>
       </Column>
-      <Column field="ailment" header="Ailment" style="width: 15%" sortable>
+      <Column field="ailment" header="Ailment" style="width: 0%" sortable>
         <template #body="slotProps">
           <ion-button class="tableButton" fill="clear" @click="openClaimNotePopover($event, slotProps.data)">  
             <span class="tableButtonEmoji">
@@ -205,17 +205,17 @@
           >
             <div class="thinBorder flexCenterColumn m4aTablePopupContainer">
               <ion-label class="tablePopupUnderLine">Claim Note</ion-label>
-              <span class="emojiText">{{ event.note }}</span>
+              <span>{{ event.note }}</span>
             </div>
           </ion-popover>
         </template>
       </Column>
-      <Column field="claimAmount" header="Claim Amount" style="width: 5%" sortable>
+      <Column field="claimAmount" header="Claim Amount" style="width: 0%" sortable>
         <template #body="slotProps">
           {{ slotProps.data.claimAmountString }}
         </template>
       </Column>
-      <Column field="statusMessage" header="Status /Denial Reason" style="width: 5%" sortable>
+      <Column field="statusMessage" header="Status /Denial Reason" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterColumn">
             <ion-label v-if="slotProps.data.status == statusTypes.Pending" color="dark">
@@ -468,7 +468,7 @@
 <style scoped>
   .tableMinWidth
   {
-    min-width: 1645px
+    min-width: 1664px
   }
 
   ion-input, ion-textarea

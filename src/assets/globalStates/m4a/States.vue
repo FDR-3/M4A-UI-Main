@@ -4,13 +4,13 @@
   export const stateAccountReadyHashMap = reactive(
   {
     //Key: CountryIndex + stateIndex, Value: stateData
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export const stateHospitalListHashMap = reactive(
   {
     //Key: CountryIndex + stateIndex, Value: stateData
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export type State = 

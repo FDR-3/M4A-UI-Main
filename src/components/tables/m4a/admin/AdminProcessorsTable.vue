@@ -62,7 +62,7 @@
 
       <Column expander style="width: 0%"/>
       <Column field="id" header="Id" style="width: 0%" sortable></Column>
-      <Column field="processorDisplayName" header="Employee" style="width: 10%" sortable>
+      <Column field="processorDisplayName" header="Employee" style="width: 20%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
               <StarWolf class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
@@ -340,7 +340,7 @@
 <style scoped>
   .tableMinWidth
   {
-    min-width: 1667px
+    min-width: 1715px
   }
 
   .actionButton

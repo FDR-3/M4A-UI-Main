@@ -171,12 +171,12 @@
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
-  import { trimAddress,
-    isValidSolanaPublicKey,
+  import { isValidSolanaPublicKey,
     copyFullAddress,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/Wallethelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
 
   const toast = inject('toast')
@@ -262,17 +262,7 @@
 
     for(var i=0; i<unprocessedData.length; i++)
     {
-      const chatAccount = customUserNameHashMap.map.get(unprocessedData[i].owner)
-
-      if(chatAccount)
-      {
-        if(chatAccount.useCustomName)
-          unprocessedData[i].ownerData.displayName = chatAccount.userName
-        else
-          unprocessedData[i].ownerData.displayName = trimAddress(unprocessedData[i].owner)
-      }
-      else
-        unprocessedData[i].ownerData.displayName = trimAddress(unprocessedData[i].owner)
+      unprocessedData[i].ownerData.displayName = getCustomOrTrimmedUserDisplayName(unprocessedData[i].owner)
 
       //This has to be done here as opposed to in the LendingProtocol.vue file since it has to be after it's deep cloned
       for(var j=0; j<unprocessedData[i].ownerData.ownerSubMarketList.length; j++)

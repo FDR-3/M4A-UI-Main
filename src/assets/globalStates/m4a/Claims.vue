@@ -6,6 +6,11 @@
     data: undefined
   })
 
+  export const claimStats = reactive(
+  {
+    data: undefined
+  })
+
   export const processedClaimStats = reactive(
   {
     data: undefined
@@ -23,12 +28,12 @@
 
   export const claimHashMap = reactive(
   {
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export const processedClaimHashMap = reactive(
   {
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export default claimQueue

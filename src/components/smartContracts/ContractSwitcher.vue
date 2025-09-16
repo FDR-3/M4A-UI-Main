@@ -54,16 +54,17 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted } from 'vue'
+  import { ref, onMounted, onUnmounted, watch } from 'vue'
   import { IonButton, IonPopover, IonLabel, IonIcon } from '@ionic/vue'
   import { chevronDown } from 'ionicons/icons'
   import { adminAccounts, devNetTreasury, hodlTreasuryBalancesDevNetHashMap, singlePayerTreasuryBalancesDevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { claimQueue, processedClaimStats, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'
+  import { claimQueue, claimStats, processedClaimStats, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'
   import { hospitalStats, hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { insuranceCompanyStats, insuranceCompanies } from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
   import { processors } from '/src/assets/globalStates/m4a/Processors.vue'
   import { patientRecordsHashMap, hospitalRecordsHashMap, insuranceCompanyRecordsHashMap } from '/src/assets/globalStates/m4a/Records.vue'
   import { m4aChat, pliChat, aboutChat } from '/src/assets/globalStates/chat/Chats.vue'
+  import { customUserNameHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { ideas, feds } from '/src/assets/globalStates/chat/QOL.vue'
   import M4AChatUpdater from './M4AChatUpdater.vue'
   import PLIChatUpdater from './PLIChatUpdater.vue'
@@ -80,6 +81,7 @@
     getAllSubmitters,
     getAllPatients,
     getClaimQueue,
+    getClaimStats,
     getQueueClaims,
     getStateAccounts,
     getProcessedClaims,
@@ -93,17 +95,25 @@
     setPatientRecordsHashMap,
     setHospitalRecordsHashMap,
     setInsuranceCompanyRecordsHashMap,
+    refreshClaimData,
+    refreshProcessedClaimData,
+    refreshProcessorsData,
+    refreshHospitalRecordsHashMaps,
+    refreshInsuranceCompanyRecordsHashMaps,
     getM4AProtocolPDA,
     getM4ATokenFeePDA,
     getSubmitterStatsPDA,
     getPatientStatsPDA,
     getClaimQueuePDA,
+    getClaimStatsPDA,
+    getClaimAndProcessorStatsPDA,
     getHospitalStatsPDA,
     getInsuranceCompanyStatsPDA,
     getProcessorStatsPDA,
     getPatientRecordStatsPDA,
     getHospitalAndInsuranceRecordStatsPDA,
     getProcessedClaimStatsPDA,
+    getUnfinishedClaimStatsPDA,
     getM4AProtocolCEOAccountPDA,
     getM4AProtocolTreasurerAccountPDA } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { getChatProtocol,
@@ -122,6 +132,8 @@
     getPollVoteRecords,
     getFEDRecords,
     getIdeas,
+    refreshIdeadsData,
+    refreshFEDsData,
     getChatProtocolCEOAccountPDA,
     getChatProtocolTreasurerAccountPDA,
     getChatProtocolPDA,
@@ -169,6 +181,8 @@
   var hodlUSDCATAWatcherId: any
   var singlePayerUSDCATAWatcherId: any
   var claimQueueWatchId: any
+  var claimStatsWatchId: any
+  var claimAndProcessorStatsWatchId: any
   var submitterStatsWatchId: any
   var patientStatsWatchId: any
   var hospitalStatsWatchId: any
@@ -177,6 +191,7 @@
   var patientRecordStatsWatchId: any 
   var hospitalAndInsuranceRecordStatsWatchId: any
   var processedClaimStatsWatchId: any
+  var unfinishedClaimStatsWatchId: any
   var isM4AProtocolReadyWatchId: any
   var isChatProtocolReadyWatchId: any
   var m4aChatWatchId: any
@@ -200,8 +215,6 @@
   var pollVoteStatsWatcherId: any
   var lendingProtocolWatcherId: any
   var subMarketStatsWatcherId: any
-
-  var currentClaimQueueCount = 0
 
   var hodlTreasuryUSDCATA: PublicKey
   var singlePayerTreasuryUSDCATA: PublicKey
@@ -296,10 +309,6 @@
     subMarkets.data = await getSubMarkets()
     await listenForSubMarketChanges()
 
-    //Chat Accounts
-    await setChatAccountAndUserNameHashMap()
-    await listenForChatAccountStatChanges()
-
     //Chat Protocol CEO Account
     const chatCEOAccount = await getChatProtocolCEOAccount()
     if(chatCEOAccount)
@@ -353,11 +362,14 @@
     //Claims and Processed Claims have submitters, patients, hospital and insurance companies on them, so best to fetch them first above, just making a note of it
     //M4A Claim Queue
     claimQueue.data = await getClaimQueue()
-    if(claimQueue.data)
-      currentClaimQueueCount = claimQueue.data.currentClaimQueueCount
     getStateAccounts()
     claims.data = await getQueueClaims()
+    claimStats.data = await getClaimStats()
     await listenForClaimQueueChanges()
+    await listenForClaimStatChanges()
+
+    //M4A Processor is assigned or unassigned from a claim
+    await listenForClaimAndProcessorStatChanges()
 
     //M4A Processed Claims
     processedClaims.data = await getProcessedClaims()
@@ -370,6 +382,46 @@
       anchorPrograms.isM4AFeeTokenAccountReady = true
     else
       listenForM4AFeeTokenAccount()
+
+    //M4A Protocol CEO Account
+    const m4aCEOAccount = await getM4AProtocolCEOAccount()
+    if(m4aCEOAccount)
+    {
+      adminAccounts.isM4ACEOAccountReady = true
+      adminAccounts.m4aCEOAddress = m4aCEOAccount.address.toBase58()
+    }
+    else
+    {
+      adminAccounts.isM4ACEOAccountReady = false
+      await listenForM4ACEOAccountInitialization()
+    }
+
+    //M4A Patient Records
+    patientRecordsHashMap.map = await setPatientRecordsHashMap()
+    await listenForPatientRecordStatChanges()
+
+    //M4A Hospital And Insurance Company Records
+    hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
+    insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
+    await listenForHospitalAndInsuranceRecordStatChanges()
+
+    //M4A Protocol Treasurer Account
+    const m4aTreasurerAccount = await getM4AProtocolTreasurerAccount()
+    if(m4aTreasurerAccount)
+      adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
+    else
+      await listenForM4ATreasurerAccountInitialization()
+
+    //Chat Protocol Treasurer Account
+    const chatTreasurerAccount = await getChatProtocolTreasurerAccount()
+    if(chatTreasurerAccount)
+      adminAccounts.chatTreasurerAddress = chatTreasurerAccount.address.toBase58()
+    else
+      await listenForChatTreasurerAccountInitialization()
+
+    //Chat Post Vote Records
+    postVoteRecords.data = await getPostVoteRecords()
+    await listenForPostVoteStatChanges()
 
     //ChatFeeTokenAccount
     const chatFeeTokenAccounts = await getChatFeeTokenAccounts()
@@ -390,6 +442,10 @@
     {
       anchorPrograms.isChatProtocolReady = false
     }
+
+    //Chat Accounts
+    await setChatAccountAndUserNameHashMap()
+    await listenForChatAccountStatChanges()
 
     //M4A Chat
     m4aChat.data = await getM4AChat()
@@ -434,42 +490,6 @@
     commentSections.data = await getCommentSections()
     await listenForCommentSectionStatChanges()
 
-    //M4A Protocol CEO Account
-    const m4aCEOAccount = await getM4AProtocolCEOAccount()
-    if(m4aCEOAccount)
-    {
-      adminAccounts.isM4ACEOAccountReady = true
-      adminAccounts.m4aCEOAddress = m4aCEOAccount.address.toBase58()
-    }
-    else
-    {
-      adminAccounts.isM4ACEOAccountReady = false
-      await listenForM4ACEOAccountInitialization()
-    }
-
-    //M4A Protocol Treasurer Account
-    const m4aTreasurerAccount = await getM4AProtocolTreasurerAccount()
-    if(m4aTreasurerAccount)
-      adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
-    else
-      await listenForM4ATreasurerAccountInitialization()
-
-    //Chat Protocol Treasurer Account
-    const chatTreasurerAccount = await getChatProtocolTreasurerAccount()
-    if(chatTreasurerAccount)
-      adminAccounts.chatTreasurerAddress = chatTreasurerAccount.address.toBase58()
-    else
-      await listenForChatTreasurerAccountInitialization()
-
-    //M4A Patient Records
-    patientRecordsHashMap.map = await setPatientRecordsHashMap()
-    await listenForPatientRecordStatChanges()
-
-    //M4A Hospital And Insurance Company Records
-    hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
-    insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
-    await listenForHospitalAndInsuranceRecordStatChanges()
-
     //Ideas
     ideas.data = await getIdeas()
     await listenForIdeaStatChanges()
@@ -478,10 +498,6 @@
     feds.data = await getFEDRecords()
     await listenForFEDStatChanges()
 
-    //Chat Post Vote Records
-    postVoteRecords.data = await getPostVoteRecords()
-    await listenForPostVoteStatChanges()
-
     //Chat Polls
     polls.data = await getAllPolls()
     await listenForPollStatChanges()
@@ -489,6 +505,9 @@
     //Chat Poll Vote Records
     pollVoteRecords.data = await getPollVoteRecords()
     await listenForPollVoteStatChanges()
+
+    //M4A Paritially Denied Claim Edits Listner
+    await listenForUnfinishedClaimStatChanges()
   })
 
   onUnmounted(() => 
@@ -517,6 +536,16 @@
     {
       anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(claimQueueWatchId)
       claimQueueWatchId = undefined
+    }
+    if(claimStatsWatchId != undefined)
+    {
+      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(claimStatsWatchId)
+      claimStatsWatchId = undefined
+    }
+    if(claimAndProcessorStatsWatchId != undefined)
+    {
+      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(claimAndProcessorStatsWatchId)
+      claimAndProcessorStatsWatchId = undefined
     }
     if(submitterStatsWatchId != undefined)
     {
@@ -557,6 +586,11 @@
     {
       anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(processedClaimStatsWatchId)
       processedClaimStatsWatchId = undefined
+    }
+    if(unfinishedClaimStatsWatchId != undefined)
+    {
+      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(unfinishedClaimStatsWatchId)
+      unfinishedClaimStatsWatchId = undefined
     }
     if(isChatProtocolReadyWatchId != undefined)
     {
@@ -845,7 +879,7 @@
         }
 
         await getStateAccounts()
-        claims.data = await getQueueClaims()
+        claims.data = await getQueueClaims()//Todo refresh data instead of fetching again
       })
     }
     catch(error)
@@ -864,12 +898,60 @@
       {
         //Handle account change...
         claimQueue.data = await getClaimQueue()
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+    }
+  }
 
-        if(claimQueue.data.currentClaimQueueCount != currentClaimQueueCount)
-        {
-          claims.data = await getQueueClaims()
-          currentClaimQueueCount = claimQueue.data.currentClaimQueueCount
-        }
+  async function listenForClaimStatChanges()
+  {
+    try
+    {
+      //Subscribe to account changes
+      claimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimStatsPDA(), async() => 
+      {
+        //Handle account change...
+        claims.data = await getQueueClaims()
+        claimStats.data = await getClaimStats()
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+    }
+  }
+
+  async function listenForClaimAndProcessorStatChanges()
+  {
+    try
+    {
+      //Subscribe to account changes
+      claimAndProcessorStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimAndProcessorStatsPDA(), async() => 
+      {
+        //Handle account change...
+        claims.data = await getQueueClaims()
+        processors.data = await getProcessors()
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+    }
+  }
+
+  async function listenForProcessorStatChanges()
+  {
+    try
+    {
+      //Subscribe to account changes
+      processorStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getProcessorStatsPDA(), async() => 
+      {
+        //Handle account change...
+        anchorPrograms.areM4AProtocolStatsReady = true
+        processors.data = await getProcessors()
       })
     }
     catch(error)
@@ -923,7 +1005,7 @@
         hospitalStats.data = await getHospitalStats()
         hospitals.data = await getAllHospitalsAndUpdateStateMap()
 
-        //Get claim que table data with updated hospitals
+        //Get claims with updated hospitals
         claims.data = await getQueueClaims()
 
         //Get insurance company record table data with updated hospitals
@@ -960,24 +1042,6 @@
     }
   }
 
-  async function listenForProcessorStatChanges()
-  {
-    try
-    {
-      //Subscribe to account changes
-      processorStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getProcessorStatsPDA(), async() => 
-      {
-        //Handle account change...
-        anchorPrograms.areM4AProtocolStatsReady = true
-        processors.data = await getProcessors()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
-  }
-
   async function listenForPatientRecordStatChanges()
   {
     try
@@ -987,7 +1051,7 @@
       {
         //Handle account change...
         patientRecordsHashMap.map = await setPatientRecordsHashMap()
-        processors.data = await getProcessors()
+        claims.data = await getQueueClaims()
       })
     }
     catch(error)
@@ -1004,9 +1068,12 @@
       hospitalAndInsuranceRecordStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getHospitalAndInsuranceRecordStatsPDA(), async() => 
       {
         //Handle account change...
+        insuranceCompanies.data = await getAllInsuranceCompanies()//Needed to update show records number
+        hospitals.data = await getAllHospitalsAndUpdateStateMap()//Needed to update show records number
+
         hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
         insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
-        processors.data = await getProcessors()
+        claims.data = await getQueueClaims()
       })
     }
     catch(error)
@@ -1023,6 +1090,8 @@
       processedClaimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getProcessedClaimStatsPDA(), async() => 
       {
         //Handle account change...
+        await getAllSubmitters()
+        await getAllPatients()
         processedClaimStats.data = await getProcessedClaimStats()
         hospitals.data = await getAllHospitalsAndUpdateStateMap()
         insuranceCompanies.data = await getAllInsuranceCompanies()
@@ -1031,6 +1100,24 @@
         hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
         insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
         processors.data = await getProcessors()
+      })
+    }
+    catch(error)
+    {
+      console.log(error)
+    }
+  }
+
+  async function listenForUnfinishedClaimStatChanges()
+  {
+    try
+    {
+      //Subscribe to account changes
+      unfinishedClaimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getUnfinishedClaimStatsPDA(), async() => 
+      {
+        //Handle account change...
+        patientRecordsHashMap.map = await setPatientRecordsHashMap()
+        processedClaims.data = await getProcessedClaims()
       })
     }
     catch(error)
@@ -1144,6 +1231,18 @@
       console.log(error)
     }
   }
+
+  //Have to refresh new custom names outside of hospital and insurance company records tables
+  watch(customUserNameHashMap, () =>
+  {
+    refreshClaimData()
+    refreshProcessedClaimData()
+    refreshHospitalRecordsHashMaps()
+    refreshInsuranceCompanyRecordsHashMaps()
+    refreshIdeadsData()
+    refreshFEDsData()
+    refreshProcessorsData()
+  })
 
   async function listenForCommentSectionStatChanges()
   {

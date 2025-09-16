@@ -146,7 +146,7 @@
           >
             <div class="thinBorder flexCenterColumn m4aTablePopupContainer">
               <ion-label class="tablePopupUnderLine">Claim Note</ion-label>
-              <span class="emojiText">{{ event.note }}</span>
+              <span>{{ event.note }}</span>
             </div>
           </ion-popover>
         </template>
@@ -267,6 +267,7 @@
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { M4A_MAX_NOTE_LENGTH, getSubmitterPatientList } from '/src/assets/contracts/Solana/M4AProtocol.vue'
+  import { submitterPatientListHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { download } from 'ionicons/icons'
   import { patientHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
@@ -305,28 +306,69 @@
   var patientMaxDeniedClaimCount = ref()
   var patientRevokedApprovalCount = ref()
 
-  onMounted(async() =>
+  onMounted(() =>
   {
     if(props.searchAddress)
     {
-      patientList.value = getSubmitterPatientList(props.searchAddress)
-      if(patientRecordsHashMap.map)
-        getPatientRecords()
+      if(submitterPatientListHashMap.map)
+      {
+        patientList.value = getSubmitterPatientList(props.searchAddress)
+
+        if(patientList.value.length != 0)
+        {
+          patientApprovedClaimAmountString.value =  parseDollarAmountStringFromFixed2PointNotationNoDollarSign(patientList.value[0].approvedClaimAmount)
+          patientSubmittedClaimCount.value = patientList.value[0].submittedClaimCount
+          patientApprovedClaimCount.value = patientList.value[0].approvedClaimCount
+          patientDeniedClaimCount.value = patientList.value[0].deniedClaimCount
+          patientUndeniedClaimCount.value = patientList.value[0].undeniedClaimCount
+          patientSubmittedAppealCount.value = patientList.value[0].submittedAppealCount
+          patientDeniedAppealCount.value = patientList.value[0].deniedAppealCount
+          patientMaxDeniedClaimCount.value = patientList.value[0].maxDeniedClaimCount 
+          patientRevokedApprovalCount.value = patientList.value[0].revokedApprovalCount
+
+          patientSelect.value = patientList.value[0].submitterPatientIndex
+        }
+        else
+        {
+          patientApprovedClaimAmountString.value =  "0.00"
+          patientSubmittedClaimCount.value = 0
+          patientApprovedClaimCount.value = 0
+          patientDeniedClaimCount.value = 0
+          patientUndeniedClaimCount.value = 0
+          patientSubmittedAppealCount.value = 0
+          patientDeniedAppealCount.value = 0
+          patientMaxDeniedClaimCount.value = 0
+          patientRevokedApprovalCount.value = 0
+
+          patientSelect.value = 0
+        }
+      }
     }
 
-    if(patientList.value.length != 0)
+    if(patientRecordsHashMap.map)
     {
-      patientApprovedClaimAmountString.value =  parseDollarAmountStringFromFixed2PointNotationNoDollarSign(patientList.value[0].approvedClaimAmount)
-      patientSubmittedClaimCount.value = patientList.value[0].submittedClaimCount
-      patientApprovedClaimCount.value = patientList.value[0].approvedClaimCount
-      patientDeniedClaimCount.value = patientList.value[0].deniedClaimCount
-      patientUndeniedClaimCount.value = patientList.value[0].undeniedClaimCount
-      patientSubmittedAppealCount.value = patientList.value[0].submittedAppealCount
-      patientDeniedAppealCount.value = patientList.value[0].deniedAppealCount
-      patientMaxDeniedClaimCount.value = patientList.value[0].maxDeniedClaimCount 
-      patientRevokedApprovalCount.value = patientList.value[0].revokedApprovalCount
+      getPatientRecords()
+      isLoading.value = false
+    }
+  })
 
-      patientSelect.value = patientList.value[0].submitterPatientIndex
+  watch(submitterPatientListHashMap, () => 
+  {
+    if(!props.searchAddress)
+      return
+
+    const patient = patientHashMap.map.get(props.searchAddress.toString() + patientSelect.value.toString())
+    if(patient)
+    {
+      patientApprovedClaimAmountString.value =  parseDollarAmountStringFromFixed2PointNotationNoDollarSign(patient.approvedClaimAmount)
+      patientSubmittedClaimCount.value = patient.submittedClaimCount
+      patientApprovedClaimCount.value = patient.approvedClaimCount
+      patientDeniedClaimCount.value = patient.deniedClaimCount
+      patientUndeniedClaimCount.value = patient.undeniedClaimCount
+      patientSubmittedAppealCount.value = patient.submittedAppealCount
+      patientDeniedAppealCount.value = patient.deniedAppealCount
+      patientMaxDeniedClaimCount.value = patient.maxDeniedClaimCount 
+      patientRevokedApprovalCount.value = patient.revokedApprovalCount
     }
     else
     {
@@ -339,24 +381,23 @@
       patientDeniedAppealCount.value = 0
       patientMaxDeniedClaimCount.value = 0
       patientRevokedApprovalCount.value = 0
-
-      patientSelect.value = 0
     }
-
-    isLoading.value = false
   })
 
-
-  watch(patientRecordsHashMap, async() => 
+  watch(patientRecordsHashMap, () => 
   {
     getPatientRecords()
+    
+    if(isLoading.value)
+      isLoading.value = false
   })
 
-  watch(() => props.searchAddress, async() =>  
+  watch(() => props.searchAddress, () =>  
   {
     isLoading.value = true
 
-    patientList.value = getSubmitterPatientList(props.searchAddress)
+    if(submitterPatientListHashMap.map)
+      patientList.value = getSubmitterPatientList(props.searchAddress)
 
     if(patientList.value.length != 0)
     {
@@ -387,13 +428,18 @@
       patientSelect.value = 0
     }
 
-    getPatientRecords()
-
-    isLoading.value = false
+    if(patientRecordsHashMap.map)
+    {
+      getPatientRecords()
+      isLoading.value = false
+    }
   })
 
   function getPatientRecords()
   {
+    if(!props.searchAddress)
+      return
+
     const patientRecords = patientRecordsHashMap.map.get(props.searchAddress.toString() + patientSelect.value.toString())
     if(patientRecords)
       patientRecordTableData.value = patientRecords

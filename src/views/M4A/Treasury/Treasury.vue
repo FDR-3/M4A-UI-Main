@@ -2,7 +2,7 @@
   <div class="tableFlipContainer">
     <div class="tableCard" :class="flipped">
       <div class="frontTable" :style="{display: display1stTable}">
-        <h2>Under Construction<br>On Devnet</h2>
+        <h2>Under Construction On Devnet<br>Monopoly Money</h2>
         <h1>Treasury</h1>
 
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Reserves</ion-button>
@@ -11,7 +11,7 @@
       </div>
 
       <div class="backTable" :style="{display: display2ndTable}">
-        <h2>Under Construction<br>On Devnet</h2>
+        <h2>Under Construction On Devnet<br>Monopoly Money</h2>
         <h1>Reserves</h1>
 
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Treasuries</ion-button>
@@ -127,14 +127,14 @@
   { 
     .tableFlipContainer
     {
-      height: 1637px
+      height: 1677px
     }
   }
   @media screen and (max-width: 1110px) 
   { 
     .tableFlipContainer
     {
-      height: 1667px
+      height: 1717px
     }
   }
 </style>

@@ -87,7 +87,7 @@
         </div>
       </template>
       <template #loading> Loading Reserves. Please wait. </template>
-      <Column field="owner" header="Owner" style="width: 0%" sortable>
+      <Column field="owner" header="Owner" style="width: 18%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openOwnerPopover($event, slotProps.data)">
@@ -247,6 +247,7 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   const toast = inject('toast')
@@ -374,20 +375,7 @@
       
       for(var j=0; j<unProcessedTokenSubMarketList.length; j++)
       {
-        const chatAccount = customUserNameHashMap.map.get(unProcessedTokenSubMarketList[j].owner.toString())
-        var displayName = ""
-
-        if(chatAccount)
-        {
-          if(chatAccount.useCustomName)
-            displayName = chatAccount.userName
-          else
-            displayName = trimAddress(unProcessedTokenSubMarketList[j].owner.toString())
-        }
-        else
-          displayName = trimAddress(unProcessedTokenSubMarketList[j].owner.toString())
-
-        unProcessedTokenSubMarketList[j].displayName = displayName
+        unProcessedTokenSubMarketList[j].displayName = getCustomOrTrimmedUserDisplayName(unProcessedTokenSubMarketList[j].owner.toString())
         tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
       }
 
@@ -506,7 +494,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   #createSubMarketModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
@@ -530,7 +518,7 @@
 
   .tableMinWidth
   {
-    min-width: 1000px
+    min-width: 1070px
   }
 
   #reservesSearchInput, #feeCollectorInput

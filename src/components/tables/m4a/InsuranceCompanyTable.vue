@@ -46,7 +46,7 @@
       <template #loading> Loading records. Please wait.</template>
 
       <Column field="insuranceCompanyIndex" header="Insurance Index" style="width: 0%" sortable></Column>
-      <Column field="insuranceCompanyName" header="Insurance Company Name" style="width: 380px" sortable>
+      <Column field="insuranceCompanyName" header="Insurance Company Name" style="width: 400px" sortable>
         <template #body="slotProps" >
           <div>
             <ion-button class="tableButton" fill="clear" @click="openInsuranceCompanyPopover($event, slotProps.data)">
@@ -79,7 +79,7 @@
           {{ slotProps.data.approvedClaimAmountString }}
         </template>
       </Column>
-      <Column field="note" header="Insurance Company Note" style="width: 1%" sortable></Column>
+      <Column field="note" header="Insurance Company Note" style="width: 300px" sortable></Column>
       <Column field="isActive" header="Active" style="width: 0%" sortable>
         <template #body="slotProps">
           <div v-if="slotProps.data.isActive">

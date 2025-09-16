@@ -86,7 +86,7 @@
 
       <Column field="recordId" header="Record Id" style="width: 0%" sortable></Column>
       <Column field="claimId" header="Claim Id" style="width: 0%" sortable></Column>
-      <Column field="submitterAddress" header="User" style="width: 10%" sortable>
+      <Column field="submitterAddress" header="Submitter" style="width: 20%" sortable>
         <template #body="slotProps">
           <div>
             <ion-button class="submitterButton" fill="clear" @click="openUserPopover($event, slotProps.data)">
@@ -139,7 +139,7 @@
           >
             <div class="thinBorder flexCenterColumn m4aTablePopupContainer">
               <ion-label class="tablePopupUnderLine">Claim Note</ion-label>
-              <span class="emojiText">{{ event.note }}</span>
+              <span>{{ event.note }}</span>
             </div>
           </ion-popover>
         </template>
@@ -273,7 +273,6 @@
     confirmM4ATransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   const emits = defineEmits(['hospitalSelect', 'showHospitalList'])
@@ -342,14 +341,15 @@
     }
 
     if(hospitalRecordsHashMap.map)
+    {
         getHospitalRecords()
-
-    isLoading.value = false
+        isLoading.value = false
+    }
   })
 
   watch(hospitals, () => 
   {
-    /*const hospital = getHospital(countryIndex.value, stateIndex.value, hospitalIndex.value)
+    const hospital = getHospital(countryIndex.value, stateIndex.value, hospitalIndex.value)
     hospitalName.value = hospital.hospitalName
     hospitalType.value = hospital.hospitalType 
     hospitalTypeName.value =  hospital.hospitalTypeName
@@ -360,8 +360,6 @@
     hospitalSubmittedAppealCount = hospital.submittedAppealCount 
     hospitalDeniedAppealCount = hospital.deniedAppealCount
     hospitalRevokedApprovalCount = hospital.revokedApprovalCount
-
-    getHospitalRecords() */
   })
 
   watch(insuranceCompanies, () => 
@@ -396,32 +394,18 @@
     hospitalRevokedApprovalCount = hospital.revokedApprovalCount
 
     getHospitalRecords()
-  })
 
-
-  watch(customUserNameHashMap, () =>
-  {
-    if(tableData.value)
-      for(var i=0; i<tableData.value.length; i++)
-      {
-        const chatAccount = customUserNameHashMap.map.get(tableData.value[i].submitterAddress)
-        if(chatAccount)
-        {
-          if(chatAccount.useCustomName)
-            tableData.value[i].submitterDisplayName = chatAccount.userName
-          else
-            tableData.value[i].submitterDisplayName = trimAddress(tableData.value[i].submitterAddress)
-        }
-      }
+    if(isLoading.value)
+      isLoading.value = false
   })
 
   function getHospitalRecords()
   {
-    const hospitalRecords = hospitalRecordsHashMap.map.get(countryIndex.value.toString(), stateIndex.value.toString(), hospitalIndex.value.toString())
+    const hospitalRecords = hospitalRecordsHashMap.map.get(countryIndex.value.toString() + stateIndex.value.toString() + hospitalIndex.value.toString())
     if(hospitalRecords)
       tableData.value = hospitalRecords
     else
-      tableData.value = hospitalRecords
+      tableData.value = []
   }
 
   const filters = ref(
@@ -527,7 +511,7 @@
 <style scoped>
   .tableMinWidth
   {
-    min-width: 1516px
+    min-width: 1594px
   }
 
   ion-input, ion-textarea

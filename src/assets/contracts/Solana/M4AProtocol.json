@@ -1,5 +1,5 @@
 {
-  "address": "95dJrgoyK7cwGT1Tr4W9D8M4KBVTJikTNi5AahHsJC6c",
+  "address": "EmKwXWsa1GeEBqYmmUMADWrVRy5W64FSV9yb2EkeKZ4t",
   "metadata": {
     "name": "m_4_a_protocol",
     "version": "1.0.0",
@@ -1183,7 +1183,7 @@
       ],
       "accounts": [
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1195,11 +1195,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -1612,7 +1612,7 @@
       ],
       "accounts": [
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1624,11 +1624,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -2093,14 +2093,22 @@
       ],
       "accounts": [
         {
-          "name": "processor_stats",
+          "name": "claim_and_processor_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  65,
+                  110,
+                  100,
+                  80,
                   114,
                   111,
                   99,
@@ -3025,7 +3033,6 @@
                   111,
                   114,
                   100,
-                  115,
                   83,
                   116,
                   97,
@@ -3186,7 +3193,7 @@
       ],
       "accounts": [
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3198,11 +3205,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -3229,7 +3236,6 @@
                   111,
                   114,
                   100,
-                  115,
                   83,
                   116,
                   97,
@@ -4484,7 +4490,7 @@
       ],
       "accounts": [
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -4496,11 +4502,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -4997,7 +5003,7 @@
           }
         },
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -5009,11 +5015,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -5903,20 +5909,21 @@
           }
         },
         {
-          "name": "processed_claim_stats",
+          "name": "unfinished_claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
-                  114,
-                  111,
-                  99,
-                  101,
+                  117,
+                  110,
+                  102,
+                  105,
+                  110,
+                  105,
                   115,
-                  115,
+                  104,
                   101,
                   100,
                   67,
@@ -5930,36 +5937,6 @@
                   116,
                   115
                 ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "patient",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  97,
-                  116,
-                  105,
-                  101,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.submitter_address",
-                "account": "ProcessedClaim"
-              },
-              {
-                "kind": "account",
-                "path": "processed_claim.patient_index",
-                "account": "ProcessedClaim"
               }
             ]
           }
@@ -6460,27 +6437,18 @@
           }
         },
         {
-          "name": "patient_records_stats",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
-                  97,
-                  116,
-                  105,
-                  101,
-                  110,
-                  116,
-                  82,
-                  101,
                   99,
-                  111,
-                  114,
-                  100,
-                  115,
+                  108,
+                  97,
+                  105,
+                  109,
                   83,
                   116,
                   97,
@@ -6492,39 +6460,30 @@
           }
         },
         {
-          "name": "hospital_and_insurance_record_stats",
+          "name": "claim_and_processor_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  104,
-                  111,
-                  115,
-                  112,
-                  105,
-                  116,
-                  97,
+                  99,
                   108,
+                  97,
+                  105,
+                  109,
                   65,
                   110,
                   100,
-                  73,
-                  110,
-                  115,
-                  117,
+                  80,
                   114,
-                  97,
-                  110,
+                  111,
                   99,
                   101,
-                  82,
-                  101,
-                  99,
+                  115,
+                  115,
                   111,
                   114,
-                  100,
                   83,
                   116,
                   97,
@@ -6623,6 +6582,114 @@
           }
         },
         {
+          "name": "patient_records_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  116,
+                  105,
+                  101,
+                  110,
+                  116,
+                  82,
+                  101,
+                  99,
+                  111,
+                  114,
+                  100,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "hospital_and_insurance_record_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  104,
+                  111,
+                  115,
+                  112,
+                  105,
+                  116,
+                  97,
+                  108,
+                  65,
+                  110,
+                  100,
+                  73,
+                  110,
+                  115,
+                  117,
+                  114,
+                  97,
+                  110,
+                  99,
+                  101,
+                  82,
+                  101,
+                  99,
+                  111,
+                  114,
+                  100,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "unfinished_claim_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  110,
+                  102,
+                  105,
+                  110,
+                  105,
+                  115,
+                  104,
+                  101,
+                  100,
+                  67,
+                  108,
+                  97,
+                  105,
+                  109,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "signer",
           "writable": true,
           "signer": true
@@ -6674,7 +6741,7 @@
           }
         },
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -6686,11 +6753,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -6885,7 +6952,7 @@
           }
         },
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -6897,11 +6964,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -7189,14 +7256,22 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "claim_and_processor_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  65,
+                  110,
+                  100,
+                  80,
                   114,
                   111,
                   99,
@@ -8242,14 +8317,22 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "claim_and_processor_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  65,
+                  110,
+                  100,
+                  80,
                   114,
                   111,
                   99,
@@ -8352,7 +8435,6 @@
       "accounts": [
         {
           "name": "claim_queue",
-          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -8368,6 +8450,29 @@
                   101,
                   117,
                   101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "claim_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -8817,14 +8922,22 @@
           }
         },
         {
-          "name": "processor_stats",
+          "name": "claim_and_processor_stats",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  112,
+                  99,
+                  108,
+                  97,
+                  105,
+                  109,
+                  65,
+                  110,
+                  100,
+                  80,
                   114,
                   111,
                   99,
@@ -9819,7 +9932,7 @@
       ],
       "accounts": [
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9831,11 +9944,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -9925,7 +10038,7 @@
       ],
       "accounts": [
         {
-          "name": "claim_queue",
+          "name": "claim_stats",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9937,11 +10050,11 @@
                   97,
                   105,
                   109,
-                  81,
-                  117,
-                  101,
-                  117,
-                  101
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
                 ]
               }
             ]
@@ -10033,6 +10146,19 @@
       ]
     },
     {
+      "name": "ClaimAndProcessorStats",
+      "discriminator": [
+        69,
+        221,
+        194,
+        2,
+        13,
+        72,
+        24,
+        131
+      ]
+    },
+    {
       "name": "ClaimQueue",
       "discriminator": [
         150,
@@ -10043,6 +10169,19 @@
         174,
         101,
         6
+      ]
+    },
+    {
+      "name": "ClaimStats",
+      "discriminator": [
+        52,
+        146,
+        195,
+        172,
+        222,
+        190,
+        210,
+        78
       ]
     },
     {
@@ -10330,78 +10469,26 @@
         47,
         18
       ]
+    },
+    {
+      "name": "UnfinishedClaimStats",
+      "discriminator": [
+        2,
+        84,
+        120,
+        144,
+        140,
+        84,
+        209,
+        167
+      ]
     }
   ],
   "errors": [
     {
       "code": 6000,
-      "name": "NoRatFuckeryAllowed",
-      "msg": "You're doing something the UI never would have allowed"
-    },
-    {
-      "code": 6001,
-      "name": "TooManyClaimsInQueue",
-      "msg": "The Claim Queue is full"
-    },
-    {
-      "code": 6002,
-      "name": "ClaimQueueDisabled",
-      "msg": "Claim Queue is currently disabled"
-    },
-    {
-      "code": 6003,
-      "name": "FlagSameState",
-      "msg": "Can't set flag to the same state"
-    },
-    {
-      "code": 6004,
-      "name": "RecordAlreadyCreated",
-      "msg": "Record has already been created"
-    },
-    {
-      "code": 6005,
-      "name": "RecordNotCreated",
-      "msg": "Record hasn't been created yet"
-    },
-    {
-      "code": 6006,
-      "name": "ClaimAlreadyAssigned",
-      "msg": "Claim must not be assigned to assign it"
-    },
-    {
-      "code": 6007,
-      "name": "ClaimNotAssigned",
-      "msg": "Claim must be assigned to unassign or reassign it"
-    },
-    {
-      "code": 6008,
-      "name": "ClaimNotPending",
-      "msg": "Claim must be being in a pending state to use this Max Deny"
-    },
-    {
-      "code": 6009,
-      "name": "ClaimNotBeingProcessed",
-      "msg": "Claim must be being processed already to need be reassigned, denied, or Max inprogress denied"
-    },
-    {
-      "code": 6010,
-      "name": "ClaimNotDenied",
-      "msg": "Claim must be in a denied state to appeal it"
-    },
-    {
-      "code": 6011,
-      "name": "ClaimNotAppealed",
-      "msg": "Can't deny appeal of a claim that isn't in an appealed state"
-    },
-    {
-      "code": 6012,
-      "name": "ClaimNotDeniedOrAppealed",
-      "msg": "Claim must be in a denied or appealed state to undeny it"
-    },
-    {
-      "code": 6013,
-      "name": "ClaimNotApproved",
-      "msg": "Claim must be in a approved state to revoke approval"
+      "name": "HospitalTypeInvalid",
+      "msg": "Hospital type must be General, Dental, Vision, or Mental (0,1,2,3)"
     }
   ],
   "types": [
@@ -10522,7 +10609,35 @@
       }
     },
     {
+      "name": "ClaimAndProcessorStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "set_or_unset_processor_on_claim_count",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ClaimQueue",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "queue_size_limit",
+            "type": "u32"
+          },
+          {
+            "name": "enabled",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ClaimStats",
       "type": {
         "kind": "struct",
         "fields": [
@@ -10533,14 +10648,6 @@
           {
             "name": "current_claim_queue_count",
             "type": "u32"
-          },
-          {
-            "name": "queue_size_limit",
-            "type": "u32"
-          },
-          {
-            "name": "enabled",
-            "type": "bool"
           },
           {
             "name": "edited_claim_count",
@@ -10637,10 +10744,6 @@
           {
             "name": "record_count",
             "type": "u64"
-          },
-          {
-            "name": "edited_record_count",
-            "type": "u32"
           },
           {
             "name": "approved_claim_amount",
@@ -10829,10 +10932,6 @@
           {
             "name": "record_count",
             "type": "u64"
-          },
-          {
-            "name": "edited_record_count",
-            "type": "u32"
           },
           {
             "name": "approved_claim_amount",
@@ -11040,10 +11139,6 @@
           },
           {
             "name": "record_count",
-            "type": "u32"
-          },
-          {
-            "name": "edited_record_count",
             "type": "u32"
           },
           {
@@ -11411,24 +11506,12 @@
             "type": "pubkey"
           },
           {
-            "name": "created_patient_record_count",
-            "type": "u64"
-          },
-          {
             "name": "created_hospital_count",
-            "type": "u64"
-          },
-          {
-            "name": "created_hospital_record_count",
             "type": "u64"
           },
           {
             "name": "created_insurance_company_count",
             "type": "u16"
-          },
-          {
-            "name": "created_insurance_company_record_count",
-            "type": "u32"
           },
           {
             "name": "processed_claim_count",
@@ -11484,10 +11567,6 @@
           },
           {
             "name": "processor_super_admin_account_total",
-            "type": "u64"
-          },
-          {
-            "name": "set_or_unset_processor_on_claim_count",
             "type": "u64"
           },
           {
@@ -11580,6 +11659,18 @@
         "fields": [
           {
             "name": "submitter_account_total",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UnfinishedClaimStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "edit_processed_claim_and_patient_record_count",
             "type": "u64"
           }
         ]

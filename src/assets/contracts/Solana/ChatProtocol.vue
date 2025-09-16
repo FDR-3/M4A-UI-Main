@@ -7,6 +7,7 @@
   import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { chatAccountHashMap, customUserNameHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { commentSectionHashMap } from '/src/assets/globalStates/chat/CommentSections.vue'
+  import { ideas, feds } from '/src/assets/globalStates/chat/QOL.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
@@ -288,7 +289,7 @@
     {
       try
       { 
-        const chatAccount = customUserNameHashMap.map.get(userAddress)//await anchorPrograms.chat.chatProgram.account.chatAccount.fetch(getChatAccountPDA(publicKey))
+        const chatAccount = customUserNameHashMap.map.get(userAddress)
 
         if(chatAccount)
         {
@@ -336,28 +337,38 @@
   {
     if (typeof userAddress === "string") 
     {
-      const chatAccount = customUserNameHashMap.map.get(userAddress)
-
-      if(chatAccount)
+      if(customUserNameHashMap.map)
       {
-        if(chatAccount.useCustomName)
-          return chatAccount.userName
+        const chatAccount = customUserNameHashMap.map.get(userAddress)
+
+        if(chatAccount)
+        {
+          if(chatAccount.useCustomName)
+            return chatAccount.userName
+          else
+            return trimAddress(userAddress)
+        }
         else
           return trimAddress(userAddress)
       }
       else
-        return trimAddress(userAddress)  
+        return trimAddress(userAddress)
     }
     else
     {
       const userAddressString = userAddress.toBase58()
 
-      const chatAccount = customUserNameHashMap.map.get(userAddressString)
-
-      if(chatAccount)
+      if(customUserNameHashMap.map)
       {
-        if(chatAccount.useCustomName)
-          return chatAccount.userName
+        const chatAccount = customUserNameHashMap.map.get(userAddressString)
+
+        if(chatAccount)
+        {
+          if(chatAccount.useCustomName)
+            return chatAccount.userName
+          else
+            return trimAddress(userAddressString)
+        }
         else
           return trimAddress(userAddressString)
       }
@@ -378,6 +389,14 @@
       userAccountHashMap.set(chatAccounts[i].account.userAddress.toBase58(), chatAccounts[i].account)
 
     chatAccountHashMap.map = userAccountHashMap
+  }
+
+  export function getChatAccount(userAddress: string)
+  {
+    if(chatAccountHashMap.map)
+      return chatAccountHashMap.map.get(userAddress)
+    else
+      return undefined 
   }
 
   export async function setChatAccountAndUserNameHashMap()
@@ -526,6 +545,14 @@
 
     commentSectionHashMap.map = hashMap
     return commentSectionList
+  }
+
+  export function getCommentSection(commentSectionNamePrefix: string, commentSectionName: string)
+  {
+    if(commentSectionHashMap.map)
+      return commentSectionHashMap.map.get(commentSectionNamePrefix + commentSectionName)
+    else
+      return undefined 
   }
 
   async function getCommentSectionsWrapper()
@@ -847,6 +874,36 @@
         }
       }
     }
+  }
+
+  export function refreshIdeadsData()
+  {
+    var refreshedData: any = []
+
+    const tableData = ideas.data
+    if(tableData)
+      for(var i=0; i<tableData.length; i++)
+      {
+        tableData[i].displayName = getCustomOrTrimmedUserDisplayName(tableData[i].postOwnerAddress)
+        refreshedData.push(tableData[i])
+      }
+
+    ideas.data = refreshedData
+  }
+
+  export function refreshFEDsData()
+  {
+    var refreshedData: any = []
+
+    const tableData = feds.data
+    if(tableData)
+      for(var i=0; i<tableData.length; i++)
+      {
+        tableData[i].displayName = getCustomOrTrimmedUserDisplayName(tableData[i].postOwnerAddress)
+        refreshedData.push(tableData[i])
+      }
+
+    feds.data = refreshedData
   }
 
   export function getChatProtocolCEOAccountPDA()

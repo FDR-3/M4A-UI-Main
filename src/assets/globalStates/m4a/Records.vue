@@ -4,19 +4,19 @@
   export const patientRecordsHashMap = reactive(
   {
     //Key: SubmitterAddress + patientIndex, Value: patientRecordsList
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export const hospitalRecordsHashMap = reactive(
   {
     //Key: CountryIndex + stateIndex + hospitalIndex, Value: hospitalRecordsList
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export const insuranceCompanyRecordsHashMap = reactive(
   {
     //Key: InsuranceCompanyIndex, Value: insuranceCompanyRecordsList
-    map: new Map<string, any>()
+    map: undefined
   })
 
   export default patientRecordsHashMap

@@ -56,7 +56,7 @@
       <Column field="processedCommentSectionName" header="Comment Section Name" style="width: 0%" sortable>
       
       </Column>
-      <Column field="postOwnerAddress" header="Federal Agent" style="width: 7%" sortable>
+      <Column field="postOwnerAddress" header="Federal Agent" style="width: 15%" sortable>
         <template #body="slotProps">
           <div >
             <ion-button style="height: 100px" class="submitterButton" fill="clear" @click="openUserPopover($event, slotProps.data)">
@@ -135,12 +135,10 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { feds } from '/src/assets/globalStates/chat/QOL.vue'
   import { PostTypes } from '/src/components/comments/PostTypes.ts'
-  import { commentSectionPreFixNameHashTable, commentSectionNameHashTable } from '/src/components/comments/hashtables.ts'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
   import { trimAddress, confirmChatTransaction, toastPreTransactionError, copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
-  import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   const toast = inject('toast')
@@ -171,22 +169,6 @@
   watch(feds, () =>
   {
     tableData.value = feds.data
-  })
-
-  watch(customUserNameHashMap, () =>
-  {
-    if(!tableData.value)
-      return
-
-    for(var i=0; i<tableData.value.length; i++)
-    {
-      const chatAccount = customUserNameHashMap.map.get(tableData.value[i].postOwnerAddress.toBase58())
-      
-      if(chatAccount.useCustomName)
-        tableData.value[i].displayName = chatAccount.userName
-      else
-        tableData.value[i].displayName = trimAddress(tableData.value[i].postOwnerAddress.toBase58())  
-    }
   })
 
   function passByRefWrapperCopyAddress()
