@@ -1834,18 +1834,21 @@
     const tableData = Array.from(hospitalRecordsHashMap.map, ([key, value]) => ({ key, value }))
 
     if(tableData)
-      for(var i=0; i<tableData.length; i++)
+      for(var hospital=0; hospital<tableData.length; hospital++)
       {
-        tableData[i].value[0].submitterDisplayName = getCustomOrTrimmedUserDisplayName(tableData[i].value[0].submitterAddress)
-
-        const previousList = hashMap.get(tableData[i].key)
-        if(previousList)
+        for(var recordEntry=0; recordEntry<tableData[hospital].value.length; recordEntry++)
         {
-          previousList.push(tableData[i].value[0])
-          hashMap.set(tableData[i].key, previousList)
+          tableData[hospital].value[recordEntry].submitterDisplayName = getCustomOrTrimmedUserDisplayName(tableData[hospital].value[recordEntry].submitterAddress)
+
+          const previousList = hashMap.get(tableData[hospital].key)
+          if(previousList)
+          {
+            previousList.push(tableData[hospital].value[recordEntry])
+            hashMap.set(tableData[hospital].key, previousList)
+          }
+          else
+            hashMap.set(tableData[hospital].key, [tableData[hospital].value[recordEntry]])
         }
-        else
-          hashMap.set(tableData[i].key, [tableData[i].value[0]])
       }
 
     hospitalRecordsHashMap.map = hashMap
@@ -1858,18 +1861,21 @@
     const tableData = Array.from(insuranceCompanyRecordsHashMap.map, ([key, value]) => ({ key, value }))
 
     if(tableData)
-      for(var i=0; i<tableData.length; i++)
+      for(var insuranceCompany=0; insuranceCompany<tableData.length; insuranceCompany++)
       {
-        tableData[i].value[0].submitterDisplayName = getCustomOrTrimmedUserDisplayName(tableData[i].value[0].submitterAddress)
-
-        const previousList = hashMap.get(tableData[i].key)
-        if(previousList)
+        for(var recordEntry=0; recordEntry<tableData[insuranceCompany].value.length; recordEntry++)
         {
-          previousList.push(tableData[i].value[0])
-          hashMap.set(tableData[i].key, previousList)
+          tableData[insuranceCompany].value[recordEntry].submitterDisplayName = getCustomOrTrimmedUserDisplayName(tableData[insuranceCompany].value[recordEntry].submitterAddress)
+
+          const previousList = hashMap.get(tableData[insuranceCompany].key)
+          if(previousList)
+          {
+            previousList.push(tableData[insuranceCompany].value[recordEntry])
+            hashMap.set(tableData[insuranceCompany].key, previousList)
+          }
+          else
+            hashMap.set(tableData[insuranceCompany].key, [tableData[insuranceCompany].value[recordEntry]])
         }
-        else
-          hashMap.set(tableData[i].key, [tableData[i].value[0]])
       }
 
     insuranceCompanyRecordsHashMap.map = hashMap
