@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, watch, markRaw } from 'vue'
+  import { ref, onMounted, watch, markRaw, computed } from 'vue'
   import { IonLabel, IonIcon, IonInput, IonButton } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
@@ -125,7 +125,9 @@
   const stableCoinTableData = ref()
   const CryptoCurrencyTableData = ref()
   const isLoading = ref(true)
-  var totalValue = ref(0)
+  var stableValue = ref(0)
+  var cryptoValue = ref(0)
+  var totalValue = computed(() => stableValue.value + cryptoValue.value)
 
   onMounted(() =>
   {
@@ -161,6 +163,7 @@
 
   function processSinglePayerStableCoinTableData()
   {
+    var value = 0
     var unprocessedTableData = []
 
     for(var i=0; i<StableCoins.length; i++)
@@ -175,7 +178,7 @@
         unprocessedTableData[i].quanity = tokenAmount as number
         unprocessedTableData[i].value = '$' + tokenAmount
 
-        totalValue.value = Number(tokenAmount) + Number(totalValue.value)
+        value = Number(tokenAmount) + Number(value)
       }
       else
       {
@@ -184,11 +187,13 @@
       }
     }
 
+    stableValue.value = value
     stableCoinTableData.value = unprocessedTableData
   }
 
   function processSinglePayerCryptoCurrencyTableData()
   {
+    var value = 0
     var unprocessedTableData = []
 
     for(var i=0; i<CryptoCurrency.length; i++)
@@ -203,7 +208,7 @@
         unprocessedTableData[i].quanity = tokenAmount as number
         unprocessedTableData[i].value = '$' + tokenAmount
 
-        totalValue.value = Number(tokenAmount) + Number(totalValue.value)
+        value = Number(tokenAmount) + Number(value)
       }
       else
       {
@@ -212,6 +217,7 @@
       }
     }
 
+    cryptoValue.value = value
     CryptoCurrencyTableData.value = unprocessedTableData
   }
 
