@@ -1,16 +1,17 @@
 <script lang="ts">
+  import { reactive } from 'vue'
   import DAISVG from '/src/assets/cryptoIcons/dai-svg.vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
-  import WEthSVG from '/src/assets/cryptoIcons/weth-svg.vue'
-  import WBtcSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
+  import WETHSVG from '/src/assets/cryptoIcons/weth-svg.vue'
+  import WBTCSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
   import { sourceDAI,
     sourceUSDC,
     sourceSOL,
-    sourceWEth,
-    sourceWBtc } from '/src/assets/helperFunctions/sources.ts'
+    sourceWETH,
+    sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
 
-  export const StableCoins =
+  export const StableCoins = reactive(
   [
     {
       tokenMintAddress: "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o",
@@ -20,7 +21,7 @@
         svg: DAISVG,
         source: () => {sourceDAI()}
       },
-      price: 1.00,
+      price: '-',
       apy: "4.44%",
       chain:
       {
@@ -30,14 +31,14 @@
       }
     },
     {
-      tokenMintAddress: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      tokenMintAddress: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
       asset: 
       {
         name: "USDC",
         svg: USDCSVG,
         source: () => {sourceUSDC()}
       },
-      price: 1.00,
+      price: '-',
       apy: "4.44%",
       chain:
       {
@@ -46,9 +47,9 @@
         source: () => {sourceSOL()}
       }
     }
-  ]
+  ])
 
-  export const CryptoCurrency =
+  export const CryptoCurrency = reactive(
   [
     {
       tokenMintAddress: "So11111111111111111111111111111111111111112",
@@ -58,7 +59,7 @@
         svg: SOLSVG,
         source: () => {sourceSOL()}
       },
-      price: 212.98,
+      price: '-',
       apy: "4.44%",
       chain:
       {
@@ -71,11 +72,11 @@
       tokenMintAddress: "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
       asset: 
       {
-        name: "WEth",
-        svg: WEthSVG,
-        source: () => {sourceWEth()}
+        name: "WETH",
+        svg: WETHSVG,
+        source: () => {sourceWETH()}
       },
-      price: 4292.44,
+      price: '-',
       apy: "4.44%",
       chain:
       {
@@ -88,11 +89,11 @@
       tokenMintAddress: "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
       asset: 
       {
-        name: "WBtc",
-        svg: WBtcSVG,
-        source: () => {sourceWBtc()}
+        name: "WBTC",
+        svg: WBTCSVG,
+        source: () => {sourceWBTC()}
       },
-      price: 110645.87,
+      price: '-',
       apy: "4.44%",
       chain:
       {
@@ -101,7 +102,7 @@
         source: () => {sourceSOL()}
       }
     },
-  ]
+  ])
 
 export default StableCoins
 </script>

@@ -33,12 +33,12 @@ export function sourceSOL()
   window.open("https://logowik.com/solana-logo-vector-svg-pdf-ai-eps-cdr-free-download-19832.html", "_blank")
 }
 
-export function sourceWEth()
+export function sourceWETH()
 {
   window.open("https://logotic.me/item/9052/weth/", "_blank")
 }
 
-export function sourceWBtc()
+export function sourceWBTC()
 {
   window.open("https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNo6wMmFxnq7PQtHBfhDIxkbGsT6ljuegzWAyL", "_blank")
 }

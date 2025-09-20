@@ -48,6 +48,8 @@
       </ion-button>
     </div>
   </ion-popover>
+  <Suspense><PriceUpdater/></Suspense>
+  
   <M4AChatUpdater/>
   <PLIChatUpdater/>
   <AboutChatUpdater/>
@@ -57,7 +59,8 @@
   import { ref, onMounted, onUnmounted, watch } from 'vue'
   import { IonButton, IonPopover, IonLabel, IonIcon } from '@ionic/vue'
   import { chevronDown } from 'ionicons/icons'
-  import { adminAccounts, devNetTreasury, hodlTreasuryBalancesDevNetHashMap, singlePayerTreasuryBalancesDevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { tokenAddressKeysMainNet, tokenAddressStringsDevNet, tokenAddressKeysDevNet } from '/src/assets/constants/TokenAddresses.ts'
+  import { adminAccounts, hodlTreasuryBalancesDevNetHashMap, singlePayerTreasuryBalancesDevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
   import { claimQueue, claimStats, processedClaimStats, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'
   import { hospitalStats, hospitals } from '/src/assets/globalStates/m4a/Hospitals.vue'
   import { insuranceCompanyStats, insuranceCompanies } from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
@@ -66,6 +69,7 @@
   import { m4aChat, pliChat, aboutChat } from '/src/assets/globalStates/chat/Chats.vue'
   import { customUserNameHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { ideas, feds } from '/src/assets/globalStates/chat/QOL.vue'
+  import PriceUpdater from './PriceUpdater.vue'
   import M4AChatUpdater from './M4AChatUpdater.vue'
   import PLIChatUpdater from './PLIChatUpdater.vue'
   import AboutChatUpdater from './AboutChatUpdater.vue'
@@ -255,13 +259,13 @@
     (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      devNetTreasury.USDCTokenMintAddress, //Token Mint Address
+      tokenAddressKeysDevNet.USDCTokenMintAddress, //Token Mint Address
       adminAccounts.hodlTreasuryAddress //Wallet Public Key
     )
     try
     {
       const hodlUDSCAccount = await anchorPrograms.chat.chatProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCATA)
-      hodlTreasuryBalancesDevNetHashMap.map.set(devNetTreasury.USDCTokenMintAddress.toString(), hodlUDSCAccount.value.uiAmount.toFixed(2))
+      hodlTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.USDCTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(2))
       await listenForHODLTreasuryUSDCChanges()
     }
     catch(error)
@@ -274,13 +278,13 @@
     (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      devNetTreasury.USDCTokenMintAddress, //Token Mint Address
+      tokenAddressKeysDevNet.USDCTokenMintAddress, //Token Mint Address
       adminAccounts.singlePayerTreasuryAddress //Wallet Public Key
     )
     try
     {
       const singlePayerUSDCAccount = await anchorPrograms.chat.chatProgram.provider.connection.getTokenAccountBalance(singlePayerTreasuryUSDCATA)
-      singlePayerTreasuryBalancesDevNetHashMap.map.set(devNetTreasury.USDCTokenMintAddress.toString(), singlePayerUSDCAccount.value.uiAmount.toFixed(2))
+      singlePayerTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.USDCTokenMintAddress, singlePayerUSDCAccount.value.uiAmount.toFixed(2))
       await listenForSinglePayerTreasuryChanges()
     }
     catch(error)
@@ -774,7 +778,7 @@
       {
         //Handle account change...
         const hodlUDSCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCATA)
-        hodlTreasuryBalancesDevNetHashMap.map.set(devNetTreasury.USDCTokenMintAddress.toString(), hodlUDSCAccount.value.uiAmount.toFixed(2))
+        hodlTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.USDCTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)
@@ -792,7 +796,7 @@
       {
         //Handle account change...
         const singlePayerUSDCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(singlePayerTreasuryUSDCATA)
-        singlePayerTreasuryBalancesDevNetHashMap.map.set(devNetTreasury.USDCTokenMintAddress.toString(), singlePayerUSDCAccount.value.uiAmount.toFixed(2))
+        singlePayerTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.USDCTokenMintAddress, singlePayerUSDCAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)

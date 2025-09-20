@@ -1,12 +1,11 @@
-<template>
-</template>
+
 
 <script setup lang="ts">
   import { onUnmounted } from 'vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
 
-  var intervalId: any;
+  var intervalId: any
   
   runDeadMansBreakDetector()
 
@@ -14,7 +13,7 @@
   {
     if(intervalId != undefined)
     {
-      clearInterval(intervalId);
+      clearInterval(intervalId)
       intervalId = undefined
     }
   })

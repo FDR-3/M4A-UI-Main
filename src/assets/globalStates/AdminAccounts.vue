@@ -18,24 +18,6 @@
     ceoIsDead: false
   })
 
-  export const mainNetTreasury = reactive(
-  {
-    DAITokenMintAddress: new PublicKey("EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o"),
-    USDCTokenMintAddress: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),
-    SOLTokenMintAddress: new PublicKey("So11111111111111111111111111111111111111112"),
-    WEthTokenMintAddress: new PublicKey("7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs"),
-    WBtcTokenMintAddress: new PublicKey("3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh")
-  })
-
-  export const devNetTreasury = reactive(
-  {
-    DAITokenMintAddress: new PublicKey("EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o"),
-    USDCTokenMintAddress: new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),
-    SOLTokenMintAddress: new PublicKey("So11111111111111111111111111111111111111112"),
-    WEthTokenMintAddress: new PublicKey("7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs"),
-    WBtcTokenMintAddress: new PublicKey("3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh")
-  })
-
   //Mainnet Net
   export const hodlTreasuryBalancesMainNetHashMap = reactive(
   {

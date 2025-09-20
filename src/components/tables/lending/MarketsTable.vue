@@ -93,7 +93,9 @@
       </Column>
       <Column field="price" header="Price" style="width: 0%" sortable>
         <template #body="slotProps">
-            ${{ slotProps.data.price.toLocaleString() }}
+          ${{ slotProps.data.price.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })}}
         </template>
       </Column>
       <Column field="apy" header="APY%" style="width: 0%" sortable></Column>

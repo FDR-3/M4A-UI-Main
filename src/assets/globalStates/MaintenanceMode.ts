@@ -1,4 +1,4 @@
-export const MAINTENANCE_MODE = false;
+export const MAINTENANCE_MODE = false
 
 export const APPROVED_TESTERS = 
 [
