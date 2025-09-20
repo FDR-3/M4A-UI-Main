@@ -127,14 +127,14 @@
   { 
     .tableFlipContainer
     {
-      height: 1677px
+      height: 1783px
     }
   }
   @media screen and (max-width: 1110px) 
   { 
     .tableFlipContainer
     {
-      height: 1717px
+      height: 1812px
     }
   }
 </style>
