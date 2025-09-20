@@ -31,7 +31,7 @@
       }
     },
     {
-      tokenMintAddress: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      tokenMintAddress: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",//Mainnet
       asset: 
       {
         name: "USDC",
@@ -39,6 +39,23 @@
         source: () => {sourceUSDC()}
       },
       price: '-',
+      apy: "4.44%",
+      chain:
+      {
+        name: "Solana",
+        svg: SOLSVG,
+        source: () => {sourceSOL()}
+      }
+    },
+    {
+      tokenMintAddress: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",//Devnet
+      asset: 
+      {
+        name: "USDC-Dev",
+        svg: USDCSVG,
+        source: () => {sourceUSDC()}
+      },
+      price: 1.00,
       apy: "4.44%",
       chain:
       {

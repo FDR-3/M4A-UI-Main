@@ -42,9 +42,19 @@
         )).json()
 
         for(var i=0; i<StableCoins.length; i++)
+        {
+            if(!price[StableCoins[i].tokenMintAddress])
+                continue
+
             StableCoins[i].price = price[StableCoins[i].tokenMintAddress].usdPrice
+        }
 
         for(var i=0; i<CryptoCurrency.length; i++)
+        {
+            if(!price[CryptoCurrency[i].tokenMintAddress])
+                continue
+
             CryptoCurrency[i].price = price[CryptoCurrency[i].tokenMintAddress].usdPrice
+        }
     }
 </script>

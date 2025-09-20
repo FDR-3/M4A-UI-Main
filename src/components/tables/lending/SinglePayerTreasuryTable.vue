@@ -132,8 +132,8 @@
     if(singlePayerTreasuryBalancesDevNetHashMap.map)
     {
       totalValue.value = 0
-      processHODLStableCoinTableData()
-      processHODLCryptoCurrencyTableData()
+      processSinglePayerStableCoinTableData()
+      processSinglePayerCryptoCurrencyTableData()
 
       isLoading.value = false
     }
@@ -144,20 +144,20 @@
   watch(singlePayerTreasuryBalancesDevNetHashMap, () => 
   {
     totalValue.value = 0
-    processHODLStableCoinTableData()
-    processHODLCryptoCurrencyTableData()
+    processSinglePayerStableCoinTableData()
+    processSinglePayerCryptoCurrencyTableData()
 
     if(isLoading.value)
       isLoading.value = false
   })
 
-  function processHODLStableCoinTableData()
+  function processSinglePayerStableCoinTableData()
   {
     var unprocessedTableData = []
 
     for(var i=0; i<StableCoins.length; i++)
     {
-      unprocessedTableData.push(cloneDeep(StableCoins[i]))//Keeps HODL and Single Payer tables from writing over each other
+      unprocessedTableData.push(cloneDeep(StableCoins[i]))//Keeps SinglePayer and Single Payer tables from writing over each other
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
@@ -179,13 +179,13 @@
     stableCoinTableData.value = unprocessedTableData
   }
 
-  function processHODLCryptoCurrencyTableData()
+  function processSinglePayerCryptoCurrencyTableData()
   {
     var unprocessedTableData = []
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
-      unprocessedTableData.push(cloneDeep(CryptoCurrency[i]))//Keeps HODL and Single Payer tables from writing over each other
+      unprocessedTableData.push(cloneDeep(CryptoCurrency[i]))//Keeps SinglePayer and Single Payer tables from writing over each other
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
