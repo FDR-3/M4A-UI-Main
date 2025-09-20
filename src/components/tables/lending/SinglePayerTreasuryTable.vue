@@ -131,7 +131,6 @@
   {
     if(singlePayerTreasuryBalancesDevNetHashMap.map)
     {
-      totalValue.value = 0
       processSinglePayerStableCoinTableData()
       processSinglePayerCryptoCurrencyTableData()
 
@@ -143,12 +142,21 @@
 
   watch(singlePayerTreasuryBalancesDevNetHashMap, () => 
   {
-    totalValue.value = 0
     processSinglePayerStableCoinTableData()
     processSinglePayerCryptoCurrencyTableData()
 
     if(isLoading.value)
       isLoading.value = false
+  })
+
+  watch(StableCoins, () => 
+  {
+    processSinglePayerStableCoinTableData()
+  })
+
+  watch(CryptoCurrency, () => 
+  {
+    processSinglePayerCryptoCurrencyTableData()
   })
 
   function processSinglePayerStableCoinTableData()

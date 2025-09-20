@@ -131,8 +131,6 @@
   {
     if(hodlTreasuryBalancesDevNetHashMap.map)
     {
-      totalValue.value = 0
-
       processHODLStableCoinTableData()
       processHODLCryptoCurrencyTableData()
 
@@ -144,13 +142,21 @@
 
   watch(hodlTreasuryBalancesDevNetHashMap, () => 
   {
-    totalValue.value = Number(0)
-
     processHODLStableCoinTableData()
     processHODLCryptoCurrencyTableData()
 
     if(isLoading.value)
       isLoading.value = false
+  })
+
+  watch(StableCoins, () => 
+  {
+    processHODLStableCoinTableData()
+  })
+
+  watch(CryptoCurrency, () => 
+  {
+    processHODLCryptoCurrencyTableData()
   })
 
   function processHODLStableCoinTableData()

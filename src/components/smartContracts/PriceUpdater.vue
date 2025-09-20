@@ -1,6 +1,4 @@
-<template>
-</template>
-
+<template></template>
 <script async setup lang="ts">
     import { onUnmounted } from 'vue'
     import { tokenAddressStringsMainNet } from '/src/assets/constants/TokenAddresses.ts'
@@ -26,11 +24,13 @@
         intervalId = setInterval(async() => 
         {
             await fetchPrices()
-        }, 60000)
+        }, 5000)
     }
 
     async function fetchPrices()
     {
+        console.log("Updating Prices")
+
         const price = await(await fetch
         (
             "https://lite-api.jup.ag/price/v3?ids=" +
