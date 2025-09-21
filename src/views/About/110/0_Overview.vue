@@ -1,8 +1,12 @@
 <template>
       <!--<StarWolfBannerHTMLText/>-->
-      <div>
-        <DarkModeStarWolfBannerSignal id="banner" v-if="darkTheme.value"/>
-        <LightModeStarWolfBannerSignal id="banner" v-if="!darkTheme.value"/>
+      <div v-if="darkTheme.value">
+        <RIPDarkModeStarWolfBannerSignal id="banner" v-if="adminAccounts.ceoIsDead"/>
+        <DarkModeStarWolfBannerSignal id="banner" v-else/>
+      </div>
+      <div v-else>
+        <RIPLightModeStarWolfBannerSignal id="banner" v-if="adminAccounts.ceoIsDead"/>
+        <LightModeStarWolfBannerSignal id="banner" v-else/>
       </div>
       <p>M4A Protocol is a decentrally funded, single payer health care system. 
         Please check out our open source sections to learn more.
@@ -16,6 +20,9 @@
   import StarWolfBannerHTMLText from '/src/components/fancy/StarWolfBannerHTMLText.vue'
   import DarkModeStarWolfBannerSignal from '/src/components/fancy/DarkModeStarWolfBannerSignal.vue' 
   import LightModeStarWolfBannerSignal from '/src/components/fancy/LightModeStarWolfBannerSignal.vue'
+  import RIPDarkModeStarWolfBannerSignal from '/src/components/fancy/rip/RIPDarkModeStarWolfBannerSignal.vue' 
+  import RIPLightModeStarWolfBannerSignal from '/src/components/fancy/rip/RIPLightModeStarWolfBannerSignal.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
 </script>
 
