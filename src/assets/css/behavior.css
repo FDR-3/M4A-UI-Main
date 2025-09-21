@@ -23,9 +23,11 @@
   overflow-x: auto
 }
 
-.copyAddressButton
+.copyAddressButton 
 {
-  font-weight: bold
+    margin: 0px;
+    width: 100% !important;
+    font-weight: bold
 }
 
 .copyAddressButton:hover
