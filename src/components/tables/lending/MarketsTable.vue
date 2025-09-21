@@ -11,7 +11,7 @@
       :value="StableCoins"
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['asset.name', 'price', 'apy', 'app.name', 'chain.name']"
+      :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'apy', 'app.name', 'chain.name']"
     >
       <template #header>
         <div>
@@ -30,10 +30,21 @@
       <Column field="asset.name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-            <ion-button fill="clear" @click="slotProps.data.asset.source()">
-              <component :is="slotProps.data.asset.svg" style="width: 24px; margin-left: -11px; margin-right: -11px"></component>
+            <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)">
+              <component :is="slotProps.data.asset.svg" style="width: 24px; margin-left: -11px; margin-right: 5px"></component>
+              <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
-            <span>{{ slotProps.data.asset.name }}</span>
+            <ion-popover 
+            :is-open="tokenPopoverOpen" 
+            :event="event" 
+            @didDismiss="tokenPopoverOpen=false"
+            side="top" 
+            alignment="center"
+            >
+              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+                <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+              </ion-button>
+            </ion-popover>
           </div>
         </template>
       </Column>
@@ -72,7 +83,7 @@
       scrollable
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['asset.name', 'price', 'apy', 'app.name', 'chain.name']"
+      :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'apy', 'app.name', 'chain.name']"
     >
     <template #header>
       <div>
@@ -83,11 +94,11 @@
     <Column field="asset.name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-            <ion-button fill="clear" @click="slotProps.data.asset.source()" style="margin-left: -8px; margin-right: -10px">
-              <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; margin-left: -8px; margin-right: -4px" />
-              <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 24px; margin-right: 2px" />
+            <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)" style="margin-left: -8px">
+              <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; margin-left: -8px; margin-right: -4px"/>
+              <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 24px; margin-right: 5px"/>
+              <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
-            <span>{{ slotProps.data.asset.name }}</span>
           </div>
         </template>
       </Column>
@@ -122,17 +133,41 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { IonLabel, IonIcon, IonInput, IonButton } from '@ionic/vue'
+  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
+  import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
+
+  const tokenPopoverOpen = ref(false)
+  const event = ref()
+  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
   const filters = ref(
   {
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
   })
+
+  function openTokenPopover(e: Event, rowData: any) 
+  {
+    event.value = e
+    event.value.tokenMintAddress = rowData.tokenMintAddress
+
+    tokenPopoverOpen.value = true
+  }
+
+  function closeTokenPopover(e: Event) 
+  {
+    event.value = e
+    tokenPopoverOpen.value = false
+  }
+
+  function passByRefWrapperCopyAddress()
+  {
+    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+  }
 </script>
 
 <style scoped>

@@ -24,7 +24,7 @@
         intervalId = setInterval(async() => 
         {
             await fetchPrices()
-        }, 5000)
+        }, 2000)
     }
 
     async function fetchPrices()

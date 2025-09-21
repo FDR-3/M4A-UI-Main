@@ -387,7 +387,7 @@
   }
 
   async function getAboutLv4Replies()
-  {console.log("Getting About Lv4 Replies")
+  {console.log("Getting About Lv4+ Replies")
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try

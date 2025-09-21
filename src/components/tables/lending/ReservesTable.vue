@@ -27,11 +27,21 @@
       <Column field="name" header="Token Reserve" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-            
-            <ion-button style="margin-left: -11px; margin-right: -11px" fill="clear" @click="slotProps.data.source()">
-              <component :is="slotProps.data.svg" style="width: 24px"></component>
+            <ion-button style="margin-left: -11px; margin-right: -5px" fill="clear" @click="openTokenPopover($event, slotProps.data)">
+              <component :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
+              <ion-label color="dark">{{ slotProps.data.name }}</ion-label>
             </ion-button>
-            <ion-text>{{ slotProps.data.name }}</ion-text>
+            <ion-popover 
+            :is-open="tokenPopoverOpen" 
+            :event="event" 
+            @didDismiss="tokenPopoverOpen=false"
+            side="top" 
+            alignment="center"
+            >
+              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
+                <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+              </ion-button>
+            </ion-popover>
           </div>
         </template>
       </Column>
@@ -109,7 +119,7 @@
             side="top" 
             alignment="center"
             >
-              <ion-button id="commentCopyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
+              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
                 <ion-label color="dark">{{ copyFullAddressButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
@@ -143,7 +153,7 @@
           (isDataEdited && !tokenMarketTableData[index].isEditingRow && !tokenMarketTableData[index].isRowDataEdited)"/>
         </template>
       </Column>
-      <Column field="actions" header="Actions" style="width: 0%" sortable>
+      <Column header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRow">
             <div v-if="connectedWallet.addressString==slotProps.data.owner">
@@ -243,6 +253,7 @@
   import { PublicKey } from "@solana/web3.js"
   import { trimAddress,
     copyFullAddress,
+    copyTokenMintAddress,
     isValidSolanaPublicKey,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
@@ -274,6 +285,9 @@
   var isEditing = false
   const isDataEdited = ref(false)
   const copyFullAddressButtonText = ref("Copy Full Address")
+
+  const tokenPopoverOpen = ref(false)
+  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
   
   onMounted(() =>
   {
@@ -342,6 +356,30 @@
     ownerPopoverOpen.value = false
   }
 
+  function passByRefWrapperCopyAddress()
+  {
+    copyFullAddress(copyFullAddressButtonText, event.value.ownerAddress)
+  }
+
+  function openTokenPopover(e: Event, rowData: any) 
+  {
+    event.value = e
+    event.value.tokenMintAddress = rowData.tokenMintAddress
+
+    tokenPopoverOpen.value = true
+  }
+
+  function closeTokenPopover(e: Event) 
+  {
+    event.value = e
+    tokenPopoverOpen.value = false
+  }
+
+  function passByRefWrapperCopyTokenMintAddress()
+  {
+    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+  }
+
   const filters = ref(
   {
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
@@ -389,11 +427,6 @@
   {
     tokenMarketTableData.value = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
     showTokenSubMarkets.value = true
-  }
-
-  function passByRefWrapperCopyAddress()
-  {
-    copyFullAddress(copyFullAddressButtonText, event.value.ownerAddress)
   }
 
   function checkAddress(address: string)

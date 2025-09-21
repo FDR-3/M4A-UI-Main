@@ -22,3 +22,16 @@
 {
   overflow-x: auto
 }
+
+.copyAddressButton
+{
+  font-weight: bold
+}
+
+.copyAddressButton:hover
+{
+  text-decoration: underline;
+  text-decoration-color: var(--ion-color-light);
+  text-decoration-thickness: 2px;
+  opacity: 1
+}

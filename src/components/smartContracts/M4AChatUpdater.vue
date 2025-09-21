@@ -387,7 +387,7 @@
   }
 
   async function getM4ALv4Replies()
-  {console.log("Getting M4A Lv4 Replies")
+  {console.log("Getting M4A Lv4+ Replies")
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try

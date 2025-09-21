@@ -30,7 +30,7 @@
             side="top" 
             alignment="center"
           >
-            <ion-button id="replyCopyAddressButton" :color="colorName" @click="passByRefWrapperCopyAddress()" @mouseleave="closeUserPopover($event)">
+            <ion-button class="copyAddressButton" :color="colorName" @click="passByRefWrapperCopyAddress()" @mouseleave="closeUserPopover($event)">
               <ion-label color="dark">{{copyFullAddressButtonText}}</ion-label>
             </ion-button>
           </ion-popover> 
@@ -233,7 +233,7 @@
             side="top" 
             alignment="center"
           >
-            <ion-button id="replyCopyAddressButton" :color="colorName" @click="passByRefWrapperCopyAddress()" @mouseleave="closeUserPopover($event)">
+            <ion-button class="copyAddressButton" :color="colorName" @click="passByRefWrapperCopyAddress()" @mouseleave="closeUserPopover($event)">
               <ion-label color="dark">{{copyFullAddressButtonText}}</ion-label>
             </ion-button>
           </ion-popover> 
@@ -1084,19 +1084,6 @@
     width: min(50vw, 150px);
     font-size: min(4vw, 15px);
     white-space: nowrap
-  }
-
-  #replyCopyAddressButton
-  {
-    font-weight: bold
-  }
-
-  #replyCopyAddressButton:hover
-  {
-    text-decoration: underline;
-    text-decoration-color: var(--ion-color-light);
-    text-decoration-thickness: 2px;
-    opacity: 1
   }
   
   .videoReplyButton

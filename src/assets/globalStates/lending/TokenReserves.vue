@@ -32,11 +32,11 @@
   export const tokenReserveDevNetMap: Map<string, tokenMapObject> = new Map(
   [ 
     //Key: Token Mint Address, Value: Token SVG
-    [tokenAddressStringsDevNet.DAITokenMintAddress, { name: "DAI", svg: markRaw(DAISVG), source: () => {sourceDAI()}} ],
-    [tokenAddressStringsDevNet.USDCTokenMintAddress, { name: "USDC", svg: markRaw(USDCSVG), source: () => {sourceUSDC()}} ],
-    [tokenAddressStringsDevNet.SOLTokenMintAddress, { name: "SOL", svg: markRaw(SOLSVG), source: () => {sourceSOL()}} ],
-    [tokenAddressStringsDevNet.WETHTokenMintAddress, { name: "WETH", svg: markRaw(WETHSVG), source: () => {sourceWETH()}} ],
-    [tokenAddressStringsDevNet.WBTCTokenMintAddress, { name: "WBTC", svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}} ]
+    [tokenAddressStringsDevNet.DAITokenMintAddress, { name: "DAI-Dev", svg: markRaw(DAISVG), source: () => {sourceDAI()}} ],
+    [tokenAddressStringsDevNet.USDCTokenMintAddress, { name: "USDC-Dev", svg: markRaw(USDCSVG), source: () => {sourceUSDC()}} ],
+    [tokenAddressStringsDevNet.SOLTokenMintAddress, { name: "SOL-Dev", svg: markRaw(SOLSVG), source: () => {sourceSOL()}} ],
+    [tokenAddressStringsDevNet.WETHTokenMintAddress, { name: "WETH-Dev", svg: markRaw(WETHSVG), source: () => {sourceWETH()}} ],
+    [tokenAddressStringsDevNet.WBTCTokenMintAddress, { name: "WBTC-Dev", svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}} ]
   ])
 
   type tokenMapObject =
