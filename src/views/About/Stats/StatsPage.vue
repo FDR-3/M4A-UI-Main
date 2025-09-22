@@ -264,17 +264,6 @@
     if(newWallet.addressString == oldWallet.addressString)
       return
 
-    if(submitterAccountWatchId != undefined)
-    {
-        anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
-        submitterAccountWatchId = undefined
-    }
-    if(chatAccountWatchId != undefined)
-    {
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatAccountWatchId)
-      chatAccountWatchId != undefined
-    }
-
     if(connectedWallet.isChatAccountReady)
     {
       displayName.value = getUserDisplayName(connectedWallet.addressString)
@@ -298,17 +287,6 @@
 
   async function checkNewAddress()
   {
-    if(submitterAccountWatchId != undefined)
-    {
-        anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
-        submitterAccountWatchId = undefined
-    }
-    if(chatAccountWatchId != undefined)
-    {
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatAccountWatchId)
-      chatAccountWatchId != undefined
-    }
-
     displayName.value = getUserDisplayName(addressToCheck.value)
     possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(addressToCheck.value)
 

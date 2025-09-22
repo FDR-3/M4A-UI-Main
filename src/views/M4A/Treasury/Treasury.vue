@@ -1,5 +1,5 @@
 <template>
-  <div class="tableFlipContainer">
+  <div class="tableFlipContainer" :class="flipped">
     <div class="tableCard" :class="flipped">
       <div class="frontTable" :style="{display: display1stTable}">
         <h2>Under Construction On Devnet<br>Monopoly Money</h2>
@@ -90,7 +90,8 @@
 <style scoped>
   .tableFlipContainer
   {
-    position: relative
+    position: relative;
+    transition: height 0.5s ease
   }
 
   .tableCard
@@ -122,12 +123,49 @@
     backface-visibility: hidden;
     transform: rotateY(180deg)
   }
-
-  @media screen and (min-width: 1110.1px)
+  
+  @media screen and (min-width: 1404.1px)
   { 
     .tableFlipContainer
     {
       height: 1783px
+    }
+    .tableFlipContainer.flipped
+    {
+      height: 1400px
+    }
+  }
+  @media screen and (min-width: 1222.1px) and (max-width: 1404px) 
+  { 
+    .tableFlipContainer
+    {
+      height: 1783px
+    }
+    .tableFlipContainer.flipped
+    {
+      height: 1413px
+    }
+  }
+  @media screen and (min-width: 1144px) and (max-width: 1222px) 
+  { 
+    .tableFlipContainer
+    {
+      height: 1783px
+    }
+    .tableFlipContainer.flipped
+    {
+      height: 1429px
+    }
+  }
+  @media screen and (min-width: 1110.1px) and (max-width: 1143.9px) 
+  { 
+    .tableFlipContainer
+    {
+      height: 1783px
+    }
+    .tableFlipContainer.flipped
+    {
+      height: 1444px
     }
   }
   @media screen and (max-width: 1110px) 
@@ -135,6 +173,10 @@
     .tableFlipContainer
     {
       height: 1812px
+    }
+    .tableFlipContainer.flipped
+    {
+      height: 1444px
     }
   }
 </style>

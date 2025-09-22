@@ -69,7 +69,7 @@
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
-            <ion-button color="dark" :disabled="true" @click="">Deposit</ion-button>
+            <ion-button color="dark" :disabled="!APPROVED_TESTERS.includes(connectedWallet.addressString)" @click="">Deposit</ion-button>
           </div>
         </template>
       </Column>
@@ -123,7 +123,7 @@
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
-            <ion-button color="dark" :disabled="true">Deposit</ion-button>
+            <ion-button color="dark" :disabled="!APPROVED_TESTERS.includes(connectedWallet.addressString)">Deposit</ion-button>
           </div>
         </template>
       </Column>
@@ -139,6 +139,8 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
   import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { APPROVED_TESTERS } from '/src/assets/globalStates/MaintenanceMode.ts'
+  import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
 
   const tokenPopoverOpen = ref(false)
@@ -183,7 +185,7 @@
 
   .tableMinWidth
   {
-    min-width: 550px
+    min-width: 640px
   }
 
   ion-input
