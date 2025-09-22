@@ -121,6 +121,7 @@
     width: 90vw;
     position: absolute;
     backface-visibility: hidden;
+    transform: rotateX(0deg) /*Needed Just for fire fox ignoring backface-visibilty*/
   }
 
   .backTable
@@ -128,6 +129,7 @@
     width: 90vw;
     position: absolute;
     backface-visibility: hidden;
+    transform: rotateX(0deg); /*Needed Just for fire fox ignoring backface-visibilty*/
     transform: rotateY(180deg)
   }
 
