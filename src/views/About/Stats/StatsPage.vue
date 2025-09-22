@@ -36,8 +36,23 @@
           <p class="statsLineHeight">Marked FED By CEO: {{ ceoMarkedFEDCommentAndReplyCount }}</p>
         </div>
       </div>
-      <ion-input v-model="addressToCheck" placeholder="Check New Address" fill="outline" style="margin-top: -10px"></ion-input>
-      <ion-button id="checkNewAddressButton" @click="checkNewAddress()" :color="colorName" style="margin-bottom: -5px">Check New Address</ion-button>
+      <ion-input
+      v-model="addressToCheck"
+      class="nSmallMarginTop"
+      placeholder="Check New Address"
+      fill="outline"
+      :class="{ 'invalid': !isValidPublicKey }"
+      @ion-input="isValidPublicKey = isValidSolanaPublicKey(addressToCheck)"
+      ></ion-input>
+      <ion-button
+      id="checkNewAddressButton"
+      class="nTinyMarginBottom"
+      @click="checkNewAddress()"
+      :color="colorName"
+      :disabled="!isValidPublicKey"
+      >
+        Check New Address
+      </ion-button>
     </div>
   </div>
 
@@ -93,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, onMounted, onUnmounted, computed, inject } from 'vue'
+  import { ref, watch, onMounted, computed, inject } from 'vue'
   import { IonButton, IonInput } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import RainbowStarWolf from '/src/components/fancy/RainbowStarWolf.vue' 
@@ -102,7 +117,9 @@
   import CanidateRecordTable from '/src/components/tables/chat/CanidateRecordTable.vue' 
   import UniqueVoterTable from '/src/components/tables/chat/UniqueVoterTable.vue'
   import UniqueCanidateTable from '/src/components/tables/chat/UniqueCanidateTable.vue'
-  import { trimAddress,
+  import { VOTE_COST,
+    trimAddress,
+    isValidSolanaPublicKey,
     parseDollarAmountStringFromDecimalNoDollarSign,
     parseDollarAmountStringFromFixed2PointNotationNoDollarSign } from '/src/assets/contracts/WalletHelper.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
@@ -111,8 +128,6 @@
   import { chatAccountHashMap, customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { postVoteRecords } from '/src/assets/globalStates/chat/PostVoteRecords.vue'
   import * as anchor from "@coral-xyz/anchor"
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { VOTE_COST } from '/src/assets/contracts/WalletHelper.vue'
   import RIPRainbowStarWolf from '/src/components/fancy/rip/RIPRainbowStarWolf.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
@@ -128,6 +143,7 @@
   var possiblyTrimmedDisplayName = ref()
   var searchAddress = ref()
   var addressToCheck = ref()
+  var isValidPublicKey = ref(false)
 
   var voterRecordTableData: any = ref([])
   var uniqueVoterTableData: any = ref([])
@@ -168,9 +184,6 @@
   var ceoMarkedFEDCommentAndReplyCount = ref(0)
 
   var submitterAccount = ref()
-  
-  var submitterAccountWatchId: any
-  var chatAccountWatchId: any
 
   onMounted(() => 
   {
@@ -178,6 +191,8 @@
     toggleUniqueTable.value = localStorage.getItem("toggleUniqueTable") == "true"
 
     searchAddress.value = connectedWallet.addressString
+    addressToCheck.value = searchAddress.value
+    isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
 
     if(searchAddress.value != "")
     {
@@ -202,12 +217,6 @@
       displayName.value = searchAddress.value
       possiblyTrimmedDisplayName.value = trimAddress(searchAddress.value)
     }
-  })
-
-  onUnmounted(() => 
-  {
-    if(submitterAccountWatchId != undefined)
-     anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(submitterAccountWatchId)
   })
 
   watch(submitterHashMap, () =>
@@ -283,6 +292,8 @@
       sortPostVoteRecords(connectedWallet.addressString)
 
     searchAddress.value = connectedWallet.addressString
+    addressToCheck.value = searchAddress.value
+    isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
   })
 
   async function checkNewAddress()

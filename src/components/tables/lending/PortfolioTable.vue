@@ -1,13 +1,27 @@
 <template>
-      <div class="tableContainer">
-    
-  
-      <h1 class="yellow">{{ displayName }}</h1>
+    <div class="tableContainer">
+        <h1 class="yellow">{{ displayName }}</h1>
 
-      <p v-if="searchAddress==SYSTEM_PROGRAM_ADDRESS_STRING">Connect Wallet or Search for a Different Public Key</p>
-    
-      <ion-input v-model="addressToCheck" placeholder="Check New Address" fill="outline" style="margin-top: -10px"></ion-input>
-      <ion-button id="checkNewAddressButton" @click="checkNewAddress()" color="green" style="margin-bottom: -5px">Check New Address</ion-button>
+        <p v-if="searchAddress==SYSTEM_PROGRAM_ADDRESS_STRING">Connect Wallet or Search for a Different Public Key</p>
+
+        <ion-input
+        v-model="addressToCheck"
+        placeholder="Check New Address"
+        fill="outline"
+        class="nSmallMarginTop"
+        :class="{ 'invalid': !isValidPublicKey }"
+        @ion-input="isValidPublicKey = isValidSolanaPublicKey(addressToCheck)"
+        ></ion-input>
+
+        <ion-button
+        id="checkNewAddressButton"
+        class="nTinyMarginBottom"
+        @click="checkNewAddress()"
+        color="green"
+        :disabled="!isValidPublicKey"
+        >
+        Check New Address
+        </ion-button>
     </div>
 
 </template>
@@ -17,17 +31,22 @@
     import { IonText, IonInput, IonButton } from '@ionic/vue'
     import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
     import { getUserDisplayName, getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
-    import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
+    import { trimAddress, isValidSolanaPublicKey } from '/src/assets/contracts/WalletHelper.vue'
     import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+
+    const emits = defineEmits(['checkNewAddress'])
 
     var displayName = ref()
     var possiblyTrimmedDisplayName = ref()
     var searchAddress = ref()
     var addressToCheck = ref()
+    var isValidPublicKey = ref(false)
 
     onMounted(() =>
     {
         searchAddress.value = connectedWallet.addressString
+        addressToCheck.value = searchAddress.value
+        isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
 
         if(connectedWallet.isChatAccountReady)
         {
@@ -44,6 +63,8 @@
     watch(connectedWallet, () =>
     {
         searchAddress.value = connectedWallet.addressString
+        addressToCheck.value = searchAddress.value
+        isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
 
         if(connectedWallet.isChatAccountReady)
         {
@@ -54,11 +75,13 @@
         {
             displayName.value = searchAddress.value
             possiblyTrimmedDisplayName.value = trimAddress(searchAddress.value)
-        }
+        }  
     })
 
     async function checkNewAddress()
     {
+        emits('checkNewAddress', addressToCheck.value)
+
         displayName.value = getUserDisplayName(addressToCheck.value)
         possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(addressToCheck.value)
 

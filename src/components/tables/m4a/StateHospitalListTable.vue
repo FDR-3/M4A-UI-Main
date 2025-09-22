@@ -71,7 +71,7 @@
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
 
-          <ion-button fill="clear" style="margin-bottom: -5px" @click="exportCSV($event)">
+          <ion-button fill="clear" class="nTinyMarginBottom" @click="exportCSV($event)">
             <ion-label color="dark">Export</ion-label><ion-icon :src="download" color="dark"></ion-icon>
           </ion-button>
         </div>

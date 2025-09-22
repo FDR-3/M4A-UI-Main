@@ -58,7 +58,7 @@
             sourceSubMarketSVG=slotProps.data.source;
             feeCollectorAddress=connectedWallet.addressString;
             creatingSubMarket=true;
-            validPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
+            isValidPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
             >
               Create SubMarket
             </ion-button>
@@ -200,8 +200,8 @@
         id="feeCollectorInput"
         v-model="feeCollectorAddress"
         fill="outline"
-        @ion-input="validPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
-        :class="{ 'invalid': !validPublicKey }"
+        @ion-input="isValidPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
+        :class="{ 'invalid': !isValidPublicKey }"
       >
       </ion-input>
       <ion-text style="font-size: 11px" class="noClickEvent">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
@@ -224,7 +224,7 @@
         color="dark"
         @click="createSubMarket()"
         class="mediumMarginTop"
-        :disabled="!validPublicKey || !connectedWallet.isConnected"
+        :disabled="!isValidPublicKey || !connectedWallet.isConnected"
       >
         Create SubMarket
       </ion-button>
@@ -274,7 +274,7 @@
   const subMarketTokenName = ref()
   const feeCollectorAddress = ref(connectedWallet.addressString)
   const feePercentage = ref(3)
-  const validPublicKey = ref(false)
+  const isValidPublicKey = ref(false)
   const ownerPopoverOpen = ref(false)
   const event = ref()
 
@@ -557,11 +557,6 @@
   #reservesSearchInput, #feeCollectorInput
   {
     --highlight-color: var(--ion-color-green) !important
-  }
-
-  #feeCollectorInput.invalid
-  {
-    --border-color: var(--ion-color-red) !important
   }
 
   .p-inputnumber:hover .p-inputnumber-input:not(:focus)

@@ -5,7 +5,7 @@
     <div v-if="connectedWallet.hasGoodEnding">
       <h2>Good Ending</h2>
       <br>
-      <h2 class="noWrapText">💚 💚 <span id="heartSpacing" style="margin-bottom: -5px">💚</span> 💚 💚 💚</h2>
+      <h2 class="noWrapText">💚 💚 <span id="heartSpacing" class="nTinyMarginBottom">💚</span> 💚 💚 💚</h2>
       <h2 class="noWrapText">💚 Thanka You So Much 💚</h2>
       <h2 class="noWrapText">💚 Fora Playing Mah Game 💚</h2>
       <a href="https://www.youtube.com/watch?v=h6DtVHqyYts" target="_blank" class="noWrapText"><h2>💚 You're Winner<span id="winnerSpacing">!</span> :D 💚</h2></a>

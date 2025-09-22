@@ -14,14 +14,14 @@
         <h1>Portfolios</h1>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Markets</ion-button>
-        <PortfolioTable/>
+        <PortfolioTable @checkNewAddress="(addressToCheck: string) => searchAddress = addressToCheck"/>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, computed } from 'vue'
+  import { ref, onMounted, computed, watch } from 'vue'
   import { IonButton } from '@ionic/vue'
   import MarketsTable from '/src/components/tables/lending/MarketsTable.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
@@ -34,10 +34,11 @@
   var flipped = ""
   var display1stTable = ref("")
   var display2ndTable = ref("none")
+  var searchAddress = ref("")
 
   var notConnected = computed (() =>
   {
-    if(connectedWallet.addressString==SYSTEM_PROGRAM_ADDRESS_STRING)
+    if(searchAddress.value == SYSTEM_PROGRAM_ADDRESS_STRING)
       return "notConnected"
     else
       return ""
@@ -45,6 +46,8 @@
 
   onMounted(() => 
   {
+    searchAddress.value = connectedWallet.addressString
+
     flipped = localStorage.getItem("marketTableSelect") || ""
     if(flipped == "")
     {
@@ -56,6 +59,11 @@
       display1stTable.value = "none"
       display2ndTable.value = ""
     }
+  })
+
+  watch(connectedWallet, () =>
+  {
+    searchAddress.value = connectedWallet.addressString
   })
 
   function flipTable()

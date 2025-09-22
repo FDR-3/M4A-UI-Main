@@ -270,7 +270,7 @@
       style="stroke-width:0.97063118000000004"/>
   </svg>
 
-  <div style="margin-top: -10px">
+  <div class="nSmallMarginTop">
     <p>SVG by: <a class="rainbowText" href="http://simplemaps.com" target="_blank">Simple Maps</a></p>
   </div>
 </template>
