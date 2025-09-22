@@ -141,11 +141,18 @@
     height: 436px
   }
 
-  @media screen and (min-width: 1656.1px)
+  @media screen and (min-width: 1769.1px)
   { 
     .tableFlipContainer
     {
       height: 1108px
+    } 
+  }
+  @media screen and (min-width: 1656.1px) and (max-width: 1769px)
+  { 
+    .tableFlipContainer
+    {
+      height: 1144px
     } 
   }
   @media screen and (min-width: 1301.1px) and (max-width: 1656px)
