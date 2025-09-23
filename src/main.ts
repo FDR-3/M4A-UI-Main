@@ -64,6 +64,7 @@ import { PhantomWalletAdapter, SolflareWalletAdapter,  TrezorWalletAdapter, Clov
 import { initM4AWorkspace, useM4AWorkspace } from '/src/assets/contracts/Solana/AnchorM4AWorkSpace.vue'
 import { initChatWorkspace, useChatWorkspace } from '/src/assets/contracts/Solana/AnchorChatWorkSpace.vue'
 import { initLendingWorkspace, useLendingWorkspace } from '/src/assets/contracts/Solana/AnchorLendingWorkSpace.vue'
+import { initAlertWorkspace, useAlertWorkspace } from '/src/assets/contracts/Solana/AnchorAlertWorkSpace.vue'
 import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
 const walletOptions = 
@@ -95,6 +96,9 @@ anchorPrograms.chat = useChatWorkspace()
 
 initLendingWorkspace(selectedLendingContractIndex)
 anchorPrograms.lending = useLendingWorkspace()
+
+initAlertWorkspace()
+anchorPrograms.alert = useAlertWorkspace()
 
 const app = createApp(App)
   .use(IonicVue,

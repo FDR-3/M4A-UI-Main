@@ -1,0 +1,700 @@
+{
+  "address": "8a9Uup7MfuERSx9iLr99uS2WQQJ9QidTvc7QaVH9nwH3",
+  "metadata": {
+    "name": "alert_protocol",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "clock_in_dead_mans_break",
+      "discriminator": [
+        192,
+        228,
+        188,
+        5,
+        16,
+        199,
+        9,
+        120
+      ],
+      "accounts": [
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  108,
+                  101,
+                  114,
+                  116,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "dead_mans_break_alert",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  100,
+                  77,
+                  97,
+                  110,
+                  115,
+                  66,
+                  114,
+                  101,
+                  97,
+                  107,
+                  65,
+                  108,
+                  101,
+                  114,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_alert_protocol",
+      "discriminator": [
+        126,
+        231,
+        77,
+        132,
+        60,
+        197,
+        2,
+        217
+      ],
+      "accounts": [
+        {
+          "name": "ceo",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  108,
+                  101,
+                  114,
+                  116,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "dead_mans_break_alert",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  100,
+                  77,
+                  97,
+                  110,
+                  115,
+                  66,
+                  114,
+                  101,
+                  97,
+                  107,
+                  65,
+                  108,
+                  101,
+                  114,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "site_update_alert",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  105,
+                  116,
+                  101,
+                  85,
+                  112,
+                  100,
+                  97,
+                  116,
+                  101,
+                  65,
+                  108,
+                  101,
+                  114,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "site_psa_alert",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  105,
+                  116,
+                  101,
+                  80,
+                  83,
+                  65,
+                  65,
+                  108,
+                  101,
+                  114,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "site_sos_alert",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  105,
+                  116,
+                  101,
+                  83,
+                  79,
+                  83,
+                  65,
+                  108,
+                  101,
+                  114,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "pass_on_alert_protocol_ceo",
+      "discriminator": [
+        183,
+        57,
+        237,
+        37,
+        58,
+        197,
+        2,
+        9
+      ],
+      "accounts": [
+        {
+          "name": "ceo",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  108,
+                  101,
+                  114,
+                  116,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_ceo_address",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "toggle_sos_alert",
+      "discriminator": [
+        33,
+        47,
+        76,
+        58,
+        110,
+        201,
+        105,
+        94
+      ],
+      "accounts": [
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  108,
+                  101,
+                  114,
+                  116,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "site_sos_alert",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  105,
+                  116,
+                  101,
+                  83,
+                  79,
+                  83,
+                  65,
+                  108,
+                  101,
+                  114,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "is_enabled",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "trigger_new_psa_alert",
+      "discriminator": [
+        190,
+        103,
+        232,
+        142,
+        22,
+        254,
+        24,
+        43
+      ],
+      "accounts": [
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  108,
+                  101,
+                  114,
+                  116,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "site_psa_alert",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  105,
+                  116,
+                  101,
+                  80,
+                  83,
+                  65,
+                  65,
+                  108,
+                  101,
+                  114,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "psa_msg",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "trigger_new_ui_available_alert",
+      "discriminator": [
+        50,
+        19,
+        235,
+        177,
+        0,
+        234,
+        166,
+        37
+      ],
+      "accounts": [
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  108,
+                  101,
+                  114,
+                  116,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "site_update_alert",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  105,
+                  116,
+                  101,
+                  85,
+                  112,
+                  100,
+                  97,
+                  116,
+                  101,
+                  65,
+                  108,
+                  101,
+                  114,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AlertProtocolCEO",
+      "discriminator": [
+        117,
+        23,
+        200,
+        75,
+        138,
+        242,
+        219,
+        226
+      ]
+    },
+    {
+      "name": "DeadMansBreakAlert",
+      "discriminator": [
+        183,
+        198,
+        197,
+        53,
+        13,
+        41,
+        71,
+        174
+      ]
+    },
+    {
+      "name": "SitePSAAlert",
+      "discriminator": [
+        84,
+        220,
+        218,
+        23,
+        196,
+        70,
+        163,
+        220
+      ]
+    },
+    {
+      "name": "SiteSOSAlert",
+      "discriminator": [
+        16,
+        73,
+        44,
+        206,
+        201,
+        9,
+        226,
+        36
+      ]
+    },
+    {
+      "name": "SiteUpdateAlert",
+      "discriminator": [
+        209,
+        193,
+        104,
+        36,
+        120,
+        100,
+        98,
+        25
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "MSGTooLong",
+      "msg": "Message can't be longer than 444 characters"
+    }
+  ],
+  "types": [
+    {
+      "name": "AlertProtocolCEO",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DeadMansBreakAlert",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "unix_clock_in_time_stamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SitePSAAlert",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "site_psa_msg",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SiteSOSAlert",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sos_flag",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SiteUpdateAlert",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "site_update_count",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}

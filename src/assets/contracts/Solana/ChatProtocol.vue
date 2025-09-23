@@ -69,32 +69,6 @@
     }
   }
 
-  export async function getDeadMansBreak()
-  {
-    console.log("Get Dead Man's Break")
-
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        return await anchorPrograms.chat.chatProgram.account.deadMansBreak.fetch(getDeadMansBreakPDA())
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log("Chat Protocol Quality Of Life Accounts Not Initialized. No DeadMansBreakTimeStamp")
-          return undefined
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
-  }
-
   export async function getChatProtocolCEOAccount()
   {
     console.log("Getting Chat Protocol CEO Account")
@@ -136,6 +110,30 @@
         if(!error.message.includes(ERROR_429))
         {
           console.log("Chat Treasurer Account Not Initialized")
+          return undefined
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export async function getChatAccountStats()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.chat.chatProgram.account.chatAccountStats.fetch(getChatAccountStatsPDA())
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log("Chat Protocol Quality of Life Accounts Not Initialized")
           return undefined
         }
         else
@@ -1319,17 +1317,6 @@
       anchorPrograms.chat.chatProgram.programId
     )
     return fedStatsPDA
-  }
-
-  export function getDeadMansBreakPDA()
-  {
-    const [deadMansBreakPDA] = PublicKey.findProgramAddressSync(
-      [
-        new TextEncoder().encode("deadMansBreak")
-      ],
-      anchorPrograms.chat.chatProgram.programId
-    )
-    return deadMansBreakPDA
   }
 
   function processCommentSectionName(commentSectionName: string)

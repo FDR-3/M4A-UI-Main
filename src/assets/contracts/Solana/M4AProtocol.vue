@@ -32,6 +32,8 @@
 
   export async function getM4AProtocol()
   {
+    console.log("Getting M4A Protocol")
+
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -1829,6 +1831,9 @@
 
   export function refreshHospitalRecordsHashMaps()
   {
+    if(!hospitalRecordsHashMap.map)
+      return
+
     var hashMap = new Map<string, any>()
 
     const tableData = Array.from(hospitalRecordsHashMap.map, ([key, value]) => ({ key, value }))
@@ -1856,6 +1861,9 @@
 
   export function refreshInsuranceCompanyRecordsHashMaps()
   {
+    if(!insuranceCompanyRecordsHashMap.map)
+      return
+
     var hashMap = new Map<string, any>()
 
     const tableData = Array.from(insuranceCompanyRecordsHashMap.map, ([key, value]) => ({ key, value }))

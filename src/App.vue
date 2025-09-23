@@ -9,7 +9,7 @@
                 <WalletButton :colorName="colorName" :colorHexValue="colorHexValue" :featured="2" container="body"/>
               </div>
             </div>
-            <ion-list>
+            <ion-list class="flexCenterColumn">
               <div id="menuHeaderContainer" class="thinBorder" style="border-radius: 8px">
                 <ion-button id="menuHeaderButton" fill="clear" style="width: 100%" @click="giveDaFontCredit()">
                   <div class="">
@@ -45,18 +45,20 @@
 
             <div :style="{display: navigation.menuIndex==MenuIndex.Jesus ? 'none':'block'}" class="flexCenterColumn">
               <ContractSwitcher :colorName="colorName" :buttonShadow="buttonShadow"/>
-              <DeadMansBreakCheck/>
-              <!--<ion-text class="largeMarginTop">Market UI built on top of
-                <br><a class="rainbowText" href="https://app.marginfi.com/" target="_blank">MarginFi</a>
-                <br><a href="https://github.com/mrgnlabs" target="_blank">Repo</a>
-                <br><a href="https://docs.marginfi.com/use-cases" target="_blank">Setup Docs</a>
-              </ion-text>-->
             </div>
+
           </div>
         </ion-content>
       </ion-menu>
       <ion-router-outlet id="mainContent" aria-hidden="false"></ion-router-outlet>
     </ion-split-pane>
+
+    <!--Calm Contract Background Processes-->
+    <ChatProtocol/>
+    <AlertProtocol/>
+    <LendingProtocol/>
+    <M4AProtocol/>
+
   </ion-app>
 </template>
 
@@ -82,8 +84,6 @@
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { commentSectionNameHashTable } from '/src/components/comments/hashtables.ts'
   import { useToast } from "primevue/usetoast"
-  import ContractSwitcher from '/src/components/smartContracts/ContractSwitcher.vue'
-  import DeadMansBreakCheck from '/src/components/smartContracts/DeadMansBreakCheck.vue'
   import WalletButton from '/src/components/navbar/SolanaWalletButton/WalletButton.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import MenuSVG from '/src/assets/svg/menu-svg.vue'
@@ -92,8 +92,12 @@
   import Shield from '/src/assets/svg/shield-svg.vue'
   import HelpCircle from '/src/assets/svg/help-circle-sharp-svg.vue'
   import { useWindowResize } from './assets/globalStates/WindowWidth.ts'
-  
   import { MAINTENANCE_MODE } from './assets/globalStates/MaintenanceMode.ts'
+  import ContractSwitcher from '/src/components/smart contracts/ContractSwitcher.vue'
+  import AlertProtocol from '/src/components/smart contracts/alert protocol/AlertProtocol.vue'
+  import LendingProtocol from '/src/components/smart contracts/lending protocol/LendingProtocol.vue'
+  import M4AProtocol from '/src/components/smart contracts/m4a protocol/M4AProtocol.vue'
+  import ChatProtocol from '/src/components/smart contracts/chat protocol/ChatProtocol.vue'
 
   const route = useRoute()
   
@@ -268,7 +272,7 @@
   {
     margin-bottom: 12px;
     margin-left: -4px;
-    width:250px;
+    width:270px;
     height: 80px
   }
 
@@ -286,13 +290,14 @@
 
   ion-icon 
   {
-    width: 60px;
-    height: 50px
+    min-width: 60px;
+    min-height: 50px
   }
 
   ion-item
   {
-    font-size: 20px;
+    font-size: 18px;
+    width: 270px;
     border-radius: 8px;
     text-align: center
   }
@@ -312,6 +317,12 @@
     text-decoration-color: var(--ion-color-light);
     text-decoration-thickness: 2px
   }
+
+  .menuIcon
+    {
+     margin-left: -1px;
+     margin-right: 1px
+    }
 
   @media screen and (min-width: 629px) 
   { 

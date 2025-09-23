@@ -82,7 +82,12 @@ h3, h4
 
 .smallMarginLeft
 {
-  margin-left: 10px
+  margin-left: 10px !important
+}
+
+.nSmallMarginLeft
+{
+  margin-left: -10px !important
 }
 
 .smallMarginBottom
@@ -115,6 +120,11 @@ h3, h4
   margin-left: -15px
 }
 
+.nMediumSmallMarginRight
+{
+  margin-right: -15px !important
+}
+
 .mediumSmallMarginBottom
 {
   margin-bottom: 15px
@@ -138,6 +148,16 @@ h3, h4
 .mediumMarginLeft
 {
   margin-left: 20px
+}
+
+.nMediumMarginLeft
+{
+  margin-left: -20px
+}
+
+.nMediumMarginRight
+{
+  margin-right: -20px !important
 }
 
 .mediumMarginBottom
@@ -190,24 +210,9 @@ h3, h4
   margin-top: -30px
 }
 
-.smallMarginLeft
+.nLargeMarginRight
 {
-  margin-left: 10px !important
-}
-
-.nSmallMarginLeft
-{
-  margin-left: -10px !important
-}
-
-.mediumMarginLeft
-{
-  margin-left: 20px
-}
-
-.nMediumMarginLeft
-{
-  margin-left: -20px
+  margin-right: -30px !important
 }
 
 .largeMarginLeft
@@ -228,11 +233,6 @@ h3, h4
 .nLargeMarginBottom
 {
   margin-bottom: -30px
-}
-
-.nMediumSmallMarginRight
-{
-  margin-right: -15px !important
 }
 
 /* The "show" class is added to the filtered elements */

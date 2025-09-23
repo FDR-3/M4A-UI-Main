@@ -23,14 +23,17 @@
   var handleGetDirectionsEventFunction: void
   var handleSubmitClaimEventFunction: void
 
-  onMounted(async() => 
+  onMounted(() => 
   {
     if(localStorage.getItem("userTheme") === "darkTheme")
       style = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"  
     else
       style = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
 
-    await setupMap(style)
+    setupMap(style)
+
+    if(props.stateHospitalList)
+      updateMarkersOnMap()
   })
 
   onUnmounted(() =>
@@ -46,7 +49,7 @@
         currentSubmitListners[i].removeEventListener('click', handleSubmitClaimEventFunction); 
   })
 
-  watch(darkTheme, async() => 
+  watch(darkTheme, () => 
   {
     if(darkTheme.value) 
       map.setStyle("https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json") 
@@ -54,12 +57,12 @@
       map.setStyle("https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json")
   })
 
-  watch(() => props.stateHospitalList, async() =>
+  watch(() => props.stateHospitalList, () =>
   {
-    await updateMarkersOnMap()
+    updateMarkersOnMap()
   })
   
-  async function setupMap(style:string)
+  function setupMap(style:string)
   {
     map = new maplibregl.Map(
     {
@@ -78,7 +81,7 @@
     })
   }
 
-  async function updateMarkersOnMap()
+  function updateMarkersOnMap()
   {
     // remove old markers 
     if (currentMarkers.length != 0)

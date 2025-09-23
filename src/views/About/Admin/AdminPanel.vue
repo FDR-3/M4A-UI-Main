@@ -29,8 +29,18 @@
       >
         Toggle Lending Admin Page
       </ion-button>
+      <ion-button
+        v-if="adminAccounts.isAlertCEOAccountReady"
+        :class="adminPanelSelect==3 ? 'tableToggleSelect' : ''"
+        color="dark"
+        @click="setAdminPanelSelect(3)"
+        :disabled="adminPanelSelect==3"
+      >
+        Toggle Alert Admin Page
+      </ion-button>
     </div>
   </div>
+
   <M4AAdmin v-if="adminPanelSelect==0 && 
     (connectedWallet.addressString==adminAccounts.m4aCEOAddress ||
     connectedWallet.addressString==adminAccounts.m4aTreasurerAddress ||
@@ -49,6 +59,7 @@
     :currentClaimQueueCount="currentClaimQueueCount"
     :claimQueueSizeLimit="claimQueueSizeLimit"
   />
+
   <ChatAdmin v-if="adminPanelSelect==1 &&
     (connectedWallet.addressString==adminAccounts.chatCEOAddress || connectedWallet.addressString==adminAccounts.chatTreasurerAddress)"
     :isPollTableDataLoading="isPollTableDataLoading"
@@ -58,6 +69,10 @@
   <LendingAdmin v-if="adminPanelSelect==2 &&
     (connectedWallet.addressString==adminAccounts.lendingCEOAddress)"
   />
+
+  <AlertAdmin v-if="adminPanelSelect==3 &&
+    (connectedWallet.addressString==adminAccounts.alertCEOAddress)"
+  />
 </template>
 
 <script setup lang="ts">
@@ -66,6 +81,7 @@
   import M4AAdmin from '/src/views/About/Admin/M4AAdmin.vue'
   import ChatAdmin from '/src/views/About/Admin/ChatAdmin.vue'
   import LendingAdmin from '/src/views/About/Admin/LendingAdmin.vue'
+  import AlertAdmin from '/src/views/About/Admin/AlertAdmin.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { claimQueue, claims, processedClaims } from '/src/assets/globalStates/m4a/Claims.vue'

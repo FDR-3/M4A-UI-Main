@@ -1,5 +1,4 @@
-
-
+<template></template> <!--Silences a warning in the browser console-->
 <script setup lang="ts">
   import { onUnmounted } from 'vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'

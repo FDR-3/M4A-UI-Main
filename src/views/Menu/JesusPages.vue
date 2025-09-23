@@ -1,5 +1,6 @@
 <template>
   <ion-page>
+    <Alerter v-if="anchorPrograms.hasWebSiteBeenUpdated"/>
     <NavBar
       :navButtons="navButtons"
       :colorName="colorName"
@@ -33,6 +34,7 @@
 <script setup lang="ts">
   import { ref, watch} from 'vue'
   import { IonContent, IonPage } from '@ionic/vue'
+  import Alerter from '/src/components//smart contracts/alert protocol/UpdateNotice.vue'
   import NavBar from '/src/components/navbar/NavBar.vue'
   import Footer from '/src/components/pages/Footer.vue'
   import { Jesus110PathSelectionPages, Jesus110PagesAfterPathSelection } from '/src/views/Jesus/110/110JesusPages.vue'
@@ -41,7 +43,7 @@
   import MaintenancePage from '/src/components/pages/MaintenancePage.vue'
   import { MAINTENANCE_MODE, APPROVED_TESTERS } from '/src/assets/globalStates/MaintenanceMode.ts'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   const pageContent = ref()
 

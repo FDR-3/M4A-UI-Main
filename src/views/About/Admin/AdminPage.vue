@@ -18,6 +18,12 @@
     >
       <ion-label color="dark">Init Lending Admin Accounts</ion-label>
     </ion-button>
+    <ion-button v-if="!adminAccounts.isAlertCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
+      @click="initializeAlertProtocol()"
+      :color=colorName
+    >
+      <ion-label color="dark">Init Alert Admin Accounts</ion-label>
+    </ion-button>
   </div>
   <div>
     <AdminPanel v-if="connectedWallet.addressString==adminAccounts.m4aCEOAddress ||
@@ -39,8 +45,12 @@
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import AdminPanel  from './AdminPanel.vue'
   import LogoArt  from './LogoArt.vue'
-  import DeadMansBreakClock from '/src/components/smartContracts/DeadMansBreakClock.vue'
-  import { confirmM4ATransaction, confirmChatTransaction, confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import DeadMansBreakClock from '/src/components/smart contracts/alert protocol/DeadMansBreakClock.vue'
+  import { confirmM4ATransaction,
+    confirmChatTransaction,
+    confirmLendingTransaction,
+    confirmAlertTransaction,
+    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
 
   const toast = inject('toast')
   const colorName = inject('colorName') as string
@@ -81,6 +91,19 @@
     catch(error)
     {
       toastPreTransactionError(error, toast, "initialize_lending_protocol")
+    }
+  }
+
+  async function initializeAlertProtocol()
+  {
+    try
+    {
+      const tx = await anchorPrograms.alert.alertProgram.methods.initializeAlertProtocol().rpc()
+      await confirmAlertTransaction(tx, toast, "initialize_alert_protocol")
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "initialize_alert_protocol")
     }
   }
 </script>

@@ -12,9 +12,11 @@
     chatCEOAddress: undefined,
     chatTreasurerAddress: undefined,
     lendingCEOAddress: undefined,
+    alertCEOAddress: undefined,
     isM4ACEOAccountReady: false,
     isChatCEOAccountReady: false,
     isLendingCEOAccountReady: false,
+    isAlertCEOAccountReady: false,
     ceoIsDead: false
   })
 

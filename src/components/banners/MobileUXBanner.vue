@@ -1,7 +1,7 @@
 <template>
   <div v-if="!mobileQualityNoticeDimissed" id="mobileBanner" class="thinBorder" style="margin: 10px">
     <div align="right">
-      <ion-button id="closeMobileBannerButton" fill="clear" color="dark" @click="dismissBanner()">
+      <ion-button class="" fill="clear" color="dark" @click="dismissBanner()">
         <ion-icon class="footerIcon":src="closeCircle"></ion-icon>
       </ion-button>
     </div>
@@ -36,7 +36,7 @@
   }
 </script>
 
-<style>
+<style scoped>
   #closeMobileBannerButton
   {
     margin-top: -18px;

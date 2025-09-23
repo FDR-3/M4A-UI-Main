@@ -132,6 +132,32 @@
     }
   }
 
+  export async function confirmAlertTransaction(transaction: any, toast: any, contractFunctionName: string)
+  {
+    try
+    {
+      const confirmation = await anchorPrograms.alert.alertProgram.provider.connection.confirmTransaction(transaction, 'processed')//'confirmed' for higher confirmation level, but seems to sometimes give error that transaction already was processed
+  
+      // Check if the transaction was successful
+      if(confirmation.value.err)
+      {
+        toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
+        detail: `${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
+      }
+      else
+      {
+        toast.add({ severity: 'success', summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
+        detail: `The UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        life: TOAST_TIME_LEN_MILLISECONDS })
+      }
+    }
+    catch(error)
+    {
+      toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
+      detail: `${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
+    }
+  }
+
   export function copyFullAddress(buttonText: Ref, addressString: string)
   {
     //Copy address to clipboard

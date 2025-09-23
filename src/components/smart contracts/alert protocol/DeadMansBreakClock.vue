@@ -8,8 +8,8 @@
     </ion-text>
     <br>
     <br>
-    <ion-button v-if="connectedWallet.addressString==adminAccounts.chatCEOAddress && !anchorPrograms.areChatQOLAccountsReady" color="dark" :disabled="true">Quality Of Life Accounts Not Initialized</ion-button>
-    <ion-button color="dark" v-else-if="connectedWallet.addressString==adminAccounts.chatCEOAddress" @click="clockInDeadMansBreak()">
+    <ion-button v-if="connectedWallet.addressString==adminAccounts.alertCEOAddress && !adminAccounts.isAlertCEOAccountReady" color="dark" :disabled="true">Alert Protocol Not Initialized</ion-button>
+    <ion-button color="dark" v-else-if="connectedWallet.addressString==adminAccounts.alertCEOAddress" @click="clockInDeadMansBreak()">
       Clock In
     </ion-button>
 
@@ -23,7 +23,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { confirmChatTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { confirmAlertTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -137,8 +137,8 @@
   {
     try
     {
-      const tx = await anchorPrograms.chat.chatProgram.methods.clockInDeadMansBreak().rpc()
-      await confirmChatTransaction(tx, toast, "clock_in_dead_mans_break")
+      const tx = await anchorPrograms.alert.alertProgram.methods.clockInDeadMansBreak().rpc()
+      await confirmAlertTransaction(tx, toast, "clock_in_dead_mans_break")
     }
     catch(error)
     {

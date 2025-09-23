@@ -1,6 +1,7 @@
 <template>
     <div class="tableContainer">
-        <h1 class="yellow">{{ displayName }}</h1>
+        <h1 class="yellow displayLongName">{{ displayName }}</h1>
+        <h1 class="yellow displayShortName">{{ possiblyTrimmedDisplayName }}</h1>
 
         <p v-if="searchAddress==SYSTEM_PROGRAM_ADDRESS_STRING">Connect Wallet or Search for a Different Public Key</p>
 
@@ -95,5 +96,28 @@
     ion-input
     {
         --highlight-color: var(--ion-color-green)
+    }
+
+     @media screen and (min-width: 1311.1px)
+    { 
+        .displayLongName
+        {
+            display: block
+        }
+        .displayShortName
+        {
+            display: none
+        }
+    }
+    @media screen and (max-width: 1311px) 
+    { 
+        .displayLongName
+        {
+            display: none
+        }
+        .displayShortName
+        {
+            display: block
+        }
     }
 </style>
