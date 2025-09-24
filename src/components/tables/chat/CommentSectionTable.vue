@@ -260,14 +260,18 @@
   onMounted(async() =>
   {
     if(commentSections.data)
+    {
       tableData.value = commentSections.data
-
-    isLoading.value = false
+      isLoading.value = false
+    }
   })
 
   watch(commentSections, () =>
   {
     tableData.value = commentSections.data
+
+    if(isLoading.value)
+      isLoading.value = false
   })
 
   watch(customUserNameHashMap, () =>

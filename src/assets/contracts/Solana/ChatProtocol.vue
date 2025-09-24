@@ -879,7 +879,10 @@
     var refreshedData: any = []
 
     const tableData = ideas.data
-    if(tableData)
+
+    if(!tableData)
+      return
+    else
       for(var i=0; i<tableData.length; i++)
       {
         tableData[i].displayName = getCustomOrTrimmedUserDisplayName(tableData[i].postOwnerAddress)
@@ -894,7 +897,10 @@
     var refreshedData: any = []
 
     const tableData = feds.data
-    if(tableData)
+
+    if(!tableData)
+      return
+    else
       for(var i=0; i<tableData.length; i++)
       {
         tableData[i].displayName = getCustomOrTrimmedUserDisplayName(tableData[i].postOwnerAddress)

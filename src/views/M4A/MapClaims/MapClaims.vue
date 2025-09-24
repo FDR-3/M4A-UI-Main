@@ -70,7 +70,7 @@
   const submitClaim = ref()
   var showStateHospitalRecords = ref()
   var stateHospitalList = ref()
-  var isLoading = ref()
+  var isLoading = ref(true)
 
   var stateApprovedClaimTotalString = ref("$0.00")
   var stateApprovedClaimCount = ref(0)
@@ -91,18 +91,20 @@
 
     if(mapSelection.countryIndex != -1 && mapSelection.stateIndex != -1)
     {
-      isLoading.value = true
-
       if(stateHospitalListHashMap.map)
+      {
         getStateData()
-
-      isLoading.value = false
+        isLoading.value = false
+      }
     }
   })
 
   watch(stateHospitalListHashMap, () =>
   {
     getStateData()
+
+    if(isLoading.value)
+      isLoading.value = false
   })
 
   function getStateData()
@@ -169,7 +171,11 @@
     localStorage.setItem("mapDefaultLatitude", mapSelection.zoomLat.toString())
     localStorage.setItem("mapDefaultLongitude", mapSelection.zoomLong.toString())
 
-    getStateData()
+    if(stateHospitalListHashMap.map)
+    {
+      getStateData()
+      isLoading.value = false
+    }
   }
 
   function resetStateSelected()

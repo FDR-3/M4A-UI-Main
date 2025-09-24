@@ -203,14 +203,18 @@
   onMounted(() =>
   {
     if(ideas.data)
+    {
       tableData.value = ideas.data
-
-    isLoading.value = false
+      isLoading.value = false
+    }
   })
 
   watch(ideas, () =>
   {
     tableData.value = ideas.data
+
+    if(isLoading.value)
+      isLoading.value = false
   })
 
   function passByRefWrapperCopyAddress()

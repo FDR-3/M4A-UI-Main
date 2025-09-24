@@ -157,18 +157,21 @@
 
   var copyFullAddressButtonText = ref("Copy Full Address")
 
-
   onMounted(() =>
   {
     if(feds.data)
+    {
       tableData.value = feds.data
-
-    isLoading.value = false
+      isLoading.value = false
+    }
   })
 
   watch(feds, () =>
   {
     tableData.value = feds.data
+
+    if(isLoading.value)
+      isLoading.value = false
   })
 
   function passByRefWrapperCopyAddress()

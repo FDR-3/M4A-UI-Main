@@ -1785,7 +1785,10 @@
     var refreshedData: any = []
 
     const tableData = claims.data
-    if(tableData)
+
+    if(!tableData)
+      return
+    else
       for(var i=0; i<tableData.length; i++)
       {
         //Get submitter display name
@@ -1801,7 +1804,10 @@
     var refreshedData: any = []
 
     const tableData = processedClaims.data
-    if(tableData)
+
+    if(!tableData)
+      return
+    else
       for(var i=0; i<tableData.length; i++)
       {
         //Get submitter display name
@@ -1817,7 +1823,10 @@
     var refreshedData: any = []
 
     const tableData = processors.data
-    if(tableData)
+
+    if(!tableData)
+      return
+    else
       for(var i=0; i<tableData.length; i++)
       {
         //Get submitter display name
