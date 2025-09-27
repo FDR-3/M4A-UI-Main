@@ -1,5 +1,6 @@
 <template>
     <Suspense><PriceUpdater/></Suspense>
+    <Suspense><BalanceUpdater/></Suspense>
 </template>
 
 <script setup lang="ts">
@@ -15,6 +16,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import PriceUpdater from './PriceUpdater.vue'
+  import BalanceUpdater from './BalanceUpdater.vue'
 
   var lendingProtocolCEOAccountWatcherId: any
 

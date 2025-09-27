@@ -21,7 +21,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import ReservesTable from '/src/components/tables/lending/ReservesTable.vue'
+  import ReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
   import {  PublicKey } from "@solana/web3.js"
 
   const toast = inject('toast')
@@ -33,7 +33,11 @@
   {
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.addTokenReserve(new PublicKey(tokenMintAddressInput.value), tokenDecmialCountInput.value).rpc()
+      const mintAddressKey = new PublicKey(tokenMintAddressInput.value)
+      const tx = await anchorPrograms.lending.lendingProgram.methods.addTokenReserve(mintAddressKey, tokenDecmialCountInput.value)
+      .accounts({mint: mintAddressKey})
+      .rpc()
+
       tokenMintAddressInput.value = ""
       tokenDecmialCountInput.value = ""
       await confirmLendingTransaction(tx, toast, "add_token_reserve")

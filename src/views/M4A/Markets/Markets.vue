@@ -143,12 +143,12 @@
 
   .tableFlipContainer.flipped
   {
-    height: 391px
+    height: 646px
   }
 
   .tableFlipContainer.flipped.notConnected
   {
-    height: 436px
+    height: 692px
   }
 
   @media screen and (min-width: 1769.1px)
@@ -158,60 +158,67 @@
       height: 1108px
     } 
   }
-  @media screen and (min-width: 1656.1px) and (max-width: 1769px)
+  @media screen and (min-width: 1432.1px) and (max-width: 1769px)
   { 
     .tableFlipContainer
     {
       height: 1144px
     } 
   }
-  @media screen and (min-width: 1301.1px) and (max-width: 1656px)
+  @media screen and (min-width: 1411.1px) and (max-width: 1432px)
   { 
     .tableFlipContainer
     {
-      height: 1144px
+      height: 1157px
     } 
   }
-  @media screen and (min-width: 1192.1px) and (max-width: 1301px)
+  @media screen and (min-width: 1301.1px) and (max-width: 1411px)
   { 
     .tableFlipContainer
     {
-      height: 1158px
+      height: 1171px
+    } 
+  }
+  @media screen and (min-width: 1191.1px) and (max-width: 1301px)
+  { 
+    .tableFlipContainer
+    {
+      height: 1186px
     }
   }
-  @media screen and (min-width: 990.1px) and (max-width: 1192px)
+  @media screen and (min-width: 999.1px) and (max-width: 1191px)
   { 
     .tableFlipContainer
     {
-      height: 1194px
+      height: 1222px
     }
   }
-  @media screen and (min-width: 924.1px) and (max-width: 990px)
+  @media screen and (min-width: 989.1px) and (max-width: 999px)
   { 
     .tableFlipContainer
     {
-      height: 1210px
+      height: 1237px
     }
   }
-  @media screen and (min-width: 799px) and (max-width: 924px)
+  @media screen and (min-width: 976.1px) and (max-width: 989px)
   { 
     .tableFlipContainer
     {
-      height: 1245px
+      height: 1252px
     }
   }
-  @media screen and (min-width: 744.1px) and (max-width: 799px)
+  @media screen and (min-width: 929.1px) and (max-width: 976px)
   { 
     .tableFlipContainer
     {
-      height: 1281px
+      height: 1267px
     }
   }
-  @media screen and (max-width: 744px)
+  @media screen and (max-width: 929px)
   { 
     .tableFlipContainer
     {
-      height: 1297px
+      height: 1282px
     }
   }
 </style>

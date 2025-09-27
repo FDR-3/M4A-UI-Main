@@ -11,7 +11,7 @@
       :value="StableCoins"
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'apy', 'app.name', 'chain.name']"
+      :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'percentChange24h', 'apy', 'chain.name']"
     >
       <template #header>
         <div>
@@ -55,7 +55,11 @@
             maximumFractionDigits: 2 })}}
         </template>
       </Column>
-      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
+      <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
+        <template #body="slotProps">
+           <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
+        </template>
+      </Column>
       <Column field="chain.name" header="Chain" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
@@ -66,6 +70,7 @@
           </div>
         </template>
       </Column>
+      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
@@ -83,7 +88,7 @@
       scrollable
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'apy', 'app.name', 'chain.name']"
+      :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'percentChange24h', 'apy', 'chain.name']"
     >
     <template #header>
       <div>
@@ -109,7 +114,11 @@
             maximumFractionDigits: 2 })}}
         </template>
       </Column>
-      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
+      <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
+        <template #body="slotProps">
+           <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
+        </template>
+      </Column>
       <Column field="chain.name" header="Chain" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
@@ -120,6 +129,7 @@
           </div>
         </template>
       </Column>
+      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
@@ -133,7 +143,7 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover } from '@ionic/vue'
+  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
@@ -185,7 +195,7 @@
 
   .tableMinWidth
   {
-    min-width: 640px
+    min-width: 807px
   }
 
   ion-input

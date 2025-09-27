@@ -10,11 +10,17 @@
     sourceSOL,
     sourceWETH,
     sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
+  import { hodlAssociatedTokenAddressKeysMainNet,
+    singlePayerAssociatedTokenAddressKeysMainNet,
+    hodlAssociatedTokenAddressKeysDevNet,
+    singlePayerAssociatedTokenAddressKeysDevNet } from '/src/assets/constants/Addresses.ts'
 
   export const StableCoins = reactive(
   [
     {
       tokenMintAddress: "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o",
+      hodlATA: hodlAssociatedTokenAddressKeysMainNet.daiATA,
+      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.daiATA,
       asset: 
       {
         name: "DAI",
@@ -22,6 +28,7 @@
         source: () => {sourceDAI()}
       },
       price: '-',
+      percentChange24h: '-',
       apy: "4.44%",
       chain:
       {
@@ -32,6 +39,8 @@
     },
     {
       tokenMintAddress: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",//Mainnet
+      hodlATA: hodlAssociatedTokenAddressKeysMainNet.usdcATA,
+      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.usdcATA,
       asset: 
       {
         name: "USDC",
@@ -39,6 +48,7 @@
         source: () => {sourceUSDC()}
       },
       price: '-',
+      percentChange24h: '-',
       apy: "4.44%",
       chain:
       {
@@ -49,6 +59,8 @@
     },
     {
       tokenMintAddress: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",//Devnet
+      hodlATA: hodlAssociatedTokenAddressKeysDevNet.usdcATA,
+      singlePayerATA: singlePayerAssociatedTokenAddressKeysDevNet.usdcATA,
       asset: 
       {
         name: "USDC-Dev",
@@ -56,6 +68,7 @@
         source: () => {sourceUSDC()}
       },
       price: 1.00,
+      percentChange24h: 0.00.toFixed(2),
       apy: "4.44%",
       chain:
       {
@@ -70,6 +83,8 @@
   [
     {
       tokenMintAddress: "So11111111111111111111111111111111111111112",
+      hodlATA: hodlAssociatedTokenAddressKeysMainNet.solATA,
+      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.solATA,
       asset: 
       {
         name: "Sol",
@@ -77,6 +92,7 @@
         source: () => {sourceSOL()}
       },
       price: '-',
+      percentChange24h: '-',
       apy: "4.44%",
       chain:
       {
@@ -87,6 +103,8 @@
     },
     {
       tokenMintAddress: "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+      hodlATA: hodlAssociatedTokenAddressKeysMainNet.wethATA,
+      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.wethATA,
       asset: 
       {
         name: "WETH",
@@ -94,6 +112,7 @@
         source: () => {sourceWETH()}
       },
       price: '-',
+      percentChange24h: '-',
       apy: "4.44%",
       chain:
       {
@@ -104,6 +123,8 @@
     },
     {
       tokenMintAddress: "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+      hodlATA: hodlAssociatedTokenAddressKeysMainNet.wbtcATA,
+      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.wbtcATA,
       asset: 
       {
         name: "WBTC",
@@ -111,6 +132,7 @@
         source: () => {sourceWBTC()}
       },
       price: '-',
+      percentChange24h: '-',
       apy: "4.44%",
       chain:
       {

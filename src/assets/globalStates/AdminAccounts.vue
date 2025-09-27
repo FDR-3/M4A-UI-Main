@@ -1,5 +1,11 @@
 <script lang="ts">
   import { reactive } from 'vue'
+  import { tokenAddressStringsMainNet,
+    tokenAddressStringsDevNet,
+    hodlAssociatedTokenAddressKeysMainNet,
+    singlePayerAssociatedTokenAddressKeysMainNet,
+    hodlAssociatedTokenAddressKeysDevNet,
+    singlePayerAssociatedTokenAddressKeysDevNet } from '/src/assets/constants/Addresses.ts'
   import { PublicKey } from "@solana/web3.js"
 
   export const adminAccounts = reactive(
@@ -29,6 +35,24 @@
   {
     map: new Map<string, string>()
   })
+  export const hodlTreasuryATAMainNetHashMap: Map<string, PublicKey> = new Map(
+  [
+    //Key: Token Mint Address, Value: Assocated Token Address
+    [tokenAddressStringsMainNet.daiTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.daiATA],
+    [tokenAddressStringsMainNet.usdcTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.usdcATA],
+    [tokenAddressStringsMainNet.solTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.solATA],
+    [tokenAddressStringsMainNet.wethTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.wethATA],
+    [tokenAddressStringsMainNet.wbtcTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.wbtcATA]
+  ])
+  export const singlePayerTreasuryATAMainNetHashMap: Map<string, PublicKey> = new Map(
+  [
+    //Key: Token Mint Address, Value: Assocated Token Address
+    [tokenAddressStringsMainNet.daiTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.daiATA],
+    [tokenAddressStringsMainNet.usdcTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.usdcATA],
+    [tokenAddressStringsMainNet.solTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.solATA],
+    [tokenAddressStringsMainNet.wethTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.wethATA],
+    [tokenAddressStringsMainNet.wbtcTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.wbtcATA]
+  ])
 
   //Dev Net
   export const hodlTreasuryBalancesDevNetHashMap = reactive(
@@ -38,6 +62,31 @@
   export const singlePayerTreasuryBalancesDevNetHashMap = reactive(
   {
     map: new Map<string, string>()
+  })
+  export const hodlTreasuryATADevNetHashMap: Map<string, PublicKey> = new Map(
+  [
+    //Key: Token Mint Address, Value: Assocated Token Address
+    [tokenAddressStringsDevNet.daiTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.daiATA],
+    [tokenAddressStringsDevNet.usdcTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.usdcATA],
+    [tokenAddressStringsDevNet.solTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.solATA],
+    [tokenAddressStringsDevNet.wethTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.wethATA],
+    [tokenAddressStringsDevNet.wbtcTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.wbtcATA]
+  ])
+  export const singlePayerTreasuryATADevNetHashMap: Map<string, PublicKey> = new Map(
+  [
+    //Key: Token Mint Address, Value: Assocated Token Address
+    [tokenAddressStringsDevNet.daiTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.daiATA],
+    [tokenAddressStringsDevNet.usdcTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.usdcATA],
+    [tokenAddressStringsDevNet.solTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.solATA],
+    [tokenAddressStringsDevNet.wethTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.wethATA],
+    [tokenAddressStringsDevNet.wbtcTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.wbtcATA]
+  ])
+
+  export const tvl = reactive(
+  {
+    hodlTVL: 0,
+    singlePayerTVL: 0,
+    tokenReserveTVL: 0
   })
 
   export default adminAccounts

@@ -49,11 +49,8 @@
   import { processors } from '/src/assets/globalStates/m4a/Processors.vue'
   import { patientRecordsHashMap, hospitalRecordsHashMap, insuranceCompanyRecordsHashMap } from '/src/assets/globalStates/m4a/Records.vue'
   import { customUserNameHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
-  import { tokenAddressKeysMainNet, tokenAddressStringsDevNet, tokenAddressKeysDevNet } from '/src/assets/constants/TokenAddresses.ts'
-  import { adminAccounts, hodlTreasuryBalancesDevNetHashMap, singlePayerTreasuryBalancesDevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { PublicKey } from "@solana/web3.js"
-  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 
   var claimQueueWatchId: any
   var claimStatsWatchId: any
@@ -68,57 +65,14 @@
   var processedClaimStatsWatchId: any
   var unfinishedClaimStatsWatchId: any
 
-  var hodlUSDCATAWatcherId: any
-  var singlePayerUSDCATAWatcherId: any
   var areM4AProtocolStatsReadyWatchId: any
   var isM4AProtocolReadyWatchId: any
   var isM4AFeeTokenAccountReadyWatchId: any
   var m4aProtocolCEOAccountWatcherId: any
   var m4aProtocolTreasurerAccountWatcherId: any
 
-  var hodlTreasuryUSDCATA: PublicKey
-  var singlePayerTreasuryUSDCATA: PublicKey
-
   onMounted(async() =>
   {
-    //Hodl Account
-    hodlTreasuryUSDCATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeysDevNet.USDCTokenMintAddress, //Token Mint Address
-      adminAccounts.hodlTreasuryAddress //Wallet Public Key
-    )
-    try
-    {
-      const hodlUDSCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCATA)
-      hodlTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.USDCTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(2))
-      await listenForHODLTreasuryUSDCChanges()
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
-
-    //Single Payer Account
-    singlePayerTreasuryUSDCATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeysDevNet.USDCTokenMintAddress, //Token Mint Address
-      adminAccounts.singlePayerTreasuryAddress //Wallet Public Key
-    )
-    try
-    {
-      const singlePayerUSDCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(singlePayerTreasuryUSDCATA)
-      singlePayerTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.USDCTokenMintAddress, singlePayerUSDCAccount.value.uiAmount.toFixed(2))
-      await listenForSinglePayerTreasuryChanges()
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
-
     //M4A Protocol Account
     const m4aProtocol = await getM4AProtocol()
     await listenForM4AProtocolChanges()
@@ -215,16 +169,6 @@
 
   onUnmounted(() => 
   {
-    if(hodlUSDCATAWatcherId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(hodlUSDCATAWatcherId)
-      hodlUSDCATAWatcherId = undefined
-    }
-    if(singlePayerUSDCATAWatcherId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(singlePayerUSDCATAWatcherId)
-      singlePayerUSDCATAWatcherId = undefined
-    }
     if(isM4AProtocolReadyWatchId != undefined)
     {
       anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(isM4AProtocolReadyWatchId)
@@ -321,42 +265,6 @@
     refreshInsuranceCompanyRecordsHashMaps()
     refreshProcessorsData()
   })
-
-  async function listenForHODLTreasuryUSDCChanges()
-  {
-    try
-    {
-      //Subscribe to account changes
-      hodlUSDCATAWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(hodlTreasuryUSDCATA, async() => 
-      {
-        //Handle account change...
-        const hodlUDSCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCATA)
-        hodlTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.USDCTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
-  }
-
-  async function listenForSinglePayerTreasuryChanges()
-  {
-    try
-    {
-      //Subscribe to account changes
-      singlePayerUSDCATAWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(singlePayerTreasuryUSDCATA, async() => 
-      {
-        //Handle account change...
-        const singlePayerUSDCAccount = await anchorPrograms.m4a.m4aProgram.provider.connection.getTokenAccountBalance(singlePayerTreasuryUSDCATA)
-        singlePayerTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.USDCTokenMintAddress, singlePayerUSDCAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-    }
-  }
 
   async function listenForM4AFeeTokenAccount()
   {

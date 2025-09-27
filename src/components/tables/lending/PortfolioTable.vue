@@ -21,8 +21,16 @@
         color="green"
         :disabled="!isValidPublicKey"
         >
-        Check New Address
+            Check New Address
         </ion-button>
+    </div>
+    <div class="thickBorder smallMarginTop">
+        <h2 class="tinyMarginTop">Life Time Interest Earned</h2>
+        <h3 class="nMediumMarginTop">$<span class="rainbowText">10.00</span></h3>
+        <h2>7 Day Projection Rate</h2>
+        <h3 class="nMediumMarginTop">$<span class="rainbowText">0.11</span> A Week</h3>
+
+        <ion-button color="dark" :disabled="true">Generate Interest Earned Tax Form</ion-button>
     </div>
 
 </template>

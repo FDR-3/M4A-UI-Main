@@ -1,9 +1,6 @@
 <script lang="ts">
   import * as anchor from "@coral-xyz/anchor"
   import { PublicKey } from "@solana/web3.js"
-  import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 

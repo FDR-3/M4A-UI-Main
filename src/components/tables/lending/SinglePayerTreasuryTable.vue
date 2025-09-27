@@ -9,11 +9,11 @@
       size="small" 
       :value="stableCoinTableData"
       rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'asset.name', 'chain.name', 'price', 'app.name', 'quanity', 'value']"  
+      :globalFilterFields="['tokenMintAddress', 'singlePayerATA', 'asset.name', 'chain.name', 'price', 'percentChange24h', 'quanity', 'value']"  
     >
       <template #header>
         <div>
-          <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ totalValue.toLocaleString('en-US', {
+          <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ tvl.singlePayerTVL.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span></h2>
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Single Payer Treasury Search     ">
@@ -38,7 +38,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+                <ion-label color="dark">{{ copyTreasuryATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -61,6 +61,11 @@
             maximumFractionDigits: 2 })}}
         </template>
       </Column>
+      <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
+        <template #body="slotProps">
+           <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
+        </template>
+      </Column>
       <Column field="quanity" header="Quantity" style="width: 0%" sortable></Column>
       <Column field="value" header="Value" style="width: 0%" sortable>
         <template #body="slotProps">
@@ -76,7 +81,7 @@
       :value="CryptoCurrencyTableData"
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'asset.name', 'chain.name', 'price', 'app.name', 'quanity', 'value']"
+      :globalFilterFields="['tokenMintAddress', 'singlePayerATA', 'asset.name', 'chain.name', 'price', 'percentChange24h', 'quanity', 'value']"
     >
       <template #header>
         <div>
@@ -100,7 +105,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+                <ion-label color="dark">{{ copyTreasuryATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -123,6 +128,11 @@
             maximumFractionDigits: 2 })}}
         </template>
       </Column>
+      <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
+        <template #body="slotProps">
+           <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
+        </template>
+      </Column>
       <Column field="quanity" header="Quantity" style="width: 0%" sortable></Column>
       <Column field="value" header="Value" style="width: 0%" sortable>
         <template #body="slotProps">
@@ -135,14 +145,15 @@
 
 <script setup lang="ts">
   import { ref, onMounted, watch, markRaw, computed } from 'vue'
-  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover } from '@ionic/vue'
+  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { singlePayerTreasuryBalancesDevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
-  import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyTreasuryATA } from '/src/assets/contracts/WalletHelper.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
+  import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   const stableCoinTableData = ref()
@@ -154,7 +165,7 @@
 
   const tokenPopoverOpen = ref(false)
   const event = ref()
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var copyTreasuryATAButtonText = ref("Copy Treasury ATA")
 
   onMounted(() =>
   {
@@ -162,6 +173,7 @@
     {
       processSinglePayerStableCoinTableData()
       processSinglePayerCryptoCurrencyTableData()
+      tvl.singlePayerTVL = stableValue.value + cryptoValue.value
 
       isLoading.value = false
     }
@@ -173,6 +185,7 @@
   {
     processSinglePayerStableCoinTableData()
     processSinglePayerCryptoCurrencyTableData()
+    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
 
     if(isLoading.value)
       isLoading.value = false
@@ -181,17 +194,19 @@
   watch(StableCoins, () => 
   {
     processSinglePayerStableCoinTableData()
+    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
   })
 
   watch(CryptoCurrency, () => 
   {
     processSinglePayerCryptoCurrencyTableData()
+    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
   })
 
   function openTokenPopover(e: Event, rowData: any) 
   {
     event.value = e
-    event.value.tokenMintAddress = rowData.tokenMintAddress
+    event.value.singlePayerATA = rowData.singlePayerATA
 
     tokenPopoverOpen.value = true
   }
@@ -204,7 +219,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+    copyTreasuryATA(copyTreasuryATAButtonText, event.value.singlePayerATA)
   }
 
   function processSinglePayerStableCoinTableData()

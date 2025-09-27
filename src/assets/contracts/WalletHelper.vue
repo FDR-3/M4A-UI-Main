@@ -182,6 +182,30 @@
     }, 2000) // 2000 milliseconds = 2 seconds
   }
 
+  export function copyTreasuryATA(buttonText: Ref, addressString: string)
+  {
+    //Copy address to clipboard
+    navigator.clipboard.writeText(addressString)
+    buttonText.value = "Copied!"
+
+    setTimeout(() =>
+    {
+      buttonText.value = "Copy Treasury ATA" // Revert to the initial value
+    }, 2000) // 2000 milliseconds = 2 seconds
+  }
+
+  export function copyTokenReserveATA(buttonText: Ref, addressString: string)
+  {
+    //Copy address to clipboard
+    navigator.clipboard.writeText(addressString)
+    buttonText.value = "Copied!"
+
+    setTimeout(() =>
+    {
+      buttonText.value = "Copy Token Reserve ATA" // Revert to the initial value
+    }, 2000) // 2000 milliseconds = 2 seconds
+  }
+
   export function trimAddress(userAddress: string | PublicKey)
   {
     

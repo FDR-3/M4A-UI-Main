@@ -5,6 +5,7 @@
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
+  import { PublicKey } from "@solana/web3.js"
   import cloneDeep from 'lodash/cloneDeep'
 
   export async function getLendingProtocolCEOAccount()
@@ -191,6 +192,19 @@
       anchorPrograms.lending.lendingProgram.programId
     )
     return lendingProtocolPDA
+  }
+
+  export function getTokenReservePDA(tokenMintAddress: PublicKey)
+  {
+    const [tokenReservePDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("tokenReserve"),
+        tokenMintAddress.toBuffer()
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return tokenReservePDA
   }
 
   export function getSubMarketStatsPDA()

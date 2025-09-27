@@ -4,6 +4,7 @@
   --ion-color-green: #39bd39;
   --ion-color-blue: #557fcc;
   --ion-color-red: #ff0000;
+  --ion-color-orange: #ff8800;
   --ion-color-gray: #b5bbcad3;
   --ion-color-darkgray: #505050;
   --ion-color-purple: #8a2be2;
@@ -46,6 +47,11 @@
 .ion-color-red 
 {
   --ion-color-base: var(--ion-color-red)
+}
+
+.ion-color-orange
+{
+  --ion-color-base: var(--ion-color-orange)
 }
 
 .ion-color-gray 

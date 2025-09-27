@@ -1,5 +1,5 @@
 {
-  "address": "H8ouYcPXMaBttjYsB5BurCdtD4TShxLHxyeAGGYQ6eVy",
+  "address": "HdwSUeYR4zdrAfquQo8WocnBLcsqvfdRYMqJ7KEGjMV7",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -106,6 +106,107 @@
               }
             ]
           }
+        },
+        {
+          "name": "token_reserve_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "token_reserve"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "signer",
@@ -255,7 +356,7 @@
         },
         {
           "name": "fee_on_interest_earned_rate",
-          "type": "f32"
+          "type": "u16"
         }
       ]
     },
@@ -274,6 +375,7 @@
       "accounts": [
         {
           "name": "token_reserve",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -474,8 +576,8 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "mint"
               }
             ],
             "program": {
@@ -608,8 +710,15 @@
           }
         },
         {
+          "name": "mint"
+        },
+        {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "signer",
@@ -640,7 +749,7 @@
         },
         {
           "name": "amount",
-          "type": "f64"
+          "type": "u64"
         }
       ]
     },
@@ -743,7 +852,7 @@
         },
         {
           "name": "fee_on_interest_earned_rate",
-          "type": "f32"
+          "type": "u16"
         }
       ]
     },
@@ -1203,7 +1312,7 @@
         },
         {
           "name": "amount",
-          "type": "f64"
+          "type": "u64"
         }
       ]
     },
@@ -1222,6 +1331,7 @@
       "accounts": [
         {
           "name": "token_reserve",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -1571,7 +1681,7 @@
       ],
       "args": [
         {
-          "name": "_token_mint_address",
+          "name": "token_mint_address",
           "type": "pubkey"
         },
         {
@@ -1580,7 +1690,7 @@
         },
         {
           "name": "_sub_market_index",
-          "type": "u8"
+          "type": "u16"
         },
         {
           "name": "account_index",
@@ -1588,7 +1698,7 @@
         },
         {
           "name": "amount",
-          "type": "f64"
+          "type": "u64"
         }
       ]
     }
@@ -1690,7 +1800,7 @@
     {
       "code": 6000,
       "name": "InvalidFeeRate",
-      "msg": "The fee on interest earned rate can't be greater than 100% or less than 0%"
+      "msg": "The fee on interest earned rate can't be greater than 100%"
     },
     {
       "code": 6001,
@@ -1700,7 +1810,7 @@
     {
       "code": 6002,
       "name": "IncorrectNumberOfObligationAccounts",
-      "msg": "You must provide all of the sub user's obligation accounts."
+      "msg": "You must provide all of the sub user's obligation accounts"
     },
     {
       "code": 6003,
@@ -1754,14 +1864,6 @@
           {
             "name": "obligation_account_count",
             "type": "u32"
-          },
-          {
-            "name": "deposited_value_usd",
-            "type": "u64"
-          },
-          {
-            "name": "borrowed_value_usd",
-            "type": "u64"
           }
         ]
       }
@@ -1801,11 +1903,11 @@
           },
           {
             "name": "deposited_amount",
-            "type": "u64"
+            "type": "u128"
           },
           {
             "name": "borrowed_amount",
-            "type": "u64"
+            "type": "u128"
           }
         ]
       }
@@ -1833,7 +1935,7 @@
           },
           {
             "name": "fee_on_interest_earned_rate",
-            "type": "f32"
+            "type": "u16"
           }
         ]
       }
@@ -1873,7 +1975,7 @@
           },
           {
             "name": "deposited_amount",
-            "type": "u64"
+            "type": "u128"
           }
         ]
       }

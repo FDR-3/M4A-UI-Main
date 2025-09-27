@@ -12,11 +12,13 @@
       :value="tokenReserveTableData"
       :loading="isLoading"
       rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['name', 'tokenMintAddress', 'subMarketCount']"  
+      :globalFilterFields="['name', 'tokenMintAddress', 'tokenReserveATA', 'price', 'percentChange24h', 'quanity', 'value', 'subMarketCount']"  
     >
       <template #header>
         <div>
-          <h2>Token Reserves</h2>
+          <h2>Token Reserves Value: $<span class="rainbowText">{{ tvl.tokenReserveTVL.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}</span></h2>
           <ion-input id="reservesSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
@@ -27,38 +29,55 @@
       <Column field="name" header="Token Reserve" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-            <ion-button style="margin-left: -11px; margin-right: -5px" fill="clear" @click="openTokenPopover($event, slotProps.data)">
+            <ion-button style="margin-left: -11px; margin-right: -5px" fill="clear" @click="openTokenReserveATAPopover($event, slotProps.data)">
               <component :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.name }}</ion-label>
             </ion-button>
             <ion-popover 
-            :is-open="tokenPopoverOpen" 
+            :is-open="tokenReserveATAPopoverOpen" 
             :event="event" 
-            @didDismiss="tokenPopoverOpen=false"
+            @didDismiss="tokenReserveATAPopoverOpen=false"
             side="top" 
             alignment="center"
             >
-              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenReserveATA()" @mouseleave="closeTokenReserveATAPopover($event)">
+                <ion-label color="dark">{{ copyTokenReserveATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
         </template>
       </Column>
-      <Column field="tokenMintAddress" header="TokenMintAddress" style="width: 0%" sortable></Column>
+      <Column field="price" header="Price" style="width: 0%" sortable>
+        <template #body="slotProps">
+          ${{ slotProps.data.price.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })}}
+        </template>
+      </Column>
+      <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
+        <template #body="slotProps">
+           <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
+        </template>
+      </Column>
+      <Column field="quanity" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="value" header="Value" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.value }}
+        </template>
+      </Column>
       <Column field="subMarketCount" header="SubMarket Count" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRow">
             <ion-button id="openCreateSubMarketModal"
             color="dark"
+            :disabled="true"
             @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
-            subMarketTokenName=slotProps.data.name;
-            createSubMarketSVG=slotProps.data.svg;
-            sourceSubMarketSVG=slotProps.data.source;
-            feeCollectorAddress=connectedWallet.addressString;
-            creatingSubMarket=true;
-            isValidPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
+            $emit('selectedTokenMintAddress', slotProps.data.tokenMintAddress);
+            $emit('subMarketTokenName', slotProps.data.name);
+            $emit('createSubMarketSVG', slotProps.data.svg);
+            $emit('subMarketTokenName', slotProps.data.source);
+            $emit('subMarketTokenName', slotProps.data.addressString)"
             >
               Create SubMarket
             </ion-button>
@@ -173,62 +192,6 @@
         </template>
       </Column>
     </DataTable>
-
-    <!--Create Sub Market Modal-->
-    <div v-if="creatingSubMarket"
-      id="createSubMarketModal"
-      class="thickBorder"
-
-    >
-      <div id="createSubMarketHeader" class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
-        <ion-button fill="clear" @click="sourceSubMarketSVG()">
-          <component id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px; margin-right: -20px"></component>
-        </ion-button>
-
-        <ion-text class="noClickEvent">{{ subMarketTokenName }}</ion-text><br>
-      </div>
-
-      <p class="nTinyMarginTop noClickEvent">Owner: {{ trimAddress(connectedWallet.addressString) }}</p>
-      <div v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom noClickEvent">
-        <ion-text  style="font-size: 11px"
-        >
-          Connect wallet to create a submarket
-        </ion-text>
-      </div>
-
-      <ion-input
-        id="feeCollectorInput"
-        v-model="feeCollectorAddress"
-        fill="outline"
-        @ion-input="isValidPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
-        :class="{ 'invalid': !isValidPublicKey }"
-      >
-      </ion-input>
-      <ion-text style="font-size: 11px" class="noClickEvent">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
-      <InputNumber
-        v-model="feePercentage"
-        class="mediumMarginTop"
-        :inputStyle="{'text-align': 'center'}"
-        suffix="%"
-        inputId="percent"
-        :minFractionDigits="2" :maxFractionDigits="2"
-        :min="0" :max="100"
-        :step="0.01"
-        showButtons
-        fluid
-      />
-      <ion-text style="font-size: 11px" class="noClickEvent">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text><br>
-
-      <ion-button
-        id="createSubMarketButton"
-        color="dark"
-        @click="createSubMarket()"
-        class="mediumMarginTop"
-        :disabled="!isValidPublicKey || !connectedWallet.isConnected"
-      >
-        Create SubMarket
-      </ion-button>
-    </div>
   </div>
 </template>
 
@@ -243,7 +206,10 @@
   import { search } from 'ionicons/icons'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
-  import { tokenReserves, tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserves,
+    tokenReserveDevNetMap, 
+    priceObjectMap,
+    tokenReserveBalancesMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { tokenReserveHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -251,15 +217,17 @@
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
-  import { trimAddress,
-    copyFullAddress,
-    copyTokenMintAddress,
+  import { copyFullAddress,
+    copyTokenReserveATA,
     isValidSolanaPublicKey,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
+  import { tokenAddressStringsMainNet, tokenAddressStringsDevNet } from '/src/assets/constants/Addresses.ts'
+  import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
+
+  defineEmits(['selectedTokenMintAddress', 'subMarketTokenName', 'createSubMarketSVG', 'subMarketTokenName', 'subMarketTokenName'])
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
@@ -268,13 +236,7 @@
   const tokenMarketTableData = ref()
   const showTokenSubMarkets = ref(false)
   const isLoading = ref(true)
-  const creatingSubMarket = ref(false)
-  const createSubMarketSVG = ref()
-  const sourceSubMarketSVG = ref()
-  const subMarketTokenName = ref()
-  const feeCollectorAddress = ref(connectedWallet.addressString)
-  const feePercentage = ref(3)
-  const isValidPublicKey = ref(false)
+  
   const ownerPopoverOpen = ref(false)
   const event = ref()
 
@@ -286,8 +248,8 @@
   const isDataEdited = ref(false)
   const copyFullAddressButtonText = ref("Copy Full Address")
 
-  const tokenPopoverOpen = ref(false)
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  const tokenReserveATAPopoverOpen = ref(false)
+  var copyTokenReserveATAButtonText = ref("Copy Token Reserve ATA")
   
   onMounted(() =>
   {
@@ -298,6 +260,11 @@
     }
     else
       isLoading.value = true
+  })
+
+  watch(priceObjectMap, () =>
+  {
+    processTokenReserveTableData()
   })
 
   watch(subMarketOwnerHashMap, () => //Watching subMarketOwnerHashMap instead of tokenReserveHashMap to avoid circular updating and watching. The most important thing is keeping the process for updating custom names separate and not causing extra fetches
@@ -312,35 +279,15 @@
       showTokenReserveSubMarkets()
   })
 
-  watch(customUserNameHashMap, () =>
+  watch(tokenReserveBalancesMap, () =>
   {
     processTokenReserveTableData()
   })
 
-  // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
-  window.onclick = function(event: any) 
+  watch(customUserNameHashMap, () =>
   {
-    if(creatingSubMarket.value)
-    {
-      const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
-
-      if((event?.target?.id != "createSubMarketHeader") &&
-      (event?.target?.id != "createSubMarketSVG") &&
-      (event?.target?.id != "createSubMarketModal") &&
-      (event?.target?.id != "openCreateSubMarketModal") &&
-      (event?.target?.id != "createSubMarketButton") &&
-      !event?.target?.classList.contains("native-input") &&
-      !event?.target?.classList.contains("native-wrapper") &&
-      !event?.target?.classList.contains("p-inputtext") &&
-      !event?.target?.classList.contains("p-icon") &&
-      !event?.target?.classList.contains("p-inputnumber-button-group") &&
-      !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
-      !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
-      !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
-      !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
-        creatingSubMarket.value = false
-    }
-  }
+    processTokenReserveTableData()
+  })
 
   function openOwnerPopover(e: Event, rowData: any) 
   {
@@ -361,23 +308,23 @@
     copyFullAddress(copyFullAddressButtonText, event.value.ownerAddress)
   }
 
-  function openTokenPopover(e: Event, rowData: any) 
+  function openTokenReserveATAPopover(e: Event, rowData: any) 
   {
     event.value = e
-    event.value.tokenMintAddress = rowData.tokenMintAddress
+    event.value.tokenReserveATA = rowData.tokenReserveATA
 
-    tokenPopoverOpen.value = true
+    tokenReserveATAPopoverOpen.value = true
   }
 
-  function closeTokenPopover(e: Event) 
+  function closeTokenReserveATAPopover(e: Event) 
   {
     event.value = e
-    tokenPopoverOpen.value = false
+    tokenReserveATAPopoverOpen.value = false
   }
 
-  function passByRefWrapperCopyTokenMintAddress()
+  function passByRefWrapperCopyTokenReserveATA()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+    copyTokenReserveATA(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
   }
 
   const filters = ref(
@@ -387,7 +334,7 @@
 
   function processTokenReserveTableData()
   {
-
+    var value = 0
     var processedTableData = []
     var newTableData = cloneDeep(tokenReserves)
 
@@ -402,24 +349,60 @@
       processedTableData[i].name = tokenReserveFrontEndProperties.name
       processedTableData[i].svg = tokenReserveFrontEndProperties.svg
       processedTableData[i].source = tokenReserveFrontEndProperties.source
+      processedTableData[i].tokenReserveATA = tokenReserveFrontEndProperties.ata
+
+      if(priceObjectMap.data)
+      {
+        //Update Price for Dev USDC
+        if(processedTableData[i].tokenMintAddress.toString() == tokenAddressStringsDevNet.usdcTokenMintAddress)
+        {
+          processedTableData[i].price = priceObjectMap.data[tokenAddressStringsMainNet.usdcTokenMintAddress].usdPrice
+          processedTableData[i].percentChange24h = priceObjectMap.data[tokenAddressStringsMainNet.usdcTokenMintAddress].priceChange24h.toFixed(2)
+        }
+        //Update Everything Else
+        else
+        {
+          processedTableData[i].price = priceObjectMap.data[processedTableData[i].tokenMintAddress.toString()].usdPrice
+          processedTableData[i].percentChange24h = priceObjectMap.data[processedTableData[i].tokenMintAddress.toString()].priceChange24h.toFixed(2)
+        } 
+      }
+
+      if(tokenReserveBalancesMap.map)
+      {
+        const tokenReserveBalance = tokenReserveBalancesMap.map.get(processedTableData[i].tokenMintAddress.toString())
+        if(tokenReserveBalance)
+        {
+          processedTableData[i].quanity = tokenReserveBalance as number
+          processedTableData[i].value = '$' + tokenReserveBalance
+
+          value = Number(tokenReserveBalance) + Number(value)
+        }
+        else
+        {
+          processedTableData[i].quanity = 0.00
+          processedTableData[i].value = '$0.00'
+        }
+      }
 
       var tokenReserveSubMarketList = []
       const unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
       if(unProcessedTokenSubMarketList)
+      {
         processedTableData[i].subMarketCount = unProcessedTokenSubMarketList.length
+
+        for(var j=0; j<unProcessedTokenSubMarketList.length; j++)
+        {
+          unProcessedTokenSubMarketList[j].displayName = getCustomOrTrimmedUserDisplayName(unProcessedTokenSubMarketList[j].owner.toString())
+          tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
+        }
+      }
       else
         processedTableData[i].subMarketCount = 0
-
-      
-      for(var j=0; j<unProcessedTokenSubMarketList.length; j++)
-      {
-        unProcessedTokenSubMarketList[j].displayName = getCustomOrTrimmedUserDisplayName(unProcessedTokenSubMarketList[j].owner.toString())
-        tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
-      }
 
       tokenReserveHashMap.map.set(processedTableData[i].tokenMintAddress.toString(), tokenReserveSubMarketList)
     }
 
+    tvl.tokenReserveTVL = value
     tokenReserveTableData.value = processedTableData
   }
 
@@ -480,28 +463,6 @@
     tokenMarketTableData.value[index].isEditingRow = false
     isEditing = false
   }
-  
-  async function createSubMarket()
-  {
-    try
-    {
-      const userNextSubMarketIndex = getUserNextSubMarketIndex(connectedWallet.addressString)
-
-      const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
-      (
-        selectedTokenMintAddress,
-        userNextSubMarketIndex,
-        new PublicKey(feeCollectorAddress.value),
-        feePercentage.value/100
-      ).rpc()
-      await confirmLendingTransaction(tx, toast, "create_sub_market")
-      creatingSubMarket.value = false
-    }
-    catch(error)
-    {
-      toastPreTransactionError(error, toast, "create_sub_market")
-    }
-  }
 
   async function editSubMarket(subMarketTableRow: any)
   {
@@ -528,17 +489,6 @@
 </script>
 
 <style scoped>
-  #createSubMarketModal
-  {
-    position: fixed; /* Makes sure the modal is fixed in place on the screen */
-    top: 70%;
-    left: 50%;
-    transform: translate(-50%, -70%);
-    z-index: 4000; /* Makes sure the modal is on top */
-    padding: 20px;
-    background-color: var(--ion-background-color)
-  }
-
   .container
   {
     margin-bottom: 77px
