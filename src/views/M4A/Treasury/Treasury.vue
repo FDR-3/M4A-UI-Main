@@ -22,24 +22,28 @@
       <div class="backTable" :style="{display: display2ndTable}">
         <h1>Reserves</h1>
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Treasuries</ion-button>
-        <ReservesTable/>
+        <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
+        createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"/>
         <OwnersTable/>
       </div>
     </div>
   </div>
+  <CreateSubMarketModal ref="createSubMarketModal"/>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, Component } from 'vue'
   import { IonButton } from '@ionic/vue'
   import HODLTreasuryTable from '/src/components/tables/lending/HODLTreasuryTable.vue'
   import SinglePayerTreasuryTable from '/src/components/tables/lending/SinglePayerTreasuryTable.vue'
-  import ReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
+  import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
   import OwnersTable from '/src/components/tables/lending/OwnersTable.vue'
   import TVLLongSVG from '/src/assets/svg/tvl-long-svg.vue'
   import TVLShortSVG from '/src/assets/svg/tvl-short-svg.vue'
+  import CreateSubMarketModal from '/src/components/tables/lending/CreateSubMarketModal.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
+  import { PublicKey } from "@solana/web3.js"
   import M4AProtocolTVLLongHTMLText from './M4AProtocolTVLLongHTMLText.vue'
   import M4AProtocolTVLShortHTMLText from './M4AProtocolTVLShortHTMLText.vue'
 
@@ -49,6 +53,8 @@
   var flipped = ""
   var display1stTable = ref("")
   var display2ndTable = ref("none")
+
+  var createSubMarketModal = ref()
 
   onMounted(() => 
   {

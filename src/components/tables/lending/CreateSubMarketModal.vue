@@ -6,11 +6,22 @@
 
   >
     <div id="createSubMarketHeader" class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
-      <ion-button fill="clear" @click="sourceSubMarketSVG()">
-        <component id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px; margin-right: -20px"></component>
+      <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
+        <component class="noClickEvent" id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px"></component>
+        <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
-
-      <ion-text class="noClickEvent">{{ subMarketTokenName }}</ion-text><br>
+      <ion-popover
+      id="copyTokenMintAddressPopover"
+      :is-open="tokenPopoverOpen" 
+      :event="event" 
+      @didDismiss="tokenPopoverOpen=false"
+      side="top" 
+      alignment="center"
+      >
+        <ion-button id="copyTokenMintAddressButton" class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+          <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+        </ion-button>
+      </ion-popover>
     </div>
 
     <p class="nTinyMarginTop noClickEvent">Owner: {{ trimAddress(connectedWallet.addressString) }}</p>
@@ -58,7 +69,8 @@
 
 <script setup lang="ts">
   import { ref, inject } from 'vue'
-  import { IonInput, IonButton, IonText, IonPopover } from '@ionic/vue'
+  import type { Component } from 'vue'
+  import { IonInput, IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import InputNumber from 'primevue/inputnumber'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
@@ -76,10 +88,13 @@
   const isValidPublicKey = ref(false)
   const creatingSubMarket = ref(false)
   const createSubMarketSVG = ref()
-  const sourceSubMarketSVG = ref()
   const subMarketTokenName = ref()
-  const feeCollectorAddress = ref(connectedWallet.addressString)
+  const feeCollectorAddress = ref()
   var selectedTokenMintAddress: PublicKey
+
+  const tokenPopoverOpen = ref(false)
+  const event = ref()
+  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   window.onclick = function(event: any) 
@@ -89,6 +104,9 @@
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
 
       if((event?.target?.id != "createSubMarketHeader") &&
+      (event?.target?.id != "openCopyTokenMintAddressButton") &&
+      (event?.target?.id != "copyTokenMintAddressButton") &&
+      (event?.target?.id != "copyTokenMintAddressPopover") &&
       (event?.target?.id != "createSubMarketSVG") &&
       (event?.target?.id != "createSubMarketModal") &&
       (event?.target?.id != "openCreateSubMarketModal") &&
@@ -102,6 +120,11 @@
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
+        creatingSubMarket.value = false
+
+      //Close modal when clicking into input search's behind Modal
+      if((event?.target?.placeholder == "Reserves Search     ") ||
+      (event?.target?.placeholder == "Owners Search     "))
         creatingSubMarket.value = false
     }
   }
@@ -127,17 +150,55 @@
       toastPreTransactionError(error, toast, "create_sub_market")
     }
   }
+
+  function openCreateSubMarketModal(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName: string, )
+  {
+    feeCollectorAddress.value = connectedWallet.addressString
+    isValidPublicKey.value = isValidSolanaPublicKey(feeCollectorAddress.value)
+    selectedTokenMintAddress = tokenMintAddress
+    createSubMarketSVG.value = tokenSVG
+    subMarketTokenName.value = tokenName
+    creatingSubMarket.value = true
+  }
+
+  function openTokenPopover(e: Event) 
+  {
+    event.value = e
+
+    tokenPopoverOpen.value = true
+  }
+
+  function closeTokenPopover(e: Event) 
+  {
+    event.value = e
+    tokenPopoverOpen.value = false
+  }
+
+  function passByRefWrapperCopyAddress()
+  {
+    copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
+  }
+
+  defineExpose(
+  {
+    openCreateSubMarketModal
+  })
 </script>
 
 <style scoped>
   #createSubMarketModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
-    top: 70%;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, -70%);
+    transform: translate(-50%, -50%);
     z-index: 4000; /* Makes sure the modal is on top */
     padding: 20px;
     background-color: var(--ion-background-color)
+  }
+
+  #feeCollectorInput
+  {
+    --highlight-color: var(--ion-color-green) !important
   }
 </style>

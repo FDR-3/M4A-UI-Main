@@ -71,13 +71,11 @@
           <div class="flexCenterRow">
             <ion-button id="openCreateSubMarketModal"
             color="dark"
-            :disabled="true"
             @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
-            $emit('selectedTokenMintAddress', slotProps.data.tokenMintAddress);
-            $emit('subMarketTokenName', slotProps.data.name);
-            $emit('createSubMarketSVG', slotProps.data.svg);
-            $emit('subMarketTokenName', slotProps.data.source);
-            $emit('subMarketTokenName', slotProps.data.addressString)"
+            $emit('createSubMarketModal', 
+              slotProps.data.tokenMintAddress,
+              slotProps.data.svg,
+              slotProps.data.name)"
             >
               Create SubMarket
             </ion-button>
@@ -116,7 +114,7 @@
         </div>
       </template>
       <template #loading> Loading Reserves. Please wait. </template>
-      <Column field="owner" header="Owner" style="width: 18%" sortable>
+      <Column field="owner" header="Owner" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openOwnerPopover($event, slotProps.data)">
@@ -226,8 +224,6 @@
   import { tokenAddressStringsMainNet, tokenAddressStringsDevNet } from '/src/assets/constants/Addresses.ts'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
-
-  defineEmits(['selectedTokenMintAddress', 'subMarketTokenName', 'createSubMarketSVG', 'subMarketTokenName', 'subMarketTokenName'])
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
@@ -351,6 +347,7 @@
       processedTableData[i].source = tokenReserveFrontEndProperties.source
       processedTableData[i].tokenReserveATA = tokenReserveFrontEndProperties.ata
 
+      //Update Table Prices
       if(priceObjectMap.data)
       {
         //Update Price for Dev USDC
@@ -367,6 +364,7 @@
         } 
       }
 
+      //Update Table Balances
       if(tokenReserveBalancesMap.map)
       {
         const tokenReserveBalance = tokenReserveBalancesMap.map.get(processedTableData[i].tokenMintAddress.toString())
@@ -385,21 +383,26 @@
       }
 
       var tokenReserveSubMarketList = []
-      const unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
-      if(unProcessedTokenSubMarketList)
-      {
-        processedTableData[i].subMarketCount = unProcessedTokenSubMarketList.length
 
-        for(var j=0; j<unProcessedTokenSubMarketList.length; j++)
+      //Get SubMarket List And Count
+      if(tokenReserveHashMap.map)
+      {
+        const unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
+        if(unProcessedTokenSubMarketList)
         {
-          unProcessedTokenSubMarketList[j].displayName = getCustomOrTrimmedUserDisplayName(unProcessedTokenSubMarketList[j].owner.toString())
-          tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
+          processedTableData[i].subMarketCount = unProcessedTokenSubMarketList.length
+
+          for(var j=0; j<unProcessedTokenSubMarketList.length; j++)
+          {
+            unProcessedTokenSubMarketList[j].displayName = getCustomOrTrimmedUserDisplayName(unProcessedTokenSubMarketList[j].owner.toString())
+            tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
+          }
         }
+
+        tokenReserveHashMap.map.set(processedTableData[i].tokenMintAddress.toString(), tokenReserveSubMarketList)
       }
       else
         processedTableData[i].subMarketCount = 0
-
-      tokenReserveHashMap.map.set(processedTableData[i].tokenMintAddress.toString(), tokenReserveSubMarketList)
     }
 
     tvl.tokenReserveTVL = value
@@ -504,9 +507,9 @@
     min-width: 1070px
   }
 
-  #reservesSearchInput, #feeCollectorInput
+  #reservesSearchInput
   {
-    --highlight-color: var(--ion-color-green) !important
+    --highlight-color: v-bind(colorHexValue) !important
   }
 
   .p-inputnumber:hover .p-inputnumber-input:not(:focus)

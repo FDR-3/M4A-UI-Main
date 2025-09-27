@@ -11,23 +11,27 @@
       </div>
     </div>
   </div>
-  <ReservesTable/>
+  <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
+  createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"/>
+  <CreateSubMarketModal ref="createSubMarketModal"/>
 </template>
 
 <script setup lang="ts">
-  import { ref, inject } from 'vue'
+  import { ref, inject, Component } from 'vue'
   import { IonButton, IonInput, IonText } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import ReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
+  import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
+  import CreateSubMarketModal from '/src/components/tables/lending/CreateSubMarketModal.vue'
   import {  PublicKey } from "@solana/web3.js"
 
   const toast = inject('toast')
 
   var tokenMintAddressInput = ref()
   var tokenDecmialCountInput = ref()
+  var createSubMarketModal = ref()
 
   async function addTokenReserve()
   {
@@ -48,3 +52,10 @@
     }
   }
 </script>
+
+<style scoped>
+  ion-input
+  {
+    --highlight-color: var(--ion-color-gray)
+  }
+</style>

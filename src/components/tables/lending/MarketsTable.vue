@@ -48,6 +48,16 @@
           </div>
         </template>
       </Column>
+      <Column field="chain.name" header="Chain" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRowHeight">
+            <ion-button fill="clear" @click="slotProps.data.chain.source()">
+              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
+            </ion-button>
+            <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
+          </div>
+        </template>
+      </Column>
       <Column field="price" header="Price" style="width: 0%" sortable>
         <template #body="slotProps">
           ${{ slotProps.data.price.toLocaleString('en-US', {
@@ -58,16 +68,6 @@
       <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
-        </template>
-      </Column>
-      <Column field="chain.name" header="Chain" style="width: 0%" sortable>
-        <template #body="slotProps">
-          <div class="flexCenterRowHeight">
-            <ion-button fill="clear" @click="slotProps.data.chain.source()">
-              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
-            </ion-button>
-            <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
-          </div>
         </template>
       </Column>
       <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
@@ -90,20 +90,30 @@
       groupRowsBy="asset.type"
       :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'percentChange24h', 'apy', 'chain.name']"
     >
-    <template #header>
-      <div>
-        <br><ion-label id="tableTitle">Crypto Currency</ion-label>
-      </div>
-    </template>
-    <template #loading> Loading Cryto Currencies. Please wait. </template>
-    <Column field="asset.name" header="Asset" style="width: 0%" sortable>
+      <template #header>
+        <div>
+          <br><ion-label id="tableTitle">Crypto Currency</ion-label>
+        </div>
+      </template>
+      <template #loading> Loading Cryto Currencies. Please wait. </template>
+      <Column field="asset.name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)" style="margin-left: -8px">
-              <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; margin-left: -8px; margin-right: -4px"/>
-              <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 24px; margin-right: 5px"/>
+                <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; margin-left: -8px; margin-right: -4px"/>
+                <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 24px; margin-right: 5px"/>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
+          </div>
+        </template>
+      </Column>
+      <Column field="chain.name" header="Chain" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <div class="flexCenterRowHeight">
+            <ion-button fill="clear" @click="slotProps.data.chain.source()">
+              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
+            </ion-button>
+            <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
           </div>
         </template>
       </Column>
@@ -117,16 +127,6 @@
       <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
-        </template>
-      </Column>
-      <Column field="chain.name" header="Chain" style="width: 0%" sortable>
-        <template #body="slotProps">
-          <div class="flexCenterRowHeight">
-            <ion-button fill="clear" @click="slotProps.data.chain.source()">
-              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
-            </ion-button>
-            <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
-          </div>
         </template>
       </Column>
       <Column field="apy" header="APY%" style="width: 0%" sortable></Column>

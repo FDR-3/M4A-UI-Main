@@ -1,16 +1,16 @@
 <template>
   <div class="mediumMarginTop">
-    <ion-button v-if="!adminAccounts.isM4ACEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
-      @click="initializeM4AProtocolAdminAccounts()"
-      :color=colorName
-    >
-      <ion-label color="dark">Init M4A Admin Accounts</ion-label>
-    </ion-button>
     <ion-button v-if="!adminAccounts.isChatCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
       @click="initializeChatProtocolAdminAccounts()"
       :color=colorName
     >
       <ion-label color="dark">Init Chat Admin Accounts</ion-label>
+    </ion-button>
+    <ion-button v-if="!adminAccounts.isAlertCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
+      @click="initializeAlertProtocol()"
+      :color=colorName
+    >
+      <ion-label color="dark">Init Alert Admin Accounts</ion-label>
     </ion-button>
     <ion-button v-if="!adminAccounts.isLendingCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
       @click="initializeLendingProtocol()"
@@ -18,11 +18,11 @@
     >
       <ion-label color="dark">Init Lending Admin Accounts</ion-label>
     </ion-button>
-    <ion-button v-if="!adminAccounts.isAlertCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
-      @click="initializeAlertProtocol()"
+    <ion-button v-if="!adminAccounts.isM4ACEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
+      @click="initializeM4AProtocolAdminAccounts()"
       :color=colorName
     >
-      <ion-label color="dark">Init Alert Admin Accounts</ion-label>
+      <ion-label color="dark">Init M4A Admin Accounts</ion-label>
     </ion-button>
   </div>
   <div>

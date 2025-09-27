@@ -3,15 +3,6 @@
     <b id="accessGrantedText">Access Granted</b>
     <div class="tinyMarginTop">
       <ion-button
-        v-if="adminAccounts.isM4ACEOAccountReady"
-        :class="adminPanelSelect==0 ? 'tableToggleSelect' : ''"
-        color="dark"
-        @click="setAdminPanelSelect(0)"
-        :disabled="adminPanelSelect==0"
-      >
-        Toggle M4A Admin Page
-      </ion-button>
-      <ion-button
         v-if="adminAccounts.isChatCEOAccountReady"
         :class="adminPanelSelect==1 ? 'tableToggleSelect' : ''"
         color="dark"
@@ -19,6 +10,15 @@
         :disabled="adminPanelSelect==1"
       >
         Toggle Chat Admin Page
+      </ion-button>
+      <ion-button
+        v-if="adminAccounts.isAlertCEOAccountReady"
+        :class="adminPanelSelect==3 ? 'tableToggleSelect' : ''"
+        color="dark"
+        @click="setAdminPanelSelect(3)"
+        :disabled="adminPanelSelect==3"
+      >
+        Toggle Alert Admin Page
       </ion-button>
       <ion-button
         v-if="adminAccounts.isLendingCEOAccountReady"
@@ -30,13 +30,13 @@
         Toggle Lending Admin Page
       </ion-button>
       <ion-button
-        v-if="adminAccounts.isAlertCEOAccountReady"
-        :class="adminPanelSelect==3 ? 'tableToggleSelect' : ''"
+        v-if="adminAccounts.isM4ACEOAccountReady"
+        :class="adminPanelSelect==0 ? 'tableToggleSelect' : ''"
         color="dark"
-        @click="setAdminPanelSelect(3)"
-        :disabled="adminPanelSelect==3"
+        @click="setAdminPanelSelect(0)"
+        :disabled="adminPanelSelect==0"
       >
-        Toggle Alert Admin Page
+        Toggle M4A Admin Page
       </ion-button>
     </div>
   </div>
