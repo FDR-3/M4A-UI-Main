@@ -1,5 +1,5 @@
 {
-  "address": "HdwSUeYR4zdrAfquQo8WocnBLcsqvfdRYMqJ7KEGjMV7",
+  "address": "DzagHWB4qB7gEqsmXm57CZsrSGgzzUAsBNYt6YBWFYYx",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -1917,6 +1917,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "id",
+            "type": "u32"
+          },
           {
             "name": "owner",
             "type": "pubkey"

@@ -19,15 +19,20 @@
           <ion-text color="white">Reload Browser for Newest UI/UX</ion-text><br>
           <ion-text color="white">See Github for Latest Code Changes/Notes</ion-text><br>
       </div>
-      <ion-button title="Github" fill="clear" @click="openGithub()">
-      <Github id="githhubIcon" class="footerIcon" :fill="'#FFFFFF'"/>
-      </ion-button>
+      <div>
+        <ion-button title="Github" fill="clear" @click="openGithub()">
+          <Github id="githhubIcon" class="footerIcon" :fill="'#FFFFFF'"/>
+        </ion-button>
+        <ion-button color="white" style="margin-bottom: -11px" @click="refreshPage()">
+          <ion-label color="black">Refresh<br>Page</ion-label>
+        </ion-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-    import { IonText, IonButton, IonIcon } from '@ionic/vue'
+    import { IonText, IonButton, IonIcon, IonLabel } from '@ionic/vue'
     import { closeCircle } from 'ionicons/icons'
     import DarkModeStarWolfBannerSignal from '/src/components/fancy/DarkModeStarWolfBannerSignal.vue' 
     import GreyModeStarWolfBannerSignal from '/src/components/fancy/GreyModeStarWolfBannerSignal.vue'
@@ -40,7 +45,12 @@
 
     function openGithub()
     {
-        window.open("https://github.com/FDR-3?tab=repositories", "_blank")
+      window.open("https://github.com/FDR-3?tab=repositories", "_blank")
+    }
+
+    function refreshPage()
+    {
+      window.location.reload()
     }
 </script>
 

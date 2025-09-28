@@ -43,6 +43,7 @@
     <ion-text style="font-size: 11px" class="noClickEvent">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
     <InputNumber
       v-model="feePercentage"
+      ref="feePercentageRef"
       class="mediumMarginTop"
       :inputStyle="{'text-align': 'center'}"
       suffix="%"
@@ -52,6 +53,7 @@
       :step="0.01"
       showButtons
       fluid
+      @keydown.enter="checkIfCursorBehindPercentSign()"
     />
     <ion-text style="font-size: 11px" class="noClickEvent">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text><br>
 
@@ -85,6 +87,7 @@
   const toast = inject('toast')
 
   const feePercentage = ref(3)
+  const feePercentageRef = ref()
   const isValidPublicKey = ref(false)
   const creatingSubMarket = ref(false)
   const createSubMarketSVG = ref()
@@ -140,7 +143,7 @@
         selectedTokenMintAddress,
         userNextSubMarketIndex,
         new PublicKey(feeCollectorAddress.value),
-        feePercentage.value/100
+        feePercentage.value * 100//convert to fixedpoint notation
       ).rpc()
       await confirmLendingTransaction(tx, toast, "create_sub_market")
       creatingSubMarket.value = false
@@ -177,6 +180,20 @@
   function passByRefWrapperCopyAddress()
   {
     copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
+  }
+
+  function checkIfCursorBehindPercentSign()
+  {
+    var inputElement = feePercentageRef.value?.$el.querySelector(".p-inputtext")
+
+    if(inputElement)
+    {
+      if(inputElement.value.length == inputElement.selectionEnd)
+      {
+        const beforePercentSign = inputElement.selectionEnd - 1
+        inputElement.setSelectionRange(beforePercentSign, beforePercentSign)
+      }
+    }
   }
 
   defineExpose(

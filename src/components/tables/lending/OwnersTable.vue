@@ -72,12 +72,14 @@
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines
+      sortField="id"
+      :sortOrder="1"
       size="small" 
       :value="OwnerSubMarketTableData"
       :loading="isLoading"
       editMode="cell" 
       @cell-edit-complete="onCellEditSave($event)"
-      :globalFilterFields="['tokenMintAddress', 'tokenName', 'feeCollectorAddress', 'feeOnInterestEarnedRate']"  
+      :globalFilterFields="['id', 'tokenMintAddress', 'tokenName', 'feeCollectorAddress', 'feeOnInterestEarnedRate']"  
     >
       <template #header>
         <div>
@@ -91,6 +93,7 @@
         </div>
       </template>
       <template #loading>Loading Owners. Please wait.</template>
+      <Column field="id" header="Id" style="width: 0%" sortable></Column>
       <Column field="tokenName" header="Token" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
@@ -126,17 +129,24 @@
       </Column>
       <Column field="feeOnInterestEarnedRate" header="Fee On Interest Earned Rate" style="width: 0%" sortable>
         <template #body="slotProps">
-          <ion-text>{{ slotProps.data.feeOnInterestEarnedRate * 100 }}%</ion-text>
+          <ion-text>{{ slotProps.data.feeOnInterestEarnedRate.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}%</ion-text>
         </template>
         <template #editor="{ index, data, field }">
           <InputNumber
           v-model="data[field]"
+          :ref="($el: any) => setInputRef($el, data)"
           class="ownerFeeInput"
-          :min=0
-          :max=100
-          :step=0.01
+          suffix="%"
+          inputId="percent"
+          :minFractionDigits="2" :maxFractionDigits="2"
+          :min="0.00" :max="100"
+          :step="0.01"
+          showButtons
           fluid
-          @input="isEditing=true; OwnerSubMarketTableData[index].isEditingRow=true"
+          @focus="moveCursorInFrontPercentSign(data)"
+          @input="isEditing=true; OwnerSubMarketTableData[index].isEditingRow=true; checkIfInputEmpty(data)"
           :disabled="connectedWallet.addressString!=OwnerSubMarketTableData[index].owner ||
           (isDataEdited && !OwnerSubMarketTableData[index].isEditingRow && !OwnerSubMarketTableData[index].isRowDataEdited)"/>
         </template>
@@ -213,6 +223,8 @@
 
   const tokenPopoverOpen = ref(false)
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+
+  const inputFeeRefs = ref(new Map())
 
   const subMarketsSText = computed(() =>
   {
@@ -342,6 +354,42 @@
       publicKeyCheckColor.value = "#ff0000"
       isInvalidPublicKey.value = true
     }
+  }
+
+  function moveCursorInFrontPercentSign(rowData: any)
+  {
+    const ref = inputFeeRefs.value.get(rowData.id)
+    const inputElement = ref?.$el.querySelector(".p-inputtext")
+
+    if(inputElement)
+    {
+      const beforePercentSign = inputElement.selectionEnd - 1
+      inputElement.setSelectionRange(beforePercentSign, beforePercentSign)
+      inputElement.focus()
+    }
+  }
+
+  function checkIfInputEmpty(rowData: any)
+  {
+    const ref = inputFeeRefs.value.get(rowData.id)
+    const inputElement = ref?.$el.querySelector(".p-inputtext")
+
+    if(inputElement)
+    {
+      if(inputElement.value == "")
+      {
+        inputElement.value = "0.00%"
+        inputElement.setSelectionRange(0, 0)
+      }
+    }
+  }
+
+  const setInputRef = (el: any, rowData: any) =>
+  {
+    if(el)
+      inputFeeRefs.value.set(rowData.id, el)
+    else
+      inputFeeRefs.value.delete(rowData.id)
   }
 
   const onCellEditSave = async (event: { newData:any; index:any } ) => 

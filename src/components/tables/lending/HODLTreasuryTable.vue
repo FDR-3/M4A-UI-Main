@@ -58,7 +58,7 @@
         <template #body="slotProps">
           ${{ slotProps.data.price.toLocaleString('en-US', {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2 })}}
+            maximumFractionDigits: 2 }) }}
         </template>
       </Column>
       <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
@@ -125,7 +125,7 @@
         <template #body="slotProps">
           ${{ slotProps.data.price.toLocaleString('en-US', {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2 })}}
+            maximumFractionDigits: 2 }) }}
         </template>
       </Column>
       <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>

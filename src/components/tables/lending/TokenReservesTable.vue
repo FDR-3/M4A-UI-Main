@@ -51,7 +51,7 @@
         <template #body="slotProps">
           ${{ slotProps.data.price.toLocaleString('en-US', {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2 })}}
+            maximumFractionDigits: 2 }) }}
         </template>
       </Column>
       <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
@@ -93,15 +93,15 @@
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines
-      sortField="tokenMintAddress" 
-      :sortOrder="-1" 
+      sortField="id"
+      :sortOrder="1"
       size="small" 
       :value="tokenMarketTableData"
       :loading="isLoading"
       editMode="cell" 
       @cell-edit-complete="onCellEditSave($event)"
       rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['owner', 'displayName', 'feeCollectorAddress', 'feeOnInterestEarnedRate']"  
+      :globalFilterFields="['id', 'owner', 'displayName', 'feeCollectorAddress', 'feeOnInterestEarnedRate']"  
     >
       <template #header>
         <div>
@@ -114,6 +114,7 @@
         </div>
       </template>
       <template #loading> Loading Reserves. Please wait. </template>
+      <Column field="id" header="Id" style="width: 0%" sortable></Column>
       <Column field="owner" header="Owner" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
@@ -156,16 +157,23 @@
       </Column>
       <Column field="feeOnInterestEarnedRate" header="Fee On Interest Earned Rate" style="width: 0%" sortable>
         <template #body="slotProps">
-          <ion-text>{{ slotProps.data.feeOnInterestEarnedRate * 100 }}%</ion-text>
+          <ion-text>{{ slotProps.data.feeOnInterestEarnedRate.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}%</ion-text>
         </template>
         <template #editor="{ index, data, field }">
           <InputNumber
           v-model="data[field]"
-          :min=0
-          :max=100
-          :step=0.01
+          :ref="($el: any) => setInputRef($el, data)"
+          suffix="%"
+          inputId="percent"
+          :minFractionDigits="2" :maxFractionDigits="2"
+          :min="0.00" :max="100"
+          :step="0.01"
+          showButtons
           fluid
-          @input="isEditing=true; tokenMarketTableData[index].isEditingRow=true"
+          @focus="moveCursorInFrontPercentSign(data)"
+          @input="isEditing=true; tokenMarketTableData[index].isEditingRow=true; checkIfInputEmpty(data)"
           :disabled="connectedWallet.addressString!=tokenMarketTableData[index].owner ||
           (isDataEdited && !tokenMarketTableData[index].isEditingRow && !tokenMarketTableData[index].isRowDataEdited)"/>
         </template>
@@ -246,6 +254,8 @@
 
   const tokenReserveATAPopoverOpen = ref(false)
   var copyTokenReserveATAButtonText = ref("Copy Token Reserve ATA")
+
+  const inputFeeRefs = ref(new Map())
   
   onMounted(() =>
   {
@@ -429,6 +439,42 @@
     }
   }
 
+  function moveCursorInFrontPercentSign(rowData: any)
+  {
+    const ref = inputFeeRefs.value.get(rowData.id)
+    const inputElement = ref?.$el.querySelector(".p-inputtext")
+
+    if(inputElement)
+    {
+      const beforePercentSign = inputElement.selectionEnd - 1
+      inputElement.setSelectionRange(beforePercentSign, beforePercentSign)
+      inputElement.focus()
+    }
+  }
+
+  function checkIfInputEmpty(rowData: any)
+  {
+    const ref = inputFeeRefs.value.get(rowData.id)
+    const inputElement = ref?.$el.querySelector(".p-inputtext")
+
+    if(inputElement)
+    {
+      if(inputElement.value == "")
+      {
+        inputElement.value = "0.00%"
+        inputElement.setSelectionRange(0, 0)
+      }
+    }
+  }
+
+  const setInputRef = (el: any, rowData: any) =>
+  {
+    if(el)
+      inputFeeRefs.value.set(rowData.id, el)
+    else
+      inputFeeRefs.value.delete(rowData.id)
+  }
+
   const onCellEditSave = async (event: { newData:any; index:any } ) => 
   {
     let { newData, index } = event
@@ -476,7 +522,7 @@
         new PublicKey(subMarketTableRow.tokenMintAddress),
         subMarketTableRow.subMarketIndex,
         new PublicKey(subMarketTableRow.feeCollectorAddress),
-        subMarketTableRow.feeOnInterestEarnedRate
+        subMarketTableRow.feeOnInterestEarnedRate * 100//convert to fixedpoint notation
       ).rpc()
       await confirmLendingTransaction(tx, toast, "edit_sub_market")
 

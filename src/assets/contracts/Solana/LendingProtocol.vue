@@ -77,6 +77,9 @@
       //Populate Token Reserve hash map
       var ownerTokenReserveList: any = []
 
+      //Convert Fee Percentage To Decimal from Fixed Point
+      allSubMarkets[i].account.feeOnInterestEarnedRate = allSubMarkets[i].account.feeOnInterestEarnedRate / 100
+
       const previousTokenReserveList = tokenReserveMap.get(allSubMarkets[i].account.tokenMintAddress.toBase58())
       if(previousTokenReserveList)
         ownerTokenReserveList = previousTokenReserveList
