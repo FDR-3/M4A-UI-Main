@@ -145,10 +145,24 @@
   {
     height: 646px
   }
+  @-moz-document url-prefix()
+  {
+    .tableFlipContainer.flipped
+    {
+      height: 647px
+    }
+  }
 
   .tableFlipContainer.flipped.notConnected
   {
     height: 692px
+  }
+  @-moz-document url-prefix()
+  {
+    .tableFlipContainer.flipped.notConnected
+    {
+      height: 695px
+    }
   }
 
   @media screen and (min-width: 1769.1px)
@@ -212,6 +226,59 @@
     .tableFlipContainer
     {
       height: 1288px
+    }
+  }
+  /*Set table height for Fire Fox*/
+  @-moz-document url-prefix()
+  {
+    @media screen and (min-width: 1769.1px)
+    { 
+      .tableFlipContainer
+      {
+        height: 1133px
+      } 
+    }
+    @media screen and (min-width: 1300.1px) and (max-width: 1769px)
+    { 
+      .tableFlipContainer
+      {
+        height: 1169px
+      } 
+    }
+    @media screen and (min-width: 1191.1px) and (max-width: 1300px)
+    { 
+      .tableFlipContainer
+      {
+        height: 1187px
+      }
+    }
+    @media screen and (min-width: 988.1px) and (max-width: 1191px)
+    { 
+      .tableFlipContainer
+      {
+        height: 1224px
+      }
+    }
+    @media screen and (min-width: 923.1px) and (max-width: 988px)
+    { 
+      .tableFlipContainer
+      {
+        height: 1241px
+      }
+    }
+    @media screen and (min-width: 915.1px)  and (max-width: 923px)
+    { 
+      .tableFlipContainer
+      {
+        height: 1277px
+      }
+    }
+    @media screen and (max-width: 915px)
+    { 
+      .tableFlipContainer
+      {
+        height: 1295px
+      }
     }
   }
 </style>
