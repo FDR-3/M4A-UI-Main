@@ -54,7 +54,7 @@
             maximumFractionDigits: 2 }) }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -93,8 +93,6 @@
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines
-      sortField="id"
-      :sortOrder="1"
       size="small" 
       :value="tokenMarketTableData"
       :loading="isLoading"
@@ -106,7 +104,7 @@
       <template #header>
         <div>
           <h2>USDC SubMarkets</h2>
-          <ion-button color="dark" class="mediumSmallMarginBottom nSmallMarginTop" @click="showTokenSubMarkets=false">Return</ion-button>
+          <ion-button color="dark" class="mediumSmallMarginBottom nSmallMarginTop" @click="unShowSubMarkets()">Return</ion-button>
           <ion-input id="reservesSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
@@ -173,15 +171,22 @@
           showButtons
           fluid
           @focus="moveCursorInFrontPercentSign(data)"
-          @input="isEditing=true; tokenMarketTableData[index].isEditingRow=true; checkIfInputEmpty(data)"
+          @input="isEditing=true; tokenMarketTableData[index].isEditingRow=true; fixCursorPosition(data)"
           :disabled="connectedWallet.addressString!=tokenMarketTableData[index].owner ||
           (isDataEdited && !tokenMarketTableData[index].isEditingRow && !tokenMarketTableData[index].isRowDataEdited)"/>
         </template>
       </Column>
       <Column header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flexCenterRow">
+          <div class="flexCenterColumn">
             <div v-if="connectedWallet.addressString==slotProps.data.owner">
+              <ion-label v-if="slotProps.data.isEditingRow" color="yellow">
+                Table Updates Paused While Editing
+              </ion-label>
+              <ion-label v-else-if="isDataEdited && !slotProps.data.isRowDataEdited && !slotProps.data.isEditingRow">
+                You can only edit one row at a time
+              </ion-label>
+              <ion-label v-else-if="!slotProps.data.isRowDataEdited">No Edits Detected</ion-label>
               <ion-button
               v-if="slotProps.data.isRowDataEdited"
               color="dark"
@@ -190,8 +195,6 @@
               >
                 Edit Market
               </ion-button>
-              <ion-text v-else-if="isDataEdited">Another Row Is Being Edited</ion-text>
-              <ion-text v-else>No edits detected</ion-text>
             </div>
             <ion-text v-else align="center">Only the owner can edit their sub market</ion-text>
           </div>
@@ -229,9 +232,10 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
-  import { tokenAddressStringsMainNet, tokenAddressStringsDevNet } from '/src/assets/constants/Addresses.ts'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
+
+  const emits = defineEmits(['createSubMarketModal', 'updateReserveTableSizing'])
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
@@ -262,6 +266,8 @@
     if(tokenReserveHashMap.map)
     {
       processTokenReserveTableData()
+      emitReserveTableSizing()
+
       isLoading.value = false
     }
     else
@@ -283,6 +289,8 @@
     //Update inner table if it's already opened
     if(showTokenSubMarkets.value)
       showTokenReserveSubMarkets()
+
+    emitReserveTableSizing()
   })
 
   watch(tokenReserveBalancesMap, () =>
@@ -360,18 +368,8 @@
       //Update Table Prices
       if(priceObjectMap.data)
       {
-        //Update Price for Dev USDC
-        if(processedTableData[i].tokenMintAddress.toString() == tokenAddressStringsDevNet.usdcTokenMintAddress)
-        {
-          processedTableData[i].price = priceObjectMap.data[tokenAddressStringsMainNet.usdcTokenMintAddress].usdPrice
-          processedTableData[i].percentChange24h = priceObjectMap.data[tokenAddressStringsMainNet.usdcTokenMintAddress].priceChange24h.toFixed(2)
-        }
-        //Update Everything Else
-        else
-        {
-          processedTableData[i].price = priceObjectMap.data[processedTableData[i].tokenMintAddress.toString()].usdPrice
-          processedTableData[i].percentChange24h = priceObjectMap.data[processedTableData[i].tokenMintAddress.toString()].priceChange24h.toFixed(2)
-        } 
+        processedTableData[i].price = priceObjectMap.data[processedTableData[i].tokenMintAddress.toString()].usdPrice
+        processedTableData[i].percentChange24h = priceObjectMap.data[processedTableData[i].tokenMintAddress.toString()].priceChange24h.toFixed(2)
       }
 
       //Update Table Balances
@@ -397,7 +395,8 @@
       //Get SubMarket List And Count
       if(tokenReserveHashMap.map)
       {
-        const unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
+        var unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
+        unProcessedTokenSubMarketList = unProcessedTokenSubMarketList.sort((a: any, b: any) => a.id - b.id)
         if(unProcessedTokenSubMarketList)
         {
           processedTableData[i].subMarketCount = unProcessedTokenSubMarketList.length
@@ -423,6 +422,21 @@
   {
     tokenMarketTableData.value = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
     showTokenSubMarkets.value = true
+    emitReserveTableSizing()
+  }
+
+  function unShowSubMarkets()
+  {
+    showTokenSubMarkets.value = false
+    emitReserveTableSizing()
+  }
+
+  function emitReserveTableSizing()
+  {
+    if(!tokenMarketTableData.value)
+      tokenMarketTableData.value = []
+
+    emits('updateReserveTableSizing', tokenReserveTableData.value.length, tokenMarketTableData.value.length, showTokenSubMarkets.value)
   }
 
   function checkAddress(address: string)
@@ -452,7 +466,7 @@
     }
   }
 
-  function checkIfInputEmpty(rowData: any)
+  function fixCursorPosition(rowData: any)
   {
     const ref = inputFeeRefs.value.get(rowData.id)
     const inputElement = ref?.$el.querySelector(".p-inputtext")
@@ -464,6 +478,16 @@
         inputElement.value = "0.00%"
         inputElement.setSelectionRange(0, 0)
       }
+
+      const previousStart = inputElement.selectionStart
+      const previousEnd = inputElement.selectionEnd
+      const previousValue = inputElement.value
+      
+      setTimeout(() =>
+      {
+        inputElement.value = previousValue
+        inputElement.setSelectionRange(previousStart, previousEnd)
+      }, 0);
     }
   }
 
@@ -502,7 +526,7 @@
 
       //Erase saved row if it exists since the row data matches what's on the block chain
       if(savedEditedRow != undefined)
-        if(tokenMarketTableData.value[index].subMarketIndex == savedEditedRow.subMarketIndex) //Keeps other rows from erasing the data when you click in them
+        if(tokenMarketTableData.value[index].id == savedEditedRow.id) //Keeps other rows from erasing the data when you click in them
         { 
           savedEditedRow = undefined
           isDataEdited.value = false

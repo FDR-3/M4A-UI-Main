@@ -406,7 +406,6 @@
   import { trimAddress,
     copyFullAddress,
     parseDollarAmountStringFromDecimal,
-    convertFromFixed2PointNotationToDecimal,
     confirmM4ATransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
@@ -561,17 +560,15 @@
         for(var i=0; i<tempTable.length; i++)
           if(tempTable[i].processedClaimId == savedEditedRow.processedClaimId)
           {
-            tempTable[i].isActive = savedEditedRow.isActive
-            tempTable[i].hospitalLongitude = savedEditedRow.hospitalLongitude
-            tempTable[i].hospitalLatitude = savedEditedRow.hospitalLatitude
-            tempTable[i].hospitalType = savedEditedRow.hospitalType
-            tempTable[i].hospitalTypeName = savedEditedRow.hospitalTypeName
-            tempTable[i].hospitalName = savedEditedRow.hospitalName
-            tempTable[i].hospitalAddress = savedEditedRow.hospitalAddress
-            tempTable[i].hospitalCity = savedEditedRow.hospitalCity
-            tempTable[i].hospitalZipCode = savedEditedRow.hospitalZipCode
-            tempTable[i].hospitalPhoneNumber = savedEditedRow.hospitalPhoneNumber
-            tempTable[i].note = savedEditedRow.note
+            tempTable[i].hospitalIndex = savedEditedRow.hospitalIndex
+            tempTable[i].insuranceCompanyIndex = savedEditedRow.insuranceCompanyIndex
+            tempTable[i].hospitalBillInvoiceNumber = savedEditedRow.hospitalBillInvoiceNumber
+            tempTable[i].claimAmount = savedEditedRow.claimAmount
+            tempTable[i].claimAmountString = savedEditedRow.claimAmountString
+            tempTable[i].ailment = savedEditedRow.ailment
+            tempTable[i].note= savedEditedRow.note
+            tempTable[i].isHospitalReady = savedEditedRow.isHospitalReady
+            tempTable[i].isInsuranceCompanyReady = savedEditedRow.isInsuranceCompanyReady
             tempTable[i].isRowDataEdited = true
           }
 

@@ -7,7 +7,7 @@
       v-model:filters="filters" 
       show-gridlines
       size="small" 
-      :value="OwnerTableData"
+      :value="ownerTableData"
       :loading="isLoading"
       :globalFilterFields="['owner', 'ownerData.displayName', 'ownerData.subMarketCount']"  
     >
@@ -69,24 +69,31 @@
     <!--SubMarkets for a Specific Owner-->
     <DataTable
       v-if="showOwnerSubMarkets"
+      ref="tableRef"
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines
-      sortField="id"
-      :sortOrder="1"
       size="small" 
-      :value="OwnerSubMarketTableData"
+      :value="ownerSubMarketTableData"
       :loading="isLoading"
       editMode="cell" 
       @cell-edit-complete="onCellEditSave($event)"
-      :globalFilterFields="['id', 'tokenMintAddress', 'tokenName', 'feeCollectorAddress', 'feeOnInterestEarnedRate']"  
+      @sort="sorting=true"
+      @value-change="onValueChange($event)"
     >
       <template #header>
         <div>
           <h2>{{ subMarketsOwnedByUser }} SubMarket{{ subMarketsSText }} Owned By:<br>{{ subMarketOwnerDisplayName }}</h2>
 
-          <ion-button color="dark" class="mediumSmallMarginBottom nSmallMarginTop" @click="showOwnerSubMarkets=false">Return</ion-button>
-          <ion-input id="ownerSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Owners Search     ">
+          <ion-button color="dark" class="mediumSmallMarginBottom nSmallMarginTop" @click="closeOwnerSubMarkets()">Return</ion-button>
+          <ion-input
+            color="dark"
+            v-model="searchInput"
+            fill="outline"
+
+            placeholder="Owners Search     "
+            @input="filterTable()"
+          >
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br>
@@ -121,9 +128,9 @@
             v-model="data[field]"
             class="feeRecipientInput"
             fluid
-            @input="isEditing=true; OwnerSubMarketTableData[index].isEditingRow=true; checkAddress(data[field])"
-            :disabled="connectedWallet.addressString!=OwnerSubMarketTableData[index].owner ||
-            (isDataEdited && !OwnerSubMarketTableData[index].isEditingRow && !OwnerSubMarketTableData[index].isRowDataEdited)"
+            @input="isEditing=true; ownerSubMarketTableData[index].isEditingRow=true; checkAddress(data[field])"
+            :disabled="connectedWallet.addressString!=ownerSubMarketTableData[index].owner ||
+            (isDataEdited && !ownerSubMarketTableData[index].isEditingRow && !ownerSubMarketTableData[index].isRowDataEdited)"
           />
         </template>
       </Column>
@@ -146,16 +153,23 @@
           showButtons
           fluid
           @focus="moveCursorInFrontPercentSign(data)"
-          @input="isEditing=true; OwnerSubMarketTableData[index].isEditingRow=true; checkIfInputEmpty(data)"
-          :disabled="connectedWallet.addressString!=OwnerSubMarketTableData[index].owner ||
-          (isDataEdited && !OwnerSubMarketTableData[index].isEditingRow && !OwnerSubMarketTableData[index].isRowDataEdited)"/>
+          @input="isEditing=true; ownerSubMarketTableData[index].isEditingRow=true; fixCursorPosition(data)"
+          :disabled="connectedWallet.addressString!=ownerSubMarketTableData[index].owner ||
+          (isDataEdited && !ownerSubMarketTableData[index].isEditingRow && !ownerSubMarketTableData[index].isRowDataEdited)"/>
         </template>
       </Column>
 
       <Column field="actions" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flexCenterRow">
+          <div class="flexCenterColumn">
             <div v-if="connectedWallet.addressString==slotProps.data.owner">
+              <ion-label v-if="slotProps.data.isEditingRow" color="yellow">
+                Table Updates Paused While Editing
+              </ion-label>
+              <ion-label v-else-if="isDataEdited && !slotProps.data.isRowDataEdited && !slotProps.data.isEditingRow">
+                You can only edit one row at a time
+              </ion-label>
+              <ion-label v-else-if="!slotProps.data.isRowDataEdited">No Edits Detected</ion-label>
               <ion-button
               v-if="slotProps.data.isRowDataEdited"
               color="dark"
@@ -164,8 +178,6 @@
               >
                 Edit Market
               </ion-button>
-              <ion-text v-else-if="isDataEdited">Another Row Is Being Edited</ion-text>
-              <ion-text v-else>No edits detected</ion-text>
             </div>
             <ion-text v-else align="center">Only the owner can edit their sub market</ion-text>
           </div>
@@ -201,30 +213,39 @@
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
 
-  const toast = inject('toast')
-  const colorHexValue = inject('colorHexValue') as string
+  const emits = defineEmits(['updateOwnerTableSizing'])
 
-  const OwnerTableData = ref()
-  const OwnerSubMarketTableData = ref()
-  const isLoading = ref(true)
-  const showOwnerSubMarkets = ref(false)
-  const subMarketsOwnedByUser = ref()
-  const subMarketOwnerDisplayName = ref()
-  const ownerPopoverOpen = ref(false)
-  const event = ref()
+  var toast = inject('toast')
+  var colorHexValue = inject('colorHexValue') as string
+
+  var ownerTableData = ref()
+  var ownerSubMarketTableData = ref()
+  var tableRef = ref()
+  var newTableData: any
+  var isLoading = ref(true)
+  var showOwnerSubMarkets = ref(false)
+  var subMarketsOwnedByUser = ref()
+  var subMarketOwnerDisplayName = ref()
+  var ownerPopoverOpen = ref(false)
+  var event = ref()
 
   var selectedOwnerAddress: PublicKey
   var publicKeyCheckColor = ref("#6fff7b")
   var isInvalidPublicKey = ref(false)
   var savedEditedRow: any 
   var isEditing = false
-  const isDataEdited = ref(false)
+  var isDataEdited = ref(false)
   var copyFullAddressButtonText = ref("Copy Full Address")
 
-  const tokenPopoverOpen = ref(false)
+  var tokenPopoverOpen = ref(false)
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
-  const inputFeeRefs = ref(new Map())
+  var inputFeeRefs = ref(new Map())
+
+  var searchInput = ref("")
+
+  var unfilteredTableData: any
+  var sorting = false
 
   const subMarketsSText = computed(() =>
   {
@@ -239,6 +260,8 @@
     if(subMarketOwnerHashMap.map)
     {
       processOwnersTable()
+      emitReserveTableSizing()
+      
       isLoading.value = false
     }
     else if(subMarkets.data)
@@ -257,6 +280,8 @@
     //Update inner table if it's already opened
     if(showOwnerSubMarkets.value)
       openOwnerSubMarkets()
+
+    emitReserveTableSizing()
   })
 
   watch(customUserNameHashMap, () =>
@@ -264,15 +289,80 @@
     processOwnersTable()
   })
 
+  //Keeps editing from fucking up the table after it's sorted or filtered
+  function onValueChange(value: any) 
+  {
+    if(sorting)
+    {
+      ownerSubMarketTableData.value = value
+      sorting = false
+    }
+  }
+
+  //Custom table filtering to be able to edit cells after filtering
+  function filterTable()
+  {
+    if(unfilteredTableData == undefined)
+      unfilteredTableData = ownerSubMarketTableData.value
+
+    if(searchInput.value == "")
+    {
+      ownerSubMarketTableData.value = unfilteredTableData
+      unfilteredTableData == undefined
+    }
+    else
+    {
+      ownerSubMarketTableData.value = customFilter(searchInput.value)
+    }
+  }
+
+  function customFilter(filterString: string)
+  {
+    var filteredTable: any = []
+
+    for(var i=0; i<unfilteredTableData.length; i++)
+    {
+      if(unfilteredTableData[i].id.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].tokenMintAddress.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].tokenName.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].feeCollectorAddress.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].feeOnInterestEarnedRate.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+    }
+
+    return filteredTable
+  }
+
   function openOwnerSubMarkets()
   {
-    const subMarketOwner = subMarketOwnerHashMap.map.get(selectedOwnerAddress)
+    var subMarketOwner = subMarketOwnerHashMap.map.get(selectedOwnerAddress)
+    subMarketOwner.ownerSubMarketList = subMarketOwner.ownerSubMarketList.sort((a: any, b: any) => a.id - b.id)
 
-    OwnerSubMarketTableData.value = subMarketOwner.ownerSubMarketList
+    ownerSubMarketTableData.value = subMarketOwner.ownerSubMarketList
     subMarketsOwnedByUser.value = subMarketOwner.subMarketCount
     subMarketOwnerDisplayName.value = subMarketOwner.displayName
 
     showOwnerSubMarkets.value = true
+
+    emitReserveTableSizing()
+  }
+
+  function closeOwnerSubMarkets()
+  {
+    showOwnerSubMarkets.value = false
+    emitReserveTableSizing()
+  }
+
+  function emitReserveTableSizing()
+  {
+    if(!subMarketsOwnedByUser.value)
+      subMarketsOwnedByUser.value = 0
+
+    emits('updateOwnerTableSizing', ownerTableData.value.length, subMarketsOwnedByUser.value, showOwnerSubMarkets.value)
   }
 
   function passByRefWrapperCopyAddress()
@@ -320,7 +410,7 @@
 
     }
 
-    OwnerTableData.value = unprocessedData
+    ownerTableData.value = unprocessedData
   }
 
   const filters = ref(
@@ -369,7 +459,7 @@
     }
   }
 
-  function checkIfInputEmpty(rowData: any)
+  function fixCursorPosition(rowData: any)
   {
     const ref = inputFeeRefs.value.get(rowData.id)
     const inputElement = ref?.$el.querySelector(".p-inputtext")
@@ -381,6 +471,16 @@
         inputElement.value = "0.00%"
         inputElement.setSelectionRange(0, 0)
       }
+
+      const previousStart = inputElement.selectionStart
+      const previousEnd = inputElement.selectionEnd
+      const previousValue = inputElement.value
+      
+      setTimeout(() =>
+      {
+        inputElement.value = previousValue
+        inputElement.setSelectionRange(previousStart, previousEnd)
+      }, 0);
     }
   }
 
@@ -396,38 +496,74 @@
   {
     let { newData, index } = event
     
-    OwnerSubMarketTableData.value[index].feeCollectorAddress = newData.feeCollectorAddress
-    OwnerSubMarketTableData.value[index].feeOnInterestEarnedRate = newData.feeOnInterestEarnedRate
+    ownerSubMarketTableData.value[index].feeCollectorAddress = newData.feeCollectorAddress
+    ownerSubMarketTableData.value[index].feeOnInterestEarnedRate = newData.feeOnInterestEarnedRate
 
     const subMarket = subMarketsHashMap.map.get
     (
-      OwnerSubMarketTableData.value[index].tokenMintAddress.toBase58() +
-      OwnerSubMarketTableData.value[index].owner.toString() +
-      OwnerSubMarketTableData.value[index].subMarketIndex.toString()
+      ownerSubMarketTableData.value[index].tokenMintAddress.toBase58() +
+      ownerSubMarketTableData.value[index].owner.toString() +
+      ownerSubMarketTableData.value[index].subMarketIndex.toString()
     )
 
     if(newData.feeCollectorAddress != subMarket.feeCollectorAddress ||
     newData.feeOnInterestEarnedRate != subMarket.feeOnInterestEarnedRate)
     {
-      OwnerSubMarketTableData.value[index].isRowDataEdited = true
-      savedEditedRow = OwnerSubMarketTableData.value[index]
+      ownerSubMarketTableData.value[index].isRowDataEdited = true
+      savedEditedRow = ownerSubMarketTableData.value[index]
       isDataEdited.value = true
     }
     else
     {
-      OwnerSubMarketTableData.value[index].isRowDataEdited = false
+      ownerSubMarketTableData.value[index].isRowDataEdited = false
 
       //Erase saved row if it exists since the row data matches what's on the block chain
       if(savedEditedRow != undefined)
-        if(OwnerSubMarketTableData.value[index].subMarketIndex == savedEditedRow.subMarketIndex) //Keeps other rows from erasing the data when you click in them
+        if(ownerSubMarketTableData.value[index].id == savedEditedRow.id) //Keeps other rows from erasing the data when you click in them
         { 
           savedEditedRow = undefined
           isDataEdited.value = false
         }
     }
 
-    OwnerSubMarketTableData.value[index].isEditingRow = false
+    //checkForNewDataAfterEditing()
+    ownerSubMarketTableData.value[index].isEditingRow = false
     isEditing = false
+  }
+
+  function checkForNewDataAfterEditing()
+  {
+    if(newTableData != undefined) //Check if newTableData came in while editing
+    {
+      if(savedEditedRow != undefined) //Combine new table data with the edited row data if it exists
+        for(var i=0; i<newTableData.length; i++)
+          if(newTableData[i].id == savedEditedRow.id)
+          {
+            newTableData[i].isActive = savedEditedRow.isActive
+            newTableData[i].hospitalLongitude = savedEditedRow.hospitalLongitude
+            newTableData[i].hospitalLatitude = savedEditedRow.hospitalLatitude
+            newTableData[i].hospitalType = savedEditedRow.hospitalType
+            newTableData[i].hospitalTypeName = savedEditedRow.hospitalTypeName
+            newTableData[i].hospitalName = savedEditedRow.hospitalName
+            newTableData[i].hospitalAddress = savedEditedRow.hospitalAddress
+            newTableData[i].hospitalCity = savedEditedRow.hospitalCity
+            newTableData[i].hospitalZipCode = savedEditedRow.hospitalZipCode
+            newTableData[i].hospitalPhoneNumber = savedEditedRow.hospitalPhoneNumber
+            newTableData[i].note = savedEditedRow.note
+            newTableData[i].isRowDataEdited = true
+            newTableData[i].isEditingRow = false
+          }
+       
+      if(unfilteredTableData != undefined)
+      {
+        unfilteredTableData = newTableData
+        ownerSubMarketTableData.value = customFilter(searchInput.value)
+      }
+      else    
+        ownerSubMarketTableData.value = newTableData
+
+      newTableData = undefined
+    }
   }
 
   async function editSubMarket(subMarketTableRow: any)

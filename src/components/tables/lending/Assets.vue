@@ -67,8 +67,8 @@
         svg: USDCSVG,
         source: () => {sourceUSDC()}
       },
-      price: 1.00,
-      percentChange24h: 0.00.toFixed(2),
+      price: '-',
+      percentChange24h: '-',
       apy: "4.44%",
       chain:
       {

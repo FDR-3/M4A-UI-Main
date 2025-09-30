@@ -162,6 +162,8 @@
       currentTableData.value = value;
       sorting = false
     }
+
+    
   }
 
   //Custom table filtering to be able to edit cells after filtering
@@ -225,16 +227,7 @@
           if(tempTable[i].id == savedEditedRow.id)
           {
             tempTable[i].isActive = savedEditedRow.isActive
-            tempTable[i].hospitalLongitude = savedEditedRow.hospitalLongitude
-            tempTable[i].hospitalLatitude = savedEditedRow.hospitalLatitude
-            tempTable[i].hospitalType = savedEditedRow.hospitalType
-            tempTable[i].hospitalTypeName = savedEditedRow.hospitalTypeName
-            tempTable[i].hospitalName = savedEditedRow.hospitalName
-            tempTable[i].hospitalAddress = savedEditedRow.hospitalAddress
-            tempTable[i].hospitalCity = savedEditedRow.hospitalCity
-            tempTable[i].hospitalZipCode = savedEditedRow.hospitalZipCode
-            tempTable[i].hospitalPhoneNumber = savedEditedRow.hospitalPhoneNumber
-            tempTable[i].note = savedEditedRow.note
+            tempTable[i].insuranceCompanyName = savedEditedRow.insuranceCompanyName
             tempTable[i].isRowDataEdited = true
           }
 

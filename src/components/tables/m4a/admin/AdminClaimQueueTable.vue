@@ -824,7 +824,7 @@
             tempTable[i].hospitalLongitude = savedEditedRow.hospitalLongitude
             tempTable[i].hospitalLatitude = savedEditedRow.hospitalLatitude
             tempTable[i].isHospitalIndexEdited = savedEditedRow.isHospitalIndexEdited
-            tempTable[i].isHospitalReady= savedEditedRow.isHospitalReady
+            tempTable[i].isHospitalReady = savedEditedRow.isHospitalReady
 
             tempTable[i].insuranceCompanyName = savedEditedRow.insuranceCompanyName
             tempTable[i].isInsuranceCompanyIndexEdited = savedEditedRow.isInsuranceCompanyIndexEdited
@@ -863,7 +863,7 @@
           tempTable[i].hospitalLongitude = savedEditedRow.hospitalLongitude
           tempTable[i].hospitalLatitude = savedEditedRow.hospitalLatitude
           tempTable[i].isHospitalIndexEdited = savedEditedRow.isHospitalIndexEdited
-          tempTable[i].isHospitalReady= savedEditedRow.isHospitalReady
+          tempTable[i].isHospitalReady = savedEditedRow.isHospitalReady
 
           tempTable[i].insuranceCompanyName = savedEditedRow.insuranceCompanyName
           tempTable[i].isInsuranceCompanyIndexEdited = savedEditedRow.isInsuranceCompanyIndexEdited

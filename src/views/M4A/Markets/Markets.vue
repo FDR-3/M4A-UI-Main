@@ -155,70 +155,63 @@
   { 
     .tableFlipContainer
     {
-      height: 1108px
+      height: 1106px
     } 
   }
-  @media screen and (min-width: 1432.1px) and (max-width: 1769px)
+  @media screen and (min-width: 1300.1px) and (max-width: 1769px)
   { 
     .tableFlipContainer
     {
-      height: 1144px
+      height: 1142px
     } 
   }
-  @media screen and (min-width: 1411.1px) and (max-width: 1432px)
+  @media screen and (min-width: 1191.1px) and (max-width: 1300px)
   { 
     .tableFlipContainer
     {
       height: 1157px
-    } 
-  }
-  @media screen and (min-width: 1301.1px) and (max-width: 1411px)
-  { 
-    .tableFlipContainer
-    {
-      height: 1171px
-    } 
-  }
-  @media screen and (min-width: 1191.1px) and (max-width: 1301px)
-  { 
-    .tableFlipContainer
-    {
-      height: 1186px
     }
   }
-  @media screen and (min-width: 999.1px) and (max-width: 1191px)
+  @media screen and (min-width: 1051.1px) and (max-width: 1191px)
+  { 
+    .tableFlipContainer
+    {
+      height: 1194px
+    }
+  }
+  @media screen and (min-width: 1028.1px) and (max-width: 1051px)
+  { 
+    .tableFlipContainer
+    {
+      height: 1208px
+    }
+  }
+  @media screen and (min-width: 988.1px) and (max-width: 1028px)
   { 
     .tableFlipContainer
     {
       height: 1222px
     }
   }
-  @media screen and (min-width: 989.1px) and (max-width: 999px)
+  @media screen and (min-width: 923.1px) and (max-width: 988px)
   { 
     .tableFlipContainer
     {
-      height: 1237px
+      height: 1236px
     }
   }
-  @media screen and (min-width: 976.1px) and (max-width: 989px)
+  @media screen and (min-width: 916.1px)  and (max-width: 923px)
   { 
     .tableFlipContainer
     {
-      height: 1252px
+      height: 1272px
     }
   }
-  @media screen and (min-width: 929.1px) and (max-width: 976px)
+  @media screen and (max-width: 916px)
   { 
     .tableFlipContainer
     {
-      height: 1267px
-    }
-  }
-  @media screen and (max-width: 929px)
-  { 
-    .tableFlipContainer
-    {
-      height: 1282px
+      height: 1288px
     }
   }
 </style>

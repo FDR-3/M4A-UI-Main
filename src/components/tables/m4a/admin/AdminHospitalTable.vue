@@ -198,7 +198,7 @@
             <ion-label v-if="slotProps.data.isEditingRow" color="yellow">
               Table Updates Paused While Editing
             </ion-label>
-            <ion-label v-if="isDataEdited && !slotProps.data.isRowDataEdited && !slotProps.data.isEditingRow">
+            <ion-label v-else-if="isDataEdited && !slotProps.data.isRowDataEdited && !slotProps.data.isEditingRow">
               You can only edit one row at a time
             </ion-label>
             <ion-label v-else-if="!slotProps.data.isRowDataEdited">No Edits Detected</ion-label>
@@ -226,7 +226,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { getHospital } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
-  import { parsePhoneNumberString, confirmM4ATransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { confirmM4ATransaction, toastPreTransactionError, parseDollarAmountStringFromFixed2PointNotation } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
@@ -388,6 +388,10 @@
     }
     else //Update current table like normal
       currentTableData.value = props.tableData
+
+    //Fixes issue with admin hospital table losing its dollar sign when editing other cells for some reason, need this for the dollar sign to be searchable
+    //Will remove this at some point when I make tables from scratch. Prime vue be super buggy
+    fixDollarSigns()
   })
 
   function exportCSV(e: Event) 
@@ -456,8 +460,10 @@
     currentTableData.value[index].hospitalName = newData.hospitalName
     currentTableData.value[index].hospitalAddress = newData.hospitalAddress
     currentTableData.value[index].hospitalCity = newData.hospitalCity
-    currentTableData.value[index].hospitalZipCode = newData.hospitalZipCode
-    currentTableData.value[index].hospitalPhoneNumber = newData.hospitalPhoneNumber
+    if(newData.hospitalZipCode != "")
+      currentTableData.value[index].hospitalZipCode = newData.hospitalZipCode
+    if(newData.hospitalPhoneNumber != "")
+      currentTableData.value[index].hospitalPhoneNumber = newData.hospitalPhoneNumber
     currentTableData.value[index].note = newData.note
 
     const hospital = getHospital(newData.countryIndex, newData.stateIndex, newData.hospitalIndex)
@@ -469,8 +475,8 @@
     newData.hospitalName != hospital.hospitalName ||
     newData.hospitalAddress != hospital.hospitalAddress ||
     newData.hospitalCity != hospital.hospitalCity ||
-    newData.hospitalZipCode != hospital.hospitalZipCode ||
-    newData.hospitalPhoneNumber != hospital.hospitalPhoneNumber ||
+    currentTableData.value[index].hospitalZipCode != hospital.hospitalZipCode ||
+    currentTableData.value[index].hospitalPhoneNumber != hospital.hospitalPhoneNumber ||
     newData.note != hospital.note)
     {
       currentTableData.value[index].isRowDataEdited = true
@@ -493,6 +499,17 @@
     checkForNewDataAfterEditing()
     currentTableData.value[index].isEditingRow = false
     isEditing = false
+  }
+
+  //Fixes issue with admin hospital table losing its dollar sign when editing other cells for some reason, need this for the dollar sign to be searchable
+  //Will remove this at some point when I make tables from scratch. Prime vue be super buggy
+  function fixDollarSigns()
+  {
+    for(var i=0; i<currentTableData.value.length; i++)
+    {
+      const hospital = getHospital(currentTableData.value[i].countryIndex, currentTableData.value[i].stateIndex, currentTableData.value[i].hospitalIndex)
+      currentTableData.value[i].approvedClaimAmountString = parseDollarAmountStringFromFixed2PointNotation(hospital.approvedClaimAmount)
+    }
   }
   
   async function updateHospital(rowData: any)

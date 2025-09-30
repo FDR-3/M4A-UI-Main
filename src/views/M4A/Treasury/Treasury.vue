@@ -23,8 +23,11 @@
         <h1>Reserves</h1>
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Treasuries</ion-button>
         <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
-        createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"/>
-        <OwnersTable/>
+        createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"
+        @updateReserveTableSizing="(tokenReserveCount: number, tokenSubMarketCount: number, showTokenSubMarkets: boolean) =>
+        updateTokenTableSizing(tokenReserveCount, tokenSubMarketCount, showTokenSubMarkets)"/>
+        <OwnersTable @updateOwnerTableSizing="(subMarketOwnerCount: number, ownerSubMarketCount: number, showOwnerSubMarkets: boolean) =>
+        updateOwnerTableSizing(subMarketOwnerCount, ownerSubMarketCount, showOwnerSubMarkets)"/>
       </div>
     </div>
   </div>
@@ -55,6 +58,10 @@
   var display2ndTable = ref("none")
 
   var createSubMarketModal = ref()
+  var dynamicTableHeight = ref("1353px")
+  var tokenReserveTableSizing = 0
+  var ownerTableSizing = 0
+  const numberToSubTractForBothTables = 99
 
   onMounted(() => 
   {
@@ -103,6 +110,28 @@
         flipping.value = false
       }, 500) // 1000 milliseconds == 1 seconds
     }   
+  }
+
+  function updateTokenTableSizing(tokenReserveCount: number, tokenSubMarketCount: number, showTokenSubMarkets: boolean)
+  {
+    if(showTokenSubMarkets)
+      tokenReserveTableSizing = (396 + tokenSubMarketCount * 81.04//TokenReserve table and rows
+    )
+    else
+      tokenReserveTableSizing = (350 + tokenReserveCount * 69.05//TokenReserve Owner table and rows
+    )
+
+    dynamicTableHeight.value = (tokenReserveTableSizing + ownerTableSizing - numberToSubTractForBothTables).toString() + "px"
+  }
+
+  function updateOwnerTableSizing(subMarketOwnerCount: number, ownerSubMarketCount: number, showOwnerSubMarkets: boolean)
+  {
+    if(showOwnerSubMarkets)
+      ownerTableSizing = (440 + ownerSubMarketCount * 69.05)
+    else
+      ownerTableSizing = (344 + subMarketOwnerCount * 81.04)
+
+    dynamicTableHeight.value = (tokenReserveTableSizing + ownerTableSizing - numberToSubTractForBothTables).toString() + "px"
   }
 </script>
 
@@ -205,46 +234,82 @@
     }
   }
   
-  /*Table Flip Container*/
-  @media screen and (min-width: 1442.1px)
+  /*Table Flip Container Front*/
+  @media screen and (min-width: 1059.1px)
   { 
     .tableFlipContainer
     {
       height: 1678px
     }
-    .tableFlipContainer.flipped
-    {
-      height: 1400px
-    }
+
   }
-  @media screen and (min-width: 1419.1px) and (max-width: 1442px) 
+  @media screen and (min-width: 1037.1px) and (max-width: 1059px) 
   { 
     .tableFlipContainer
     {
-      height: 1706px
-    }
-    .tableFlipContainer.flipped
-    {
-      height: 1413px
+      height: 1707px
     }
   }
-  @media screen  and (min-width: 1111.1px) and (max-width: 1419px) 
+  @media screen and (min-width: 965.1px) and (max-width: 1037px) 
   { 
     .tableFlipContainer
     {
       height: 1734px
     }
-    .tableFlipContainer.flipped
-    {
-      height: 1413px
-    }
   }
-  @media screen and (max-width: 1111px) 
+  @media screen and (min-width: 926.1px) and (max-width: 965px) 
   { 
     .tableFlipContainer
     {
-      height: 1764px
+      height: 1771px
     }
+  }
+  @media screen and (max-width: 926px) 
+  { 
+    .tableFlipContainer
+    {
+      height: 1800px
+    }
+  }
+
+  /*Table Flip Container Back*/
+  /*@media screen and (min-width: 1909.1px)
+  { 
+    .tableFlipContainer.flipped
+    {
+      height: 1339px
+    } 
+  }*/
+  @media screen and (min-width: 1338.1px)/* and (max-width: 1909px)*/
+  { 
+    .tableFlipContainer.flipped
+    {
+      height: v-bind(dynamicTableHeight) /*1353px*/
+    }
+  }
+  @media screen and (min-width: 1290.1px) and (max-width: 1338px) 
+  { 
+    .tableFlipContainer.flipped
+    {
+      height: 1368px
+    }
+  }
+  @media screen and (min-width: 1221.1px) and (max-width: 1290px) 
+  { 
+    .tableFlipContainer.flipped
+    {
+      height: 1383px
+    }
+  }
+  @media screen and (min-width: 1143.1px) and (max-width: 1221px) 
+  { 
+    .tableFlipContainer.flipped
+    {
+      height: 1398px
+    }
+  }
+  @media screen and (max-width: 1143px) 
+  { 
     .tableFlipContainer.flipped
     {
       height: 1413px

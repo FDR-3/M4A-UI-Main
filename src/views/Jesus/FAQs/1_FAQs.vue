@@ -4,7 +4,6 @@
     <h2 class="nSmallMarginTop">(And so the lord spake onto thee, and said, "You had-eth, but one job!")</h2>
     <div class="flexCenterRow">
       <PrevPageButton/>
-      <Uploading/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/FAQs/FAQs1/FAQs1.mp4">
         <media-provider><track src="src/assets/video/Jesus Debate/FAQs/FAQs1/FAQs1.vtt" kind="subtitles" label="English" lang="en-US" default/></media-provider>
         <media-plyr-layout thumbnails="src/assets/video/Jesus Debate/FAQs/FAQs1/FAQs1-thumbnails.vtt"></media-plyr-layout>

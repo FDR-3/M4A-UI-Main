@@ -65,7 +65,7 @@
             maximumFractionDigits: 2 }) }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -124,7 +124,7 @@
             maximumFractionDigits: 2 }) }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h Percent Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -195,7 +195,7 @@
 
   .tableMinWidth
   {
-    min-width: 807px
+    min-width: 795px
   }
 
   ion-input

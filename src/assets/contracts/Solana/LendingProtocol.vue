@@ -109,7 +109,6 @@
       //subMarketOwner.ownerSubMarketList[newIndex].tokenSVG = tokenFrontEndProperties.svg//This has to be marked raw in the Owners Table since it is cloned at the end of this fuction. The cloning is for allowing users to edit the table without updating the original hashmap. It was originally marked Raw in the TokenReserves.vue file
       subMarketOwner.ownerSubMarketList[newIndex].tokenName = tokenFrontEndProperties.name
       subMarketOwner.ownerSubMarketList[newIndex].svgSource = tokenFrontEndProperties.source
-
       subMarketOwner.subMarketCount = subMarketOwner.ownerSubMarketList.length
 
       subMarketOwnerMap.set(allSubMarkets[i].account.owner.toBase58(), subMarketOwner)
