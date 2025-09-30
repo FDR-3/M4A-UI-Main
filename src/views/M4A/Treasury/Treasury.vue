@@ -10,7 +10,7 @@
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) }}</span></h1>
       
-  <div class="tableFlipContainer" :class="flipped">
+  <div class="tableFlipContainer" :class="[flipped, viewingTokenMarkets, viewingOwnerMarkets]">
     <div class="tableCard" :class="flipped">
       <div class="frontTable" :style="{display: display1stTable}">
         <h1>Treasuries</h1>
@@ -54,11 +54,13 @@
 
   var flipping = ref(false)
   var flipped = ""
+  var viewingTokenMarkets = ref("viewingTokenMarkets")
+  var viewingOwnerMarkets = ref("")
   var display1stTable = ref("")
   var display2ndTable = ref("none")
 
   var createSubMarketModal = ref()
-  var dynamicTableHeight = ref("1353px")
+  var dynamicTableHeight = ref(1353)
   var tokenReserveTableSizing = 0
   var ownerTableSizing = 0
   const numberToSubTractForBothTables = 99
@@ -115,23 +117,33 @@
   function updateTokenTableSizing(tokenReserveCount: number, tokenSubMarketCount: number, showTokenSubMarkets: boolean)
   {
     if(showTokenSubMarkets)
-      tokenReserveTableSizing = (396 + tokenSubMarketCount * 81.04//TokenReserve table and rows
-    )
+    {
+      tokenReserveTableSizing = 399 + tokenSubMarketCount * 81
+      viewingTokenMarkets.value = "viewingTokenMarkets"
+    }
     else
-      tokenReserveTableSizing = (350 + tokenReserveCount * 69.05//TokenReserve Owner table and rows
-    )
-
-    dynamicTableHeight.value = (tokenReserveTableSizing + ownerTableSizing - numberToSubTractForBothTables).toString() + "px"
+    {
+      tokenReserveTableSizing = 350 + tokenReserveCount * 70
+      viewingTokenMarkets.value = ""
+    }
+    console.log(viewingTokenMarkets)
+    dynamicTableHeight.value = tokenReserveTableSizing + ownerTableSizing - numberToSubTractForBothTables
   }
 
   function updateOwnerTableSizing(subMarketOwnerCount: number, ownerSubMarketCount: number, showOwnerSubMarkets: boolean)
   {
     if(showOwnerSubMarkets)
-      ownerTableSizing = (440 + ownerSubMarketCount * 69.05)
+    {
+      ownerTableSizing = 438 + ownerSubMarketCount * 70
+      viewingOwnerMarkets.value = "viewingOwnerMarkets"
+    }
     else
-      ownerTableSizing = (344 + subMarketOwnerCount * 81.04)
+    {
+      ownerTableSizing = 344 + subMarketOwnerCount * 81
+      viewingOwnerMarkets.value = ""
+    }
 
-    dynamicTableHeight.value = (tokenReserveTableSizing + ownerTableSizing - numberToSubTractForBothTables).toString() + "px"
+    dynamicTableHeight.value = tokenReserveTableSizing + ownerTableSizing - numberToSubTractForBothTables
   }
 </script>
 
@@ -272,7 +284,7 @@
     }
   }
 
-  /*Table Flip Container Back*/
+  /*Table Flip Container Back NOT ViewingTokenMarkets*/
   /*@media screen and (min-width: 1909.1px)
   { 
     .tableFlipContainer.flipped
@@ -280,39 +292,136 @@
       height: 1339px
     } 
   }*/
-  @media screen and (min-width: 1338.1px)/* and (max-width: 1909px)*/
+  @media screen and (min-width: 1430.1px)/* and (max-width: 1909px)*/
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind(dynamicTableHeight) /*1353px*/
+      height: v-bind('dynamicTableHeight + "px"')/*1353px*/
     }
   }
-  @media screen and (min-width: 1290.1px) and (max-width: 1338px) 
+  @media screen and (min-width: 1338.1px) and (max-width: 1430px) 
   { 
     .tableFlipContainer.flipped
     {
-      height: 1368px
+      height: v-bind('(dynamicTableHeight + 14) + "px"'); 
     }
   }
-  @media screen and (min-width: 1221.1px) and (max-width: 1290px) 
+  @media screen and (min-width: 1227.1px) and (max-width: 1338px) 
   { 
     .tableFlipContainer.flipped
     {
-      height: 1383px
+      height: v-bind('(dynamicTableHeight + 14) + "px"'); 
     }
   }
-  @media screen and (min-width: 1143.1px) and (max-width: 1221px) 
+  @media screen and (min-width: 1143.1px) and (max-width: 1227px) 
   { 
     .tableFlipContainer.flipped
     {
-      height: 1398px
+      height: v-bind('(dynamicTableHeight + 29) + "px"'); 
     }
   }
   @media screen and (max-width: 1143px) 
   { 
     .tableFlipContainer.flipped
     {
-      height: 1413px
+      height: v-bind('(dynamicTableHeight + 45) + "px"'); 
+    }
+  }
+
+  /*Table Flip Container Back ViewingTokenMarkets*/
+  @media screen and (min-width: 1338.1px)
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets
+    {
+      height: v-bind('dynamicTableHeight + "px"'); 
+    }
+  }
+  @media screen and (min-width: 1227.1px) and (max-width: 1338px) 
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 17) + "px"'); 
+    }
+  }
+  @media screen and (min-width: 1143.1px) and (max-width: 1227px) 
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 32) + "px"'); 
+    }
+  }
+  @media screen and (max-width: 1143px) 
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 45) + "px"'); 
+    }
+  }
+
+  /*Table Flip Container Back ViewingOwnerMarkets*/
+  @media screen and (min-width: 1430.1px)
+  { 
+    .tableFlipContainer.flipped.viewingOwnerMarkets
+    {
+      height: v-bind('dynamicTableHeight + "px"'); 
+    }
+  }
+  @media screen and (min-width: 1227.1px) and (max-width: 1430px)
+  { 
+    .tableFlipContainer.flipped.viewingOwnerMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 14) + "px"'); 
+    }
+  }
+  @media screen and (min-width: 1227.1px) and (max-width: 1290px)
+  { 
+    .tableFlipContainer.flipped.viewingOwnerMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 29) + "px"'); 
+    }
+  }
+  @media screen and (min-width: 1143.1px) and (max-width: 1227px)
+  { 
+    .tableFlipContainer.flipped.viewingOwnerMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 45) + "px"'); 
+    }
+  }
+  @media screen and (max-width: 1143px)
+  { 
+    .tableFlipContainer.flipped.viewingOwnerMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 59) + "px"'); 
+    }
+  }
+
+  /*Table Flip Container Back ViewingTokenMarkets and ViewingOwnerMarkets*/
+  @media screen and (min-width: 1338.1px)
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets.viewingOwnerMarkets
+    {
+      height: v-bind('dynamicTableHeight + "px"'); 
+    }
+  }
+  @media screen and (min-width: 1290.1px) and (max-width: 1338px)
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets.viewingOwnerMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 15) + "px"'); 
+    }
+  }
+  @media screen and (min-width: 1227.1px) and (max-width: 1290px)
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets.viewingOwnerMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 30) + "px"'); 
+    }
+  }
+  @media screen and (min-width: 1143.1px) and (max-width: 1227px)
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets.viewingOwnerMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 45) + "px"'); 
     }
   }
 </style>

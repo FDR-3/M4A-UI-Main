@@ -574,7 +574,7 @@
 
   .tableMinWidth
   {
-    min-width: 1070px
+    min-width: 1075px
   }
 
   #reservesSearchInput
