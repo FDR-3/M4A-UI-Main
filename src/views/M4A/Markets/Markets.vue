@@ -18,6 +18,9 @@
       </div>
     </div>
   </div>
+  
+  <KingobamaMobileM1 :style="{display: display1stTable}"/>
+  <KingobamaMobileM2 :style="{display: display2ndTable}"/>
 </template>
 
 <script setup lang="ts">
@@ -27,6 +30,8 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import PortfolioTable from '/src/components/tables/lending/PortfolioTable.vue'
+  import KingobamaMobileM1 from '/src/components/fancy/poly/KingobamaMobileM1.vue'
+  import KingobamaMobileM2 from '/src/components/fancy/poly/KingobamaMobileM2.vue'
 
   defineProps(['colorName', 'colorHexValue'])//This just keeps a warning from going off since all pages get feed these props
 
@@ -84,7 +89,7 @@
       {
         display1stTable.value = "none"
         flipping.value = false
-      }, 500) // 1000 milliseconds == 1 seconds
+      }, 500) //1000 milliseconds == 1 seconds
     }
     else
     {
@@ -97,7 +102,7 @@
       {
         display2ndTable.value = "none"
         flipping.value = false
-      }, 500) // 1000 milliseconds == 1 seconds
+      }, 500) //1000 milliseconds == 1 seconds
     }   
   }
 </script>

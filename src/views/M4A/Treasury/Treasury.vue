@@ -32,6 +32,8 @@
     </div>
   </div>
   <CreateSubMarketModal ref="createSubMarketModal"/>
+  <KingobamaMobileT1 :style="{display: display1stTable}"/>
+  <KingobamaMobileT2 :style="{display: display2ndTable}"/>
 </template>
 
 <script setup lang="ts">
@@ -47,6 +49,8 @@
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { PublicKey } from "@solana/web3.js"
+  import KingobamaMobileT1 from '/src/components/fancy/poly/KingobamaMobileT1.vue'
+  import KingobamaMobileT2 from '/src/components/fancy/poly/KingobamaMobileT2.vue'
   import M4AProtocolTVLLongHTMLText from './M4AProtocolTVLLongHTMLText.vue'
   import M4AProtocolTVLShortHTMLText from './M4AProtocolTVLShortHTMLText.vue'
 
@@ -98,7 +102,7 @@
       {
         display1stTable.value = "none"
         flipping.value = false
-      }, 500) // 1000 milliseconds == 1 seconds
+      }, 500) //500 milliseconds == 0.5 seconds
     }
     else
     {
@@ -111,7 +115,7 @@
       {
         display2ndTable.value = "none"
         flipping.value = false
-      }, 500) // 1000 milliseconds == 1 seconds
+      }, 500) //500 milliseconds == 0.5 seconds
     }   
   }
 

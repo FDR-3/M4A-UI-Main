@@ -51,7 +51,7 @@
       {
         display1stVideo.value = "none"
         flipping.value = false
-      }, 500) // 1000 milliseconds == 1 seconds
+      }, 500) //500 milliseconds == 0.5 seconds
     }
     else
     {
@@ -62,7 +62,7 @@
       {
         display2ndVideo.value = "none"
         flipping.value = false
-      }, 500) // 1000 milliseconds == 1 seconds
+      }, 500) //500 milliseconds == 0.5 seconds
     }   
   }
 
