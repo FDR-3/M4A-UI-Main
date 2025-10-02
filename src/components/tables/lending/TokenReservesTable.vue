@@ -19,7 +19,7 @@
           <h2>Token Reserves Value: $<span class="rainbowText">{{ tvl.tokenReserveTVL.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span></h2>
-          <ion-input id="reservesSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
+          <ion-input v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br>
@@ -98,14 +98,22 @@
       :loading="isLoading"
       editMode="cell" 
       @cell-edit-complete="onCellEditSave($event)"
-      rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['id', 'owner', 'displayName', 'feeCollectorAddress', 'feeOnInterestEarnedRate']"  
+      @sort="sorting=true"
+      @value-change="onValueChange($event)"
     >
       <template #header>
         <div>
           <h2>USDC SubMarkets</h2>
+
           <ion-button color="dark" class="mediumSmallMarginBottom nSmallMarginTop" @click="unShowSubMarkets()">Return</ion-button>
-          <ion-input id="reservesSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
+          <ion-input
+            color="dark"
+            v-model="searchInput"
+            fill="outline"
+
+            placeholder="Reserves Search     "
+            @input="filterTable()"
+          >
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br>
@@ -176,7 +184,7 @@
           (isDataEdited && !tokenMarketTableData[index].isEditingRow && !tokenMarketTableData[index].isRowDataEdited)"/>
         </template>
       </Column>
-      <Column header="Actions" style="width: 0%" sortable>
+      <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
             <div v-if="connectedWallet.addressString==slotProps.data.owner">
@@ -190,7 +198,7 @@
               <ion-button
               v-if="slotProps.data.isRowDataEdited"
               color="dark"
-              @click="editSubMarket(slotProps.data)"
+              @click="editSubMarket(slotProps.data, slotProps.index)"
               :disabled="isInvalidPublicKey"
               >
                 Edit Market
@@ -244,6 +252,7 @@
   const tokenMarketTableData = ref()
   const showTokenSubMarkets = ref(false)
   const isLoading = ref(true)
+  var newTableData: any
   
   const ownerPopoverOpen = ref(false)
   const event = ref()
@@ -260,6 +269,11 @@
   var copyTokenReserveATAButtonText = ref("Copy Token Reserve ATA")
 
   const inputFeeRefs = ref(new Map())
+
+  var searchInput = ref("")
+
+  var unfilteredTableData: any
+  var sorting = false
   
   onMounted(() =>
   {
@@ -288,7 +302,7 @@
 
     //Update inner table if it's already opened
     if(showTokenSubMarkets.value)
-      showTokenReserveSubMarkets()
+      processNewSubMarketData()
 
     emitReserveTableSizing()
   })
@@ -302,6 +316,54 @@
   {
     processTokenReserveTableData()
   })
+
+  //Keeps editing from fucking up the table after it's sorted or filtered
+  function onValueChange(value: any) 
+  {
+    if(sorting)
+    {
+      tokenMarketTableData.value = value
+      sorting = false
+    }
+  }
+
+  //Custom table filtering to be able to edit cells after filtering
+  function filterTable()
+  {
+    if(unfilteredTableData == undefined)
+      unfilteredTableData = tokenMarketTableData.value
+
+    if(searchInput.value == "")
+    {
+      tokenMarketTableData.value = unfilteredTableData
+      unfilteredTableData == undefined
+    }
+    else
+    {
+      tokenMarketTableData.value = customFilter(searchInput.value)
+    }
+  }
+
+  function customFilter(filterString: string)
+  {
+    var filteredTable: any = []
+
+    for(var i=0; i<unfilteredTableData.length; i++)
+    {
+      if(unfilteredTableData[i].id.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].owner.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].displayName.toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].feeCollectorAddress.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].feeOnInterestEarnedRate.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+    }
+
+    return filteredTable
+  }
 
   function openOwnerPopover(e: Event, rowData: any) 
   {
@@ -416,6 +478,51 @@
 
     tvl.tokenReserveTVL = value
     tokenReserveTableData.value = processedTableData
+  }
+
+  function processNewSubMarketData()
+  {
+    if(isEditing)//Save new table data until after Processor is done typing
+      newTableData = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+    else if(unfilteredTableData != undefined) //Set new data into the unfiltered table if currently filtering table
+    {
+      if(savedEditedRow != undefined)//Combine saved row data with new table data
+      {
+        var tempTable = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+
+        for(var i=0; i<tempTable.length; i++)
+          if(tempTable[i].id == savedEditedRow.id)
+          {
+            tempTable[i].feeCollectorAddress = savedEditedRow.feeCollectorAddress
+            tempTable[i].feeOnInterestEarnedRate = savedEditedRow.feeOnInterestEarnedRate
+            tempTable[i].isRowDataEdited = true
+          }
+
+        unfilteredTableData = tempTable
+        tokenMarketTableData.value = customFilter(searchInput.value)
+      }
+      else
+      {
+        unfilteredTableData = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+        tokenMarketTableData.value = customFilter(searchInput.value)
+      }
+    }
+    else if(savedEditedRow != undefined)//Combine saved row data with new table data
+    {
+      var tempTable = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+
+      for(var i=0; i<tempTable.length; i++)
+        if(tempTable[i].id == savedEditedRow.id)
+        {
+          tempTable[i].feeCollectorAddress = savedEditedRow.feeCollectorAddress
+          tempTable[i].feeOnInterestEarnedRate = savedEditedRow.feeOnInterestEarnedRate
+          tempTable[i].isRowDataEdited = true
+        }
+
+      tokenMarketTableData.value = tempTable
+    }
+    else //Update current table like normal
+      tokenMarketTableData.value = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
   }
 
   function showTokenReserveSubMarkets()
@@ -533,11 +640,37 @@
         }
     }
 
+    checkForNewDataAfterEditing()
     tokenMarketTableData.value[index].isEditingRow = false
     isEditing = false
   }
 
-  async function editSubMarket(subMarketTableRow: any)
+  function checkForNewDataAfterEditing()
+  {
+    if(newTableData != undefined) //Check if newTableData came in while editing
+    {
+      if(savedEditedRow != undefined) //Combine new table data with the edited row data if it exists
+        for(var i=0; i<newTableData.length; i++)
+          if(newTableData[i].id == savedEditedRow.id)
+          {
+            newTableData[i].feeCollectorAddress = savedEditedRow.feeCollectorAddress
+            newTableData[i].feeOnInterestEarnedRate = savedEditedRow.feeOnInterestEarnedRate
+            newTableData[i].isRowDataEdited = true
+            newTableData[i].isEditingRow = false
+          }
+      if(unfilteredTableData != undefined)
+      {
+        unfilteredTableData = newTableData
+        tokenMarketTableData.value = customFilter(searchInput.value)
+      }
+      else    
+        tokenMarketTableData.value = newTableData
+
+      newTableData = undefined
+    }
+  }
+
+  async function editSubMarket(subMarketTableRow: any, index: number)
   {
     try
     {
@@ -550,7 +683,7 @@
       ).rpc()
       await confirmLendingTransaction(tx, toast, "edit_sub_market")
 
-      subMarketTableRow.isRowDataEdited = false
+      tokenMarketTableData.value[index].isRowDataEdited = false
       savedEditedRow = undefined
       isDataEdited.value = false
     }
@@ -577,7 +710,7 @@
     min-width: 1075px
   }
 
-  #reservesSearchInput
+  ion-input
   {
     --highlight-color: v-bind(colorHexValue) !important
   }

@@ -14,7 +14,7 @@
       <template #header>
         <div>
           <h2>SubMarket Owner Count: {{ subMarkets.ownerCount }}</h2>
-          <ion-input id="ownerSearchInput" v-model="filters['global'].value" fill="outline" placeholder="Owners Search     ">
+          <ion-input v-model="filters['global'].value" fill="outline" placeholder="Owners Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br>
@@ -159,7 +159,7 @@
         </template>
       </Column>
 
-      <Column field="actions" header="Actions" style="width: 0%" sortable>
+      <Column field="actions" header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
             <div v-if="connectedWallet.addressString==slotProps.data.owner">
@@ -173,7 +173,7 @@
               <ion-button
               v-if="slotProps.data.isRowDataEdited"
               color="dark"
-              @click="editSubMarket(slotProps.data)"
+              @click="editSubMarket(slotProps.data, slotProps.index)"
               :disabled="isInvalidPublicKey"
               >
                 Edit Market
@@ -279,7 +279,7 @@
 
     //Update inner table if it's already opened
     if(showOwnerSubMarkets.value)
-      openOwnerSubMarkets()
+      processNewSubMarketData()
 
     emitReserveTableSizing()
   })
@@ -326,7 +326,7 @@
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].tokenMintAddress.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
-      else if(unfilteredTableData[i].tokenName.toString().toLowerCase().includes(filterString.toLowerCase()))
+      else if(unfilteredTableData[i].tokenName.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].feeCollectorAddress.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
@@ -411,6 +411,54 @@
     }
 
     ownerTableData.value = unprocessedData
+  }
+
+  function processNewSubMarketData()
+  {
+    var subMarketOwner = subMarketOwnerHashMap.map.get(selectedOwnerAddress)
+    const newData =  subMarketOwner.ownerSubMarketList.sort((a: any, b: any) => a.id - b.id)
+
+    if(isEditing)//Save new table data until after Processor is done typing
+      newTableData = newData
+    else if(unfilteredTableData != undefined) //Set new data into the unfiltered table if currently filtering table
+    {
+      if(savedEditedRow != undefined)//Combine saved row data with new table data
+      {
+        var tempTable = newData
+
+        for(var i=0; i<tempTable.length; i++)
+          if(tempTable[i].id == savedEditedRow.id)
+          {
+            tempTable[i].feeCollectorAddress = savedEditedRow.feeCollectorAddress
+            tempTable[i].feeOnInterestEarnedRate = savedEditedRow.feeOnInterestEarnedRate
+            tempTable[i].isRowDataEdited = true
+          }
+
+        unfilteredTableData = tempTable
+        ownerSubMarketTableData.value = customFilter(searchInput.value)
+      }
+      else
+      {
+        unfilteredTableData = newData
+        ownerSubMarketTableData.value = customFilter(searchInput.value)
+      }
+    }
+    else if(savedEditedRow != undefined)//Combine saved row data with new table data
+    {
+      var tempTable = newData
+
+      for(var i=0; i<tempTable.length; i++)
+        if(tempTable[i].id == savedEditedRow.id)
+        {
+          tempTable[i].feeCollectorAddress = savedEditedRow.feeCollectorAddress
+          tempTable[i].feeOnInterestEarnedRate = savedEditedRow.feeOnInterestEarnedRate
+          tempTable[i].isRowDataEdited = true
+        }
+
+      ownerSubMarketTableData.value = tempTable
+    }
+    else //Update current table like normal
+      ownerSubMarketTableData.value = newData
   }
 
   const filters = ref(
@@ -526,7 +574,7 @@
         }
     }
 
-    //checkForNewDataAfterEditing()
+    checkForNewDataAfterEditing()
     ownerSubMarketTableData.value[index].isEditingRow = false
     isEditing = false
   }
@@ -539,17 +587,8 @@
         for(var i=0; i<newTableData.length; i++)
           if(newTableData[i].id == savedEditedRow.id)
           {
-            newTableData[i].isActive = savedEditedRow.isActive
-            newTableData[i].hospitalLongitude = savedEditedRow.hospitalLongitude
-            newTableData[i].hospitalLatitude = savedEditedRow.hospitalLatitude
-            newTableData[i].hospitalType = savedEditedRow.hospitalType
-            newTableData[i].hospitalTypeName = savedEditedRow.hospitalTypeName
-            newTableData[i].hospitalName = savedEditedRow.hospitalName
-            newTableData[i].hospitalAddress = savedEditedRow.hospitalAddress
-            newTableData[i].hospitalCity = savedEditedRow.hospitalCity
-            newTableData[i].hospitalZipCode = savedEditedRow.hospitalZipCode
-            newTableData[i].hospitalPhoneNumber = savedEditedRow.hospitalPhoneNumber
-            newTableData[i].note = savedEditedRow.note
+            newTableData[i].feeCollectorAddress = savedEditedRow.feeCollectorAddress
+            newTableData[i].feeOnInterestEarnedRate = savedEditedRow.feeOnInterestEarnedRate
             newTableData[i].isRowDataEdited = true
             newTableData[i].isEditingRow = false
           }
@@ -566,7 +605,7 @@
     }
   }
 
-  async function editSubMarket(subMarketTableRow: any)
+  async function editSubMarket(subMarketTableRow: any, index: number)
   {
     try
     {
@@ -575,11 +614,11 @@
         new PublicKey(subMarketTableRow.tokenMintAddress),
         subMarketTableRow.subMarketIndex,
         new PublicKey(subMarketTableRow.feeCollectorAddress),
-        subMarketTableRow.feeOnInterestEarnedRate
+        subMarketTableRow.feeOnInterestEarnedRate * 100//convert to fixedpoint notation
       ).rpc()
       await confirmLendingTransaction(tx, toast, "edit_sub_market")
 
-      subMarketTableRow.isRowDataEdited = false
+      ownerSubMarketTableData.value[index].isRowDataEdited = false
       savedEditedRow = undefined
       isDataEdited.value = false
     }
@@ -617,9 +656,9 @@
     min-width: 1000px
   }
 
-  #ownerSearchInput
+  ion-input
   {
-    --highlight-color: var(--ion-color-green) !important
+    --highlight-color: v-bind(colorHexValue) !important
   }
 
   .p-inputnumber-input:focus
