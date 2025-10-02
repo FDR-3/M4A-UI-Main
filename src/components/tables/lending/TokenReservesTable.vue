@@ -92,7 +92,10 @@
       v-if="showTokenSubMarkets" 
       class="tableMinWidth"
       v-model:filters="filters" 
-      show-gridlines
+      paginator 
+      show-gridlines 
+      :rows="10" 
+      :rowsPerPageOptions="[10, 20, 50, 100]" 
       size="small" 
       :value="tokenMarketTableData"
       :loading="isLoading"

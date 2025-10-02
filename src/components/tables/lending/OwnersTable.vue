@@ -5,7 +5,10 @@
       v-if="!showOwnerSubMarkets"
       class="tableMinWidth"
       v-model:filters="filters" 
-      show-gridlines
+      paginator 
+      show-gridlines 
+      :rows="10" 
+      :rowsPerPageOptions="[10, 20, 50, 100]" 
       size="small" 
       :value="ownerTableData"
       :loading="isLoading"
@@ -72,7 +75,10 @@
       ref="tableRef"
       class="tableMinWidth"
       v-model:filters="filters" 
-      show-gridlines
+      paginator 
+      show-gridlines 
+      :rows="10" 
+      :rowsPerPageOptions="[10, 20, 50, 100]" 
       size="small" 
       :value="ownerSubMarketTableData"
       :loading="isLoading"
@@ -653,7 +659,15 @@
 
   .tableMinWidth
   {
-    min-width: 1000px
+    min-width: 1120px
+  }
+
+  @-moz-document url-prefix()
+  {
+    .tableMinWidth
+    {
+      min-width: 1300px
+    }
   }
 
   ion-input
