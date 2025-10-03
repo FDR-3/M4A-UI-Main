@@ -177,7 +177,7 @@
           suffix="%"
           inputId="percent"
           :minFractionDigits="2" :maxFractionDigits="2"
-          :min="0.00" :max="100"
+          :min="0" :max="100"
           :step="0.01"
           showButtons
           fluid
@@ -461,9 +461,9 @@
       if(tokenReserveHashMap.map)
       {
         var unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
-        unProcessedTokenSubMarketList = unProcessedTokenSubMarketList.sort((a: any, b: any) => a.id - b.id)
         if(unProcessedTokenSubMarketList)
         {
+          unProcessedTokenSubMarketList = unProcessedTokenSubMarketList.sort((a: any, b: any) => a.id - b.id)
           processedTableData[i].subMarketCount = unProcessedTokenSubMarketList.length
 
           for(var j=0; j<unProcessedTokenSubMarketList.length; j++)

@@ -1,5 +1,5 @@
 {
-  "address": "DzagHWB4qB7gEqsmXm57CZsrSGgzzUAsBNYt6YBWFYYx",
+  "address": "8HjrjBymLxDBUnQhwgkE3XvW6u3W2dbfLVdvsWzpLgSt",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -398,6 +398,35 @@
               {
                 "kind": "arg",
                 "path": "token_mint_address"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lending_user_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
               }
             ]
           }
@@ -956,6 +985,35 @@
           }
         },
         {
+          "name": "lending_user_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "signer",
           "writable": true,
           "signer": true
@@ -1359,6 +1417,35 @@
           }
         },
         {
+          "name": "lending_user_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "sub_market",
           "writable": true,
           "pda": {
@@ -1757,6 +1844,19 @@
       ]
     },
     {
+      "name": "LendingUserStats",
+      "discriminator": [
+        53,
+        93,
+        131,
+        123,
+        253,
+        85,
+        71,
+        88
+      ]
+    },
+    {
       "name": "SubMarket",
       "discriminator": [
         8,
@@ -1907,6 +2007,34 @@
           },
           {
             "name": "borrowed_amount",
+            "type": "u128"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LendingUserStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "deposits",
+            "type": "u128"
+          },
+          {
+            "name": "withdrawals",
+            "type": "u128"
+          },
+          {
+            "name": "repayments",
+            "type": "u128"
+          },
+          {
+            "name": "liquidations",
+            "type": "u128"
+          },
+          {
+            "name": "swaps",
             "type": "u128"
           }
         ]

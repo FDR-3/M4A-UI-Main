@@ -6,7 +6,8 @@
         <h1>Markets</h1>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
-        <MarketsTable/>
+        <MarketsTable @openDepositModal="(tokenMingAddress: PublicKey, decimalAmount: number, tokenSVG: Component, tokenName: string) =>
+        depositModal.openDepositModal(tokenMingAddress, decimalAmount, tokenSVG, tokenName)"/>
       </div>
 
       <div class="backTable" :style="{display: display2ndTable}">
@@ -18,18 +19,20 @@
       </div>
     </div>
   </div>
-  
+  <DepositModal ref="depositModal"/>
   <KingobamaMobileM1 :style="{display: display1stTable}"/>
   <KingobamaMobileM2 :style="{display: display2ndTable}"/>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, computed, watch } from 'vue'
+  import { ref, onMounted, computed, watch, Component } from 'vue'
   import { IonButton } from '@ionic/vue'
   import MarketsTable from '/src/components/tables/lending/MarketsTable.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { PublicKey } from "@solana/web3.js"
   import PortfolioTable from '/src/components/tables/lending/PortfolioTable.vue'
+  import DepositModal from '/src/components/smart contracts/lending protocol/DepositModal.vue'
   import KingobamaMobileM1 from '/src/components/fancy/poly/KingobamaMobileM1.vue'
   import KingobamaMobileM2 from '/src/components/fancy/poly/KingobamaMobileM2.vue'
 
@@ -40,6 +43,8 @@
   var display1stTable = ref("")
   var display2ndTable = ref("none")
   var searchAddress = ref("")
+
+  var depositModal = ref()
 
   var notConnected = computed (() =>
   {

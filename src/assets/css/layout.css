@@ -302,6 +302,12 @@ h3, h4
   text-align: center
 }
 
+.alignSelfLeft
+{
+  display: flex;
+  align-self: left
+}
+
 /*.flexCenterSelfHorizontally
 {
   display: flex;

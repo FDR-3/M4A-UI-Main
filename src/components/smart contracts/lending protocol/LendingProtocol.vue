@@ -8,9 +8,11 @@
   import { getLendingProtocolCEOAccount,
   getTokenReserves,
   getSubMarkets,
+  setLendingUserAccountHashMap,
   getLendingProtocolCEOAccountPDA,
   getLendingProtocolPDA,
-  getSubMarketStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  getSubMarketStatsPDA,
+  getLendingUserStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenReserves } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -22,6 +24,7 @@
 
   var lendingProtocolWatcherId: any
   var subMarketStatsWatcherId: any
+  var lendingUsersWatcherId: any
 
   onMounted(async() =>
   {
@@ -32,6 +35,10 @@
     //SubMarkets
     subMarkets.data = await getSubMarkets()
     await listenForSubMarketChanges()
+
+    //Lending Users
+    await setLendingUserAccountHashMap()
+    await listenForLendingUserChanges()
 
     //Lending Protocol CEO Account
     const lendingCEOAccount = await getLendingProtocolCEOAccount()
@@ -58,7 +65,12 @@
     {
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(subMarketStatsWatcherId)
       subMarketStatsWatcherId = undefined
-    }  
+    }
+    if(lendingUsersWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUsersWatcherId)
+      lendingUsersWatcherId = undefined
+    }
     if(lendingProtocolCEOAccountWatcherId != undefined)
     {
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolCEOAccountWatcherId)
@@ -83,6 +95,16 @@
     {
       //Handle account change..
       subMarkets.data = await getSubMarkets()
+    })
+  }
+
+  async function listenForLendingUserChanges()
+  {
+    //Subscribe to account changes
+    lendingUsersWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingUserStatsPDA(), async() => 
+    {
+      //Handle account change..
+      await setLendingUserAccountHashMap()
     })
   }
 

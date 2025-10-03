@@ -154,7 +154,7 @@
           suffix="%"
           inputId="percent"
           :minFractionDigits="2" :maxFractionDigits="2"
-          :min="0.00" :max="100"
+          :min="0" :max="100"
           :step="0.01"
           showButtons
           fluid
@@ -263,6 +263,8 @@
   
   onMounted(() =>
   {
+    ownerTableData.value = []
+
     if(subMarketOwnerHashMap.map)
     {
       processOwnersTable()

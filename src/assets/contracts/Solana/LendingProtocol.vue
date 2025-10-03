@@ -3,6 +3,7 @@
   import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { lendingerUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import { PublicKey } from "@solana/web3.js"
@@ -172,6 +173,53 @@
       return 0
   }
 
+  export async function setLendingUserAccountHashMap()
+  {
+    console.log("Setting Lending User Hashmap")
+
+    var hashmap = new Map<string, any>()
+    const lendingUserAccounts = await getLendingUserAccountsWrapper()
+
+    for(var i=0; i<lendingUserAccounts.length; i++)
+    {
+      var list = []
+      const previousLendingUserList = hashmap.get(lendingUserAccounts[i].account.owner.toBase58())
+
+      if(previousLendingUserList)
+        list = previousLendingUserList
+
+      list.push(lendingUserAccounts[i].account)
+
+      hashmap.set(lendingUserAccounts[i].account.owner.toBase58(), list)
+    }
+
+    lendingerUserHashMap.map = hashmap
+  }
+
+  async function getLendingUserAccountsWrapper()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.lending.lendingProgram.account.lendingUserAccount.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
   export function getLendingProtocolCEOAccountPDA()
   {
     const [lendingProtocolCEOPDA] = anchor.web3.PublicKey.findProgramAddressSync
@@ -219,6 +267,18 @@
       anchorPrograms.lending.lendingProgram.programId
     )
     return submarketStatsPDA
+  }
+
+  export function getLendingUserStatsPDA()
+  {
+    const [lendingUserStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("lendingUserStats")
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return lendingUserStatsPDA
   }
 
   export default getLendingProtocolCEOAccount

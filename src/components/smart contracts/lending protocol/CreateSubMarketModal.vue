@@ -1,5 +1,4 @@
 <template>
-  <!--Create Sub Market Modal-->
   <div v-if="creatingSubMarket"
     id="createSubMarketModal"
     class="thickBorder"
@@ -85,6 +84,7 @@
   import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
 
   const toast = inject('toast')
+  const colorHexValue = inject('colorHexValue') as string
 
   const feePercentage = ref(3)
   const feePercentageRef = ref()
@@ -114,10 +114,13 @@
       (event?.target?.id != "createSubMarketModal") &&
       (event?.target?.id != "openCreateSubMarketModal") &&
       (event?.target?.id != "createSubMarketButton") &&
+      (event?.target?.id != "themeButton") &&
       !event?.target?.classList.contains("native-input") &&
       !event?.target?.classList.contains("native-wrapper") &&
       !event?.target?.classList.contains("p-inputtext") &&
       !event?.target?.classList.contains("p-icon") &&
+      !event?.target?.classList.contains("p-inputnumber") &&
+      !event?.target?.classList.contains("p-inputnumber-button") &&
       !event?.target?.classList.contains("p-inputnumber-button-group") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
@@ -129,28 +132,6 @@
       if((event?.target?.placeholder == "Reserves Search     ") ||
       (event?.target?.placeholder == "Owners Search     "))
         creatingSubMarket.value = false
-    }
-  }
-
-  async function createSubMarket()
-  {
-    try
-    {
-      const userNextSubMarketIndex = getUserNextSubMarketIndex(connectedWallet.addressString)
-
-      const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
-      (
-        selectedTokenMintAddress,
-        userNextSubMarketIndex,
-        new PublicKey(feeCollectorAddress.value),
-        feePercentage.value * 100//convert to fixedpoint notation
-      ).rpc()
-      await confirmLendingTransaction(tx, toast, "create_sub_market")
-      creatingSubMarket.value = false
-    }
-    catch(error)
-    {
-      toastPreTransactionError(error, toast, "create_sub_market")
     }
   }
 
@@ -196,6 +177,28 @@
     }
   }
 
+  async function createSubMarket()
+  {
+    try
+    {
+      const userNextSubMarketIndex = getUserNextSubMarketIndex(connectedWallet.addressString)
+
+      const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
+      (
+        selectedTokenMintAddress,
+        userNextSubMarketIndex,
+        new PublicKey(feeCollectorAddress.value),
+        feePercentage.value * 100//convert to fixedpoint notation
+      ).rpc()
+      await confirmLendingTransaction(tx, toast, "create_sub_market")
+      creatingSubMarket.value = false
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "create_sub_market")
+    }
+  }
+
   defineExpose(
   {
     openCreateSubMarketModal
@@ -216,6 +219,6 @@
 
   #feeCollectorInput
   {
-    --highlight-color: var(--ion-color-green) !important
+    --highlight-color: v-bind(colorHexValue) !important
   }
 </style>

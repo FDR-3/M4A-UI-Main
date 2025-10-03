@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { reactive, component, markRaw } from 'vue'
+  import { reactive, Component, markRaw } from 'vue'
   import DAISVG from '/src/assets/cryptoIcons/dai-svg.vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
@@ -53,7 +53,7 @@
   type tokenMapObject =
   {
     name: string;
-    svg: component;
+    svg: Component;
     source: () => void;
     ata: PublicKey
   }

@@ -6,7 +6,7 @@
   export const connectedWallet = reactive(
   {
     publicKey: new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING),
-    addressString: "",
+    addressString: SYSTEM_PROGRAM_ADDRESS_STRING,
     isConnected: false,
     isChatAccountReady: false,
     hasHadCustomName: false,
@@ -15,7 +15,8 @@
     isProcessorAccountActive: false,
     isProcessorAccountSuperAdmin: false,
     isProcessorWorkingAClaim: false,
-    submitterAddressOfClaimBeingProcessed: ""
+    submitterAddressOfClaimBeingProcessed: "",
+    tokenBalanceMap: new Map<string, string>()
   })
 
   export default connectedWallet

@@ -42,15 +42,10 @@
       `${tokenAddressStringsMainNet.wbtcTokenMintAddress}`
     )).json()
 
-    for(var i=0; i<price.length; i++)
-    {
-      console.log(price)
-    }
-
     for(var i=0; i<StableCoins.length; i++)
     {
       //Update Price for Dev USDC
-      if(StableCoins[i].tokenMintAddress == tokenAddressStringsDevNet.usdcTokenMintAddress)
+      if(StableCoins[i].tokenMintAddress.toBase58() == tokenAddressStringsDevNet.usdcTokenMintAddress)
       {
         StableCoins[i].price = price[tokenAddressStringsMainNet.usdcTokenMintAddress].usdPrice
         StableCoins[i].percentChange24h = price[tokenAddressStringsMainNet.usdcTokenMintAddress].priceChange24h.toFixed(2)
@@ -58,15 +53,15 @@
         continue
       }
 
-      StableCoins[i].price = price[StableCoins[i].tokenMintAddress].usdPrice
+      StableCoins[i].price = price[StableCoins[i].tokenMintAddress.toBase58()].usdPrice
       if(StableCoins[i].percentChange24h)//Seems like sometimes just these come back empty
-        StableCoins[i].percentChange24h = price[StableCoins[i].tokenMintAddress].priceChange24h.toFixed(2)
+        StableCoins[i].percentChange24h = price[StableCoins[i].tokenMintAddress.toBase58()].priceChange24h.toFixed(2)
     }
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
       CryptoCurrency[i].price = price[CryptoCurrency[i].tokenMintAddress].usdPrice
-      CryptoCurrency[i].percentChange24h = price[CryptoCurrency[i].tokenMintAddress].priceChange24h.toFixed(2)
+      CryptoCurrency[i].percentChange24h = price[CryptoCurrency[i].tokenMintAddress.toBase58()].priceChange24h.toFixed(2)
     }
 
     if(price)

@@ -233,7 +233,7 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddress)
+      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddress.toBase58())
       if(tokenAmount)
       {
         unprocessedTableData[i].quanity = tokenAmount as number
@@ -263,7 +263,7 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddress)
+      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddress.toBase58())
       if(tokenAmount)
       {
         unprocessedTableData[i].quanity = tokenAmount as number

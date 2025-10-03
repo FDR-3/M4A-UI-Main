@@ -14,11 +14,13 @@
     singlePayerAssociatedTokenAddressKeysMainNet,
     hodlAssociatedTokenAddressKeysDevNet,
     singlePayerAssociatedTokenAddressKeysDevNet } from '/src/assets/constants/Addresses.ts'
+  import { PublicKey } from "@solana/web3.js"
 
   export const StableCoins = reactive(
   [
     {
-      tokenMintAddress: "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o",
+      tokenMintAddress: new PublicKey("EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o"),
+      decimalAmount: 8,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.daiATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.daiATA,
       asset: 
@@ -38,7 +40,8 @@
       }
     },
     {
-      tokenMintAddress: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",//Mainnet
+      tokenMintAddress: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),//Mainnet
+      decimalAmount: 6,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.usdcATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.usdcATA,
       asset: 
@@ -58,7 +61,8 @@
       }
     },
     {
-      tokenMintAddress: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",//Devnet
+      tokenMintAddress: new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),//Devnet
+      decimalAmount: 6,
       hodlATA: hodlAssociatedTokenAddressKeysDevNet.usdcATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysDevNet.usdcATA,
       asset: 
@@ -82,7 +86,8 @@
   export const CryptoCurrency = reactive(
   [
     {
-      tokenMintAddress: "So11111111111111111111111111111111111111112",
+      tokenMintAddress: new PublicKey("So11111111111111111111111111111111111111112"),
+      decimalAmount: 9,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.solATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.solATA,
       asset: 
@@ -102,7 +107,8 @@
       }
     },
     {
-      tokenMintAddress: "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+      tokenMintAddress: new PublicKey("7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs"),
+      decimalAmount: 8,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.wethATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.wethATA,
       asset: 
@@ -122,7 +128,8 @@
       }
     },
     {
-      tokenMintAddress: "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+      tokenMintAddress: new PublicKey("3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh"),
+      decimalAmount: 8,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.wbtcATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.wbtcATA,
       asset: 
