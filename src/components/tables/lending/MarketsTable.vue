@@ -11,7 +11,7 @@
       :value="StableCoins"
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'percentChange24h', 'apy', 'chain.name']"
+      :globalFilterFields="['tokenMintAddress', 'asset.name', 'priceString', 'percentChange24h', 'apy', 'chain.name']"
     >
       <template #header>
         <div>
@@ -60,9 +60,7 @@
       </Column>
       <Column field="price" header="Price" style="width: 0%" sortable>
         <template #body="slotProps">
-          ${{ slotProps.data.price.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}
+           {{ slotProps.data.priceString }}
         </template>
       </Column>
       <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
@@ -98,7 +96,7 @@
       scrollable
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'asset.name', 'price', 'percentChange24h', 'apy', 'chain.name']"
+      :globalFilterFields="['tokenMintAddress', 'asset.name', 'priceString', 'percentChange24h', 'apy', 'chain.name']"
     >
       <template #header>
         <div>
@@ -129,9 +127,7 @@
       </Column>
       <Column field="price" header="Price" style="width: 0%" sortable>
         <template #body="slotProps">
-          ${{ slotProps.data.price.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}
+           {{ slotProps.data.priceString }}
         </template>
       </Column>
       <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>

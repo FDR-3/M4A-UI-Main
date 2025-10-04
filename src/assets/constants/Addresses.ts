@@ -41,7 +41,7 @@ const TOKEN_RESERVE_WETH_ASSOCIATED_TOKEN_ADDRESS_MAINNET = SYSTEM_PROGRAM_ADDRE
 const TOKEN_RESERVE_WBTC_ASSOCIATED_TOKEN_ADDRESS_MAINNET = SYSTEM_PROGRAM_ADDRESS_STRING
 
 const TOKEN_RESERVE_DAI_ASSOCIATED_TOKEN_ADDRESS_DEVNET = SYSTEM_PROGRAM_ADDRESS_STRING
-const TOKEN_RESERVE_USDC_ASSOCIATED_TOKEN_ADDRESS_DEVNET = "4gcfUZxhQRwWgKRZoMRiwQ7EdcRwAiEpXyj29wZUqCFB"
+const TOKEN_RESERVE_USDC_ASSOCIATED_TOKEN_ADDRESS_DEVNET = "5gLXj6DpoKjbL76vgRc851KmBz6Aq7kVNLAnCX6Aa3NC"
 const TOKEN_RESERVE_SOL_ASSOCIATED_TOKEN_ADDRESS_DEVNET = SYSTEM_PROGRAM_ADDRESS_STRING
 const TOKEN_RESERVE_WETH_ASSOCIATED_TOKEN_ADDRESS_DEVNET = SYSTEM_PROGRAM_ADDRESS_STRING
 const TOKEN_RESERVE_WBTC_ASSOCIATED_TOKEN_ADDRESS_DEVNET = SYSTEM_PROGRAM_ADDRESS_STRING
@@ -135,3 +135,14 @@ export const tokenReserveAssociatedTokenAddressKeysDevNet =
     wethATA: new PublicKey(TOKEN_RESERVE_WETH_ASSOCIATED_TOKEN_ADDRESS_DEVNET),
     wbtcATA: new PublicKey(TOKEN_RESERVE_WBTC_ASSOCIATED_TOKEN_ADDRESS_DEVNET)
 }
+
+export const tokenDecimalHashMap: Map<string, number> = new Map(
+[
+    //Key: Token Mint Address, Value: Token Decimal Amount
+    [tokenAddressStringsMainNet.daiTokenMintAddress, 8],
+    [tokenAddressStringsMainNet.usdcTokenMintAddress,6],
+    [tokenAddressStringsDevNet.usdcTokenMintAddress,6],
+    [tokenAddressStringsMainNet.solTokenMintAddress, 9],
+    [tokenAddressStringsMainNet.wethTokenMintAddress,8],
+    [tokenAddressStringsMainNet.wbtcTokenMintAddress,8]
+])

@@ -30,7 +30,7 @@
   {
     //Token Reserves
     tokenReserves.data = await getTokenReserves()
-    await listenForTokenReserveChanges()
+    await listenForNewTokenReserves()
 
     //SubMarkets
     subMarkets.data = await getSubMarkets()
@@ -78,7 +78,7 @@
     }    
   })
 
-  async function listenForTokenReserveChanges()
+  async function listenForNewTokenReserves()
   {
     //Subscribe to account changes
     lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(), async() => 
@@ -104,6 +104,8 @@
     lendingUsersWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingUserStatsPDA(), async() => 
     {
       //Handle account change..
+      tokenReserves.data = await getTokenReserves()
+      subMarkets.data = await getSubMarkets()
       await setLendingUserAccountHashMap()
     })
   }

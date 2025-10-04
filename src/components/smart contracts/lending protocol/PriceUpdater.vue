@@ -48,12 +48,18 @@
       if(StableCoins[i].tokenMintAddress.toBase58() == tokenAddressStringsDevNet.usdcTokenMintAddress)
       {
         StableCoins[i].price = price[tokenAddressStringsMainNet.usdcTokenMintAddress].usdPrice
+        StableCoins[i].priceString = '$' + price[tokenAddressStringsMainNet.usdcTokenMintAddress].usdPrice.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
         StableCoins[i].percentChange24h = price[tokenAddressStringsMainNet.usdcTokenMintAddress].priceChange24h.toFixed(2)
         price[tokenAddressStringsDevNet.usdcTokenMintAddress] = price[tokenAddressStringsMainNet.usdcTokenMintAddress]
         continue
       }
 
       StableCoins[i].price = price[StableCoins[i].tokenMintAddress.toBase58()].usdPrice
+      StableCoins[i].priceString = '$' + price[StableCoins[i].tokenMintAddress.toBase58()].usdPrice.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
       if(StableCoins[i].percentChange24h)//Seems like sometimes just these come back empty
         StableCoins[i].percentChange24h = price[StableCoins[i].tokenMintAddress.toBase58()].priceChange24h.toFixed(2)
     }
@@ -61,6 +67,9 @@
     for(var i=0; i<CryptoCurrency.length; i++)
     {
       CryptoCurrency[i].price = price[CryptoCurrency[i].tokenMintAddress].usdPrice
+      CryptoCurrency[i].priceString = '$' + price[CryptoCurrency[i].tokenMintAddress].usdPrice.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
       CryptoCurrency[i].percentChange24h = price[CryptoCurrency[i].tokenMintAddress.toBase58()].priceChange24h.toFixed(2)
     }
 

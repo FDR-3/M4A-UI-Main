@@ -4,6 +4,8 @@
   import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingerUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import { PublicKey } from "@solana/web3.js"
@@ -39,6 +41,25 @@
   {
     console.log("Getting Token Reserves")
 
+    var list = []
+    const tokenReserves = await getTokenReservesWrapper()
+
+    for(var i=0; i<tokenReserves.length; i++)
+    {
+      const tokenReserve = tokenReserves[i].account
+
+      //Convert Deposit Amount To Decimal from Fixed Point
+      const decimalAmount = tokenDecimalHashMap.get(tokenReserve.tokenMintAddress.toBase58())
+      tokenReserve.depositedAmount = (Number(tokenReserve.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+
+      list.push(tokenReserve)
+    }
+
+    return list
+  }
+
+  async function getTokenReservesWrapper()
+  {
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
@@ -78,8 +99,12 @@
       //Populate Token Reserve hash map
       var ownerTokenReserveList: any = []
 
+      //Convert Deposit Amount To Decimal from Fixed Point
+      const decimalAmount = tokenDecimalHashMap.get(allSubMarkets[i].account.tokenMintAddress.toBase58())
+      allSubMarkets[i].account.depositedAmount = (Number(allSubMarkets[i].account.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+
       //Convert Fee Percentage To Decimal from Fixed Point
-      allSubMarkets[i].account.feeOnInterestEarnedRate = allSubMarkets[i].account.feeOnInterestEarnedRate / 100
+      allSubMarkets[i].account.feeOnInterestEarnedRate = (allSubMarkets[i].account.feeOnInterestEarnedRate / 100)
 
       const previousTokenReserveList = tokenReserveMap.get(allSubMarkets[i].account.tokenMintAddress.toBase58())
       if(previousTokenReserveList)

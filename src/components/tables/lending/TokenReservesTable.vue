@@ -12,7 +12,7 @@
       :value="tokenReserveTableData"
       :loading="isLoading"
       rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['name', 'tokenMintAddress', 'tokenReserveATA', 'price', 'percentChange24h', 'quanity', 'value', 'subMarketCount']"  
+      :globalFilterFields="['name', 'tokenMintAddress', 'tokenReserveATA', 'price', 'percentChange24h', 'quantity', 'value', 'subMarketCount']"  
     >
       <template #header>
         <div>
@@ -47,24 +47,14 @@
           </div>
         </template>
       </Column>
-      <Column field="price" header="Price" style="width: 0%" sortable>
-        <template #body="slotProps">
-          ${{ slotProps.data.price.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}
-        </template>
-      </Column>
+      <Column field="price" header="Price" style="width: 0%" sortable></Column>
       <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="quanity" header="Quantity" style="width: 0%" sortable></Column>
-      <Column field="value" header="Value" style="width: 0%" sortable>
-        <template #body="slotProps">
-          {{ slotProps.data.value }}
-        </template>
-      </Column>
+      <Column field="depositedAmount" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="value" header="Value" style="width: 0%" sortable></Column>
       <Column field="subMarketCount" header="SubMarket Count" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
@@ -153,6 +143,8 @@
           </div>
         </template>
       </Column>
+      <Column field="depositedAmount" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="value" header="Value" style="width: 0%" sortable></Column>
       <Column field="feeCollectorAddress" header="Fee Collector Address" style="width: 0%" sortable>
         <template #editor="{ index, data, field }">
           <InputText
@@ -228,8 +220,7 @@
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { tokenReserves,
     tokenReserveDevNetMap, 
-    priceObjectMap,
-    tokenReserveBalancesMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+    priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { tokenReserveHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -310,11 +301,6 @@
     emitReserveTableSizing()
   })
 
-  watch(tokenReserveBalancesMap, () =>
-  {
-    processTokenReserveTableData()
-  })
-
   watch(customUserNameHashMap, () =>
   {
     processTokenReserveTableData()
@@ -358,6 +344,10 @@
       else if(unfilteredTableData[i].owner.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].displayName.toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].quantity.toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].value.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].feeCollectorAddress.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
@@ -422,9 +412,10 @@
 
     for(var i=0; i<newTableData.data.length; i++)
     {
-      processedTableData.push(newTableData.data[i].account)
+      processedTableData.push(newTableData.data[i])
 
-      const tokenReserveFrontEndProperties = tokenReserveDevNetMap.get(processedTableData[i].tokenMintAddress.toString())//These are static and don't need to be reactive
+      const tokenMintAddressString = processedTableData[i].tokenMintAddress.toString()
+      const tokenReserveFrontEndProperties = tokenReserveDevNetMap.get(tokenMintAddressString)//These are static and don't need to be reactive
       processedTableData[i].name = tokenReserveFrontEndProperties.name
       processedTableData[i].svg = tokenReserveFrontEndProperties.svg
       processedTableData[i].source = tokenReserveFrontEndProperties.source
@@ -433,34 +424,28 @@
       //Update Table Prices
       if(priceObjectMap.data)
       {
-        processedTableData[i].price = priceObjectMap.data[processedTableData[i].tokenMintAddress.toString()].usdPrice
-        processedTableData[i].percentChange24h = priceObjectMap.data[processedTableData[i].tokenMintAddress.toString()].priceChange24h.toFixed(2)
+        processedTableData[i].price = '$' + priceObjectMap.data[tokenMintAddressString].usdPrice.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+        processedTableData[i].percentChange24h = priceObjectMap.data[tokenMintAddressString].priceChange24h.toFixed(2)
       }
 
-      //Update Table Balances
-      if(tokenReserveBalancesMap.map)
-      {
-        const tokenReserveBalance = tokenReserveBalancesMap.map.get(processedTableData[i].tokenMintAddress.toString())
-        if(tokenReserveBalance)
-        {
-          processedTableData[i].quanity = tokenReserveBalance as number
-          processedTableData[i].value = '$' + tokenReserveBalance
+      const balance = processedTableData[i].depositedAmount
+      var calculatedValue = 0
 
-          value = Number(tokenReserveBalance) + Number(value)
-        }
-        else
-        {
-          processedTableData[i].quanity = 0.00
-          processedTableData[i].value = '$0.00'
-        }
-      }
+      const priceData = priceObjectMap.data[tokenMintAddressString]
+      if(priceData)
+        calculatedValue = (balance * priceData.usdPrice)
 
-      var tokenReserveSubMarketList = []
+      processedTableData[i].value = '$' + calculatedValue.toFixed(2)
+      value += calculatedValue + value
 
       //Get SubMarket List And Count
+      var tokenReserveSubMarketList = []
+
       if(tokenReserveHashMap.map)
       {
-        var unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(processedTableData[i].tokenMintAddress.toString())//These are reactive
+        var unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(tokenMintAddressString)//These are reactive
         if(unProcessedTokenSubMarketList)
         {
           unProcessedTokenSubMarketList = unProcessedTokenSubMarketList.sort((a: any, b: any) => a.id - b.id)
@@ -469,11 +454,19 @@
           for(var j=0; j<unProcessedTokenSubMarketList.length; j++)
           {
             unProcessedTokenSubMarketList[j].displayName = getCustomOrTrimmedUserDisplayName(unProcessedTokenSubMarketList[j].owner.toString())
+
+            if(priceObjectMap.data)
+            {
+              const priceData = priceObjectMap.data[unProcessedTokenSubMarketList[j].tokenMintAddress.toBase58()]
+              if(priceData)
+                unProcessedTokenSubMarketList[j].value = '$' + (unProcessedTokenSubMarketList[j].depositedAmount * priceData.usdPrice).toFixed(2)
+            }
+
             tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
           }
         }
 
-        tokenReserveHashMap.map.set(processedTableData[i].tokenMintAddress.toString(), tokenReserveSubMarketList)
+        tokenReserveHashMap.map.set(tokenMintAddressString, tokenReserveSubMarketList)
       }
       else
         processedTableData[i].subMarketCount = 0

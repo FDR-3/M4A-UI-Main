@@ -4,7 +4,8 @@
   import { tokenAddressKeysMainNet,
     tokenAddressStringsDevNet,
     tokenAddressKeysDevNet,
-    tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+    tokenAddressStringsMainNet,
+  tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveDevNetMap, tokenReserveBalancesMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { hodlTreasuryBalancesDevNetHashMap,
     singlePayerTreasuryBalancesDevNetHashMap,
@@ -44,7 +45,8 @@
     {
       //Get HODL USDC Balance
       const hodlUDSCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCATA)
-      hodlTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(2))
+      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStringsDevNet.usdcTokenMintAddress)
+      hodlTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForHODLTreasuryUSDCChanges()
     }
     catch
@@ -64,7 +66,8 @@
     {
       //Get Single Payer USDC Balance
       const singlePayerUSDCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(singlePayerTreasuryUSDCATA)
-      singlePayerTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, singlePayerUSDCAccount.value.uiAmount.toFixed(2))
+      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStringsDevNet.usdcTokenMintAddress)
+      singlePayerTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, singlePayerUSDCAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSinglePayerTreasuryUSDCChanges()
     }
     catch
@@ -74,148 +77,29 @@
 
     //Token Reserve Account
     /*const tokenReservePDA = getTokenReservePDA(tokenAddressKeysDevNet.usdcTokenMintAddress)
-    const test = await Token.getAssociatedTokenAddress
+    const newtokenResreveUSDCDevATA = await Token.getAssociatedTokenAddress
     (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
       tokenAddressKeysDevNet.usdcTokenMintAddress, //Token Mint Address
       tokenReservePDA, //Wallet Public Key
       true //allowOwnerOffCurve for getting PDA ATAs
-    )*/
+    );console.log(newtokenResreveUSDCDevATA.toString())
     try
     {
       //Get Token Reserve USDC Balance
       const tokenReserveUSDCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveUSDCATA)
-      tokenReserveBalancesMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, tokenReserveUSDCAccount.value.uiAmount.toFixed(2))
+      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStringsDevNet.usdcTokenMintAddress)
+      tokenReserveBalancesMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, tokenReserveUSDCAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForTokenReserveUSDCChanges()
     }
     catch
     {
       console.log("Token Reserve USDC ATA Not Found")
-    }
+    }*/
 
     if(connectedWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
-    {
-      //User DAI Account
-      const userDaiATA = await Token.getAssociatedTokenAddress
-      (
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        tokenAddressKeysMainNet.daiTokenMintAddress, //Token Mint Address
-        connectedWallet.publicKey //Wallet Public Key
-      )
-      try
-      {
-        //Get User DAI Balance
-        const userDaiAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userDaiATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.daiTokenMintAddress, userDaiAccount.value.uiAmount.toFixed(2))
-        await listenForUserDAIChanges()
-      }
-      catch
-      {
-        console.log("User DAI ATA Not Found")
-      }
-
-      //User USDC Account
-      const userUsdcATA = await Token.getAssociatedTokenAddress
-      (
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        tokenAddressKeysMainNet.usdcTokenMintAddress, //Token Mint Address
-        connectedWallet.publicKey //Wallet Public Key
-      )
-      try
-      {
-        //Get User USDC Balance
-        const userUsdcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUsdcATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.usdcTokenMintAddress, userUsdcAccount.value.uiAmount.toFixed(2))
-        await listenForUserUSDCChanges()
-      }
-      catch
-      {
-        console.log("User USDC ATA Not Found")
-      }
-
-      //User USDC Dev Account
-      const userUsdcDevATA = await Token.getAssociatedTokenAddress
-      (
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        tokenAddressKeysDevNet.usdcTokenMintAddress, //Token Mint Address
-        connectedWallet.publicKey //Wallet Public Key
-      )
-      try
-      {
-        //Get User USDC Dev Balance
-        const userUsdcDevAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUsdcDevATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsDevNet.usdcTokenMintAddress, userUsdcDevAccount.value.uiAmount.toFixed(2))
-        await listenForUserUSDCDevChanges()
-      }
-      catch
-      {
-        console.log("User USDC DevATA Not Found")
-      }
-
-      //User SOL Account
-      const userSolATA = await Token.getAssociatedTokenAddress
-      (
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        tokenAddressKeysMainNet.solTokenMintAddress, //Token Mint Address
-        connectedWallet.publicKey //Wallet Public Key
-      )
-      try
-      {
-        //Get User SOL Balance
-        const userSolAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userSolATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.solTokenMintAddress, userSolAccount.value.uiAmount.toFixed(2))
-        await listenForUserSOLChanges()
-      }
-      catch
-      {
-        console.log("User SOL ATA Not Found")
-      }
-
-      //User WETH Account
-      const userWEthATA = await Token.getAssociatedTokenAddress
-      (
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        tokenAddressKeysMainNet.wethTokenMintAddress, //Token Mint Address
-        connectedWallet.publicKey //Wallet Public Key
-      )
-      try
-      {
-        //Get User WETH Balance
-        const userWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWEthATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.wethTokenMintAddress, userWEthAccount.value.uiAmount.toFixed(2))
-        await listenForUserWETHChanges()
-      }
-      catch
-      {
-        console.log("User WETH ATA Not Found")
-      }
-
-      //User WBTC Account
-      const userWBtcATA = await Token.getAssociatedTokenAddress
-      (
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        tokenAddressKeysMainNet.wbtcTokenMintAddress, //Token Mint Address
-        connectedWallet.publicKey //Wallet Public Key
-      )
-      try
-      {
-        //Get User WBTC Balance
-        const userWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWBtcATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.wbtcTokenMintAddress, userWBtcAccount.value.uiAmount.toFixed(2))
-        await listenForUserWBTCChanges()
-      }
-      catch
-      {
-        console.log("User WBTC ATA Not Found")
-      }
-    }
+      await getUserBalancesAndWatchForChanges()
   })
 
   onUnmounted(() => 
@@ -282,7 +166,10 @@
       return
 
     if(newWallet.addressString == SYSTEM_PROGRAM_ADDRESS_STRING)
+    {
+      connectedWallet.tokenBalanceMap = new Map<string, string>()
       return
+    }
 
     if(userDAIATAWatcherId != undefined)
     {
@@ -315,13 +202,131 @@
       userWBTCATAWatcherId = undefined
     }
 
-    await listenForUserDAIChanges()
-    await listenForUserUSDCChanges()
-    await listenForUserUSDCDevChanges()
-    await listenForUserSOLChanges()
-    await listenForUserWETHChanges()
-    await listenForUserWBTCChanges()
+    await getUserBalancesAndWatchForChanges()
   })
+
+  async function getUserBalancesAndWatchForChanges()
+  {
+    //User DAI Account
+    const userDaiATA = await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      tokenAddressKeysMainNet.daiTokenMintAddress, //Token Mint Address
+      connectedWallet.publicKey //Wallet Public Key
+    )
+    try
+    {
+      //Get User DAI Balance
+      const userDaiAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userDaiATA)
+      connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.daiTokenMintAddress, userDaiAccount.value.uiAmount)
+      await listenForUserDAIChanges()
+    }
+    catch
+    {
+      console.log("User DAI ATA Not Found")
+    }
+
+    //User USDC Account
+    const userUsdcATA = await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      tokenAddressKeysMainNet.usdcTokenMintAddress, //Token Mint Address
+      connectedWallet.publicKey //Wallet Public Key
+    )
+    try
+    {
+      //Get User USDC Balance
+      const userUsdcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUsdcATA)
+      connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.usdcTokenMintAddress, userUsdcAccount.value.uiAmount)
+      await listenForUserUSDCChanges()
+    }
+    catch
+    {
+      console.log("User USDC ATA Not Found")
+    }
+
+    //User USDC Dev Account
+    const userUsdcDevATA = await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      tokenAddressKeysDevNet.usdcTokenMintAddress, //Token Mint Address
+      connectedWallet.publicKey //Wallet Public Key
+    )
+    try
+    {
+      //Get User USDC Dev Balance
+      const userUsdcDevAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUsdcDevATA)
+      connectedWallet.tokenBalanceMap.set(tokenAddressStringsDevNet.usdcTokenMintAddress, userUsdcDevAccount.value.uiAmount)
+      await listenForUserUSDCDevChanges()
+    }
+    catch
+    {
+      console.log("User USDC DevATA Not Found")
+    }
+
+    //User SOL Account
+    const userSolATA = await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      tokenAddressKeysMainNet.solTokenMintAddress, //Token Mint Address
+      connectedWallet.publicKey //Wallet Public Key
+    )
+    try
+    {
+      //Get User SOL Balance
+      const userSolAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userSolATA)
+      connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.solTokenMintAddress, userSolAccount.value.uiAmount)
+      await listenForUserSOLChanges()
+    }
+    catch
+    {
+      console.log("User SOL ATA Not Found")
+    }
+
+    //User WETH Account
+    const userWEthATA = await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      tokenAddressKeysMainNet.wethTokenMintAddress, //Token Mint Address
+      connectedWallet.publicKey //Wallet Public Key
+    )
+    try
+    {
+      //Get User WETH Balance
+      const userWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWEthATA)
+      connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.wethTokenMintAddress, userWEthAccount.value.uiAmount)
+      await listenForUserWETHChanges()
+    }
+    catch
+    {
+      console.log("User WETH ATA Not Found")
+    }
+
+    //User WBTC Account
+    const userWBtcATA = await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      TOKEN_PROGRAM_ID,
+      tokenAddressKeysMainNet.wbtcTokenMintAddress, //Token Mint Address
+      connectedWallet.publicKey //Wallet Public Key
+    )
+    try
+    {
+      //Get User WBTC Balance
+      const userWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWBtcATA)
+      connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.wbtcTokenMintAddress, userWBtcAccount.value.uiAmount)
+      await listenForUserWBTCChanges()
+    }
+    catch
+    {
+      console.log("User WBTC ATA Not Found")
+    }
+  }
   
   async function listenForHODLTreasuryUSDCChanges()
   {
@@ -335,7 +340,7 @@
         hodlTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(2))
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }
@@ -353,7 +358,7 @@
         singlePayerTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, singlePayerUSDCAccount.value.uiAmount.toFixed(2))
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }
@@ -371,7 +376,7 @@
         singlePayerTreasuryBalancesDevNetHashMap.map.set(tokenAddressStringsDevNet.usdcTokenMintAddress, singlePayerUSDCAccount.value.uiAmount.toFixed(2))
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }
@@ -393,10 +398,10 @@
       {
         //Handle account change...
         const userDaiAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userDaiATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.daiTokenMintAddress, userDaiAccount.value.uiAmount.toFixed(2))
+        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.daiTokenMintAddress, userDaiAccount.value.uiAmount)
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }
@@ -418,10 +423,10 @@
       {
         //Handle account change...
         const userUsdcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUsdcATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.usdcTokenMintAddress, userUsdcAccount.value.uiAmount.toFixed(2))
+        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.usdcTokenMintAddress, userUsdcAccount.value.uiAmount)
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }
@@ -443,10 +448,10 @@
       {
         //Handle account change...
         const userUsdcDevAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUsdcDevATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsDevNet.usdcTokenMintAddress, userUsdcDevAccount.value.uiAmount.toFixed(2))
+        connectedWallet.tokenBalanceMap.set(tokenAddressStringsDevNet.usdcTokenMintAddress, userUsdcDevAccount.value.uiAmount)
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }
@@ -468,10 +473,10 @@
       {
         //Handle account change...
         const userSolAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(useSolATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.solTokenMintAddress, userSolAccount.value.uiAmount.toFixed(2))
+        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.solTokenMintAddress, userSolAccount.value.uiAmount)
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }
@@ -493,10 +498,10 @@
       {
         //Handle account change...
         const userWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWEthATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.wethTokenMintAddress, userWEthAccount.value.uiAmount.toFixed(2))
+        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.wethTokenMintAddress, userWEthAccount.value.uiAmount)
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }
@@ -518,10 +523,10 @@
       {
         //Handle account change...
         const userWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWBtcATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.wbtcTokenMintAddress, userWBtcAccount.value.uiAmount.toFixed(2))
+        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.wbtcTokenMintAddress, userWBtcAccount.value.uiAmount)
       })
     }
-    catch
+    catch(error)
     {
       console.log(error)
     }

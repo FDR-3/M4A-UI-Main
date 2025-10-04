@@ -21,7 +21,7 @@
         </ion-button>
       </ion-popover>
     </div>
-    <ion-label class="alignSelfLeft">Bal: {{ userBalance }}</ion-label>
+    <ion-label class="alignSelfLeft noClickEvent">Bal: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <InputNumber
       v-model="depositAmount"
       :inputStyle="{'text-align': 'center'}"
@@ -64,7 +64,7 @@
   import type { Component } from 'vue'
   import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import InputNumber from 'primevue/inputnumber'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
@@ -83,7 +83,7 @@
   const depositSVG = ref()
   const subMarketTokenName = ref()
   const userBalance = ref()
-  var selectedTokenMintAddress: PublicKey
+  var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
 
   const tokenPopoverOpen = ref(false)
@@ -107,7 +107,7 @@
   {
     const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
     if(balance)
-      userBalance.value = balance
+      userBalance.value = Number(balance)
     else
       userBalance.value = 0
   })
@@ -118,7 +118,7 @@
     if(depositing.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
-
+      console.log(event?.target)
       if((event?.target?.id != "depositModalHeader") &&
       (event?.target?.id != "openCopyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressButton") &&
@@ -186,11 +186,7 @@
   }
 
   async function depositTokens()
-  {console.log(depositAmount.value * Math.pow(10, tokenDecimalAmount.value))
-
-
-    console.log(selectedTokenMintAddress)
-    console.log(adminAccounts.initialCEOPublicKey)
+  {
     try
     {
       const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens

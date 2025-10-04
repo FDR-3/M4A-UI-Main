@@ -1,5 +1,5 @@
 {
-  "address": "8HjrjBymLxDBUnQhwgkE3XvW6u3W2dbfLVdvsWzpLgSt",
+  "address": "7xp8Dt4DJ8PWC2FSX14APWeaMrxeARsNyD9BZecwmp4g",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -2068,6 +2068,10 @@
           {
             "name": "fee_on_interest_earned_rate",
             "type": "u16"
+          },
+          {
+            "name": "deposited_amount",
+            "type": "u128"
           }
         ]
       }

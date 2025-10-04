@@ -9,7 +9,7 @@
       size="small" 
       :value="stableCoinTableData"
       rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'hodlATA', 'asset.name', 'chain.name', 'price', 'percentChange24h', 'quanity', 'value']"  
+      :globalFilterFields="['tokenMintAddress', 'hodlATA', 'asset.name', 'chain.name', 'priceString', 'percentChange24h', 'quantity', 'value']"  
     >
       <template #header>
         <div>
@@ -56,9 +56,7 @@
       </Column>
       <Column field="price" header="Price" style="width: 0%" sortable>
         <template #body="slotProps">
-          ${{ slotProps.data.price.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}
+           {{ slotProps.data.priceString }}
         </template>
       </Column>
       <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
@@ -66,12 +64,8 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="quanity" header="Quantity" style="width: 0%" sortable></Column>
-      <Column field="value" header="Value" style="width: 0%" sortable>
-        <template #body="slotProps">
-          {{ slotProps.data.value.toLocaleString() }}
-        </template>
-      </Column>
+      <Column field="quantity" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="value" header="Value" style="width: 0%" sortable></Column>
     </DataTable>
 
     <DataTable 
@@ -81,7 +75,7 @@
       :value="CryptoCurrencyTableData"
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'hodlATA', 'asset.name', 'chain.name', 'price', 'percentChange24h', 'quanity', 'value']"
+      :globalFilterFields="['tokenMintAddress', 'hodlATA', 'asset.name', 'chain.name', 'priceString', 'percentChange24h', 'quantity', 'value']"
     >
       <template #header>
         <div>
@@ -123,9 +117,7 @@
       </Column>
       <Column field="price" header="Price" style="width: 0%" sortable>
         <template #body="slotProps">
-          ${{ slotProps.data.price.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}
+           {{ slotProps.data.priceString }}
         </template>
       </Column>
       <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
@@ -133,22 +125,19 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="quanity" header="Quantity" style="width: 0%" sortable></Column>
-      <Column field="value" header="Value" style="width: 0%" sortable>
-        <template #body="slotProps">
-          {{ slotProps.data.value.toLocaleString() }}
-        </template>
-      </Column>
+      <Column field="quantity" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="value" header="Value" style="width: 0%" sortable></Column>
     </DataTable>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, watch, markRaw, computed } from 'vue'
+  import { ref, onMounted, watch, markRaw } from 'vue'
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { hodlTreasuryBalancesDevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
   import { copyTreasuryATA } from '/src/assets/contracts/WalletHelper.vue'
@@ -235,14 +224,20 @@
       const tokenAmount = hodlTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddress.toBase58())
       if(tokenAmount)
       {
-        unprocessedTableData[i].quanity = tokenAmount as number
-        unprocessedTableData[i].value = '$' + tokenAmount
+        var calculatedValue = 0
 
-        value = Number(tokenAmount) + Number(value)
+        const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddress.toBase58()]
+        if(priceData)
+          calculatedValue = (tokenAmount * priceData.usdPrice)
+
+        unprocessedTableData[i].quantity = tokenAmount
+        unprocessedTableData[i].value = '$' + calculatedValue.toFixed(2)
+
+        value += calculatedValue
       }
       else
       {
-        unprocessedTableData[i].quanity = 0.00
+        unprocessedTableData[i].quantity = 0.00
         unprocessedTableData[i].value = '$0.00'
       }
     }
@@ -266,14 +261,20 @@
 
       if(tokenAmount)
       {
-        unprocessedTableData[i].quanity = tokenAmount as number
-        unprocessedTableData[i].value = '$' + tokenAmount
+        var calculatedValue = 0
 
-        value = Number(tokenAmount) + Number(value)
+        const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddress.toBase58()]
+        if(priceData)
+          calculatedValue = (tokenAmount * priceData.usdPrice)
+
+        unprocessedTableData[i].quantity = tokenAmount
+        unprocessedTableData[i].value = '$' + calculatedValue.toFixed(2)
+
+        value += calculatedValue
       }
       else
       {
-        unprocessedTableData[i].quanity = 0.00
+        unprocessedTableData[i].quantity = 0.00
         unprocessedTableData[i].value = '$0.00'
       }
     }
