@@ -74,8 +74,8 @@
   var dynamicTableHeight = ref(1353)
   var tokenReserveTableSizing = 0
   var ownerTableSizing = 0
-  const numberToSubTractForBothTables = 111
-  const numberToSubTractForBothTablesFireFox = 110
+  const numberToSubTractForBothTables = 110
+  const numberToSubTractForBothTablesFireFox = 93
 
   onMounted(() => 
   {
@@ -132,12 +132,12 @@
     {
       if(showTokenSubMarkets)
       {
-        tokenReserveTableSizing = 463 + tokenSubMarketCount * 81
+        tokenReserveTableSizing = 469 + tokenSubMarketCount * 104
         viewingTokenMarkets.value = "viewingTokenMarkets"
       }
       else
       {
-        tokenReserveTableSizing = 354 + tokenReserveCount * 70
+        tokenReserveTableSizing = 355 + tokenReserveCount * 70
         viewingTokenMarkets.value = ""
       }
 
@@ -147,12 +147,12 @@
     {
       if(showTokenSubMarkets)
       {
-        tokenReserveTableSizing = 472 + tokenSubMarketCount * 78
+        tokenReserveTableSizing = 444 + tokenSubMarketCount * 104
         viewingTokenMarkets.value = "viewingTokenMarkets"
       }
       else
       {
-        tokenReserveTableSizing = 359 + tokenReserveCount * 70
+        tokenReserveTableSizing = 342 + tokenReserveCount * 70
         viewingTokenMarkets.value = ""
       }
       
@@ -171,7 +171,7 @@
       }
       else
       {
-        ownerTableSizing = 412 + subMarketOwnerCount * 81
+        ownerTableSizing = 414 + subMarketOwnerCount * 84
         viewingOwnerMarkets.value = ""
       }
 
@@ -186,7 +186,7 @@
       }
       else
       {
-        ownerTableSizing = 422 + subMarketOwnerCount * 78
+        ownerTableSizing = 419 + subMarketOwnerCount * 84
         viewingOwnerMarkets.value = ""
       }
       
@@ -367,7 +367,7 @@
   }
 
   /*Table Flip Container Back NOT ViewingTokenMarkets*/
-  @media screen and (min-width: 1430.1px)/* and (max-width: 1909px)*/
+  @media screen and (min-width: 1430.1px)
   { 
     .tableFlipContainer.flipped
     {
@@ -429,64 +429,84 @@
   }
 
   /*Table Flip Container Back ViewingTokenMarkets*/
-  @media screen and (min-width: 1338.1px)
+  @media screen and (min-width: 1691.1px)
   { 
     .tableFlipContainer.flipped.viewingTokenMarkets
     {
       height: v-bind('dynamicTableHeight + "px"'); 
     }
   }
-  @media screen and (min-width: 1277.1px) and (max-width: 1338px) 
+  @media screen and (min-width: 1402.1px) and (max-width: 1691px) 
   { 
     .tableFlipContainer.flipped.viewingTokenMarkets
     {
       height: v-bind('(dynamicTableHeight + 17) + "px"'); 
     }
   }
-  @media screen and (min-width: 1227.1px) and (max-width: 1277px) 
+  @media screen and (min-width: 1277.1px) and (max-width: 1402px) 
   { 
     .tableFlipContainer.flipped.viewingTokenMarkets
     {
-      height: v-bind('(dynamicTableHeight + 32) + "px"'); 
+      height: v-bind('(dynamicTableHeight + 31) + "px"'); 
     }
   }
-  @media screen and (max-width: 1227px) 
+  @media screen and (min-width: 1227.1px) and (max-width: 1277px) 
   { 
     .tableFlipContainer.flipped.viewingTokenMarkets
     {
       height: v-bind('(dynamicTableHeight + 45) + "px"'); 
     }
   }
+  @media screen and (max-width: 1227px) 
+  { 
+    .tableFlipContainer.flipped.viewingTokenMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 60) + "px"'); 
+    }
+  }
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    
-    @media screen and (min-width: 1575.1px)
+    @media screen and (min-width: 1803.1px)
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
         height: v-bind('dynamicTableHeight + "px"'); 
       }
     }
-    @media screen and (min-width: 1476.1px) and (max-width: 1575px) 
+    @media screen and (min-width: 1476.1px) and (max-width: 1803px) 
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
-        height: v-bind('(dynamicTableHeight + 18)  + "px"'); 
+        height: v-bind('(dynamicTableHeight + 18) + "px"'); 
       }
     }
-    @media screen and (min-width: 1226.1px) and (max-width: 1476px) 
+    @media screen and (min-width: 1413.1px) and (max-width: 1476px) 
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
         height: v-bind('(dynamicTableHeight + 35) + "px"'); 
       }
     }
-    @media screen and (max-width: 1226px) 
+    @media screen and (min-width: 1283.1px) and (max-width: 1413px) 
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
         height: v-bind('(dynamicTableHeight + 52) + "px"'); 
+      }
+    }
+    @media screen and (min-width: 1226.1px) and (max-width: 1283px) 
+    { 
+      .tableFlipContainer.flipped.viewingTokenMarkets
+      {
+        height: v-bind('(dynamicTableHeight + 72) + "px"'); 
+      }
+    }
+    @media screen and (max-width: 1226px) 
+    { 
+      .tableFlipContainer.flipped.viewingTokenMarkets
+      {
+        height: v-bind('(dynamicTableHeight + 88) + "px"'); 
       }
     }
   }
@@ -561,70 +581,84 @@
   }
 
   /*Table Flip Container Back ViewingTokenMarkets and ViewingOwnerMarkets*/
-  @media screen and (min-width: 1890.1px)
+  @media screen and (min-width: 1691.1px)
   { 
-    .tableFlipContainer.flipped.viewingOwnerMarkets
+    .tableFlipContainer.flipped.viewingBothMarkets
     {
       height: v-bind('dynamicTableHeight + "px"'); 
     }
   }
-  @media screen and (min-width: 1319.1px) and (max-width: 1890px)
-  { 
-    .tableFlipContainer.flipped.viewingBothMarkets
-    {
-      height: v-bind('(dynamicTableHeight + 15) + "px"'); 
-    }
-  }
-  @media screen and (min-width: 1277.1px) and (max-width: 1319px)
+  @media screen and (min-width: 1402.1px) and (max-width: 1691px)
   { 
     .tableFlipContainer.flipped.viewingBothMarkets
     {
       height: v-bind('(dynamicTableHeight + 30) + "px"'); 
     }
   }
-  @media screen and (min-width: 1227.1px) and (max-width: 1277px)
+  @media screen and (min-width: 1277.1px) and (max-width: 1402px)
   { 
     .tableFlipContainer.flipped.viewingBothMarkets
     {
       height: v-bind('(dynamicTableHeight + 45) + "px"'); 
     }
   }
+  @media screen and (min-width: 1227.1px) and (max-width: 1277px)
+  { 
+    .tableFlipContainer.flipped.viewingBothMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 59) + "px"'); 
+    }
+  }
   @media screen and (max-width: 1227px)
   { 
     .tableFlipContainer.flipped.viewingBothMarkets
     {
-      height: v-bind('(dynamicTableHeight + 60) + "px"'); 
+      height: v-bind('(dynamicTableHeight + 74) + "px"'); 
     }
   }
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 1575.1px)
+    @media screen and (min-width: 1803.1px)
     { 
       .tableFlipContainer.flipped.viewingBothMarkets
       {
         height: v-bind('dynamicTableHeight + "px"'); 
       }
     }
-    @media screen and (min-width: 1476.1px) and (max-width: 1575px) 
+    @media screen and (min-width: 1476.1px) and (max-width: 1803px) 
     { 
       .tableFlipContainer.flipped.viewingBothMarkets
       {
-        height: v-bind('(dynamicTableHeight + 18)  + "px"'); 
+        height: v-bind('(dynamicTableHeight + 18) + "px"'); 
       }
     }
-    @media screen and (min-width: 1226.1px) and (max-width: 1476px)
+    @media screen and (min-width: 1413.1px) and (max-width: 1476px)
     { 
       .tableFlipContainer.flipped.viewingBothMarkets
       {
-        height: v-bind('(dynamicTableHeight + 36) + "px"'); 
+        height: v-bind('(dynamicTableHeight + 35) + "px"'); 
+      }
+    }
+    @media screen and (min-width: 1283.1px) and (max-width: 1413px) 
+    { 
+      .tableFlipContainer.flipped.viewingTokenMarkets
+      {
+        height: v-bind('(dynamicTableHeight + 53) + "px"'); 
+      }
+    }
+    @media screen and (min-width: 1226.1px) and (max-width: 1283px) 
+    { 
+      .tableFlipContainer.flipped.viewingTokenMarkets
+      {
+        height: v-bind('(dynamicTableHeight + 71) + "px"'); 
       }
     }
     @media screen and (max-width: 1226px)
     { 
       .tableFlipContainer.flipped.viewingBothMarkets
       {
-        height: v-bind('(dynamicTableHeight + 53) + "px"'); 
+        height: v-bind('(dynamicTableHeight + 88) + "px"'); 
       }
     }
   }

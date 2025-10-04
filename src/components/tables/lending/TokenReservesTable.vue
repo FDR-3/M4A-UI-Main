@@ -3,7 +3,7 @@
     <!--TokenReserveTable-->
     <DataTable
       v-if="!showTokenSubMarkets"
-      class="tableMinWidth"
+      class="tableMinWidth my-custom-table"
       v-model:filters="filters" 
       show-gridlines
       sortField="tokenMintAddress" 
@@ -79,7 +79,8 @@
 
     <!--TokenReserveSubMarketsTable-->
     <DataTable
-      v-if="showTokenSubMarkets" 
+      v-if="showTokenSubMarkets"
+      id="tokenReserveSubMarketsTable"
       class="tableMinWidth"
       v-model:filters="filters" 
       paginator 
@@ -694,6 +695,12 @@
   .container
   {
     margin-bottom: 77px
+  }
+
+  /*Set row height to higest possible value*/
+  #tokenReserveSubMarketsTable :deep(.p-datatable-tbody > tr)
+  {
+    height: 104px !important
   }
 
   #tableTitle

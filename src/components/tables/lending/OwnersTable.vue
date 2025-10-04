@@ -3,6 +3,7 @@
     <!--Table of SubMarket Owners-->
     <DataTable
       v-if="!showOwnerSubMarkets"
+      id="submarketOwnersTable"
       class="tableMinWidth"
       v-model:filters="filters" 
       paginator 
@@ -637,21 +638,16 @@
   }
 </script>
 
-<style>
-  #createSubMarketModal
-  {
-    position: fixed; /* Makes sure the modal is fixed in place on the screen */
-    top: 70%;
-    left: 50%;
-    transform: translate(-50%, -70%);
-    z-index: 4000; /* Makes sure the modal is on top */
-    padding: 20px;
-    background-color: var(--ion-background-color)
-  }
-
+<style scoped>
   .container
   {
     margin-bottom: 77px
+  }
+
+  /*Set row height to higest possible value*/
+  #submarketOwnersTable :deep(.p-datatable-tbody > tr)
+  {
+    height: 84px !important
   }
 
   #tableTitle
