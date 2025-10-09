@@ -32,6 +32,8 @@
   })
 
   export const SYSTEM_PROGRAM_ADDRESS_STRING = "11111111111111111111111111111111"
+  export const MAX_ACCOUNT_NAME_LENGTH = 25
+  export const DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX = 0
 
   export default anchorPrograms
 </script>

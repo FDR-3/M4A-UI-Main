@@ -19,7 +19,7 @@
         <div>
           <h2>SubMarket Owner Count: {{ subMarkets.ownerCount }}</h2>
           <ion-input v-model="filters['global'].value" fill="outline" placeholder="Owners Search     ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br>
         </div>
@@ -101,7 +101,7 @@
             placeholder="Owners Search     "
             @input="filterTable()"
           >
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br>
         </div>

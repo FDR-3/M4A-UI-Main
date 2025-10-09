@@ -41,7 +41,7 @@
             <ion-button color="dark" @click="$emit('toggleProcessedClaimsTable')">Toggle Processed Claims Table</ion-button>
           </div>
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" label-placement="stacked" placeholder="Processor Search     ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
 
           <ion-button fill="clear" @click="expandProcessorStats()">

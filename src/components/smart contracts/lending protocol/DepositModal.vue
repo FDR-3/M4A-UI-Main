@@ -3,7 +3,7 @@
     id="depositModal"
     class="thickBorder"
   >
-    <div id="depositModalHeader" class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
+    <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
       <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
         <component class="noClickEvent" id="depositSVG" :is="depositSVG" style="width: 44px; max-height: 40px"></component>
         <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
@@ -21,6 +21,50 @@
         </ion-button>
       </ion-popover>
     </div>
+
+    <div class="flexCenterRow accountNameActionContainer">
+      <ion-button v-if="addingAdditionalLendingAccount" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
+        <ion-icon :src="close" color="dark"></ion-icon>
+      </ion-button>
+
+      <Select
+      v-if="hasAtleast1Account && !addingAdditionalLendingAccount"
+      id="accountSelect"
+      class="standardFontSize mediumMarginTop mediumMarginBottom"
+      v-model="accountSelect" 
+      :options="accountList" 
+      optionLabel="accountName" 
+      optionValue="userAccountIndex" 
+      placeholder="Select Account"
+      appendTo="self"
+      @change="updateStoredSelectedAccount()">
+        <template #footer>
+          <div class="flexCenterRow accountNameActionContainer">
+            <ion-button @click="setNewAccountDefaultName()" color="dark">
+              <ion-label color="light">New</ion-label>
+            </ion-button>
+          </div>
+        </template>
+      </Select>
+
+      <ion-input
+      v-else
+      v-model="accountName"
+      ref="accountNameEditInputRef"
+      id="accountNameEditInput"
+      class="mediumMarginTop mediumMarginBottom"
+      :class="{ 'invalid': overCommentByteSizeLimit }"
+      fill="outline"
+      :counter="true"
+      :counter-formatter="customFormatter"
+      :maxlength=MAX_ACCOUNT_NAME_LENGTH>
+        <EmojiButton
+        :marginTop="'4px'"
+        :colorHexValue="colorHexValue"
+        @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
+      </ion-input>
+    </div>
+
     <ion-label class="alignSelfLeft noClickEvent">Bal: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <InputNumber
       v-model="depositAmount"
@@ -52,7 +96,7 @@
       color="dark"
       @click="depositTokens()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="depositAmount == 0"
+      :disabled="depositAmount == 0 || overCommentByteSizeLimit"
     >
       Deposit
     </ion-button>
@@ -60,11 +104,16 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, watch, computed } from 'vue'
-  import type { Component } from 'vue'
-  import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
+  import { ref, inject, watch, computed, onUpdated, type Component } from 'vue'
+  import { IonButton, IonText, IonPopover, IonLabel, IonInput, IonIcon } from '@ionic/vue'
+  import { close } from 'ionicons/icons'
+  import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
-  import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
+  import { anchorPrograms,
+    SYSTEM_PROGRAM_ADDRESS_STRING,
+    MAX_ACCOUNT_NAME_LENGTH,
+    DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
@@ -76,21 +125,32 @@
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
+  const colorHexValue = inject('colorHexValue')
 
-  const depositAmount = ref()
-  const depositIncrementAmount = ref()
-  const depositing = ref(false)
-  const depositSVG = ref()
-  const subMarketTokenName = ref()
-  const userBalance = ref()
+  var accountName = ref()
+  var accountSelect = ref()
+  var previousAccountSelect: number
+  var accountList = ref()
+  var hasAtleast1Account = ref()
+  var accountNameEditInputRef = ref()
+  var addingAdditionalLendingAccount = ref(false)
+  var depositAmount = ref()
+  var depositIncrementAmount = ref()
+  var depositing = ref(false)
+  var depositSVG = ref()
+  var subMarketTokenName = ref()
+  var userBalance = ref()
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
 
-  const tokenPopoverOpen = ref(false)
-  const event = ref()
+  var tokenPopoverOpen = ref(false)
+  var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
-  const depositValue = computed ( () =>
+  var savedEmojiCursorPosition: any
+  var overCommentByteSizeLimit = ref()
+
+  var depositValue = computed ( () =>
   {
     const price = priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice
     if(price)
@@ -110,6 +170,22 @@
       userBalance.value = Number(balance)
     else
       userBalance.value = 0
+
+    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+  })
+
+  //Move cursor back after emoji insert
+  onUpdated(() => 
+  {
+    //Move cursor back after inserting emoji in reply
+    const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
+    if(savedEmojiCursorPosition != undefined)
+      if(inputElement)
+      {
+        inputElement.setSelectionRange(savedEmojiCursorPosition, savedEmojiCursorPosition)
+        inputElement.focus()
+        savedEmojiCursorPosition = undefined
+      }
   })
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
@@ -119,10 +195,11 @@
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
       console.log(event?.target)
-      if((event?.target?.id != "depositModalHeader") &&
+      if((event?.target?.id != "tokenButtonContainer") &&
       (event?.target?.id != "openCopyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressPopover") &&
+      (event?.target?.id != "accountNameEditInput") &&
       (event?.target?.id != "depositSVG") &&
       (event?.target?.id != "depositModal") &&
       (event?.target?.id != "openDepositModal") &&
@@ -132,6 +209,23 @@
       (event?.target?.id != "themeButton") &&
       !event?.target?.classList.contains("tableDepositButton") &&
       !event?.target?.classList.contains("native-wrapper") &&
+      !event?.target?.classList.contains("native-input") &&
+      !event?.target?.classList.contains("input-outline-container") &&
+      !event?.target?.classList.contains("input-wrapper") &&
+      !event?.target?.classList.contains("input-bottom") &&
+      !event?.target?.classList.contains("emoteButton") &&
+      !event?.target?.classList.contains("emojiButton") &&
+      !event?.target?.classList.contains("sc-ion-label-md-h") &&
+      !event?.target?.classList.contains("button") &&
+      !event?.target?.classList.contains("accountNameActionContainer") &&
+      !event?.target?.classList.contains("p-select") &&
+      !event?.target?.classList.contains("p-select-list") &&
+      !event?.target?.classList.contains("p-select-label") &&
+      !event?.target?.classList.contains("p-select-dropdown") &&
+      !event?.target?.classList.contains("p-select-empty-message") &&
+      !event?.target?.classList.contains("p-select-option") &&
+      !event?.target?.classList.contains("p-select-option-label") &&
+      !event?.target?.classList.contains("p-select-list-container") &&
       !event?.target?.classList.contains("p-inputtext") &&
       !event?.target?.classList.contains("p-icon") &&
       !event?.target?.classList.contains("p-inputnumber") &&
@@ -141,17 +235,52 @@
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
+      {
         depositing.value = false
+        addingAdditionalLendingAccount.value = false
+      }
 
       //Close modal when clicking into input search's behind Modal
       if((event?.target?.placeholder == "Reserves Search     ") ||
       (event?.target?.placeholder == "Owners Search     "))
+      {
         depositing.value = false
+        addingAdditionalLendingAccount.value = false
+      }
     }
   }
 
   function openDepositModal(tokenMintAddress: PublicKey, decimalAmount: number, tokenSVG: Component, tokenName: string)
   {
+    if(lendingerUserHashMap.map)
+    {
+      const userAccountList = lendingerUserHashMap.map.get(connectedWallet.addressString)
+      if(userAccountList)
+      {
+        accountName.value = null
+        accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+        accountList.value = userAccountList
+        hasAtleast1Account.value = true
+      }
+      else
+      {
+        accountName.value = "Account 1"
+        hasAtleast1Account.value = false
+      }
+    }
+    else
+    {
+      accountName.value = "Account 1"
+      hasAtleast1Account.value = false
+    }
+
+    setTimeout(() =>
+    {
+      const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
+      if(inputElement)
+        inputElement.focus()
+    }, 10) 
+
     const balance = connectedWallet.tokenBalanceMap.get(tokenMintAddress.toString())
     if(balance)
       userBalance.value = Number(balance)
@@ -185,6 +314,63 @@
     copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
 
+  const customFormatter = (inputLength: number, maxLength: number) => 
+  {
+    const blob = new Blob([accountName.value])
+    const sizeInBytes = blob.size
+
+    inputLength = sizeInBytes
+
+    if(inputLength > maxLength)
+    {
+      overCommentByteSizeLimit.value = true
+    }
+    else
+      overCommentByteSizeLimit.value = false
+
+    return `${inputLength}/${maxLength} `
+  }
+
+  function insertEmoji(emoji: String)
+  {
+    const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
+    if(inputElement) 
+    {
+      const start = inputElement.selectionStart
+      const end = inputElement.selectionEnd
+      const newValue =
+      accountName.value.substring(0, start) + 
+      emoji + 
+      accountName.value.substring(end)
+
+      accountName.value = newValue
+
+      savedEmojiCursorPosition = inputElement.selectionStart + emoji.length
+    }
+  }
+
+  function setNewAccountDefaultName()
+  {
+    const userAccountList = lendingerUserHashMap.map.get(connectedWallet.addressString)
+
+    accountName.value = `Account ${userAccountList.length + 1}`
+    previousAccountSelect = accountSelect.value
+    accountSelect.value = userAccountList.length
+    addingAdditionalLendingAccount.value = true
+  }
+
+  function cancelAddingAdditionalLendingAccount()
+  {
+    accountSelect.value = previousAccountSelect
+    addingAdditionalLendingAccount.value = false
+  }
+
+  function updateStoredSelectedAccount()
+  { console.log(accountSelect.value)
+    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
+    localStorage.setItem(connectedWallet.addressString + "selectedLendingAccountIndex", accountSelect.value.toString())
+  }
+
   async function depositTokens()
   {
     try
@@ -192,13 +378,16 @@
       const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
         selectedTokenMintAddress,
-        adminAccounts.initialCEOPublicKey,
-        0,
-        0,
-        new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
+        new PublicKey(adminAccounts.lendingCEOAddress),
+        DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX,
+        accountSelect.value,
+        new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
+        accountName.value
       ).accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey }).rpc()
+
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
       depositing.value = false
+      addingAdditionalLendingAccount.value = false
     }
     catch(error)
     {
@@ -222,5 +411,21 @@
     z-index: 4000; /* Makes sure the modal is on top */
     padding: 20px;
     background-color: var(--ion-background-color)
+  }
+
+  #accountNameEditInput
+  {
+    min-height: 25px;
+    --highlight-color: v-bind(colorHexValue) !important
+  }
+
+  .emoteButton::part(native)
+  {
+    margin-top: 20px !important
+  }
+
+  :deep(.p-inputnumber .p-inputnumber-input:focus)
+  {
+    border-color: v-bind(colorHexValue) !important
   }
 </style>

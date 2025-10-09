@@ -9,10 +9,12 @@
   getTokenReserves,
   getSubMarkets,
   setLendingUserAccountHashMap,
+  setLendingUserObligationsHashMap,
   getLendingProtocolCEOAccountPDA,
-  getLendingProtocolPDA,
+  getTokenReserveStatsPDA,
   getSubMarketStatsPDA,
-  getLendingUserStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  getLendingStatsPDA,
+  getUserLendingStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenReserves } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -24,7 +26,8 @@
 
   var lendingProtocolWatcherId: any
   var subMarketStatsWatcherId: any
-  var lendingUsersWatcherId: any
+  var lendingStatsWatcherId: any
+  var lendingUserStatsWatcherId: any 
 
   onMounted(async() =>
   {
@@ -38,7 +41,9 @@
 
     //Lending Users
     await setLendingUserAccountHashMap()
-    await listenForLendingUserChanges()
+    await setLendingUserObligationsHashMap()
+    await listenForLendingStatChanges()
+    await listenForLendingUserStatChanges()
 
     //Lending Protocol CEO Account
     const lendingCEOAccount = await getLendingProtocolCEOAccount()
@@ -66,10 +71,15 @@
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(subMarketStatsWatcherId)
       subMarketStatsWatcherId = undefined
     }
-    if(lendingUsersWatcherId != undefined)
+    if(lendingStatsWatcherId != undefined)
     {
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUsersWatcherId)
-      lendingUsersWatcherId = undefined
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingStatsWatcherId)
+      lendingStatsWatcherId = undefined
+    }
+    if(lendingUserStatsWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserStatsWatcherId)
+      lendingUserStatsWatcherId = undefined
     }
     if(lendingProtocolCEOAccountWatcherId != undefined)
     {
@@ -81,7 +91,7 @@
   async function listenForNewTokenReserves()
   {
     //Subscribe to account changes
-    lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(), async() => 
+    lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getTokenReserveStatsPDA(), async() => 
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
@@ -98,14 +108,25 @@
     })
   }
 
-  async function listenForLendingUserChanges()
+  async function listenForLendingStatChanges()
   {
     //Subscribe to account changes
-    lendingUsersWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingUserStatsPDA(), async() => 
+    lendingStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingStatsPDA(), async() => 
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
       subMarkets.data = await getSubMarkets()
+      await setLendingUserAccountHashMap()
+      await setLendingUserObligationsHashMap()
+    })
+  }
+
+  async function listenForLendingUserStatChanges()
+  {
+    //Subscribe to account changes
+    lendingUserStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getUserLendingStatsPDA(), async() => 
+    {
+      //Handle account change..
       await setLendingUserAccountHashMap()
     })
   }

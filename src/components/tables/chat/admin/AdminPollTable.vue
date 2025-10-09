@@ -57,7 +57,7 @@
             fill="outline"
             placeholder="Poll Search      "  
           >
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
 
           <div :class="connectedWallet.addressString!=adminAccounts.m4aCEOAddress ? 'largeMarginBottom' : ''">

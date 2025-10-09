@@ -75,7 +75,7 @@
             <ion-button color="dark" @click="$emit('toggleProcessedClaimsTable')">Toggle Processed Claims</ion-button>
           </div>
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Hospital Search     ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
 
           <ion-button fill="clear" @click="exportCSV($event)">

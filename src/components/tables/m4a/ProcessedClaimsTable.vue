@@ -65,7 +65,7 @@
             <ion-button color="dark" class="tableToggleSelect" :disabled="true">Toggle Processed Claims</ion-button>
           </div>
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Processed Claims Search     ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
      
           <ion-button fill="clear" class="nTinyMarginBottom" @click="exportCSV($event)">
@@ -190,7 +190,7 @@
         <template #body="slotProps">
           <ion-button class="tableButton" fill="clear" @click="openClaimNotePopover($event, slotProps.data)">  
             <span class="tableButtonEmoji">
-              {{ "🤮" }}
+              {{ "🤒" }}
             </span>
             <ion-label align="left" color="dark">
               {{ slotProps.data.ailment }}

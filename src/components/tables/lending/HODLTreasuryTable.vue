@@ -17,7 +17,7 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span></h2>
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="HODL Treasury Search     ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br><ion-label id="tableTitle">Stable Coins</ion-label>
         </div>

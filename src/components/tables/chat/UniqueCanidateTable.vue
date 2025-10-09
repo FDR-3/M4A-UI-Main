@@ -18,7 +18,7 @@
           <h2 class="voteRecordSubTitle">Unique Canidate List</h2>
           <ion-button class="toggleVoteRecordsButton" color="dark" @click="toggleRecordTable()">Show Received Vote Records Table</ion-button>
           <ion-input color="dark" v-model="filters['global'].value " fill="outline" placeholder="Unique Canidate Search    ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
           <div class="voterTableUtilityBar">
             <ion-label slot="start" color="dark">Unique Canidates: {{ uniqueCanidateCount }}</ion-label>

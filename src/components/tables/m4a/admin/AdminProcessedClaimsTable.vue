@@ -33,7 +33,7 @@
             placeholder="Processsed Claims Search     "
             @input="filterTable()"
           >
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
 
           <ion-button fill="clear" @click="exportCSV($event)">

@@ -25,6 +25,7 @@
       <p align="left">Links<br>
         <a href="https://www.youtube.com/watch?v=e2HbHq0wmeU" target="_blank" class="rainbowText">Can You Use YT-DLP To Grab LinkedIn Videos?</a><br>
         <a href="https://www.youtube.com/watch?v=o3g7ZrrwK9w" target="_blank" class="rainbowText">Can You Use YT-DLP To Grab LinkedIn Course Videos?</a><br>
+        <a href="https://www.youtube.com/watch?v=OBu6TJmluiQ" target="_blank" class="rainbowText">How To Fix YT-DLP 403 Forbidden/Cookies Error?</a><br>
       </p>
     </div>
   </div>

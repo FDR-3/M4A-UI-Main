@@ -7,7 +7,9 @@
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
         <MarketsTable @openDepositModal="(tokenMingAddress: PublicKey, decimalAmount: number, tokenSVG: Component, tokenName: string) =>
-        depositModal.openDepositModal(tokenMingAddress, decimalAmount, tokenSVG, tokenName)"/>
+        depositModal.openDepositModal(tokenMingAddress, decimalAmount, tokenSVG, tokenName)"
+        @marketTableHeightChange="(hasAtleast1Account: boolean, editingAccountName: boolean) =>
+        updateMarketTableHeight(hasAtleast1Account, editingAccountName)"/>
       </div>
 
       <div class="backTable" :style="{display: display2ndTable}">
@@ -45,6 +47,7 @@
   var searchAddress = ref("")
 
   var depositModal = ref()
+  var dynamicTableHeight = ref(0)
 
   var notConnected = computed (() =>
   {
@@ -109,6 +112,16 @@
         flipping.value = false
       }, 500) //1000 milliseconds == 1 seconds
     }   
+  }
+
+  function updateMarketTableHeight(hasAtleast1Account: boolean, editingAccountName: boolean)
+  {
+    if(editingAccountName)
+      dynamicTableHeight.value = 118
+    else if(hasAtleast1Account)
+      dynamicTableHeight.value = 58
+    else
+      dynamicTableHeight.value = 0
   }
 </script>
 
@@ -179,63 +192,63 @@
   { 
     .tableFlipContainer
     {
-      height: 1106px
+      height: v-bind('(1106 + dynamicTableHeight) + "px"')
     } 
   }
   @media screen and (min-width: 1300.1px) and (max-width: 1769px)
   { 
     .tableFlipContainer
     {
-      height: 1142px
+      height: v-bind('(1142 + dynamicTableHeight) + "px"')
     } 
   }
   @media screen and (min-width: 1191.1px) and (max-width: 1300px)
   { 
     .tableFlipContainer
     {
-      height: 1157px
+      height: v-bind('(1157 + dynamicTableHeight) + "px"')
     }
   }
   @media screen and (min-width: 1051.1px) and (max-width: 1191px)
   { 
     .tableFlipContainer
     {
-      height: 1194px
+      height: v-bind('(1194 + dynamicTableHeight) + "px"')
     }
   }
   @media screen and (min-width: 1028.1px) and (max-width: 1051px)
   { 
     .tableFlipContainer
     {
-      height: 1208px
+      height: v-bind('(1208 + dynamicTableHeight) + "px"')
     }
   }
   @media screen and (min-width: 988.1px) and (max-width: 1028px)
   { 
     .tableFlipContainer
     {
-      height: 1222px
+      height: v-bind('(1222 + dynamicTableHeight) + "px"')
     }
   }
   @media screen and (min-width: 923.1px) and (max-width: 988px)
   { 
     .tableFlipContainer
     {
-      height: 1236px
+      height: v-bind('(1236 + dynamicTableHeight) + "px"')
     }
   }
   @media screen and (min-width: 916.1px)  and (max-width: 923px)
   { 
     .tableFlipContainer
     {
-      height: 1272px
+      height: v-bind('(1272 + dynamicTableHeight) + "px"')
     }
   }
   @media screen and (max-width: 916px)
   { 
     .tableFlipContainer
     {
-      height: 1288px
+      height: v-bind('(1288 + dynamicTableHeight) + "px"')
     }
   }
   /*Set table height for Fire Fox*/

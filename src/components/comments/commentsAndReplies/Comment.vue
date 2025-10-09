@@ -142,7 +142,7 @@
             :maxlength=MAX_COMMENT_LENGTH
             :counter-formatter="editCustomFormatter"
           >
-            <EmojiButton 
+            <EmojiButton
               :colorHexValue="colorHexValue"
               @emojiSelected="(emoji: String) => insertEditEmoji(emoji)"
             />
@@ -331,7 +331,7 @@
             :maxlength=MAX_COMMENT_LENGTH
             :counter-formatter="editCustomFormatter"
           >
-            <EmojiButton 
+            <EmojiButton
               :colorHexValue="colorHexValue"
               @emojiSelected="(emoji: String) => insertEditEmoji(emoji)"
             />
@@ -383,7 +383,7 @@
         :maxlength=MAX_COMMENT_LENGTH
         :counter-formatter="replyCustomFormatter"
       >
-        <EmojiButton 
+        <EmojiButton
           :colorHexValue="colorHexValue"
           @emojiSelected="(emoji: String) => insertReplyEmoji(emoji)"
         />

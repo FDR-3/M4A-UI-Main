@@ -3,9 +3,8 @@
   import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingerUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingerUserHashMap, lendingerUserObligationsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import { PublicKey } from "@solana/web3.js"
@@ -214,6 +213,7 @@
         list = previousLendingUserList
 
       list.push(lendingUserAccounts[i].account)
+      list = list.sort((a: any, b: any) => a.userAccountIndex - b.userAccountIndex) 
 
       hashmap.set(lendingUserAccounts[i].account.owner.toBase58(), list)
     }
@@ -222,6 +222,53 @@
   }
 
   async function getLendingUserAccountsWrapper()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.lending.lendingProgram.account.lendingUserAccount.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export async function setLendingUserObligationsHashMap()
+  {
+    console.log("Setting Lending User Obligation Hashmap")
+
+    var hashmap = new Map<string, any>()
+    const lendingUserObligations = await getLendingUserObligationsWrapper()
+
+    for(var i=0; i<lendingUserObligations.length; i++)
+    {
+      var list = []
+      const previousLendingUserObligationList = hashmap.get(lendingUserObligations[i].account.owner.toBase58())
+
+      if(previousLendingUserObligationList)
+        list = previousLendingUserObligationList
+
+      list.push(lendingUserObligations[i].account)
+
+      hashmap.set(lendingUserObligations[i].account.owner.toBase58(), list)
+    }
+
+    lendingerUserObligationsHashMap.map = hashmap
+  }
+
+  async function getLendingUserObligationsWrapper()
   {
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
@@ -269,6 +316,18 @@
     return lendingProtocolPDA
   }
 
+  export function getTokenReserveStatsPDA()
+  {
+    const [tokenReserveStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("tokenReserveStats")
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return tokenReserveStatsPDA
+  }
+
   export function getTokenReservePDA(tokenMintAddress: PublicKey)
   {
     const [tokenReservePDA] = anchor.web3.PublicKey.findProgramAddressSync
@@ -294,7 +353,19 @@
     return submarketStatsPDA
   }
 
-  export function getLendingUserStatsPDA()
+  export function getLendingStatsPDA()
+  {
+    const [lendingStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("lendingStats")
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return lendingStatsPDA
+  }
+
+  export function getUserLendingStatsPDA()
   {
     const [lendingUserStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
     (

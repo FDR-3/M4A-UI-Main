@@ -20,7 +20,7 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span></h2>
           <ion-input v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br>
         </div>
@@ -108,7 +108,7 @@
             placeholder="Reserves Search     "
             @input="filterTable()"
           >
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br>
         </div>

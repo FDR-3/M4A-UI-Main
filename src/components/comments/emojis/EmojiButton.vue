@@ -1,7 +1,8 @@
 <template>
   <ion-button 
     ref="emojiButton"
-    style="margin-left: -7px; margin-right: -20px; margin-top: -9px"
+    style="margin-left: -7px; margin-right: -20px"
+    :style="{marginTop: marginTop}"
     slot="end"
     fill="clear"
     @click="openPopover($event); isEmojiSearchActive=false; emojiSearchValue=''">
@@ -128,7 +129,18 @@
   import { bottomMenuBars } from './BottomMenuBarList.vue'
   import { emojiSelector, skinColorBarIndex } from '/src/assets/globalStates/EmojiSelector.vue'
 
-  defineProps(['colorHexValue'])
+  defineProps(
+  {
+    marginTop:
+    {
+      type: String,
+      default: '-9px' 
+    },
+    colorHexValue:
+    {
+      type: String
+    }
+  })
   defineEmits(['emojiSelected'])
 
   var isEmojiSearchActive = ref()

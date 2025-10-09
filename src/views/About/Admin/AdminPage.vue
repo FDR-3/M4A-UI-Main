@@ -12,12 +12,16 @@
     >
       <ion-label color="dark">Init Alert Admin Accounts</ion-label>
     </ion-button>
-    <ion-button v-if="!adminAccounts.isLendingCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
-      @click="initializeLendingProtocol()"
-      :color=colorName
-    >
-      <ion-label color="dark">Init Lending Admin Accounts</ion-label>
-    </ion-button>
+    <div v-if="!adminAccounts.isLendingCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress">
+      <ion-button 
+        @click="initializeLendingProtocol()"
+        :color=colorName
+        :disabled="taxYearInput == ''"
+      >
+        <ion-label color="dark">Init Lending Admin Accounts</ion-label>
+      </ion-button>
+      <ion-input v-model="taxYearInput" fill="outline" placeholder="Enter Tax Year" type="number" step="1" min="2025"></ion-input>
+    </div>
     <ion-button v-if="!adminAccounts.isM4ACEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
       @click="initializeM4AProtocolAdminAccounts()"
       :color=colorName
@@ -38,8 +42,8 @@
 </template>
 
 <script setup lang="ts">
-  import { inject } from 'vue'
-  import { IonButton, IonLabel } from '@ionic/vue'
+  import { ref, inject } from 'vue'
+  import { IonButton, IonLabel, IonInput } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
@@ -54,6 +58,9 @@
 
   const toast = inject('toast')
   const colorName = inject('colorName') as string
+  const colorHexValue = inject('colorHexValue') as string
+
+  var taxYearInput = ref("")
 
   async function initializeM4AProtocolAdminAccounts()
   {
@@ -85,7 +92,7 @@
   {
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol().rpc()
+      const tx = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol(Number(taxYearInput.value)).rpc()
       await confirmLendingTransaction(tx, toast, "initialize_lending_protocol")
     }
     catch(error)
@@ -109,5 +116,8 @@
 </script>
 
 <style scoped>
-
+  ion-input
+  {
+    --highlight-color: v-bind(colorHexValue)
+  }
 </style>

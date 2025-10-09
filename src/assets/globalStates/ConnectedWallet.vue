@@ -16,7 +16,9 @@
     isProcessorAccountSuperAdmin: false,
     isProcessorWorkingAClaim: false,
     submitterAddressOfClaimBeingProcessed: "",
-    tokenBalanceMap: new Map<string, string>()
+    tokenBalanceMap: new Map<string, string>(), //Balances in the user's wallet
+    depositedTokenMap: new Map<string, string>(), //Balances that the user has deposited into the lending protocol
+    selectedLendingUserAccountIndex: 0
   })
 
   export default connectedWallet

@@ -68,7 +68,7 @@
           </div>
 
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" label-placement="stacked" :placeholder="`${stateName} Hospital Search   `">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
 
           <ion-button fill="clear" class="nTinyMarginBottom" @click="exportCSV($event)">

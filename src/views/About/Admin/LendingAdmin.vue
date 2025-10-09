@@ -1,5 +1,5 @@
 <template>
-  <div v-if="connectedWallet.addressString==adminAccounts.chatCEOAddress" class="thickBorder smallMarginTop">
+  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddress" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
       <ion-text>Add Lending Token Reserve Account</ion-text>
     </div>
@@ -11,6 +11,21 @@
       </div>
     </div>
   </div>
+
+  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddress" class="thickBorder smallMarginTop">
+    <div class="smallMarginTop">
+      <ion-text>Change Current Tax Year</ion-text>
+    </div>
+    <div class=" flexCenterRow">
+      <div style="width: 90%">
+        <ion-input v-model="taxYearInput" fill="outline" placeholder="Enter Tax Year" type="number" step="1" min="2025"></ion-input>
+        <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentTaxYear()" style="width:77px" :disabled="taxYearInput == ''">
+          Add
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
   <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
   createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"/>
   <CreateSubMarketModal ref="createSubMarketModal"/>
@@ -32,6 +47,7 @@
   var tokenMintAddressInput = ref()
   var tokenDecmialCountInput = ref()
   var createSubMarketModal = ref()
+  var taxYearInput = ref("")
 
   async function addTokenReserve()
   {
@@ -49,6 +65,21 @@
     catch(error)
     {
       toastPreTransactionError(error, toast, "add_token_reserve")
+    }
+  }
+
+  async function updateCurrentTaxYear()
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.updateCurrentTaxYear(Number(taxYearInput.value)).rpc()
+
+      taxYearInput.value = ""
+      await confirmLendingTransaction(tx, toast, "update_current_tax_year")
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "update_current_tax_year")
     }
   }
 </script>

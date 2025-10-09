@@ -41,6 +41,7 @@
     </ion-input>
     <ion-text style="font-size: 11px" class="noClickEvent">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
     <InputNumber
+      id="feeCollectorInput"
       v-model="feePercentage"
       ref="feePercentageRef"
       class="mediumMarginTop"
@@ -220,5 +221,10 @@
   #feeCollectorInput
   {
     --highlight-color: v-bind(colorHexValue) !important
+  }
+
+  :deep(.p-inputnumber .p-inputnumber-input:focus)
+  {
+    border-color: v-bind(colorHexValue) !important
   }
 </style>

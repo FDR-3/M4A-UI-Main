@@ -121,7 +121,7 @@
         :maxlength=MAX_COMMENT_LENGTH
         :counter-formatter="customFormatter"
       >
-      <EmojiButton
+        <EmojiButton
           :colorHexValue="colorHexValue"
           @emojiSelected="(emoji: String) => insertEmoji(emoji)"
         /> 

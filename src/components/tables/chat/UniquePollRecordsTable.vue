@@ -29,7 +29,7 @@
           <h1>Unique Poll Voter Option List</h1>
 
           <ion-input color="dark" v-model="filters['global'].value " fill="outline" placeholder="Unique Voter Search    ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
           <div class="voterTableUtilityBar">
             <ion-label slot="start" color="dark">Unique Voters: {{ uniqueVoterCount }}</ion-label>

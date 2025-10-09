@@ -21,8 +21,65 @@
           <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) = $109.70</p>
           <!--<a href="https://www.youtube.com/@fdr-3" target="_blank">Where does the money come from that users are earning on their deposits?</a>-->
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Market Search     ">
-            <ion-icon slot="start" :icon="search"></ion-icon>
+            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
+
+          <div v-if="hasAtleast1Account" class="nMediumSmallMarginBottom">
+            <div class="flexCenterRow">
+              <ion-button fill="clear" @click="openUserLendingAccountInfo($event)">
+                <ion-icon :src="informationCircle" color="dark"></ion-icon>
+              </ion-button>
+              <ion-popover
+              :is-open="userLendingInfo" 
+              :event="event" 
+              @didDismiss="userLendingInfo=false"
+              side="top" 
+              alignment="center">
+                <ion-text align="center">Create New Accounts from the portfolio page or while making a deposit</ion-text>
+              </ion-popover>
+
+              <Select
+              v-if="!editingAccountName"
+              id="accountSelect"
+              class="standardFontSize mediumMarginTop"
+              style="margin-bottom: 17px"
+              v-model="accountSelect" 
+              :options="accountList" 
+              optionLabel="accountName" 
+              optionValue="userAccountIndex" 
+              placeholder="Select Account"
+              appendTo="self"
+              @change="updateStoredSelectedAccount()">
+              </Select>
+
+              <ion-input
+              v-else
+              v-model="accountName"
+              ref="accountNameEditInputRef"
+              id="accountNameEditInput"
+              class="mediumMarginTop mediumMarginBottom"
+              :class="{ 'invalid': overCommentByteSizeLimit }"
+              fill="outline"
+              :counter="true"
+              :counter-formatter="customFormatter"
+              :maxlength=MAX_ACCOUNT_NAME_LENGTH>
+                <EmojiButton
+                :marginTop="'4px'"
+                :colorHexValue="colorHexValue"
+                @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
+              </ion-input>
+
+              <ion-button v-if="editingAccountName" fill="clear" @click="editingAccountName=false; $emit('marketTableHeightChange', true, editingAccountName)">
+                <ion-icon :src="close" color="dark"></ion-icon>
+              </ion-button>
+              <ion-button v-else fill="clear" @click="setInputFocus(); editingAccountName=true; $emit('marketTableHeightChange', true, editingAccountName)">
+                <ion-icon :src="pencil" color="dark"></ion-icon>
+              </ion-button>
+            </div>
+            
+            <ion-button v-if="editingAccountName" color="dark" class="mediumMarginBottom" @click="editLendingUserAccountName()">Update Name</ion-button>
+          </div>
+
           <br><ion-label id="tableTitle">Stable Coins</ion-label>
         </div>
       </template>
@@ -158,21 +215,118 @@
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, onMounted, watch, inject } from 'vue'
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
+  import { pencil, informationCircle, close } from 'ionicons/icons'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
+  import Select from 'primevue/select'
+  import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
   import { FilterMatchMode } from '@primevue/core/api'
+  import { anchorPrograms, MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { search } from 'ionicons/icons'
-  import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyTokenMintAddress,
+    confirmLendingTransaction,
+    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
+  import { lendingerUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
 
-  defineEmits(['openDepositModal'])
+  const toast = inject('toast')
+  const colorHexValue = inject('colorHexValue')
 
-  const tokenPopoverOpen = ref(false)
-  const event = ref()
+  const emits = defineEmits(['openDepositModal', 'marketTableHeightChange'])
+
+  var tokenPopoverOpen = ref(false)
+  var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+
+  var userLendingInfo = ref(false)
+  var accountSelect = ref(0)
+  var accountList = ref()
+  var hasAtleast1Account = ref()
+  var editingAccountName = ref(false)
+  var accountName = ref()
+  var accountList = ref()
+  var hasAtleast1Account = ref()
+  var accountNameEditInputRef = ref()
+  var savedEmojiCursorPosition: any
+  var overCommentByteSizeLimit = ref()
+
+  onMounted(() =>
+  {
+    setLendingUserAccountList()
+
+    accountSelect.value = Number(localStorage.getItem(connectedWallet.addressString + "selectedLendingAccountIndex")) || 0
+    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
+  })
+  
+  watch([lendingerUserHashMap, connectedWallet],() =>
+  {
+    setLendingUserAccountList()
+
+    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+  })
+  
+  function setLendingUserAccountList()
+  {
+    if(lendingerUserHashMap.map)
+    {
+      const userAccountList = lendingerUserHashMap.map.get(connectedWallet.addressString)
+      if(userAccountList)
+      {
+        accountList.value = userAccountList
+        hasAtleast1Account.value = true
+        emits("marketTableHeightChange", true, editingAccountName.value)
+      }
+      else
+      {
+        hasAtleast1Account.value = false
+        emits("marketTableHeightChange", false, editingAccountName.value)
+      }
+    }
+  }
+
+  function updateStoredSelectedAccount()
+  {
+    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
+    localStorage.setItem(connectedWallet.addressString + "selectedLendingAccountIndex", accountSelect.value.toString())
+  }
+
+  const customFormatter = (inputLength: number, maxLength: number) => 
+  {
+    const blob = new Blob([accountName.value])
+    const sizeInBytes = blob.size
+
+    inputLength = sizeInBytes
+
+    if(inputLength > maxLength)
+    {
+      overCommentByteSizeLimit.value = true
+    }
+    else
+      overCommentByteSizeLimit.value = false
+
+    return `${inputLength}/${maxLength} `
+  }
+
+  function insertEmoji(emoji: String)
+  {
+    const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
+    if(inputElement) 
+    {
+      const start = inputElement.selectionStart
+      const end = inputElement.selectionEnd
+      const newValue =
+      accountName.value.substring(0, start) + 
+      emoji + 
+      accountName.value.substring(end)
+
+      accountName.value = newValue
+
+      savedEmojiCursorPosition = inputElement.selectionStart + emoji.length
+    }
+  }
 
   const filters = ref(
   {
@@ -193,9 +347,46 @@
     tokenPopoverOpen.value = false
   }
 
+  function openUserLendingAccountInfo(e: Event) 
+  {
+    event.value = e
+    userLendingInfo.value = true
+  }
+
+  function setInputFocus()
+  {
+    accountName.value = accountList.value[accountSelect.value].accountName
+
+    setTimeout(() =>
+    {
+      const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
+      if(inputElement)
+        inputElement.focus()
+    }, 10) 
+  }
+
   function passByRefWrapperCopyAddress()
   {
     copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+  }
+
+  async function editLendingUserAccountName()
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.editLendingUserAccountName
+      (
+        accountSelect.value,
+        accountName.value
+      ).accounts({ signer: connectedWallet.publicKey }).rpc()
+
+      await confirmLendingTransaction(tx, toast, "edit_lending_user_account_name")
+      editingAccountName.value = false
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "edit_lending_user_account_name")
+    }
   }
 </script>
 
@@ -215,8 +406,23 @@
     min-width: 795px
   }
 
+  #accountNameEditInput
+  {
+    width: 300px;
+    height: 32px;
+ 
+    min-height: 22px;
+    --highlight-color: v-bind(colorHexValue) !important
+  }
+
   ion-input
   {
     --highlight-color: var(--ion-color-green)
+  }
+
+  ion-icon
+  {
+    width: 25px;
+    height: 25px
   }
 </style>

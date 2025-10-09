@@ -7,5 +7,11 @@
     map: undefined
   })
 
+  //Key: Lending User Address, Value: List of User Obligations
+  export const lendingerUserObligationsHashMap = reactive(
+  {
+    map: undefined
+  })
+
   export default lendingerUserHashMap
 </script>
