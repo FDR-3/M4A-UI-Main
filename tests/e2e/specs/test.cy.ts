@@ -11,7 +11,10 @@
 
 describe('My Youtube Bot Helper', () => {
   it('Helps Youtube bottinger', () => {
-    cy.visit('https://www.youtube.com/@SecularTalk')
+    cy.visit('https://www.youtube.com/@SecularTalk/Videos')
+
+    cy.get(':nth-child(1) > :nth-child(3) > .ytd-item-section-renderer > :nth-child(1) > #contents > .ytd-shelf-renderer > #scroll-outer-container > #scroll-container > #items > :nth-child(1) > #dismissible > ytd-thumbnail.style-scope > #thumbnail > yt-image.style-scope > .ytCoreImageHost').click()
+    cy.pause()
 
     //cy.get('#homeButton').click()
     cy.get('[tab-title="Videos"] > .yt-tab-shape-wiz__tab').click()

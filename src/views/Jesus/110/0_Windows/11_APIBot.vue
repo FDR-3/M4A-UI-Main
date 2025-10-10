@@ -16,7 +16,7 @@
     <div class="sources">
       <h1>Sources</h1>
       <p align="left">Links<br>
-        <a href="https://www.tunepocket.com/youtube-channel-id-finder/?srsltid=AfmBOoqyJtHrAzAXYJljJDl_XOLvY1ZOjmMwJbXqigRrNkZpNNzardCM" target="_blank">TunePocket</a><br>
+        <a href="https://www.tunepocket.com/youtube-channel-id-finder" target="_blank">TunePocket</a><br>
         <a href="https://pypi.org/project/scrapetube/" target="_blank">Scrape Tube API</a><br>
         <a href="https://pypi.org/project/youtube-transcript-api/" target="_blank">Youtube Transcript API</a><br>
         <a href="https://www.myinstants.com/en/instant/drum-roll-sound-effect-92004/" target="_blank">Drumroll SFX</a><br>

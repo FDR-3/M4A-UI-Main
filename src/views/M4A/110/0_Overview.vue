@@ -74,14 +74,19 @@
   {
     try
     {
+      const account = await anchorPrograms.chat.chatProgram.provider.connection.getAccountInfo(new PublicKey("9qc5AnmfyXivyCivqfvUPEbRR2UEQMKYQzL96WNP9PBy"))
+      const maxWithdraw = account.lamports//Use this to get the lamports that are in the account
+
       //2. Wrap instructions into a transaction, only 1 instruction in this case
-      const transaction = new Transaction().add(
+      const transaction = new Transaction().add
+      (
         //1. Create instructions that you want to add to transaction
-        StakeProgram.withdraw({
-          stakePubkey: new PublicKey("AQD4Qb1cSJe6tePsF4bhZ2nzDTYtrj73jjcnrU9MeiN7"),
+        StakeProgram.withdraw(
+        {
+          stakePubkey: new PublicKey("9qc5AnmfyXivyCivqfvUPEbRR2UEQMKYQzL96WNP9PBy"),
           authorizedPubkey: new PublicKey("Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg"),
           toPubkey: new PublicKey("Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg"),
-          lamports: LAMPORTS_PER_SOL * 2.010029569// Specify the amount of SOL to withdraw (in lamports)
+          lamports: maxWithdraw// Specify the amount of SOL to withdraw (in lamports)
         })
       )
 
@@ -96,9 +101,7 @@
 
       //5. Send the signed transaction to the network.
       //We get the signature back, which can be used to track the transaction.
-      const signature = await anchorPrograms.chat.provider.connection.sendRawTransaction(
-        signedTransaction.serialize()
-      )
+      const signature = await anchorPrograms.chat.provider.connection.sendRawTransaction(signedTransaction.serialize())
 
       //6. Confirm the transaction to ensure it was processed on-chain.
       await confirmChatTransaction(signature, toast, "withdraw_stake")
