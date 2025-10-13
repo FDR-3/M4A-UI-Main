@@ -35,7 +35,7 @@
               @didDismiss="userLendingInfo=false"
               side="top" 
               alignment="center">
-                <ion-text align="center">Create New Accounts from the portfolio page or while making a deposit</ion-text>
+                <ion-text align="center">Create new accounts while making a deposit</ion-text>
               </ion-popover>
 
               <Select
@@ -128,7 +128,7 @@
       <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
-          <div class="flexCenterColumn">
+          <div class="flexCenterRow">
             <ion-button
             class="tableDepositButton"
             color="dark"
@@ -139,6 +139,18 @@
             slotProps.data.asset.name)"
             >
              Deposit
+            </ion-button>
+            <ion-button
+            v-if="slotProps.data.depositBalance"
+            class="tableWithdrawButton"
+            color="dark"
+            @click="$emit('openWithdrawModal',
+            slotProps.data.tokenMintAddress,
+            slotProps.data.decimalAmount,
+            slotProps.data.asset.svg,
+            slotProps.data.asset.name)"
+            >
+             Withdraw
             </ion-button>
           </div>
         </template>
@@ -207,6 +219,18 @@
             >
              Deposit
             </ion-button>
+            <ion-button
+            v-if="slotProps.data.depositBalance"
+            class="tableWithdrawButton"
+            color="dark"
+            @click="$emit('openWithdrawModal',
+            slotProps.data.tokenMintAddress,
+            slotProps.data.decimalAmount,
+            slotProps.data.asset.svg,
+            slotProps.data.asset.name)"
+            >
+             Withdraw
+            </ion-button>
           </div>
         </template>
       </Column>
@@ -230,12 +254,12 @@
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
-  import { lendingerUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
-  const emits = defineEmits(['openDepositModal', 'marketTableHeightChange'])
+  const emits = defineEmits(['openDepositModal', 'openWithdrawModal', 'marketTableHeightChange'])
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -256,23 +280,30 @@
   onMounted(() =>
   {
     setLendingUserAccountList()
+    checkForLendingUserDeposits()
 
     accountSelect.value = Number(localStorage.getItem(connectedWallet.addressString + "selectedLendingAccountIndex")) || 0
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
   })
   
-  watch([lendingerUserHashMap, connectedWallet],() =>
+  watch([lendingerUserAccountsHashMap, connectedWallet],() =>
   {
     setLendingUserAccountList()
 
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+    accountSelect.value = Number(localStorage.getItem(connectedWallet.addressString + "selectedLendingAccountIndex")) || 0
+    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
+  })
+
+  watch([lendingerUserDepositBalanceHashMap, connectedWallet],() =>
+  {
+    checkForLendingUserDeposits()
   })
   
   function setLendingUserAccountList()
   {
-    if(lendingerUserHashMap.map)
+    if(lendingerUserAccountsHashMap.map)
     {
-      const userAccountList = lendingerUserHashMap.map.get(connectedWallet.addressString)
+      const userAccountList = lendingerUserAccountsHashMap.map.get(connectedWallet.addressString)
       if(userAccountList)
       {
         accountList.value = userAccountList
@@ -287,10 +318,42 @@
     }
   }
 
+  function checkForLendingUserDeposits()
+  {
+    for(var i=0; i<StableCoins.length; i++)
+    {
+      if(lendingerUserDepositBalanceHashMap.map)
+      {
+        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + StableCoins[i].tokenMintAddress)
+        if(depositBalance)
+          StableCoins[i].depositBalance = depositBalance
+        else
+          StableCoins[i].depositBalance = undefined
+      }
+      else
+        StableCoins[i].depositBalance = undefined
+    }
+
+    for(var i=0; i<CryptoCurrency.length; i++)
+    {
+      if(lendingerUserDepositBalanceHashMap.map)
+      {
+        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + CryptoCurrency[i].tokenMintAddress)
+        if(depositBalance)
+          CryptoCurrency[i].depositBalance = depositBalance
+        else
+          CryptoCurrency[i].depositBalance = undefined
+      }
+      else
+        CryptoCurrency[i].depositBalance = undefined
+    }
+  }
+
   function updateStoredSelectedAccount()
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     localStorage.setItem(connectedWallet.addressString + "selectedLendingAccountIndex", accountSelect.value.toString())
+    checkForLendingUserDeposits()
   }
 
   const customFormatter = (inputLength: number, maxLength: number) => 
@@ -406,11 +469,16 @@
     min-width: 795px
   }
 
+  #accountSelect
+  {
+    height: 35px;
+    padding-left: 16px
+  }
+
   #accountNameEditInput
   {
     width: 300px;
     height: 32px;
- 
     min-height: 22px;
     --highlight-color: v-bind(colorHexValue) !important
   }

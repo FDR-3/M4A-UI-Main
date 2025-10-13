@@ -1,5 +1,5 @@
 {
-  "address": "HKaSjxcm2sdpmvrJeRsEDDZB93wDRdHcmFUS3hXxknV9",
+  "address": "FvBCiiFp3AU16oBP1hE3ZQkDVoyXVMM6sxjvhxhShdJe",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -530,7 +530,7 @@
           }
         },
         {
-          "name": "lending_user_obligation_account",
+          "name": "lending_user_tab_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -548,16 +548,9 @@
                   115,
                   101,
                   114,
-                  79,
-                  98,
-                  108,
-                  105,
-                  103,
+                  84,
                   97,
-                  116,
-                  105,
-                  111,
-                  110,
+                  98,
                   65,
                   99,
                   99,
@@ -1511,7 +1504,7 @@
           }
         },
         {
-          "name": "lending_user_obligation_account",
+          "name": "lending_user_tab_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1529,16 +1522,9 @@
                   115,
                   101,
                   114,
-                  79,
-                  98,
-                  108,
-                  105,
-                  103,
+                  84,
                   97,
-                  116,
-                  105,
-                  111,
-                  110,
+                  98,
                   65,
                   99,
                   99,
@@ -2101,7 +2087,7 @@
           }
         },
         {
-          "name": "lending_user_obligation_account",
+          "name": "lending_user_tab_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2119,16 +2105,9 @@
                   115,
                   101,
                   114,
-                  79,
-                  98,
-                  108,
-                  105,
-                  103,
+                  84,
                   97,
-                  116,
-                  105,
-                  111,
-                  110,
+                  98,
                   65,
                   99,
                   99,
@@ -2490,19 +2469,6 @@
       ]
     },
     {
-      "name": "LendingUserObligationAccount",
-      "discriminator": [
-        99,
-        53,
-        170,
-        115,
-        167,
-        183,
-        89,
-        65
-      ]
-    },
-    {
       "name": "LendingUserStats",
       "discriminator": [
         53,
@@ -2513,6 +2479,19 @@
         85,
         71,
         88
+      ]
+    },
+    {
+      "name": "LendingUserTabAccount",
+      "discriminator": [
+        86,
+        109,
+        108,
+        214,
+        125,
+        233,
+        55,
+        195
       ]
     },
     {
@@ -2594,18 +2573,18 @@
     },
     {
       "code": 6002,
-      "name": "IncorrectNumberOfObligationAccounts",
-      "msg": "You must provide all of the sub user's obligation accounts"
+      "name": "IncorrectNumberOfTabAccounts",
+      "msg": "You must provide all of the sub user's tab accounts"
     },
     {
       "code": 6003,
-      "name": "IncorrectOrderOfObligationAccounts",
-      "msg": "You must provide the sub user's obligation accounts ordered by user_obligation_account_index"
+      "name": "IncorrectOrderOfTabAccounts",
+      "msg": "You must provide the sub user's tab accounts ordered by user_tab_account_index"
     },
     {
       "code": 6004,
-      "name": "UnexpectedObligationAccount",
-      "msg": "Unexpected Obligation Account PDA detected. Feed in only legitimate PDA's ordered by user_obligation_account_index"
+      "name": "UnexpectedTabAccount",
+      "msg": "Unexpected Tab Account PDA detected. Feed in only legitimate PDA's ordered by user_tab_account_index"
     },
     {
       "code": 6005,
@@ -2688,7 +2667,7 @@
             "type": "bool"
           },
           {
-            "name": "obligation_account_count",
+            "name": "tab_account_count",
             "type": "u32"
           },
           {
@@ -2707,7 +2686,19 @@
       }
     },
     {
-      "name": "LendingUserObligationAccount",
+      "name": "LendingUserStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name_change_count",
+            "type": "u128"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LendingUserTabAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2732,11 +2723,11 @@
             "type": "u16"
           },
           {
-            "name": "user_obligation_account_index",
+            "name": "user_tab_account_index",
             "type": "u32"
           },
           {
-            "name": "user_obligation_account_added",
+            "name": "user_tab_account_added",
             "type": "bool"
           },
           {
@@ -2745,18 +2736,6 @@
           },
           {
             "name": "borrowed_amount",
-            "type": "u128"
-          }
-        ]
-      }
-    },
-    {
-      "name": "LendingUserStats",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name_change_count",
             "type": "u128"
           }
         ]

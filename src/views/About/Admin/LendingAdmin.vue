@@ -1,5 +1,5 @@
 <template>
-  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddress" class="thickBorder smallMarginTop">
+  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
       <ion-text>Add Lending Token Reserve Account</ion-text>
     </div>
@@ -12,15 +12,16 @@
     </div>
   </div>
 
-  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddress" class="thickBorder smallMarginTop">
+  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
+      <h2>{{ anchorPrograms.currentTaxYear }}</h2>
       <ion-text>Change Current Tax Year</ion-text>
     </div>
     <div class=" flexCenterRow">
       <div style="width: 90%">
         <ion-input v-model="taxYearInput" fill="outline" placeholder="Enter Tax Year" type="number" step="1" min="2025"></ion-input>
         <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentTaxYear()" style="width:77px" :disabled="taxYearInput == ''">
-          Add
+          Update
         </ion-button>
       </div>
     </div>

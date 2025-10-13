@@ -34,7 +34,7 @@
     connectedWallet.addressString==adminAccounts.m4aTreasurerAddress ||
     connectedWallet.addressString==adminAccounts.chatCEOAddress ||
     connectedWallet.addressString==adminAccounts.chatTreasurerAddress ||
-    connectedWallet.addressString==adminAccounts.lendingCEOAddress ||
+    connectedWallet.addressString==adminAccounts.lendingCEOAddressString ||
     connectedWallet.isProcessorAccountActive"/>
     <LogoArt v-else/>
   </div>

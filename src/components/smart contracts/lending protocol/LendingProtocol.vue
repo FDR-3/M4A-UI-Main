@@ -5,11 +5,13 @@
 
 <script setup lang="ts">
   import { onMounted, onUnmounted } from 'vue'
-  import { getLendingProtocolCEOAccount,
+  import { getLendingProtocol,
+  getLendingProtocolCEOAccount,
   getTokenReserves,
   getSubMarkets,
   setLendingUserAccountHashMap,
-  setLendingUserObligationsHashMap,
+  setLendingUserTabHashMaps,
+  getLendingProtocolPDA,
   getLendingProtocolCEOAccountPDA,
   getTokenReserveStatsPDA,
   getSubMarketStatsPDA,
@@ -22,15 +24,35 @@
   import PriceUpdater from './PriceUpdater.vue'
   import BalanceUpdater from './BalanceUpdater.vue'
 
-  var lendingProtocolCEOAccountWatcherId: any
-
   var lendingProtocolWatcherId: any
+  var lendingProtocolCEOAccountWatcherId: any
+  var tokenReserveStatsWatcherId: any
   var subMarketStatsWatcherId: any
   var lendingStatsWatcherId: any
   var lendingUserStatsWatcherId: any 
 
   onMounted(async() =>
   {
+    //Lending Protocol CEO Account 
+    const lendingCEOAccount = await getLendingProtocolCEOAccount()
+    if(lendingCEOAccount)
+    {
+      adminAccounts.isLendingCEOAccountReady = true
+      adminAccounts.lendingCEOAddressKey = lendingCEOAccount.address
+      adminAccounts.lendingCEOAddressString = lendingCEOAccount.address.toBase58()
+    }
+    else
+    {
+      adminAccounts.isLendingCEOAccountReady = false
+      await listenForLendingCEOAccountInitialization()
+    }
+
+    //Lending Users
+    await setLendingUserAccountHashMap()
+    await setLendingUserTabHashMaps() //adminAccounts.lendingCEOAddressString needs to be set before this is called
+    await listenForLendingStatChanges()
+    await listenForLendingUserStatChanges()
+
     //Token Reserves
     tokenReserves.data = await getTokenReserves()
     await listenForNewTokenReserves()
@@ -39,32 +61,18 @@
     subMarkets.data = await getSubMarkets()
     await listenForSubMarketChanges()
 
-    //Lending Users
-    await setLendingUserAccountHashMap()
-    await setLendingUserObligationsHashMap()
-    await listenForLendingStatChanges()
-    await listenForLendingUserStatChanges()
-
-    //Lending Protocol CEO Account
-    const lendingCEOAccount = await getLendingProtocolCEOAccount()
-    if(lendingCEOAccount)
-    {
-      adminAccounts.isLendingCEOAccountReady = true
-      adminAccounts.lendingCEOAddress = lendingCEOAccount.address.toBase58()
-    }
-    else
-    {
-      adminAccounts.isLendingCEOAccountReady = false
-      await listenForLendingCEOAccountInitialization()
-    }
+    //Lending Protocol (Current Tax Year Info)
+    const lendingProtocol = await getLendingProtocol()
+    anchorPrograms.currentTaxYear = lendingProtocol.currentTaxYear
+    await listenForLendingProtocolChanges()
   })
 
   onUnmounted(() => 
   {
-    if(lendingProtocolWatcherId != undefined)
+    if(tokenReserveStatsWatcherId != undefined)
     {
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolWatcherId)
-      lendingProtocolWatcherId = undefined
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(tokenReserveStatsWatcherId)
+      tokenReserveStatsWatcherId = undefined
     }
     if(subMarketStatsWatcherId != undefined)
     {
@@ -85,13 +93,18 @@
     {
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolCEOAccountWatcherId)
       lendingProtocolCEOAccountWatcherId = undefined
-    }    
+    }
+    if(lendingProtocolWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolWatcherId)
+      lendingProtocolWatcherId = undefined
+    }
   })
 
   async function listenForNewTokenReserves()
   {
     //Subscribe to account changes
-    lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getTokenReserveStatsPDA(), async() => 
+    tokenReserveStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getTokenReserveStatsPDA(), async() => 
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
@@ -117,7 +130,7 @@
       tokenReserves.data = await getTokenReserves()
       subMarkets.data = await getSubMarkets()
       await setLendingUserAccountHashMap()
-      await setLendingUserObligationsHashMap()
+      await setLendingUserTabHashMaps()
     })
   }
 
@@ -131,6 +144,17 @@
     })
   }
 
+  async function listenForLendingProtocolChanges()
+  {
+    //Subscribe to account changes
+    lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(), async() => 
+    {
+      //Handle account change..
+      const lendingProtocol = await getLendingProtocol()
+      anchorPrograms.currentTaxYear = lendingProtocol.currentTaxYear
+    })
+  }
+
   async function listenForLendingCEOAccountInitialization()
   {
     //Subscribe to account changes
@@ -139,7 +163,8 @@
       //Handle account change..
       const lendingCEOAccount = await getLendingProtocolCEOAccount()
       adminAccounts.isLendingCEOAccountReady = true
-      adminAccounts.lendingCEOAddress = lendingCEOAccount.address.toBase58()
+      adminAccounts.lendingCEOAddressKey = lendingCEOAccount.address
+      adminAccounts.lendingCEOAddressString = lendingCEOAccount.address.toBase58()
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolCEOAccountWatcherId)
       lendingProtocolCEOAccountWatcherId = undefined
     })

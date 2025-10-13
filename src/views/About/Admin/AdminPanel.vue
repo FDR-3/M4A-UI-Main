@@ -67,7 +67,7 @@
   />
 
   <LendingAdmin v-if="adminPanelSelect==2 &&
-    (connectedWallet.addressString==adminAccounts.lendingCEOAddress)"
+    (connectedWallet.addressString==adminAccounts.lendingCEOAddressString)"
   />
 
   <AlertAdmin v-if="adminPanelSelect==3 &&
@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { IonButton } from '@ionic/vue'
   import M4AAdmin from '/src/views/About/Admin/M4AAdmin.vue'
   import ChatAdmin from '/src/views/About/Admin/ChatAdmin.vue'
@@ -89,7 +89,6 @@
   import { insuranceCompanies } from '/src/assets/globalStates/m4a/InsuranceCompanies.vue'
   import { processors } from '/src/assets/globalStates/m4a/Processors.vue'
   import { polls } from '/src/assets/globalStates/chat/Polls.vue'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   var adminPanelSelect = ref()
@@ -112,11 +111,15 @@
   var isProcessedClaimsTableLoading = ref(true)
   var isPollTableDataLoading = ref(true)
 
-  var pollStatsWatchId: any
-
   onMounted(() => 
   {
     adminPanelSelect.value = localStorage.getItem("adminPanelSelect") || 0
+
+    if(processors.data)
+    {
+      processorsTableData.value = processors.data
+      isProcessorsTableLoading.value = false
+    }
 
     if(claimQueue.data)
     {
@@ -132,30 +135,44 @@
       claimQueueTableData.value = []
     }
 
-    processorsTableData.value = processors.data
-    claimQueueTableData.value = cloneDeep(claims.data)
-    hospitalTableData.value = cloneDeep(hospitals.data)
-    insuranceCompanyTableData.value = cloneDeep(insuranceCompanies.data)
-    processedClaimsTableData.value = cloneDeep(processedClaims.data)
+    if(claims.data)
+    {
+      claimQueueTableData.value = cloneDeep(claims.data)
+      isClaimQueueTableLoading.value = false
+    }
 
+    if(hospitals.data)
+    {
+      hospitalTableData.value = cloneDeep(hospitals.data)
+      isHospitalTableLoading.value = false
+    }
+
+    if(insuranceCompanies.data)
+    {
+      insuranceCompanyTableData.value = cloneDeep(insuranceCompanies.data)
+      isInsuranceCompanyTableLoading.value = false
+    }
+    
+    if(processedClaims.data)
+    {
+      processedClaimsTableData.value = cloneDeep(processedClaims.data)
+      isProcessedClaimsTableLoading.value = false
+    }
+    
     if(polls.data)
+    {
       pollTableData.value = polls.data
-
-    isProcessorsTableLoading.value = false
-    isClaimQueueTableLoading.value = false
-    isHospitalTableLoading.value = false
-    isInsuranceCompanyTableLoading.value = false
-    isProcessedClaimsTableLoading.value = false 
-    isPollTableDataLoading.value = false
+      isPollTableDataLoading.value = false
+    } 
   })
 
-  onUnmounted(() =>
+  watch(processors, () => 
   {
-    if(pollStatsWatchId != undefined)
-    {
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(pollStatsWatchId)
-      pollStatsWatchId = undefined
-    }
+    //Get processors table data
+    processorsTableData.value = processors.data
+
+    if(isProcessorsTableLoading.value)
+      isProcessorsTableLoading.value = false
   })
 
   watch(claimQueue, () => 
@@ -167,37 +184,47 @@
 
   watch(claims, () => 
   {
+    //Get claims table data
     claimQueueTableData.value = cloneDeep(claims.data)
+
+    if(isClaimQueueTableLoading.value)
+      isClaimQueueTableLoading.value = false
   })
 
   watch(hospitals, () => 
   {
     //Get hospital table data
     hospitalTableData.value = cloneDeep(hospitals.data)
+
+    if(isHospitalTableLoading.value)
+      isHospitalTableLoading.value = false
   })
 
   watch(insuranceCompanies, () => 
   {
     //Get insurance company table data
     insuranceCompanyTableData.value = cloneDeep(insuranceCompanies.data)
-  })
 
-  watch(processors, () => 
-  {
-    //Get processors table data
-    processorsTableData.value = processors.data
+    if(isInsuranceCompanyTableLoading.value)
+      isInsuranceCompanyTableLoading.value = false
   })
 
   watch(processedClaims, () => 
   {
     //Get processed claims table data
     processedClaimsTableData.value = cloneDeep(processedClaims.data)
+
+    if(isProcessedClaimsTableLoading.value)
+      isProcessedClaimsTableLoading.value = false
   })
 
   watch(polls, () => 
   {
     //Get poll table data
     pollTableData.value = cloneDeep(polls.data)
+
+    if(isPollTableDataLoading.value)
+      isPollTableDataLoading.value = false
   })
 
   function setAdminPanelSelect(value: number)

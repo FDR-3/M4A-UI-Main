@@ -120,7 +120,7 @@
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openOwnerPopover($event, slotProps.data)">
 
-              <div v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddress">
+              <div v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddressString">
                 <RIPStarWolf v-if="adminAccounts.ceoIsDead" class="starWolfButton" :fill="colorHexValue"/>
                 <StarWolf v-else class="starWolfButton" :fill="colorHexValue"/>
               </div>

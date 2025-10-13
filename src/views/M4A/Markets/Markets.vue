@@ -6,8 +6,8 @@
         <h1>Markets</h1>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
-        <MarketsTable @openDepositModal="(tokenMingAddress: PublicKey, decimalAmount: number, tokenSVG: Component, tokenName: string) =>
-        depositModal.openDepositModal(tokenMingAddress, decimalAmount, tokenSVG, tokenName)"
+        <MarketsTable @openDepositModal="openDepositAndCloseWithdraw"
+        @openWithdrawModal="openWithdrawAndCloseDeposit"
         @marketTableHeightChange="(hasAtleast1Account: boolean, editingAccountName: boolean) =>
         updateMarketTableHeight(hasAtleast1Account, editingAccountName)"/>
       </div>
@@ -22,6 +22,7 @@
     </div>
   </div>
   <DepositModal ref="depositModal"/>
+  <WithdrawModal ref="withdrawModal"/>
   <KingobamaMobileM1 :style="{display: display1stTable}"/>
   <KingobamaMobileM2 :style="{display: display2ndTable}"/>
 </template>
@@ -35,6 +36,7 @@
   import { PublicKey } from "@solana/web3.js"
   import PortfolioTable from '/src/components/tables/lending/PortfolioTable.vue'
   import DepositModal from '/src/components/smart contracts/lending protocol/DepositModal.vue'
+  import WithdrawModal from '/src/components/smart contracts/lending protocol/WithdrawModal.vue'
   import KingobamaMobileM1 from '/src/components/fancy/poly/KingobamaMobileM1.vue'
   import KingobamaMobileM2 from '/src/components/fancy/poly/KingobamaMobileM2.vue'
 
@@ -47,6 +49,7 @@
   var searchAddress = ref("")
 
   var depositModal = ref()
+  var withdrawModal = ref()
   var dynamicTableHeight = ref(0)
 
   var notConnected = computed (() =>
@@ -112,6 +115,26 @@
         flipping.value = false
       }, 500) //1000 milliseconds == 1 seconds
     }   
+  }
+
+  function openDepositAndCloseWithdraw(
+  tokenMintAddress: PublicKey, 
+  decimalAmount: number, 
+  tokenSVG: Component, 
+  tokenName: string)
+  {
+    depositModal.value.openDepositModal(tokenMintAddress, decimalAmount, tokenSVG, tokenName)
+    withdrawModal.value.closeWithdrawModal()
+  }
+
+  function openWithdrawAndCloseDeposit(
+  tokenMintAddress: PublicKey, 
+  decimalAmount: number, 
+  tokenSVG: Component, 
+  tokenName: string)
+  {
+    withdrawModal.value.openWithdrawModal(tokenMintAddress, decimalAmount, tokenSVG, tokenName)
+    depositModal.value.closeDepositModal()
   }
 
   function updateMarketTableHeight(hasAtleast1Account: boolean, editingAccountName: boolean)

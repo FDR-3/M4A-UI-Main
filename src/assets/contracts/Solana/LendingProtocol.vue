@@ -3,9 +3,10 @@
   import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingerUserHashMap, lendingerUserObligationsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap, lendingerUserTabsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import { PublicKey } from "@solana/web3.js"
   import cloneDeep from 'lodash/cloneDeep'
@@ -218,7 +219,7 @@
       hashmap.set(lendingUserAccounts[i].account.owner.toBase58(), list)
     }
 
-    lendingerUserHashMap.map = hashmap
+    lendingerUserAccountsHashMap.map = hashmap
   }
 
   async function getLendingUserAccountsWrapper()
@@ -245,36 +246,87 @@
     }
   }
 
-  export async function setLendingUserObligationsHashMap()
+  export async function setLendingUserTabHashMaps()
   {
-    console.log("Setting Lending User Obligation Hashmap")
+    console.log("Setting Lending User Tab Hashmaps")
 
-    var hashmap = new Map<string, any>()
-    const lendingUserObligations = await getLendingUserObligationsWrapper()
+    var userTabListHashMap = new Map<string, any>()
+    var depositBalanceHashMap = new Map<string, any>()
+    const lendingUserTabs = await getLendingUserTabsWrapper()
 
-    for(var i=0; i<lendingUserObligations.length; i++)
+    for(var i=0; i<lendingUserTabs.length; i++)
     {
+      const lendingUserTabAccount = lendingUserTabs[i].account
+      const lendingUserTabAccountPDA = lendingUserTabs[i].publicKey
+
+      //Set user tab list hash map
       var list = []
-      const previousLendingUserObligationList = hashmap.get(lendingUserObligations[i].account.owner.toBase58())
+      const previousLendingUserTabList = userTabListHashMap.get(lendingUserTabAccount.owner.toBase58())
 
-      if(previousLendingUserObligationList)
-        list = previousLendingUserObligationList
+      if(previousLendingUserTabList)
+        list = previousLendingUserTabList
 
-      list.push(lendingUserObligations[i].account)
+      const lendingUserTabRemainingAccount = 
+      {
+        pubkey: lendingUserTabAccountPDA,
+        userTabAccountIndex: lendingUserTabAccount.userTabAccountIndex,
+        isSigner: false,
+        isWritable: true
+      }
 
-      hashmap.set(lendingUserObligations[i].account.owner.toBase58(), list)
+      list.push(lendingUserTabRemainingAccount)
+      list = list.sort((a: any, b: any) => a.userTabAccountIndex - b.userTabAccountIndex) 
+
+      userTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
+
+      //Set has deposited balance hash map
+      if(lendingUserTabAccount.subMarketOwnerAddress.toString() == adminAccounts.lendingCEOAddressString &&
+      lendingUserTabAccount.subMarketIndex == DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX &&
+      lendingUserTabAccount.depositedAmount.gt(new anchor.BN(0)))
+      {
+        const decimalAmount = tokenDecimalHashMap.get(lendingUserTabAccount.tokenMintAddress.toBase58())
+
+        depositBalanceHashMap.set(lendingUserTabAccount.owner.toBase58() +
+        lendingUserTabAccount.userAccountIndex.toString() +
+        lendingUserTabAccount.tokenMintAddress.toBase58(), Number(lendingUserTabAccount.depositedAmount  / Math.pow(10, decimalAmount)))//Convert from fixed point notation to decimal
+      }
     }
 
-    lendingerUserObligationsHashMap.map = hashmap
+    lendingerUserTabsHashMap.map = userTabListHashMap
+    lendingerUserDepositBalanceHashMap.map = depositBalanceHashMap
   }
 
-  async function getLendingUserObligationsWrapper()
+  async function getLendingUserTabsWrapper()
   {
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try
       {
-        return await anchorPrograms.lending.lendingProgram.account.lendingUserAccount.all()
+        return await anchorPrograms.lending.lendingProgram.account.lendingUserTabAccount.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export async function getLendingProtocol()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.lending.lendingProgram.account.lendingProtocol.fetch(getLendingProtocolPDA())
       }
       catch(error: any)
       {
