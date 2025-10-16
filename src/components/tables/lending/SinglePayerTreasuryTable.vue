@@ -17,7 +17,7 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span></h2>
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Single Payer Treasury Search     ">
-              <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
+              <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br><ion-label id="tableTitle">Stable Coins</ion-label>
         </div>
@@ -221,12 +221,12 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddress.toBase58())
+      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
       if(tokenAmount)
       {
         var calculatedValue = 0
 
-        const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddress.toBase58()]
+        const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
         if(priceData)
           calculatedValue = (tokenAmount * priceData.usdPrice)
 
@@ -257,12 +257,12 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddress.toBase58())
+      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
       if(tokenAmount)
       {
         var calculatedValue = 0
 
-        const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddress.toBase58()]
+        const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
         if(priceData)
           calculatedValue = (tokenAmount * priceData.usdPrice)
 

@@ -10,7 +10,7 @@
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) }}</span></h1>
       
-  <div class="tableFlipContainer" :class="[flipped, viewingTokenMarkets, viewingOwnerMarkets, viewingBothMarkets]">
+  <div class="tableFlipContainer" :class="[flipped, noData, viewingTokenMarkets, viewingOwnerMarkets, viewingBothMarkets]">
     <div class="tableCard" :class="flipped">
       <div class="frontTable" :style="{display: display1stTable}">
         <h1>Treasuries</h1>
@@ -58,6 +58,7 @@
 
   var flipping = ref(false)
   var flipped = ""
+  var noData = ref("")
   var viewingTokenMarkets = ref("viewingTokenMarkets")
   var viewingOwnerMarkets = ref("")
   var viewingBothMarkets = computed (() =>
@@ -138,9 +139,16 @@
       else
       {
         if(tokenReserveCount == 0)
+        {
           tokenReserveTableSizing = 355 + 14
+          noData.value = "noData"
+        }
         else
+        {
           tokenReserveTableSizing = 355 + tokenReserveCount * 70
+          noData.value = ""
+        }
+
         viewingTokenMarkets.value = ""
       }
 
@@ -156,9 +164,16 @@
       else
       {
         if(tokenReserveCount == 0)
+        {
           tokenReserveTableSizing = 342 + 14
+          noData.value = "noData"
+        }
         else
+        {
           tokenReserveTableSizing = 342 + tokenReserveCount * 70
+          noData.value = ""
+        }
+
         viewingTokenMarkets.value = ""
       }
       
@@ -374,6 +389,61 @@
       .tableFlipContainer
       {
         height: 1783px
+      }
+    }
+  }
+
+  /*Table Flip Container Back No Data*/
+  @media screen and (min-width: 1283.1px)
+  { 
+    .tableFlipContainer.flipped.noData
+    {
+      height: v-bind('(dynamicTableHeight) + "px"')
+    }
+  }
+  @media screen and (min-width: 1277.1px) and (max-width: 1283px) 
+  { 
+    .tableFlipContainer.flipped.noData
+    {
+      height: v-bind('(dynamicTableHeight + 14) + "px"')
+    }
+  }
+  @media screen and (min-width: 1227.1px) and (max-width: 1277px) 
+  { 
+    .tableFlipContainer.flipped.noData
+    {
+      height: v-bind('(dynamicTableHeight + 29) + "px"')
+    }
+  }
+  @media screen and (max-width: 1227px) 
+  { 
+    .tableFlipContainer.flipped.noData
+    {
+      height: v-bind('(dynamicTableHeight + 45) + "px"')
+    }
+  }
+  /*Set table height for Fire Fox*/
+  @-moz-document url-prefix()
+  {
+    @media screen and (min-width: 1476.1px)
+    { 
+      .tableFlipContainer.flipped.noData
+      {
+        height: v-bind('(dynamicTableHeight) + "px"')
+      }
+    }
+    @media screen and (min-width: 1226.1px) and (max-width: 1476px) 
+    { 
+      .tableFlipContainer.flipped.noData
+      {
+        height: v-bind('(dynamicTableHeight + 18) + "px"')
+      }
+    }
+    @media screen and (max-width: 1226px) 
+    { 
+      .tableFlipContainer.flipped.noData
+      {
+        height: v-bind('(dynamicTableHeight + 36) + "px"')
       }
     }
   }

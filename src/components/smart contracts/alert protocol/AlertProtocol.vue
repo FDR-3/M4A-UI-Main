@@ -6,6 +6,7 @@
   import { onMounted, onUnmounted } from 'vue'
   import { getDeadMansBreak,
   getAlertProtocolCEOAccount,
+  getSiteUpdateAlertAccount,
   getDeadMansBreakPDA,
   getSiteUpdateAlertPDA,
   getAlertProtocolCEOAccountPDA } from '/src/assets/contracts/Solana/AlertProtocol.vue'
@@ -16,6 +17,8 @@
   var deadMansBreakWatchId: any
   var siteUpdateAlertWatcherId: any
   var alertProtocolCEOAccountWatcherId: any
+
+  var alertCounter: any = undefined //This is used to prevent false positives on website update alerts. Sometimes the listner just goes off, so we want to be sure there was actually an update.
 
   onMounted(async() =>
   {
@@ -29,6 +32,9 @@
     }
 
     //WebSite Update Notice
+    const siteUpdateAlertAccount = await getSiteUpdateAlertAccount()
+    if(siteUpdateAlertAccount)
+      alertCounter = siteUpdateAlertAccount.siteUpdateCount
     await listenForWebSiteUpdateNotices()
 
     //Alert Protocol CEO Account
@@ -74,10 +80,8 @@
   {
     try
     {
-      const deadMansBreakPDA = getDeadMansBreakPDA()
-
       //Subscribe to account changes
-      deadMansBreakWatchId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(deadMansBreakPDA, async() => 
+      deadMansBreakWatchId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getDeadMansBreakPDA(), async() => 
       {
         //Handle account change...
         const deadMansBreak = await getDeadMansBreak()
@@ -94,10 +98,17 @@
   async function listenForWebSiteUpdateNotices()
   {
     //Subscribe to account changes
-    siteUpdateAlertWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getSiteUpdateAlertPDA(), () => 
+    siteUpdateAlertWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getSiteUpdateAlertPDA(), async() => 
     {
       //Handle account change..
-      anchorPrograms.hasWebSiteBeenUpdated = true
+      const siteUpdateAlertAccount = await getSiteUpdateAlertAccount()
+      if(alertCounter == undefined)
+        alertCounter = siteUpdateAlertAccount.siteUpdateCount
+      else if(alertCounter.lt(siteUpdateAlertAccount.siteUpdateCount))
+      {
+        alertCounter = siteUpdateAlertAccount.siteUpdateCount
+        anchorPrograms.hasWebSiteBeenUpdated = true
+      }
     })
   }
 

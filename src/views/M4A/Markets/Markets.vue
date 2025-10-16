@@ -7,7 +7,7 @@
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
         <MarketsTable @openDepositModal="openDepositAndCloseWithdraw"
-        @openWithdrawModal="openWithdrawAndCloseDeposit"
+        @openWithdrawalModal="openWithdrawAndCloseDeposit"
         @marketTableHeightChange="(hasAtleast1Account: boolean, editingAccountName: boolean) =>
         updateMarketTableHeight(hasAtleast1Account, editingAccountName)"/>
       </div>
@@ -22,7 +22,7 @@
     </div>
   </div>
   <DepositModal ref="depositModal"/>
-  <WithdrawModal ref="withdrawModal"/>
+  <WithdrawalModal ref="withdrawalModal"/>
   <KingobamaMobileM1 :style="{display: display1stTable}"/>
   <KingobamaMobileM2 :style="{display: display2ndTable}"/>
 </template>
@@ -33,10 +33,9 @@
   import MarketsTable from '/src/components/tables/lending/MarketsTable.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { PublicKey } from "@solana/web3.js"
   import PortfolioTable from '/src/components/tables/lending/PortfolioTable.vue'
   import DepositModal from '/src/components/smart contracts/lending protocol/DepositModal.vue'
-  import WithdrawModal from '/src/components/smart contracts/lending protocol/WithdrawModal.vue'
+  import WithdrawalModal from '/src/components/smart contracts/lending protocol/WithdrawalModal.vue'
   import KingobamaMobileM1 from '/src/components/fancy/poly/KingobamaMobileM1.vue'
   import KingobamaMobileM2 from '/src/components/fancy/poly/KingobamaMobileM2.vue'
 
@@ -49,7 +48,7 @@
   var searchAddress = ref("")
 
   var depositModal = ref()
-  var withdrawModal = ref()
+  var withdrawalModal = ref()
   var dynamicTableHeight = ref(0)
 
   var notConnected = computed (() =>
@@ -118,22 +117,22 @@
   }
 
   function openDepositAndCloseWithdraw(
-  tokenMintAddress: PublicKey, 
+  tokenMintAddressString: String, 
   decimalAmount: number, 
   tokenSVG: Component, 
   tokenName: string)
   {
-    depositModal.value.openDepositModal(tokenMintAddress, decimalAmount, tokenSVG, tokenName)
-    withdrawModal.value.closeWithdrawModal()
+    depositModal.value.openDepositModal(tokenMintAddressString, decimalAmount, tokenSVG, tokenName)
+    withdrawalModal.value.closeWithdrawalModal()
   }
 
   function openWithdrawAndCloseDeposit(
-  tokenMintAddress: PublicKey, 
+  tokenMintAddressString: String, 
   decimalAmount: number, 
   tokenSVG: Component, 
   tokenName: string)
   {
-    withdrawModal.value.openWithdrawModal(tokenMintAddress, decimalAmount, tokenSVG, tokenName)
+    withdrawalModal.value.openWithdrawalModal(tokenMintAddressString, decimalAmount, tokenSVG, tokenName)
     depositModal.value.closeDepositModal()
   }
 
@@ -215,63 +214,21 @@
   { 
     .tableFlipContainer
     {
-      height: v-bind('(1106 + dynamicTableHeight) + "px"')
+      height: v-bind('(1135 + dynamicTableHeight) + "px"')
     } 
   }
-  @media screen and (min-width: 1300.1px) and (max-width: 1769px)
+  @media screen and (min-width: 1560.1px) and (max-width: 1769px)
   { 
     .tableFlipContainer
     {
-      height: v-bind('(1142 + dynamicTableHeight) + "px"')
+      height: v-bind('(1171 + dynamicTableHeight) + "px"')
     } 
   }
-  @media screen and (min-width: 1191.1px) and (max-width: 1300px)
+  @media screen and (max-width: 1560px)
   { 
     .tableFlipContainer
     {
-      height: v-bind('(1157 + dynamicTableHeight) + "px"')
-    }
-  }
-  @media screen and (min-width: 1051.1px) and (max-width: 1191px)
-  { 
-    .tableFlipContainer
-    {
-      height: v-bind('(1194 + dynamicTableHeight) + "px"')
-    }
-  }
-  @media screen and (min-width: 1028.1px) and (max-width: 1051px)
-  { 
-    .tableFlipContainer
-    {
-      height: v-bind('(1208 + dynamicTableHeight) + "px"')
-    }
-  }
-  @media screen and (min-width: 988.1px) and (max-width: 1028px)
-  { 
-    .tableFlipContainer
-    {
-      height: v-bind('(1222 + dynamicTableHeight) + "px"')
-    }
-  }
-  @media screen and (min-width: 923.1px) and (max-width: 988px)
-  { 
-    .tableFlipContainer
-    {
-      height: v-bind('(1236 + dynamicTableHeight) + "px"')
-    }
-  }
-  @media screen and (min-width: 916.1px)  and (max-width: 923px)
-  { 
-    .tableFlipContainer
-    {
-      height: v-bind('(1272 + dynamicTableHeight) + "px"')
-    }
-  }
-  @media screen and (max-width: 916px)
-  { 
-    .tableFlipContainer
-    {
-      height: v-bind('(1288 + dynamicTableHeight) + "px"')
+      height: v-bind('(1186 + dynamicTableHeight) + "px"')
     }
   }
   /*Set table height for Fire Fox*/

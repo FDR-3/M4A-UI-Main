@@ -400,6 +400,9 @@
 
   function processOwnersTable()
   {
+    if(!subMarketOwnerHashMap.map)
+      return
+    
     const unprocessedData = Array.from(subMarketOwnerHashMap.map, ([owner, ownerData]) => ({ owner, ownerData }))
     
     if(!unprocessedData || unprocessedData.length == 0)

@@ -29,12 +29,64 @@
     usdcFeeTokenAddress: new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),//Devnet USDC_MINT_ADDRESS
     isM4AFeeTokenAccountReady: false,
     isChatFeeTokenAccountReady: false,
-    currentTaxYear: 0
+    currentStatementYear: 0
   })
 
   export const SYSTEM_PROGRAM_ADDRESS_STRING = "11111111111111111111111111111111"
   export const MAX_ACCOUNT_NAME_LENGTH = 25
   export const DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX = 0
+
+  export const monthList = 
+  [
+    {
+      monthName: "January",
+      monthNumber: 1
+    },
+    {
+      monthName: "February",
+      monthNumber: 2
+    },
+    {
+      monthName: "March",
+      monthNumber: 3
+    },
+    {
+      monthName: "April",
+      monthNumber: 4
+    },
+    {
+      monthName: "May",
+      monthNumber: 5
+    },
+    {
+      monthName: "June",
+      monthNumber: 6
+    },
+    {
+      monthName: "July",
+      monthNumber: 7
+    },
+    {
+      monthName: "August",
+      monthNumber: 8
+    },
+    {
+      monthName: "September",
+      monthNumber: 9
+    },
+    {
+      monthName: "October",
+      monthNumber: 10
+    },
+    {
+      monthName: "November",
+      monthNumber: 11
+    },
+    {
+      monthName: "December",
+      monthNumber: 12
+    },
+  ]
 
   export default anchorPrograms
 </script>

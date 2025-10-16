@@ -56,6 +56,32 @@
     }
   }
 
+  export async function getSiteUpdateAlertAccount()
+  {
+    console.log("Getting Site Update Alert Account")
+
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.alert.alertProgram.account.siteUpdateAlert.fetch(getSiteUpdateAlertPDA())
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log("Site Update Alert Account Not Initialized")
+          return undefined
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
   export function getDeadMansBreakPDA()
   {
     const [deadMansBreakPDA] = PublicKey.findProgramAddressSync(

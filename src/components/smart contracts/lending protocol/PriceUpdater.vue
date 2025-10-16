@@ -45,7 +45,7 @@
     for(var i=0; i<StableCoins.length; i++)
     {
       //Update Price for Dev USDC
-      if(StableCoins[i].tokenMintAddress.toBase58() == tokenAddressStringsDevNet.usdcTokenMintAddress)
+      if(StableCoins[i].tokenMintAddressString == tokenAddressStringsDevNet.usdcTokenMintAddress)
       {
         StableCoins[i].price = price[tokenAddressStringsMainNet.usdcTokenMintAddress].usdPrice
         StableCoins[i].priceString = '$' + price[tokenAddressStringsMainNet.usdcTokenMintAddress].usdPrice.toLocaleString('en-US', {
@@ -56,21 +56,21 @@
         continue
       }
 
-      StableCoins[i].price = price[StableCoins[i].tokenMintAddress.toBase58()].usdPrice
-      StableCoins[i].priceString = '$' + price[StableCoins[i].tokenMintAddress.toBase58()].usdPrice.toLocaleString('en-US', {
+      StableCoins[i].price = price[StableCoins[i].tokenMintAddressString].usdPrice
+      StableCoins[i].priceString = '$' + price[StableCoins[i].tokenMintAddressString].usdPrice.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
       if(StableCoins[i].percentChange24h)//Seems like sometimes just these come back empty
-        StableCoins[i].percentChange24h = price[StableCoins[i].tokenMintAddress.toBase58()].priceChange24h.toFixed(2)
+        StableCoins[i].percentChange24h = price[StableCoins[i].tokenMintAddressString].priceChange24h.toFixed(2)
     }
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
-      CryptoCurrency[i].price = price[CryptoCurrency[i].tokenMintAddress].usdPrice
-      CryptoCurrency[i].priceString = '$' + price[CryptoCurrency[i].tokenMintAddress].usdPrice.toLocaleString('en-US', {
+      CryptoCurrency[i].price = price[CryptoCurrency[i].tokenMintAddressString].usdPrice
+      CryptoCurrency[i].priceString = '$' + price[CryptoCurrency[i].tokenMintAddressString].usdPrice.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
-      CryptoCurrency[i].percentChange24h = price[CryptoCurrency[i].tokenMintAddress.toBase58()].priceChange24h.toFixed(2)
+      CryptoCurrency[i].percentChange24h = price[CryptoCurrency[i].tokenMintAddressString].priceChange24h.toFixed(2)
     }
 
     if(price)

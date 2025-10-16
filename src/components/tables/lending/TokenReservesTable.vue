@@ -222,7 +222,7 @@
   import { tokenReserves,
     tokenReserveDevNetMap, 
     priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { tokenReserveHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { tokenReserveSubMarketListHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
   import RIPStarWolf from '/src/assets/svg/rip-star-wolf-svg.vue'
@@ -272,7 +272,7 @@
   
   onMounted(() =>
   {
-    if(tokenReserveHashMap.map)
+    if(tokenReserveSubMarketListHashMap.map)
     {
       processTokenReserveTableData()
       emitReserveTableSizing()
@@ -288,7 +288,7 @@
     processTokenReserveTableData()
   })
 
-  watch(subMarketOwnerHashMap, () => //Watching subMarketOwnerHashMap instead of tokenReserveHashMap to avoid circular updating and watching. The most important thing is keeping the process for updating custom names separate and not causing extra fetches
+  watch(subMarketOwnerHashMap, () => //Watching subMarketOwnerHashMap instead of tokenReserveSubMarketListHashMap to avoid circular updating and watching. The most important thing is keeping the process for updating custom names separate and not causing extra fetches
   {
     processTokenReserveTableData()
 
@@ -444,9 +444,9 @@
       //Get SubMarket List And Count
       var tokenReserveSubMarketList = []
 
-      if(tokenReserveHashMap.map)
+      if(tokenReserveSubMarketListHashMap.map)
       {
-        var unProcessedTokenSubMarketList = tokenReserveHashMap.map.get(tokenMintAddressString)//These are reactive
+        var unProcessedTokenSubMarketList = tokenReserveSubMarketListHashMap.map.get(tokenMintAddressString)//These are reactive
         if(unProcessedTokenSubMarketList)
         {
           unProcessedTokenSubMarketList = unProcessedTokenSubMarketList.sort((a: any, b: any) => a.id - b.id)
@@ -467,7 +467,7 @@
           }
         }
 
-        tokenReserveHashMap.map.set(tokenMintAddressString, tokenReserveSubMarketList)
+        tokenReserveSubMarketListHashMap.map.set(tokenMintAddressString, tokenReserveSubMarketList)
       }
       else
         processedTableData[i].subMarketCount = 0
@@ -480,12 +480,12 @@
   function processNewSubMarketData()
   {
     if(isEditing)//Save new table data until after Processor is done typing
-      newTableData = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+      newTableData = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
     else if(unfilteredTableData != undefined) //Set new data into the unfiltered table if currently filtering table
     {
       if(savedEditedRow != undefined)//Combine saved row data with new table data
       {
-        var tempTable = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+        var tempTable = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
 
         for(var i=0; i<tempTable.length; i++)
           if(tempTable[i].id == savedEditedRow.id)
@@ -500,13 +500,13 @@
       }
       else
       {
-        unfilteredTableData = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+        unfilteredTableData = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
         tokenMarketTableData.value = customFilter(searchInput.value)
       }
     }
     else if(savedEditedRow != undefined)//Combine saved row data with new table data
     {
-      var tempTable = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+      var tempTable = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
 
       for(var i=0; i<tempTable.length; i++)
         if(tempTable[i].id == savedEditedRow.id)
@@ -519,12 +519,12 @@
       tokenMarketTableData.value = tempTable
     }
     else //Update current table like normal
-      tokenMarketTableData.value = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+      tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
   }
 
   function showTokenReserveSubMarkets()
   {
-    tokenMarketTableData.value = tokenReserveHashMap.map.get(selectedTokenMintAddress.toString()) 
+    tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
     showTokenSubMarkets.value = true
     emitReserveTableSizing()
   }

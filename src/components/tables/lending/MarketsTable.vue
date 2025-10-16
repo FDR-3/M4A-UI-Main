@@ -4,20 +4,33 @@
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines 
-      sortField="apy" 
+      sortField="supplyAPY" 
       :sortOrder="-1" 
       size="small" 
       scrollable
       :value="StableCoins"
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'asset.name', 'priceString', 'percentChange24h', 'apy', 'chain.name']"
+      :globalFilterFields="
+      [
+        'tokenMintAddress',
+        'asset.name',
+        'chain.name',
+        'priceString',
+        'percentChange24h',
+        'supplyAPYString',
+        'borrowAPYString',
+        'utilizationRateString',
+        'depositsString',
+        'borrowsString',
+        'globalLimitString'
+      ]"
     >
       <template #header>
         <div>
           <h2>Earn interest on deposits while helping to push the USA to universal health care like every other fucking first world country not named the United States of America</h2>
           <p>A 3% fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
-          <p>IE: If you have $100 of USDC deposited for a year, and the apy remains at exactly 10% for the whole year (Not likely at all)</p>
+          <p>IE: If you have $100 of USDC deposited for a year, and the supply APY remains at exactly 10% for the whole year (Not likely at all)</p>
           <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) = $109.70</p>
           <!--<a href="https://www.youtube.com/@fdr-3" target="_blank">Where does the money come from that users are earning on their deposits?</a>-->
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Market Search     ">
@@ -125,7 +138,36 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
+      <Column field="supplyAPY" header="Supply APY%" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.supplyAPYString }}
+        </template>
+      </Column>
+      <Column field="borrowAPY" header="Borrow APY%" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.borrowAPYString }}
+        </template>
+      </Column>
+      <Column field="utilizationRate" header="Utilization Rate%" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.utilizationRateString }}
+        </template>
+      </Column>
+      <Column field="deposits" header="Deposits" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.depositsString }}
+        </template>
+      </Column>
+      <Column field="borrows" header="Borrows" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.borrowsString }}
+        </template>
+      </Column>
+      <Column field="globalLimit" header="Global Limit" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.globalLimitString }}
+        </template>
+      </Column>
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterRow">
@@ -133,10 +175,11 @@
             class="tableDepositButton"
             color="dark"
             @click="$emit('openDepositModal',
-            slotProps.data.tokenMintAddress,
+            slotProps.data.tokenMintAddressString,
             slotProps.data.decimalAmount,
             slotProps.data.asset.svg,
             slotProps.data.asset.name)"
+            :disabled="!slotProps.data.isMainSubMarketReady"
             >
              Deposit
             </ion-button>
@@ -144,8 +187,8 @@
             v-if="slotProps.data.depositBalance"
             class="tableWithdrawButton"
             color="dark"
-            @click="$emit('openWithdrawModal',
-            slotProps.data.tokenMintAddress,
+            @click="$emit('openWithdrawalModal',
+            slotProps.data.tokenMintAddressString,
             slotProps.data.decimalAmount,
             slotProps.data.asset.svg,
             slotProps.data.asset.name)"
@@ -165,7 +208,20 @@
       scrollable
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
-      :globalFilterFields="['tokenMintAddress', 'asset.name', 'priceString', 'percentChange24h', 'apy', 'chain.name']"
+      :globalFilterFields="
+      [
+        'tokenMintAddress',
+        'asset.name',
+        'chain.name',
+        'priceString',
+        'percentChange24h',
+        'supplyAPYString',
+        'borrowAPYString',
+        'utilizationRateString',
+        'depositsString',
+        'borrowsString',
+        'globalLimitString'
+      ]"
     >
       <template #header>
         <div>
@@ -204,7 +260,36 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="apy" header="APY%" style="width: 0%" sortable></Column>
+      <Column field="supplyAPY" header="Supply APY%" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.supplyAPYString }}
+        </template>
+      </Column>
+      <Column field="borrowAPY" header="Borrow APY%" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.borrowAPYString }}
+        </template>
+      </Column>
+      <Column field="utilizationRate" header="Utilization Rate%" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.utilizationRateString }}
+        </template>
+      </Column>
+      <Column field="deposits" header="Deposits" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.depositsString }}
+        </template>
+      </Column>
+      <Column field="borrows" header="Borrows" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.borrowsString }}
+        </template>
+      </Column>
+      <Column field="globalLimit" header="Global Limit" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.globalLimitString }}
+        </template>
+      </Column>
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterColumn">
@@ -212,10 +297,11 @@
             class="tableDepositButton"
             color="dark"
             @click="$emit('openDepositModal',
-            slotProps.data.tokenMintAddress,
+            slotProps.data.tokenMintAddressString,
             slotProps.data.decimalAmount,
             slotProps.data.asset.svg,
             slotProps.data.asset.name)"
+            :disabled="!slotProps.data.isMainSubMarketReady"
             >
              Deposit
             </ion-button>
@@ -223,8 +309,8 @@
             v-if="slotProps.data.depositBalance"
             class="tableWithdrawButton"
             color="dark"
-            @click="$emit('openWithdrawModal',
-            slotProps.data.tokenMintAddress,
+            @click="$emit('openWithdrawalModal',
+            slotProps.data.tokenMintAddressString,
             slotProps.data.decimalAmount,
             slotProps.data.asset.svg,
             slotProps.data.asset.name)"
@@ -247,19 +333,22 @@
   import Select from 'primevue/select'
   import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
   import { FilterMatchMode } from '@primevue/core/api'
-  import { anchorPrograms, MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX, MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { search } from 'ionicons/icons'
   import { copyTokenMintAddress,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
-  import { lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { lendingerUserHashMap, lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
-  const emits = defineEmits(['openDepositModal', 'openWithdrawModal', 'marketTableHeightChange'])
+  const emits = defineEmits(['openDepositModal', 'openWithdrawalModal', 'marketTableHeightChange'])
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -271,7 +360,6 @@
   var hasAtleast1Account = ref()
   var editingAccountName = ref(false)
   var accountName = ref()
-  var accountList = ref()
   var hasAtleast1Account = ref()
   var accountNameEditInputRef = ref()
   var savedEmojiCursorPosition: any
@@ -280,17 +368,17 @@
   onMounted(() =>
   {
     setLendingUserAccountList()
-    checkForLendingUserDeposits()
-
+    updateStableCoinAndCurrencyData()
+    
     accountSelect.value = Number(localStorage.getItem(connectedWallet.addressString + "selectedLendingAccountIndex")) || 0
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
   })
-  
+ 
   watch([lendingerUserAccountsHashMap, connectedWallet],() =>
   {
     setLendingUserAccountList()
-
     accountSelect.value = Number(localStorage.getItem(connectedWallet.addressString + "selectedLendingAccountIndex")) || 0
+
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
   })
 
@@ -298,7 +386,17 @@
   {
     checkForLendingUserDeposits()
   })
-  
+
+  watch(tokenReservesHashMap, () =>
+  {
+    updateTokenReserveRelatedMarketData()
+  })
+
+  watch(subMarketsHashMap,() =>
+  {
+    checkForMainSubMarkets()
+  })
+
   function setLendingUserAccountList()
   {
     if(lendingerUserAccountsHashMap.map)
@@ -318,13 +416,157 @@
     }
   }
 
+  function updateTokenReserveRelatedMarketData()
+  {
+    for(var i=0; i<StableCoins.length; i++)
+    {
+      if(tokenReservesHashMap.map)
+      {
+        const tokenReserve = tokenReservesHashMap.map.get(StableCoins[i].tokenMintAddressString)
+        if(tokenReserve)
+        {
+          StableCoins[i].supplyAPY = Number(tokenReserve.supplyApy) / 100 //Convert to decimal from fixed point notation
+          StableCoins[i].supplyAPYString = StableCoins[i].supplyAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          StableCoins[i].borrowAPY = tokenReserve.borrowApy / 100 //Convert to decimal from fixed point notation
+          StableCoins[i].borrowAPYString = StableCoins[i].borrowAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          StableCoins[i].utilizationRate = Number(tokenReserve.utilizationRate)
+          StableCoins[i].utilizationRateString = StableCoins[i].utilizationRate.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          StableCoins[i].deposits = tokenReserve.depositedAmount // Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
+          StableCoins[i].depositsString = StableCoins[i].deposits.toLocaleString('en-US', {
+          minimumFractionDigits: StableCoins[i].decimalAmount,
+          maximumFractionDigits: StableCoins[i].decimalAmount })
+          StableCoins[i].borrows = tokenReserve.borrowedAmount / Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
+          StableCoins[i].borrowsString = StableCoins[i].borrows.toLocaleString('en-US', {
+          minimumFractionDigits: StableCoins[i].decimalAmount,
+          maximumFractionDigits: StableCoins[i].decimalAmount })
+          StableCoins[i].globalLimit = Number(tokenReserve.globalLimit) / Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
+          StableCoins[i].globalLimitString = StableCoins[i].globalLimit.toLocaleString('en-US', {
+          minimumFractionDigits: StableCoins[i].decimalAmount,
+          maximumFractionDigits: StableCoins[i].decimalAmount })
+        }
+        else
+        {
+          StableCoins[i].supplyAPYString = "N/A"
+          StableCoins[i].borrowAPYString = "N/A"
+          StableCoins[i].utilizationRateString = "N/A"
+          StableCoins[i].depositsString = "N/A"
+          StableCoins[i].borrowsString = "N/A"
+          StableCoins[i].globalLimitString = "N/A"
+        }
+      }
+      else
+      {
+        StableCoins[i].supplyAPYString = "N/A"
+        StableCoins[i].borrowAPYString = "N/A"
+        StableCoins[i].utilizationRateString = "N/A"
+        StableCoins[i].depositsString = "N/A"
+        StableCoins[i].borrowsString = "N/A"
+        StableCoins[i].globalLimitString = "N/A"
+      }
+    }
+
+    for(var i=0; i<CryptoCurrency.length; i++)
+    {
+      if(tokenReservesHashMap.map)
+      {
+        const tokenReserve = tokenReservesHashMap.map.get(CryptoCurrency[i].tokenMintAddressString)
+        if(tokenReserve)
+        {
+          CryptoCurrency[i].supplyAPY  = Number(tokenReserve.supplyApy) / 100 //Convert to decimal from fixed point notation
+          CryptoCurrency[i].supplyAPYString = CryptoCurrency[i].supplyAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          CryptoCurrency[i].borrowAPY = tokenReserve.borrowApy / 100 //Convert to decimal from fixed point notation
+          CryptoCurrency[i].borrowAPYString = CryptoCurrency[i].borrowAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          CryptoCurrency[i].utilizationRate = Number(tokenReserve.utilizationRate)
+          CryptoCurrency[i].utilizationRateString = CryptoCurrency[i].utilizationRate.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          CryptoCurrency[i].deposits = tokenReserve.depositedAmount / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
+          CryptoCurrency[i].depositsString = CryptoCurrency[i].deposits.toLocaleString('en-US', {
+          minimumFractionDigits: CryptoCurrency[i].decimalAmount,
+          maximumFractionDigits: CryptoCurrency[i].decimalAmount })
+          CryptoCurrency[i].borrows = tokenReserve.borrowedAmount / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
+          CryptoCurrency[i].borrowsString = CryptoCurrency[i].borrows.toLocaleString('en-US', {
+          minimumFractionDigits: CryptoCurrency[i].decimalAmount,
+          maximumFractionDigits: CryptoCurrency[i].decimalAmount })
+          CryptoCurrency[i].globalLimit = Number(tokenReserve.globalLimit) / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
+          CryptoCurrency[i].globalLimitString = CryptoCurrency[i].globalLimit.toLocaleString('en-US', {
+          minimumFractionDigits: CryptoCurrency[i].decimalAmount,
+          maximumFractionDigits: CryptoCurrency[i].decimalAmount })
+        }
+        else
+        {
+          CryptoCurrency[i].supplyAPYString = "N/A"
+          CryptoCurrency[i].borrowAPYString = "N/A"
+          CryptoCurrency[i].utilizationRateString = "N/A"
+          CryptoCurrency[i].depositsString = "N/A"
+          CryptoCurrency[i].borrowsString = "N/A"
+          CryptoCurrency[i].globalLimitString = "N/A"
+        }
+      }
+      else
+      {
+        CryptoCurrency[i].supplyAPYString = "N/A"
+        CryptoCurrency[i].borrowAPYString = "N/A"
+        CryptoCurrency[i].utilizationRateString = "N/A"
+        CryptoCurrency[i].depositsString = "N/A"
+        CryptoCurrency[i].borrowsString = "N/A"
+        CryptoCurrency[i].globalLimitString = "N/A"
+      }
+    }
+  }
+
+  function checkForMainSubMarkets()
+  {
+    for(var i=0; i<StableCoins.length; i++)
+    {
+      if(subMarketsHashMap.map)
+      {
+        const subMarketEntry = subMarketsHashMap.map.get(StableCoins[i].tokenMintAddressString +
+        adminAccounts.lendingCEOAddressKey +
+        DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX.toString())
+        if(subMarketEntry)
+          StableCoins[i].isMainSubMarketReady = true
+        else
+          StableCoins[i].isMainSubMarketReady = false
+      }
+      else
+        StableCoins[i].isMainSubMarketReady = false
+    }
+
+    for(var i=0; i<CryptoCurrency.length; i++)
+    {
+      if(subMarketsHashMap.map)
+      {
+        const subMarketEntry = subMarketsHashMap.map.get(CryptoCurrency[i].tokenMintAddressString +
+        adminAccounts.lendingCEOAddressKey +
+        DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX.toString())
+        if(subMarketEntry)
+          CryptoCurrency[i].isMainSubMarketReady = true
+        else
+          CryptoCurrency[i].isMainSubMarketReady = false
+      }
+      else
+        CryptoCurrency[i].isMainSubMarketReady = false
+    }
+  }
+
   function checkForLendingUserDeposits()
   {
     for(var i=0; i<StableCoins.length; i++)
     {
       if(lendingerUserDepositBalanceHashMap.map)
       {
-        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + StableCoins[i].tokenMintAddress)
+        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + StableCoins[i].tokenMintAddressString)
         if(depositBalance)
           StableCoins[i].depositBalance = depositBalance
         else
@@ -338,7 +580,164 @@
     {
       if(lendingerUserDepositBalanceHashMap.map)
       {
-        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + CryptoCurrency[i].tokenMintAddress)
+        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + CryptoCurrency[i].tokenMintAddressString)
+        if(depositBalance)
+          CryptoCurrency[i].depositBalance = depositBalance
+        else
+          CryptoCurrency[i].depositBalance = undefined
+      }
+      else
+        CryptoCurrency[i].depositBalance = undefined
+    }
+  }
+
+  function updateStableCoinAndCurrencyData()
+  {
+    for(var i=0; i<StableCoins.length; i++)
+    {
+      if(tokenReservesHashMap.map)
+      {
+        const tokenReserve = tokenReservesHashMap.map.get(StableCoins[i].tokenMintAddressString)
+        if(tokenReserve)
+        {
+          StableCoins[i].supplyAPY = Number(tokenReserve.supplyApy) / 100 //Convert to decimal from fixed point notation
+          StableCoins[i].supplyAPYString = StableCoins[i].supplyAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          StableCoins[i].borrowAPY = tokenReserve.borrowApy / 100 //Convert to decimal from fixed point notation
+          StableCoins[i].borrowAPYString = StableCoins[i].borrowAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          StableCoins[i].utilizationRate = Number(tokenReserve.utilizationRate)
+          StableCoins[i].utilizationRateString = StableCoins[i].utilizationRate.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          StableCoins[i].deposits = tokenReserve.depositedAmount // Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
+          StableCoins[i].depositsString = StableCoins[i].deposits.toLocaleString('en-US', {
+          minimumFractionDigits: StableCoins[i].decimalAmount,
+          maximumFractionDigits: StableCoins[i].decimalAmount })
+          StableCoins[i].borrows = tokenReserve.borrowedAmount / Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
+          StableCoins[i].borrowsString = StableCoins[i].borrows.toLocaleString('en-US', {
+          minimumFractionDigits: StableCoins[i].decimalAmount,
+          maximumFractionDigits: StableCoins[i].decimalAmount })
+          StableCoins[i].globalLimit = Number(tokenReserve.globalLimit) / Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
+          StableCoins[i].globalLimitString = StableCoins[i].globalLimit.toLocaleString('en-US', {
+          minimumFractionDigits: StableCoins[i].decimalAmount,
+          maximumFractionDigits: StableCoins[i].decimalAmount })
+        }
+        else
+        {
+          StableCoins[i].supplyAPYString = "N/A"
+          StableCoins[i].borrowAPYString = "N/A"
+          StableCoins[i].utilizationRateString = "N/A"
+          StableCoins[i].depositsString = "N/A"
+          StableCoins[i].borrowsString = "N/A"
+          StableCoins[i].globalLimitString = "N/A"
+        }
+      }
+      else
+      {
+        StableCoins[i].supplyAPYString = "N/A"
+        StableCoins[i].borrowAPYString = "N/A"
+        StableCoins[i].utilizationRateString = "N/A"
+        StableCoins[i].depositsString = "N/A"
+        StableCoins[i].borrowsString = "N/A"
+        StableCoins[i].globalLimitString = "N/A"
+      }
+
+      if(subMarketsHashMap.map)
+      {
+        const subMarketEntry = subMarketsHashMap.map.get(StableCoins[i].tokenMintAddressString +
+        adminAccounts.lendingCEOAddressKey +
+        DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX.toString())
+        if(subMarketEntry)
+          StableCoins[i].isMainSubMarketReady = true
+        else
+          StableCoins[i].isMainSubMarketReady = false
+      }
+      else
+        StableCoins[i].isMainSubMarketReady = false
+
+      if(lendingerUserDepositBalanceHashMap.map)
+      {
+        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + StableCoins[i].tokenMintAddressString)
+        if(depositBalance)
+          StableCoins[i].depositBalance = depositBalance
+        else
+          StableCoins[i].depositBalance = undefined
+      }
+      else
+        StableCoins[i].depositBalance = undefined
+    }
+
+    for(var i=0; i<CryptoCurrency.length; i++)
+    {
+      if(tokenReservesHashMap.map)
+      {
+        const tokenReserve = tokenReservesHashMap.map.get(CryptoCurrency[i].tokenMintAddressString)
+        if(tokenReserve)
+        {
+          CryptoCurrency[i].supplyAPY  = Number(tokenReserve.supplyApy) / 100 //Convert to decimal from fixed point notation
+          CryptoCurrency[i].supplyAPYString = CryptoCurrency[i].supplyAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          CryptoCurrency[i].borrowAPY = tokenReserve.borrowApy / 100 //Convert to decimal from fixed point notation
+          CryptoCurrency[i].borrowAPYString = CryptoCurrency[i].borrowAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          CryptoCurrency[i].utilizationRate = Number(tokenReserve.utilizationRate)
+          CryptoCurrency[i].utilizationRateString = CryptoCurrency[i].utilizationRate.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          CryptoCurrency[i].deposits = tokenReserve.depositedAmount / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
+          CryptoCurrency[i].depositsString = CryptoCurrency[i].deposits.toLocaleString('en-US', {
+          minimumFractionDigits: CryptoCurrency[i].decimalAmount,
+          maximumFractionDigits: CryptoCurrency[i].decimalAmount })
+          CryptoCurrency[i].borrows = tokenReserve.borrowedAmount / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
+          CryptoCurrency[i].borrowsString = CryptoCurrency[i].borrows.toLocaleString('en-US', {
+          minimumFractionDigits: CryptoCurrency[i].decimalAmount,
+          maximumFractionDigits: CryptoCurrency[i].decimalAmount })
+          CryptoCurrency[i].globalLimit = Number(tokenReserve.globalLimit) / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
+          CryptoCurrency[i].globalLimitString = CryptoCurrency[i].globalLimit.toLocaleString('en-US', {
+          minimumFractionDigits: CryptoCurrency[i].decimalAmount,
+          maximumFractionDigits: CryptoCurrency[i].decimalAmount })
+        }
+        else
+        {
+          CryptoCurrency[i].supplyAPYString = "N/A"
+          CryptoCurrency[i].borrowAPYString = "N/A"
+          CryptoCurrency[i].utilizationRateString = "N/A"
+          CryptoCurrency[i].depositsString = "N/A"
+          CryptoCurrency[i].borrowsString = "N/A"
+          CryptoCurrency[i].globalLimitString = "N/A"
+        }
+      }
+      else
+      {
+        CryptoCurrency[i].supplyAPYString = "N/A"
+        CryptoCurrency[i].borrowAPYString = "N/A"
+        CryptoCurrency[i].utilizationRateString = "N/A"
+        CryptoCurrency[i].depositsString = "N/A"
+        CryptoCurrency[i].borrowsString = "N/A"
+        CryptoCurrency[i].globalLimitString = "N/A"
+      }
+
+      if(subMarketsHashMap.map)
+      {
+        const subMarketEntry = subMarketsHashMap.map.get(CryptoCurrency[i].tokenMintAddressString +
+        adminAccounts.lendingCEOAddressKey +
+        DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX.toString())
+        if(subMarketEntry)
+          CryptoCurrency[i].isMainSubMarketReady = true
+        else
+          CryptoCurrency[i].isMainSubMarketReady = false
+      }
+      else
+        CryptoCurrency[i].isMainSubMarketReady = false
+
+      if(lendingerUserDepositBalanceHashMap.map)
+      {
+        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + CryptoCurrency[i].tokenMintAddressString)
         if(depositBalance)
           CryptoCurrency[i].depositBalance = depositBalance
         else
@@ -418,7 +817,9 @@
 
   function setInputFocus()
   {
-    accountName.value = accountList.value[accountSelect.value].accountName
+    const lendingUserAccount = lendingerUserHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    accountName.value = lendingUserAccount.accountName //This is more reliable. Which switching to a new deployed contract, it's possible that and old account index was saved in local storage
+    //accountName.value = accountList.value[accountSelect.value].accountName
 
     setTimeout(() =>
     {
@@ -466,7 +867,7 @@
 
   .tableMinWidth
   {
-    min-width: 795px
+    min-width: 1375px
   }
 
   #accountSelect

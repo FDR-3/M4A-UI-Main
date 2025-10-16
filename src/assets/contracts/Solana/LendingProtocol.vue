@@ -1,15 +1,41 @@
 <script lang="ts">
   import * as anchor from "@coral-xyz/anchor"
-  import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { tokenReserves, tokenReserveDevNetMap, tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap, lendingerUserTabsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingerUserHashMap, lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap, lendingerUserTabsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import { PublicKey } from "@solana/web3.js"
   import cloneDeep from 'lodash/cloneDeep'
+
+  export async function getLendingProtocol()
+  {
+    console.log("Getting Lending Protocol")
+
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.lending.lendingProgram.account.lendingProtocol.fetch(getLendingProtocolPDA())
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log("Lending Protocol Not Initialized")
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
 
   export async function getLendingProtocolCEOAccount()
   {
@@ -80,6 +106,18 @@
         }
       }
     }
+  }
+
+  export function setTokenReserveHashMap()
+  {
+    console.log("Updating Token Reserve Hash Map")
+    
+    var hashmap = new Map<string, any>()
+
+    for(var i=0; i<tokenReserves.data.length; i++)
+      hashmap.set(tokenReserves.data[i].tokenMintAddress.toBase58(), tokenReserves.data[i])
+
+    tokenReservesHashMap.map = hashmap
   }
 
   export async function getSubMarkets()
@@ -154,7 +192,7 @@
 
     console.log("Setting SubMarket Hash Maps")
 
-    tokenReserveHashMap.map = cloneDeep(tokenReserveMap)
+    tokenReserveSubMarketListHashMap.map = cloneDeep(tokenReserveMap)
     subMarketsHashMap.map = cloneDeep(subMarketsMap)
     subMarketOwnerHashMap.map = cloneDeep(subMarketOwnerMap)
 
@@ -202,13 +240,14 @@
   {
     console.log("Setting Lending User Hashmap")
 
-    var hashmap = new Map<string, any>()
+    var lendingUserAccountHashMap = new Map<string, any>()
+    var lendingUserAccountListHashMap = new Map<string, any>()
     const lendingUserAccounts = await getLendingUserAccountsWrapper()
 
     for(var i=0; i<lendingUserAccounts.length; i++)
     {
       var list = []
-      const previousLendingUserList = hashmap.get(lendingUserAccounts[i].account.owner.toBase58())
+      const previousLendingUserList = lendingUserAccountListHashMap.get(lendingUserAccounts[i].account.owner.toBase58())
 
       if(previousLendingUserList)
         list = previousLendingUserList
@@ -216,10 +255,12 @@
       list.push(lendingUserAccounts[i].account)
       list = list.sort((a: any, b: any) => a.userAccountIndex - b.userAccountIndex) 
 
-      hashmap.set(lendingUserAccounts[i].account.owner.toBase58(), list)
+      lendingUserAccountHashMap.set(lendingUserAccounts[i].account.owner.toBase58() + lendingUserAccounts[i].account.userAccountIndex.toString(), lendingUserAccounts[i].account)
+      lendingUserAccountListHashMap.set(lendingUserAccounts[i].account.owner.toBase58(), list)
     }
 
-    lendingerUserAccountsHashMap.map = hashmap
+    lendingerUserHashMap.map = lendingUserAccountHashMap
+    lendingerUserAccountsHashMap.map = lendingUserAccountListHashMap
   }
 
   async function getLendingUserAccountsWrapper()
@@ -303,30 +344,6 @@
       try
       {
         return await anchorPrograms.lending.lendingProgram.account.lendingUserTabAccount.all()
-      }
-      catch(error: any)
-      {
-        if(!error.message.includes(ERROR_429))
-        {
-          console.log(error)
-          return []
-        }
-        else
-        {
-          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
-          await sleep(RETRY_TIME_OUT*i*2)
-        }
-      }
-    }
-  }
-
-  export async function getLendingProtocol()
-  {
-    for(var i=1; i<=MAX_RETRY_FETCH; i++)
-    {
-      try
-      {
-        return await anchorPrograms.lending.lendingProgram.account.lendingProtocol.fetch(getLendingProtocolPDA())
       }
       catch(error: any)
       {

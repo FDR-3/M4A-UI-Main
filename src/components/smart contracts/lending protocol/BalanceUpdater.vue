@@ -6,12 +6,11 @@
     tokenAddressKeysDevNet,
     tokenAddressStringsMainNet,
   tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { tokenReserveDevNetMap, tokenReserveBalancesMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { hodlTreasuryBalancesDevNetHashMap,
     singlePayerTreasuryBalancesDevNetHashMap,
     hodlTreasuryATADevNetHashMap,
     singlePayerTreasuryATADevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { getTokenReservePDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   //import { PublicKey } from "@solana/web3.js"

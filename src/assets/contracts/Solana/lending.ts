@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/lending_protocol.json`.
  */
 export type LendingProtocol = {
-  "address": "HKaSjxcm2sdpmvrJeRsEDDZB93wDRdHcmFUS3hXxknV9",
+  "address": "647rEvxabMSeBVmnBB4pgqt4qTUQRNJu16ogWHF3PgC2",
   "metadata": {
     "name": "lendingProtocol",
     "version": "0.1.0",
@@ -234,6 +234,514 @@ export type LendingProtocol = {
         {
           "name": "tokenDecimalAmount",
           "type": "u8"
+        },
+        {
+          "name": "borrowApy",
+          "type": "u16"
+        },
+        {
+          "name": "globalLimit",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "borrowTokens",
+      "discriminator": [
+        98,
+        145,
+        18,
+        209,
+        129,
+        98,
+        215,
+        25
+      ],
+      "accounts": [
+        {
+          "name": "lendingProtocol",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenReserve",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  82,
+                  101,
+                  115,
+                  101,
+                  114,
+                  118,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenMintAddress"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lendingStats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "subMarket",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  77,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenMintAddress"
+              },
+              {
+                "kind": "arg",
+                "path": "subMarketOwnerAddress"
+              },
+              {
+                "kind": "arg",
+                "path": "subMarketIndex"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userLendingAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "userAccountIndex"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lendingUserTabAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  84,
+                  97,
+                  98,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenMintAddress"
+              },
+              {
+                "kind": "arg",
+                "path": "subMarketOwnerAddress"
+              },
+              {
+                "kind": "arg",
+                "path": "subMarketIndex"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "userAccountIndex"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lendingUserMonthlyStatementAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
+                  108,
+                  121,
+                  83,
+                  116,
+                  97,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_month",
+                "account": "lendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
+                "account": "lendingProtocol"
+              },
+              {
+                "kind": "arg",
+                "path": "tokenMintAddress"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "userAccountIndex"
+              }
+            ]
+          }
+        },
+        {
+          "name": "userAta",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenMintAddress"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "tokenReserveAta",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "tokenReserve"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenMintAddress"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenMintAddress",
+          "type": "pubkey"
+        },
+        {
+          "name": "subMarketOwnerAddress",
+          "type": "pubkey"
+        },
+        {
+          "name": "subMarketIndex",
+          "type": "u16"
+        },
+        {
+          "name": "userAccountIndex",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
         }
       ]
     },
@@ -590,33 +1098,33 @@ export type LendingProtocol = {
           }
         },
         {
-          "name": "lendingUserYearlyTaxAccount",
+          "name": "lendingUserMonthlyStatementAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  85,
+                  117,
                   115,
                   101,
                   114,
-                  89,
-                  101,
-                  97,
-                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
                   108,
                   121,
-                  84,
+                  83,
+                  116,
                   97,
-                  120,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
                   65,
                   99,
                   99,
@@ -628,7 +1136,12 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_tax_year",
+                "path": "lending_protocol.current_statement_month",
+                "account": "lendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
                 "account": "lendingProtocol"
               },
               {
@@ -1276,7 +1789,11 @@ export type LendingProtocol = {
       ],
       "args": [
         {
-          "name": "taxYear",
+          "name": "statementMonth",
+          "type": "u8"
+        },
+        {
+          "name": "statementYear",
           "type": "u32"
         }
       ]
@@ -1564,33 +2081,33 @@ export type LendingProtocol = {
           }
         },
         {
-          "name": "lendingUserYearlyTaxAccount",
+          "name": "lendingUserMonthlyStatementAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  85,
+                  117,
                   115,
                   101,
                   114,
-                  89,
-                  101,
-                  97,
-                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
                   108,
                   121,
-                  84,
+                  83,
+                  116,
                   97,
-                  120,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
                   65,
                   99,
                   99,
@@ -1602,7 +2119,12 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_tax_year",
+                "path": "lending_protocol.current_statement_month",
+                "account": "lendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
                 "account": "lendingProtocol"
               },
               {
@@ -1838,16 +2360,16 @@ export type LendingProtocol = {
       ]
     },
     {
-      "name": "updateCurrentTaxYear",
+      "name": "updateCurrentStatementMonthAndYear",
       "discriminator": [
-        48,
-        62,
-        92,
-        6,
-        6,
-        78,
-        161,
-        98
+        83,
+        0,
+        245,
+        197,
+        247,
+        149,
+        59,
+        55
       ],
       "accounts": [
         {
@@ -1920,8 +2442,139 @@ export type LendingProtocol = {
       ],
       "args": [
         {
-          "name": "taxYear",
+          "name": "statementMonth",
+          "type": "u8"
+        },
+        {
+          "name": "statementYear",
           "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "updateTokenReserve",
+      "discriminator": [
+        4,
+        133,
+        52,
+        158,
+        128,
+        235,
+        127,
+        213
+      ],
+      "accounts": [
+        {
+          "name": "tokenReserveStats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  82,
+                  101,
+                  115,
+                  101,
+                  114,
+                  118,
+                  101,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenReserve",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  82,
+                  101,
+                  115,
+                  101,
+                  114,
+                  118,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "tokenMintAddress"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "tokenMintAddress",
+          "type": "pubkey"
+        },
+        {
+          "name": "borrowApy",
+          "type": "u16"
+        },
+        {
+          "name": "globalLimit",
+          "type": "u128"
         }
       ]
     },
@@ -2147,33 +2800,33 @@ export type LendingProtocol = {
           }
         },
         {
-          "name": "lendingUserYearlyTaxAccount",
+          "name": "lendingUserMonthlyStatementAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  85,
+                  117,
                   115,
                   101,
                   114,
-                  89,
-                  101,
-                  97,
-                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
                   108,
                   121,
-                  84,
+                  83,
+                  116,
                   97,
-                  120,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
                   65,
                   99,
                   99,
@@ -2185,7 +2838,12 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_tax_year",
+                "path": "lending_protocol.current_statement_month",
+                "account": "lendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
                 "account": "lendingProtocol"
               },
               {
@@ -2475,6 +3133,19 @@ export type LendingProtocol = {
       ]
     },
     {
+      "name": "lendingUserMonthlyStatementAccount",
+      "discriminator": [
+        156,
+        110,
+        92,
+        141,
+        83,
+        104,
+        195,
+        161
+      ]
+    },
+    {
       "name": "lendingUserStats",
       "discriminator": [
         53,
@@ -2498,19 +3169,6 @@ export type LendingProtocol = {
         233,
         55,
         195
-      ]
-    },
-    {
-      "name": "lendingUserYearlyTaxAccount",
-      "discriminator": [
-        5,
-        84,
-        181,
-        85,
-        253,
-        128,
-        185,
-        240
       ]
     },
     {
@@ -2605,7 +3263,11 @@ export type LendingProtocol = {
         "kind": "struct",
         "fields": [
           {
-            "name": "currentTaxYear",
+            "name": "currentStatementMonth",
+            "type": "u8"
+          },
+          {
+            "name": "currentStatementYear",
             "type": "u32"
           }
         ]
@@ -2687,6 +3349,106 @@ export type LendingProtocol = {
           {
             "name": "amountLiquidated",
             "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityTokenMintAddress",
+            "type": "pubkey"
+          },
+          {
+            "name": "lastLendingActivityAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityType",
+            "type": "u8"
+          },
+          {
+            "name": "lastLendingActivityTimeStamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "lendingUserMonthlyStatementAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "userAccountIndex",
+            "type": "u8"
+          },
+          {
+            "name": "tokenMintAddress",
+            "type": "pubkey"
+          },
+          {
+            "name": "statementMonth",
+            "type": "u8"
+          },
+          {
+            "name": "statementYear",
+            "type": "u32"
+          },
+          {
+            "name": "monthlyStatementAccountAdded",
+            "type": "bool"
+          },
+          {
+            "name": "lifeTimeBalanceAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lifeTimeBorrowedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lifeTimeInterestAccruedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lifeTimeDebtRepaidAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lifeTimeLiquidatedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "monthlyDepositedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "monthlyWithdrawalAmount",
+            "type": "u128"
+          },
+          {
+            "name": "monthlyBorrowedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "monthlyRepaidAmount",
+            "type": "u128"
+          },
+          {
+            "name": "monthlyLiquidatedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityType",
+            "type": "u8"
+          },
+          {
+            "name": "lastLendingActivityTimeStamp",
+            "type": "u64"
           }
         ]
       }
@@ -2737,50 +3499,6 @@ export type LendingProtocol = {
             "type": "bool"
           },
           {
-            "name": "depositedAmount",
-            "type": "u128"
-          },
-          {
-            "name": "borrowedAmount",
-            "type": "u128"
-          }
-        ]
-      }
-    },
-    {
-      "name": "lendingUserYearlyTaxAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "pubkey"
-          },
-          {
-            "name": "userAccountIndex",
-            "type": "u8"
-          },
-          {
-            "name": "tokenMintAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "taxYear",
-            "type": "u32"
-          },
-          {
-            "name": "yearlyTaxAccountAdded",
-            "type": "bool"
-          },
-          {
-            "name": "lastActivityType",
-            "type": "u8"
-          },
-          {
-            "name": "lastLendingActivityTimeStamp",
-            "type": "u64"
-          },
-          {
             "name": "interestAccrued",
             "type": "u128"
           },
@@ -2791,6 +3509,26 @@ export type LendingProtocol = {
           {
             "name": "amountLiquidated",
             "type": "u128"
+          },
+          {
+            "name": "depositedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "borrowedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityType",
+            "type": "u8"
+          },
+          {
+            "name": "lastLendingActivityTimeStamp",
+            "type": "u64"
           }
         ]
       }
@@ -2825,8 +3563,36 @@ export type LendingProtocol = {
             "type": "u16"
           },
           {
+            "name": "interestAccrued",
+            "type": "u128"
+          },
+          {
+            "name": "debtRepaid",
+            "type": "u128"
+          },
+          {
+            "name": "amountLiquidated",
+            "type": "u128"
+          },
+          {
             "name": "depositedAmount",
             "type": "u128"
+          },
+          {
+            "name": "borrowedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityType",
+            "type": "u8"
+          },
+          {
+            "name": "lastLendingActivityTimeStamp",
+            "type": "u64"
           }
         ]
       }
@@ -2865,8 +3631,56 @@ export type LendingProtocol = {
             "type": "u8"
           },
           {
+            "name": "supplyApy",
+            "type": "u128"
+          },
+          {
+            "name": "borrowApy",
+            "type": "u16"
+          },
+          {
+            "name": "utilizationRate",
+            "type": "u64"
+          },
+          {
+            "name": "globalLimit",
+            "type": "u128"
+          },
+          {
+            "name": "accruedInterestIndex",
+            "type": "u128"
+          },
+          {
+            "name": "interestAccrued",
+            "type": "u128"
+          },
+          {
+            "name": "debtRepaid",
+            "type": "u128"
+          },
+          {
+            "name": "amountLiquidated",
+            "type": "u128"
+          },
+          {
             "name": "depositedAmount",
             "type": "u128"
+          },
+          {
+            "name": "borrowedAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityAmount",
+            "type": "u128"
+          },
+          {
+            "name": "lastLendingActivityType",
+            "type": "u8"
+          },
+          {
+            "name": "lastLendingActivityTimeStamp",
+            "type": "u64"
           }
         ]
       }
@@ -2879,6 +3693,10 @@ export type LendingProtocol = {
           {
             "name": "tokenReserveCount",
             "type": "u32"
+          },
+          {
+            "name": "tokenReservesUpdatedCount",
+            "type": "u128"
           }
         ]
       }

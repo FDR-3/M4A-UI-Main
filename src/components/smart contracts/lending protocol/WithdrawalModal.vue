@@ -1,6 +1,6 @@
 <template>
   <div v-if="withdrawing"
-    id="withdrawModal"
+    id="withdrawalModal"
     class="thickBorder"
   >
     <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
@@ -159,8 +159,8 @@
       (event?.target?.id != "copyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressPopover") &&
       (event?.target?.id != "withdrawSVG") &&
-      (event?.target?.id != "withdrawModal") &&
-      (event?.target?.id != "openWithdrawModal") &&
+      (event?.target?.id != "withdrawalModal") &&
+      (event?.target?.id != "openWithdrawalModal") &&
       (event?.target?.id != "maxButtonContainer") &&
       (event?.target?.id != "maxButton") &&
       (event?.target?.id != "withdrawButton") &&
@@ -200,7 +200,7 @@
     }
   }
 
-  function openWithdrawModal(tokenMintAddress: PublicKey, decimalAmount: number, tokenSVG: Component, tokenName: string)
+  function openWithdrawalModal(tokenMintAddress: string, decimalAmount: number, tokenSVG: Component, tokenName: string)
   {
     addCloseListner()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
@@ -227,7 +227,7 @@
       hasAtleast2Accounts.value = false
     }
 
-    const balance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + tokenMintAddress.toString())
+    const balance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else
@@ -235,14 +235,14 @@
 
     withdrawAmount.value = 0
     withdrawIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
-    selectedTokenMintAddress = tokenMintAddress
+    selectedTokenMintAddress = new PublicKey(tokenMintAddress)
     tokenDecimalAmount.value = decimalAmount
     withdrawSVG.value = tokenSVG
     subMarketTokenName.value = tokenName
     withdrawing.value = true
   }
 
-  function closeWithdrawModal()
+  function closeWithdrawalModal()
   {
     withdrawing.value = false
     removeCloseListner()
@@ -300,13 +300,13 @@
 
   defineExpose(
   {
-    openWithdrawModal,
-    closeWithdrawModal
+    openWithdrawalModal,
+    closeWithdrawalModal
   })
 </script>
 
 <style scoped>
-  #withdrawModal
+  #withdrawalModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
     top: 50%;

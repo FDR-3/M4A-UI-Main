@@ -12,15 +12,32 @@
     >
       <ion-label color="dark">Init Alert Admin Accounts</ion-label>
     </ion-button>
-    <div v-if="!adminAccounts.isLendingCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress">
+    <div v-if="!adminAccounts.isLendingCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress" class="flexCenterColumn">
       <ion-button 
         @click="initializeLendingProtocol()"
         :color=colorName
-        :disabled="taxYearInput == ''"
+        :disabled="statementYearInput == ''"
       >
         <ion-label color="dark">Init Lending Admin Accounts</ion-label>
       </ion-button>
-      <ion-input v-model="taxYearInput" fill="outline" placeholder="Enter Tax Year" type="number" step="1" min="2025"></ion-input>
+      <Select
+      class="tinyMarginBottom"
+      v-model="monthSelect" 
+      :options="monthList" 
+      optionLabel="monthName" 
+      optionValue="monthNumber" 
+      placeholder="Select Month"
+      appendTo="self">
+      </Select>
+      <ion-input
+      v-model="statementYearInput"
+      style="width: 100px"
+      fill="outline"
+      placeholder="Enter Statement Year"
+      type="number"
+      step="1"
+      min="2024">
+      </ion-input>
     </div>
     <ion-button v-if="!adminAccounts.isM4ACEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
       @click="initializeM4AProtocolAdminAccounts()"
@@ -42,14 +59,15 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject } from 'vue'
+  import { ref, inject, onMounted } from 'vue'
   import { IonButton, IonLabel, IonInput } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import AdminPanel  from './AdminPanel.vue'
   import LogoArt  from './LogoArt.vue'
   import DeadMansBreakClock from '/src/components/smart contracts/alert protocol/DeadMansBreakClock.vue'
+  import Select from 'primevue/select'
   import { confirmM4ATransaction,
     confirmChatTransaction,
     confirmLendingTransaction,
@@ -59,8 +77,17 @@
   const toast = inject('toast')
   const colorName = inject('colorName') as string
   const colorHexValue = inject('colorHexValue') as string
+  var monthSelect = ref()
 
-  var taxYearInput = ref("")
+  var statementYearInput = ref("")
+
+  onMounted(() =>
+  {
+    const currentDate = new Date()
+
+    statementYearInput.value = currentDate.getFullYear().toString()
+    monthSelect.value = currentDate.getMonth() + 1
+  })
 
   async function initializeM4AProtocolAdminAccounts()
   {
@@ -92,7 +119,7 @@
   {
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol(Number(taxYearInput.value)).rpc()
+      const tx = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol(monthSelect.value, Number(statementYearInput.value)).rpc()
       await confirmLendingTransaction(tx, toast, "initialize_lending_protocol")
     }
     catch(error)

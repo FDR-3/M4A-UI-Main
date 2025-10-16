@@ -268,7 +268,7 @@
     }
   }
 
-  function openDepositModal(tokenMintAddress: PublicKey, decimalAmount: number, tokenSVG: Component, tokenName: string)
+  function openDepositModal(tokenMintAddress: string, decimalAmount: number, tokenSVG: Component, tokenName: string)
   {
     addCloseListner()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
@@ -301,7 +301,7 @@
         inputElement.focus()
     }, 10) 
 
-    const balance = connectedWallet.tokenBalanceMap.get(tokenMintAddress.toString())
+    const balance = connectedWallet.tokenBalanceMap.get(tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else
@@ -309,7 +309,7 @@
 
     depositAmount.value = 0
     depositIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
-    selectedTokenMintAddress = tokenMintAddress
+    selectedTokenMintAddress = new PublicKey(tokenMintAddress)
     tokenDecimalAmount.value = decimalAmount
     depositSVG.value = tokenSVG
     subMarketTokenName.value = tokenName
@@ -415,6 +415,7 @@
       ).accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey }).rpc()
 
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
+      //updateStoredSelectedAccount()//Do this incase inbetween deployed contracts and there is a dead account index saved to local storage
       depositing.value = false
       addingAdditionalLendingAccount.value = false
     }

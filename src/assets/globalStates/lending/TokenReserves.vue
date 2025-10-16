@@ -18,6 +18,12 @@
     data: undefined
   })
 
+  //Key: Token Mint Address, Value: Specific Token Reserve
+  export const tokenReservesHashMap = reactive(
+  {
+    map: undefined
+  })
+
   export const priceObjectMap = reactive(
   {
     data: undefined
@@ -44,11 +50,6 @@
     [tokenAddressStringsDevNet.wethTokenMintAddress, { name: "WETH-Dev", svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wethATA }],
     [tokenAddressStringsDevNet.wbtcTokenMintAddress, { name: "WBTC-Dev", svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wbtcATA }]
   ])
-
-  export const tokenReserveBalancesMap = reactive(
-  {
-    map: new Map<string, string>()
-  })
 
   type tokenMapObject =
   {

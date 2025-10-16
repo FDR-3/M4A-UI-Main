@@ -8,6 +8,7 @@
   import { getLendingProtocol,
   getLendingProtocolCEOAccount,
   getTokenReserves,
+  setTokenReserveHashMap,
   getSubMarkets,
   setLendingUserAccountHashMap,
   setLendingUserTabHashMaps,
@@ -20,7 +21,7 @@
   import { tokenReserves } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import PriceUpdater from './PriceUpdater.vue'
   import BalanceUpdater from './BalanceUpdater.vue'
 
@@ -55,15 +56,18 @@
 
     //Token Reserves
     tokenReserves.data = await getTokenReserves()
-    await listenForNewTokenReserves()
+    
+    setTokenReserveHashMap()
+    await listenForNewTokenChanges()
 
     //SubMarkets
     subMarkets.data = await getSubMarkets()
     await listenForSubMarketChanges()
 
-    //Lending Protocol (Current Tax Year Info)
+    //Lending Protocol (Current Statement Info)
     const lendingProtocol = await getLendingProtocol()
-    anchorPrograms.currentTaxYear = lendingProtocol.currentTaxYear
+    anchorPrograms.currentStatementMonth = monthList[lendingProtocol.currentStatementMonth-1].monthName
+    anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
     await listenForLendingProtocolChanges()
   })
 
@@ -101,13 +105,14 @@
     }
   })
 
-  async function listenForNewTokenReserves()
+  async function listenForNewTokenChanges()
   {
     //Subscribe to account changes
     tokenReserveStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getTokenReserveStatsPDA(), async() => 
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
+      setTokenReserveHashMap()
     })
   }
 
@@ -128,6 +133,7 @@
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
+      setTokenReserveHashMap()
       subMarkets.data = await getSubMarkets()
       await setLendingUserAccountHashMap()
       await setLendingUserTabHashMaps()
@@ -151,7 +157,8 @@
     {
       //Handle account change..
       const lendingProtocol = await getLendingProtocol()
-      anchorPrograms.currentTaxYear = lendingProtocol.currentTaxYear
+      anchorPrograms.currentStatementMonth = monthList[lendingProtocol.currentStatementMonth-1].monthName
+      anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
     })
   }
 

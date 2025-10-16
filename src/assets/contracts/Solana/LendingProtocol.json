@@ -1,5 +1,5 @@
 {
-  "address": "FvBCiiFp3AU16oBP1hE3ZQkDVoyXVMM6sxjvhxhShdJe",
+  "address": "647rEvxabMSeBVmnBB4pgqt4qTUQRNJu16ogWHF3PgC2",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -228,6 +228,514 @@
         {
           "name": "token_decimal_amount",
           "type": "u8"
+        },
+        {
+          "name": "borrow_apy",
+          "type": "u16"
+        },
+        {
+          "name": "global_limit",
+          "type": "u128"
+        }
+      ]
+    },
+    {
+      "name": "borrow_tokens",
+      "discriminator": [
+        98,
+        145,
+        18,
+        209,
+        129,
+        98,
+        215,
+        25
+      ],
+      "accounts": [
+        {
+          "name": "lending_protocol",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_reserve",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  82,
+                  101,
+                  115,
+                  101,
+                  114,
+                  118,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lending_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "sub_market",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  77,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_owner_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_lending_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "user_account_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lending_user_tab_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  84,
+                  97,
+                  98,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_owner_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_index"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "user_account_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lending_user_monthly_statement_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
+                  108,
+                  121,
+                  83,
+                  116,
+                  97,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_month",
+                "account": "LendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
+                "account": "LendingProtocol"
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "user_account_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_reserve_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "token_reserve"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_mint_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "_sub_market_owner_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "_sub_market_index",
+          "type": "u16"
+        },
+        {
+          "name": "user_account_index",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
         }
       ]
     },
@@ -584,33 +1092,33 @@
           }
         },
         {
-          "name": "lending_user_yearly_tax_account",
+          "name": "lending_user_monthly_statement_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  85,
+                  117,
                   115,
                   101,
                   114,
-                  89,
-                  101,
-                  97,
-                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
                   108,
                   121,
-                  84,
+                  83,
+                  116,
                   97,
-                  120,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
                   65,
                   99,
                   99,
@@ -622,7 +1130,12 @@
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_tax_year",
+                "path": "lending_protocol.current_statement_month",
+                "account": "LendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
                 "account": "LendingProtocol"
               },
               {
@@ -1270,7 +1783,11 @@
       ],
       "args": [
         {
-          "name": "tax_year",
+          "name": "statement_month",
+          "type": "u8"
+        },
+        {
+          "name": "statement_year",
           "type": "u32"
         }
       ]
@@ -1558,33 +2075,33 @@
           }
         },
         {
-          "name": "lending_user_yearly_tax_account",
+          "name": "lending_user_monthly_statement_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  85,
+                  117,
                   115,
                   101,
                   114,
-                  89,
-                  101,
-                  97,
-                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
                   108,
                   121,
-                  84,
+                  83,
+                  116,
                   97,
-                  120,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
                   65,
                   99,
                   99,
@@ -1596,7 +2113,12 @@
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_tax_year",
+                "path": "lending_protocol.current_statement_month",
+                "account": "LendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
                 "account": "LendingProtocol"
               },
               {
@@ -1832,16 +2354,16 @@
       ]
     },
     {
-      "name": "update_current_tax_year",
+      "name": "update_current_statement_month_and_year",
       "discriminator": [
-        48,
-        62,
-        92,
-        6,
-        6,
-        78,
-        161,
-        98
+        83,
+        0,
+        245,
+        197,
+        247,
+        149,
+        59,
+        55
       ],
       "accounts": [
         {
@@ -1914,8 +2436,139 @@
       ],
       "args": [
         {
-          "name": "tax_year",
+          "name": "statement_month",
+          "type": "u8"
+        },
+        {
+          "name": "statement_year",
           "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "update_token_reserve",
+      "discriminator": [
+        4,
+        133,
+        52,
+        158,
+        128,
+        235,
+        127,
+        213
+      ],
+      "accounts": [
+        {
+          "name": "token_reserve_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  82,
+                  101,
+                  115,
+                  101,
+                  114,
+                  118,
+                  101,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_reserve",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  82,
+                  101,
+                  115,
+                  101,
+                  114,
+                  118,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "_token_mint_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "borrow_apy",
+          "type": "u16"
+        },
+        {
+          "name": "global_limit",
+          "type": "u128"
         }
       ]
     },
@@ -2141,33 +2794,33 @@
           }
         },
         {
-          "name": "lending_user_yearly_tax_account",
+          "name": "lending_user_monthly_statement_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  85,
+                  117,
                   115,
                   101,
                   114,
-                  89,
-                  101,
-                  97,
-                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
                   108,
                   121,
-                  84,
+                  83,
+                  116,
                   97,
-                  120,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
                   65,
                   99,
                   99,
@@ -2179,7 +2832,12 @@
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_tax_year",
+                "path": "lending_protocol.current_statement_month",
+                "account": "LendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
                 "account": "LendingProtocol"
               },
               {
@@ -2469,6 +3127,19 @@
       ]
     },
     {
+      "name": "LendingUserMonthlyStatementAccount",
+      "discriminator": [
+        156,
+        110,
+        92,
+        141,
+        83,
+        104,
+        195,
+        161
+      ]
+    },
+    {
       "name": "LendingUserStats",
       "discriminator": [
         53,
@@ -2492,19 +3163,6 @@
         233,
         55,
         195
-      ]
-    },
-    {
-      "name": "LendingUserYearlyTaxAccount",
-      "discriminator": [
-        5,
-        84,
-        181,
-        85,
-        253,
-        128,
-        185,
-        240
       ]
     },
     {
@@ -2599,7 +3257,11 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "current_tax_year",
+            "name": "current_statement_month",
+            "type": "u8"
+          },
+          {
+            "name": "current_statement_year",
             "type": "u32"
           }
         ]
@@ -2681,6 +3343,106 @@
           {
             "name": "amount_liquidated",
             "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_token_mint_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "last_lending_activity_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_type",
+            "type": "u8"
+          },
+          {
+            "name": "last_lending_activity_time_stamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LendingUserMonthlyStatementAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "user_account_index",
+            "type": "u8"
+          },
+          {
+            "name": "token_mint_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "statement_month",
+            "type": "u8"
+          },
+          {
+            "name": "statement_year",
+            "type": "u32"
+          },
+          {
+            "name": "monthly_statement_account_added",
+            "type": "bool"
+          },
+          {
+            "name": "life_time_balance_amount",
+            "type": "u128"
+          },
+          {
+            "name": "life_time_borrowed_amount",
+            "type": "u128"
+          },
+          {
+            "name": "life_time_interest_accrued_amount",
+            "type": "u128"
+          },
+          {
+            "name": "life_time_debt_repaid_amount",
+            "type": "u128"
+          },
+          {
+            "name": "life_time_liquidated_amount",
+            "type": "u128"
+          },
+          {
+            "name": "monthly_deposited_amount",
+            "type": "u128"
+          },
+          {
+            "name": "monthly_withdrawal_amount",
+            "type": "u128"
+          },
+          {
+            "name": "monthly_borrowed_amount",
+            "type": "u128"
+          },
+          {
+            "name": "monthly_repaid_amount",
+            "type": "u128"
+          },
+          {
+            "name": "monthly_liquidated_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_type",
+            "type": "u8"
+          },
+          {
+            "name": "last_lending_activity_time_stamp",
+            "type": "u64"
           }
         ]
       }
@@ -2731,50 +3493,6 @@
             "type": "bool"
           },
           {
-            "name": "deposited_amount",
-            "type": "u128"
-          },
-          {
-            "name": "borrowed_amount",
-            "type": "u128"
-          }
-        ]
-      }
-    },
-    {
-      "name": "LendingUserYearlyTaxAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "pubkey"
-          },
-          {
-            "name": "user_account_index",
-            "type": "u8"
-          },
-          {
-            "name": "token_mint_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "tax_year",
-            "type": "u32"
-          },
-          {
-            "name": "yearly_tax_account_added",
-            "type": "bool"
-          },
-          {
-            "name": "last_activity_type",
-            "type": "u8"
-          },
-          {
-            "name": "last_lending_activity_time_stamp",
-            "type": "u64"
-          },
-          {
             "name": "interest_accrued",
             "type": "u128"
           },
@@ -2785,6 +3503,26 @@
           {
             "name": "amount_liquidated",
             "type": "u128"
+          },
+          {
+            "name": "deposited_amount",
+            "type": "u128"
+          },
+          {
+            "name": "borrowed_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_type",
+            "type": "u8"
+          },
+          {
+            "name": "last_lending_activity_time_stamp",
+            "type": "u64"
           }
         ]
       }
@@ -2819,8 +3557,36 @@
             "type": "u16"
           },
           {
+            "name": "interest_accrued",
+            "type": "u128"
+          },
+          {
+            "name": "debt_repaid",
+            "type": "u128"
+          },
+          {
+            "name": "amount_liquidated",
+            "type": "u128"
+          },
+          {
             "name": "deposited_amount",
             "type": "u128"
+          },
+          {
+            "name": "borrowed_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_type",
+            "type": "u8"
+          },
+          {
+            "name": "last_lending_activity_time_stamp",
+            "type": "u64"
           }
         ]
       }
@@ -2859,8 +3625,56 @@
             "type": "u8"
           },
           {
+            "name": "supply_apy",
+            "type": "u128"
+          },
+          {
+            "name": "borrow_apy",
+            "type": "u16"
+          },
+          {
+            "name": "utilization_rate",
+            "type": "u64"
+          },
+          {
+            "name": "global_limit",
+            "type": "u128"
+          },
+          {
+            "name": "accrued_interest_index",
+            "type": "u128"
+          },
+          {
+            "name": "interest_accrued",
+            "type": "u128"
+          },
+          {
+            "name": "debt_repaid",
+            "type": "u128"
+          },
+          {
+            "name": "amount_liquidated",
+            "type": "u128"
+          },
+          {
             "name": "deposited_amount",
             "type": "u128"
+          },
+          {
+            "name": "borrowed_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_amount",
+            "type": "u128"
+          },
+          {
+            "name": "last_lending_activity_type",
+            "type": "u8"
+          },
+          {
+            "name": "last_lending_activity_time_stamp",
+            "type": "u64"
           }
         ]
       }
@@ -2873,6 +3687,10 @@
           {
             "name": "token_reserve_count",
             "type": "u32"
+          },
+          {
+            "name": "token_reserves_updated_count",
+            "type": "u128"
           }
         ]
       }

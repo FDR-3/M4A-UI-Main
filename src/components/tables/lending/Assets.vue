@@ -19,7 +19,7 @@
   export const StableCoins = reactive(
   [
     {
-      tokenMintAddress: new PublicKey("EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o"),
+      tokenMintAddressString: "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o",
       decimalAmount: 8,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.daiATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.daiATA,
@@ -31,7 +31,8 @@
       },
       price: '-',
       percentChange24h: '-',
-      apy: "4.44%",
+      supplyAPY: "-",
+      borrowAPY: "-",
       chain:
       {
         name: "Solana",
@@ -40,7 +41,7 @@
       }
     },
     {
-      tokenMintAddress: new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"),//Mainnet
+      tokenMintAddressString: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",//Mainnet
       decimalAmount: 6,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.usdcATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.usdcATA,
@@ -52,7 +53,8 @@
       },
       price: '-',
       percentChange24h: '-',
-      apy: "4.44%",
+      supplyAPY: "-",
+      borrowAPY: "-",
       chain:
       {
         name: "Solana",
@@ -61,7 +63,7 @@
       }
     },
     {
-      tokenMintAddress: new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),//Devnet
+      tokenMintAddressString: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",//Devnet
       decimalAmount: 6,
       hodlATA: hodlAssociatedTokenAddressKeysDevNet.usdcATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysDevNet.usdcATA,
@@ -73,7 +75,8 @@
       },
       price: '-',
       percentChange24h: '-',
-      apy: "4.44%",
+      supplyAPY: "-",
+      borrowAPY: "-",
       chain:
       {
         name: "Solana",
@@ -86,7 +89,7 @@
   export const CryptoCurrency = reactive(
   [
     {
-      tokenMintAddress: new PublicKey("So11111111111111111111111111111111111111112"),
+      tokenMintAddressString: "So11111111111111111111111111111111111111112",
       decimalAmount: 9,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.solATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.solATA,
@@ -98,7 +101,8 @@
       },
       price: '-',
       percentChange24h: '-',
-      apy: "4.44%",
+      supplyAPY: "-",
+      borrowAPY: "-",
       chain:
       {
         name: "Solana",
@@ -107,7 +111,7 @@
       }
     },
     {
-      tokenMintAddress: new PublicKey("7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs"),
+      tokenMintAddressString: "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
       decimalAmount: 8,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.wethATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.wethATA,
@@ -119,7 +123,8 @@
       },
       price: '-',
       percentChange24h: '-',
-      apy: "4.44%",
+      supplyAPY: "-",
+      borrowAPY: "-",
       chain:
       {
         name: "Solana",
@@ -128,7 +133,7 @@
       }
     },
     {
-      tokenMintAddress: new PublicKey("3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh"),
+      tokenMintAddressString: "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
       decimalAmount: 8,
       hodlATA: hodlAssociatedTokenAddressKeysMainNet.wbtcATA,
       singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.wbtcATA,
@@ -140,7 +145,8 @@
       },
       price: '-',
       percentChange24h: '-',
-      apy: "4.44%",
+      supplyAPY: "-",
+      borrowAPY: "-",
       chain:
       {
         name: "Solana",

@@ -87,17 +87,17 @@
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
 
-  const feePercentage = ref(3)
-  const feePercentageRef = ref()
-  const isValidPublicKey = ref(false)
-  const creatingSubMarket = ref(false)
-  const createSubMarketSVG = ref()
-  const subMarketTokenName = ref()
-  const feeCollectorAddress = ref()
+  var feePercentage = ref(3)
+  var feePercentageRef = ref()
+  var isValidPublicKey = ref(false)
+  var creatingSubMarket = ref(false)
+  var createSubMarketSVG = ref()
+  var subMarketTokenName = ref()
+  var feeCollectorAddress = ref()
   var selectedTokenMintAddress: PublicKey
 
-  const tokenPopoverOpen = ref(false)
-  const event = ref()
+  var tokenPopoverOpen = ref(false)
+  var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
