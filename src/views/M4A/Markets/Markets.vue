@@ -186,30 +186,102 @@
     transform: rotateY(180deg)
   }
 
-  .tableFlipContainer.flipped
-  {
-    height: 646px
-  }
-  @-moz-document url-prefix()
-  {
+  /*Set Portfolio Table Height */
+  @media screen and (min-width: 1285.1px)
+  { 
     .tableFlipContainer.flipped
     {
-      height: 647px
+      height: 2405px
+    }
+  }
+  @media screen and (min-width: 444.1px) and (max-width: 1285px)
+  { 
+    .tableFlipContainer.flipped
+    {
+      height: v-bind('(3231 + 0) + "px"')
+    } 
+  }
+  @media screen and (max-width: 444px)
+  { 
+    .tableFlipContainer.flipped
+    {
+      height: v-bind('(3559 + 0) + "px"')
+    } 
+  }
+  /*Set table height for Fire Fox*/
+  @-moz-document url-prefix()
+  {
+    @media screen and (min-width: 1285.1px)
+    { 
+      .tableFlipContainer.flipped
+      {
+        height: 2422px
+      }
+    }
+    @media screen and (min-width: 444.1px) and (max-width: 1285px)
+    { 
+      .tableFlipContainer.flipped
+      {
+        height: v-bind('(3249 + 0) + "px"')
+      } 
+    }
+    @media screen and (max-width: 444px)
+    { 
+      .tableFlipContainer.flipped
+      {
+        height: v-bind('(3477 + 0) + "px"')
+      } 
     }
   }
 
-  .tableFlipContainer.flipped.notConnected
-  {
-    height: 692px
-  }
-  @-moz-document url-prefix()
+  /*Set Portfolio Table Height Wallet Not Connected*/
+  @media screen and (min-width: 1285.1px)
   {
     .tableFlipContainer.flipped.notConnected
     {
-      height: 695px
+      height: 2450px
+    }
+  }
+  @media screen and (min-width: 444.1px) and (max-width: 1285px)
+  { 
+    .tableFlipContainer.flipped.notConnected
+    {
+      height: v-bind('(3277 + 0) + "px"')
+    } 
+  }
+  @media screen and (max-width: 444px)
+  { 
+    .tableFlipContainer.flipped.notConnected
+    {
+      height: v-bind('(3640 + 0) + "px"')
+    } 
+  }
+  @-moz-document url-prefix()
+  {
+    @media screen and (min-width: 1285.1px)
+    {
+      .tableFlipContainer.flipped.notConnected
+      {
+        height: 2470px
+      }
+    }
+    @media screen and (min-width: 444.1px) and (max-width: 1285px)
+    { 
+      .tableFlipContainer.flipped.notConnected
+      {
+        height: v-bind('(3297 + 0) + "px"')
+      } 
+    }
+    @media screen and (max-width: 444px)
+    { 
+      .tableFlipContainer.flipped.notConnected
+      {
+        height: v-bind('(3544 + 0) + "px"')
+      } 
     }
   }
 
+  /*Set Market Table height */
   @media screen and (min-width: 1769.1px)
   { 
     .tableFlipContainer

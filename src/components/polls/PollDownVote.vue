@@ -85,7 +85,7 @@
   {
     if(intervalId != undefined)
     {
-      clearInterval(intervalId);
+      clearInterval(intervalId)
       intervalId = undefined
     }
   }

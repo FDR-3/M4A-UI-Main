@@ -35,7 +35,7 @@
   var milisecondsLeft = ref()
   var countDownComplete = ref(false)
 
-  var intervalId: any;
+  var intervalId: any
 
   var currentDeadMansBreakTimeStamp: any
 
@@ -59,7 +59,7 @@
   {
     if(intervalId != undefined)
     {
-      clearInterval(intervalId);
+      clearInterval(intervalId)
       intervalId = undefined
     }
   })
@@ -75,7 +75,7 @@
 
     if(intervalId != undefined)
     {
-      clearInterval(intervalId);
+      clearInterval(intervalId)
       intervalId = undefined
     }
 
@@ -125,7 +125,7 @@
         secondsLeft.value = 0
         milisecondsLeft.value = "000"
 
-        clearInterval(intervalId);
+        clearInterval(intervalId)
         intervalId = undefined
 
         countDownComplete.value = true

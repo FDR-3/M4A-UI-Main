@@ -93,7 +93,7 @@
         secondsLeft.value = 0
         milisecondsLeft.value = 0
 
-        clearInterval(intervalId);
+        clearInterval(intervalId)
         intervalId = undefined
 
         countDownComplete.value = true
@@ -113,7 +113,7 @@
   {
     if(intervalId != undefined)
     {
-      clearInterval(intervalId);
+      clearInterval(intervalId)
       intervalId = undefined
     }
   })

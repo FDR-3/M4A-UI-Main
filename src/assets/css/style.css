@@ -41,6 +41,18 @@ iframe
   border: thick solid
 }
 
+.thinBorderTop
+{
+  border-top: thin solid;
+  border-radius: 0px
+}
+
+.thinBorderBottom
+{
+  border-bottom: thin solid;
+  border-radius: 0px
+}
+
 div
 {
   border-radius: 17px

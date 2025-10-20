@@ -3,7 +3,13 @@
   import { tokenReserves, tokenReserveDevNetMap, tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingerUserHashMap, lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap, lendingerUserTabsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingerUserHashMap,
+    lendingerUserAccountsHashMap,
+    lendingerUserDepositBalanceHashMap,
+    lendingerUserTabsHashMap,
+    lendingerUserAvailableTokenMintAddressesHashMap,
+    lendingerUserAvailableStatementYearsHashMap,
+    lendingerUserMonthlyStatementsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -344,6 +350,102 @@
       try
       {
         return await anchorPrograms.lending.lendingProgram.account.lendingUserTabAccount.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export async function setLendingUserMonthlyStatementHashMaps()
+  {
+    console.log("Setting Lending User Monthly Statement Hashmaps")
+
+    var monthlyStatementsHashMap = new Map<string, any>()
+    var availableTokenMintAddressesHashMap = new Map<string, any>()
+    var availableStatementYearsHashMap = new Map<string, any>()
+
+    const lendingUserMonthlyStatementAccounts = await getLendingUserMonthlyStatementsWrapper()
+
+    for(var i=0; i<lendingUserMonthlyStatementAccounts.length; i++)
+    {
+      const lendingUserMonthlyStatementAccount = lendingUserMonthlyStatementAccounts[i].account
+
+      const owner = lendingUserMonthlyStatementAccount.owner.toString()
+      const tokenMintAddress = lendingUserMonthlyStatementAccount.tokenMintAddress.toString()
+      const userAccountIndex = lendingUserMonthlyStatementAccount.userAccountIndex.toString()
+      const statementYear = lendingUserMonthlyStatementAccount.statementYear.toString()
+
+      //Set user yearly Statements hash map
+      var list = []
+      const previousLendingUserTabList = monthlyStatementsHashMap.get(owner + userAccountIndex + tokenMintAddress + statementYear)
+
+      if(previousLendingUserTabList)
+        list = previousLendingUserTabList
+
+      list.push(lendingUserMonthlyStatementAccount)
+      list = list.sort((a: any, b: any) => a.statementMonth - b.statementMonth)
+
+      monthlyStatementsHashMap.set(owner + userAccountIndex + tokenMintAddress + statementYear, list)
+
+      //Set user available TokenMintAddress hash map
+      var list = []
+
+      const previousLendingUserAvailableTokenMintAddressList = availableTokenMintAddressesHashMap.get(owner + userAccountIndex + tokenMintAddress)
+
+      if(previousLendingUserAvailableTokenMintAddressList)
+      {
+        list = previousLendingUserAvailableTokenMintAddressList
+        if(!previousLendingUserTabList.includes(tokenMintAddress))
+        {
+          list.push(tokenMintAddress)
+          list = list.sort((a: any, b: any) => a - b) 
+          availableTokenMintAddressesHashMap.set(owner + userAccountIndex + tokenMintAddress, list) 
+        }
+      }
+      else
+        availableTokenMintAddressesHashMap.set(owner + userAccountIndex + tokenMintAddress, [tokenMintAddress]) 
+
+      //Set user available Statement Year hash map
+      var list = []
+      const previousLendingUserAvailableYearList = availableStatementYearsHashMap.get(owner + userAccountIndex + tokenMintAddress)
+
+      if(previousLendingUserAvailableYearList)
+      {
+        list = previousLendingUserAvailableYearList
+        if(!previousLendingUserTabList.includes(lendingUserMonthlyStatementAccount.statementYear))
+        {
+          list.push(lendingUserMonthlyStatementAccount.statementYear)
+          list = list.sort((a: any, b: any) => a - b) 
+          availableStatementYearsHashMap.set(owner + lendingUserMonthlyStatementAccount.userAccountIndex.toString() + tokenMintAddress, list) 
+        }
+      }
+      else
+        availableStatementYearsHashMap.set(owner + lendingUserMonthlyStatementAccount.userAccountIndex.toString() + tokenMintAddress, [lendingUserMonthlyStatementAccount.statementYear]) 
+    }
+
+    lendingerUserAvailableTokenMintAddressesHashMap.map = availableTokenMintAddressesHashMap
+    lendingerUserAvailableStatementYearsHashMap.map = availableStatementYearsHashMap
+    lendingerUserMonthlyStatementsHashMap.map = monthlyStatementsHashMap
+  }
+
+  async function getLendingUserMonthlyStatementsWrapper()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.lending.lendingProgram.account.lendingUserMonthlyStatementAccount.all()
       }
       catch(error: any)
       {

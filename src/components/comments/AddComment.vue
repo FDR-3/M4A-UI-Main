@@ -51,14 +51,17 @@
 
     <div id="feeInfo" class="thickBorder">
       <ion-text><span class="rainbowText">110%</span> of these crowd funding donation fees will go to the <ion-text color="green">M4A</ion-text> 
-      treasury. These fees also deter bots, but on an unrelated note, bots and DOS/DDOS attacks are welcomed :D Come at me Bro!!!
-      Exposing any weaknesses would be greatly appreciated.<br>
+        treasury. These fees also deter bots, but on an unrelated note, bots and DOS/DDOS attacks are welcomed :D Come at me Bro!!!
+        Exposing any weaknesses would be greatly appreciated.<br>
 
-      <ion-button fill="clear" @click="sourceBowingJapaneseMan()">
-        <img id="bow" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNRvMD9h9nMKDparwjbHtxvqFyh8i2fL5ZXEd0">
-      </ion-button><br>
+        <div class="flexCenterColumn">
+          <ion-button fill="clear" @click="sourceBowingJapaneseMan()">
+            <img id="bow" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNRvMD9h9nMKDparwjbHtxvqFyh8i2fL5ZXEd0">
+          </ion-button>
+          <strong class="nMediumSmallMarginTop">Please</strong>
+        </div>
 
-      <strong>Please</strong></ion-text>
+      </ion-text><br>
       <ion-text>Any advice on improving the code or processes for the customer experience would be greatly appreciated. You do not have to be a software developer to have a great idea or to give <b>"constructive"</b> critism.<br> 
         Asking questions not directly derived from the website content may not receive a response
         <ion-button fill="clear" @click="giveSadSadPepeFeelsBadManCredit()">

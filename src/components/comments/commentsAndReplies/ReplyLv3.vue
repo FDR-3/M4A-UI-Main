@@ -505,13 +505,13 @@
 
   var overReplyByteSizeLimit = ref()
 
-  onMounted(async() => 
+  onMounted(() => 
   {
     editedMessage.value = props.msg; //Need semicolon here because of tuple line next
     [parsedMessage.value, embeddedYouTubeLink.value] = parseYoutubeLink(props.msg as string)
   })  
 
-  watch(() => props.msg, (async() => 
+  watch(() => props.msg, (() => 
   {
     [parsedMessage.value, embeddedYouTubeLink.value] = parseYoutubeLink(props.msg as string)
   }))

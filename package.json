@@ -26,6 +26,7 @@
     "@solana/wallet-adapter-wallets": "^0.19.32",
     "@solana/web3.js": "^1.98.4",
     "bn.js": "^5.2.2",
+    "chart.js": "^4.5.1",
     "connect": "^3.7.0",
     "deck.gl": "^9.0.29",
     "ethers": "^6.13.2",

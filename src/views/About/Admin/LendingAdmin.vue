@@ -1,7 +1,7 @@
 <template>
   <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
-      <h2>Current Statment Month And Year:</h2>
+      <h2>Current Statement Month And Year:</h2>
       <div class="flexCenterRow preserveWhiteSpace nMediumMarginTop">
         <h2>{{ anchorPrograms.currentStatementMonth + ", " }}</h2>
         <h2>{{ anchorPrograms.currentStatementYear }}</h2>

@@ -155,7 +155,7 @@
   {
     if(intervalId != undefined)
     {
-      clearInterval(intervalId);
+      clearInterval(intervalId)
       intervalId = undefined
     }
   })
@@ -164,7 +164,7 @@
   {
     if(intervalId != undefined)
     {
-      clearInterval(intervalId);
+      clearInterval(intervalId)
       intervalId = undefined
     }
   }
