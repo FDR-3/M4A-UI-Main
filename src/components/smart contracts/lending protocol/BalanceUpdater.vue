@@ -13,7 +13,7 @@
     singlePayerTreasuryATADevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
-  //import { PublicKey } from "@solana/web3.js"
+  import { LAMPORTS_PER_SOL } from "@solana/web3.js"
   import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token"
 
   const hodlTreasuryUSDCATA = hodlTreasuryATADevNetHashMap.get(tokenAddressStringsDevNet.usdcTokenMintAddress)
@@ -266,24 +266,16 @@
       console.log("User USDC DevATA Not Found")
     }
 
-    //User SOL Account
-    const userSolATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeysMainNet.solTokenMintAddress, //Token Mint Address
-      connectedWallet.publicKey //Wallet Public Key
-    )
     try
     {
       //Get User SOL Balance
-      const userSolAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userSolATA)
-      connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.solTokenMintAddress, userSolAccount.value.uiAmount)
+      const userSolBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(connectedWallet.publicKey)
+      connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.solTokenMintAddress, userSolBalance / LAMPORTS_PER_SOL)
       await listenForUserSOLChanges()
     }
-    catch
+    catch(error)
     {
-      console.log("User SOL ATA Not Found")
+      console.log(error)
     }
 
     //User WETH Account
@@ -458,21 +450,14 @@
 
   async function listenForUserSOLChanges()
   {
-    const useSolATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeysMainNet.solTokenMintAddress, //Token Mint Address
-      connectedWallet.publicKey //Wallet Public Key
-    )
     try
     {
       //Subscribe to account changes
-      userSOLATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(useSolATA, async() => 
+      userSOLATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.publicKey, async() => 
       {
         //Handle account change...
-        const userSolAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(useSolATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.solTokenMintAddress, userSolAccount.value.uiAmount)
+        const userSolBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(connectedWallet.publicKey)
+        connectedWallet.tokenBalanceMap.set(tokenAddressStringsMainNet.solTokenMintAddress, userSolBalance / LAMPORTS_PER_SOL)
       })
     }
     catch(error)

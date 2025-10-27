@@ -4,30 +4,68 @@
       <div>
         <h4 class="underLine" >7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
-        <h5 class="nMediumSmallMarginTop">Amount: <span class="rainbowText">0.15</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.15</span> A Week</h5>
       </div>
-    
-      <ion-button fill="clear" @click="openTokenPopover($event)">
-        <img v-if="tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; margin-right: -7px"/>
-        <component v-else :is="tokenSVG" style="width: 44px; max-height: 40px"></component>
-        <ion-text color="dark">{{ tokenName }}</ion-text>
-      </ion-button>
-      <ion-popover
-      :is-open="tokenPopoverOpen" 
-      :event="event" 
-      @didDismiss="tokenPopoverOpen=false"
-      side="top" 
-      alignment="center"
-      >
-        <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-          <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
-        </ion-button>
-      </ion-popover>
+
+      <div class="flexCenterColumn">
+        <div class="flexCenterRow">
+          <ion-button fill="clear" @click="openTokenPopover($event)">
+            <img v-if="tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px;  height: 35px; margin-right: -7px"/>
+            <component v-else :is="tokenSVG" style="width: 44px; height: 35px; max-height: 40px"></component>
+            <ion-text color="dark">{{ tokenName }}</ion-text>
+          </ion-button>
+          <ion-popover
+          :is-open="tokenPopoverOpen" 
+          :event="event" 
+          @didDismiss="tokenPopoverOpen=false"
+          side="top" 
+          alignment="center"
+          >
+            <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+              <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+            </ion-button>
+          </ion-popover>
+        </div>
+
+        <ion-label class="smallMarginBottom">Balance: <span class="rainbowText">{{ userBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValue }} </span></ion-label>
+ 
+        <ion-label >Last Action: {{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount + ' ' + tokenName}}
+          <br>{{ convertUnixTimeToLocalDate(chartData?.lastActionTimeStamp) + ' ' + convertUnixTimeToLocalTime(chartData?.lastActionTimeStamp)}}
+        </ion-label>
+
+        <div class="flexCenterRow">
+          <Select
+          class="yearSelect"
+          style="margin: 10px"
+          v-model="yearSelect" 
+          :options="yearList" 
+          optionLabel="yearAvailable" 
+          optionValue="yearAvailable" 
+          placeholder="Select Year"
+          @change="$emit('changeYear', tokenMintAddress, yearSelect)">
+          </Select>
+          <ion-button v-if="ownerAddress==connectedWallet.addressString" fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
+          <ion-popover
+          :is-open="actionsPopoverOpen" 
+          :event="event" 
+          @didDismiss="actionsPopoverOpen=false"
+          side="top" 
+          alignment="center"
+          >
+            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress); actionsPopoverOpen=false">
+              <ion-label color="dark">Deposit</ion-label>
+            </ion-button>
+            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress); actionsPopoverOpen=false">
+              <ion-label color="dark">Withdraw</ion-label>
+            </ion-button>
+          </ion-popover>
+        </div>
+      </div>
 
       <div>
         <h4 class="underLine">Life Time Interest Earned</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
-        <h5 class="nMediumSmallMarginTop">Amount: <span class="rainbowText">15.00</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">15.00</span></h5>
       </div>   
     </div>
 
@@ -49,16 +87,51 @@
         </ion-button>
       </ion-popover>
 
-      <div class="nLargeMarginTop">
+      <br><ion-label>Balance: <span class="rainbowText">{{ userBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValue }} </span></ion-label>
+
+      <div class="mediumSmallMarginTop">
+        <ion-label>Last Action: <br>{{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount + ' ' + tokenName}}
+          <br>{{ convertUnixTimeToLocalTime(chartData?.lastActionTimeStamp) }}<br>{{ convertUnixTimeToLocalDate(chartData?.lastActionTimeStamp) }}
+        </ion-label>
+      </div>
+      
+      <div class="nSmallMarginTop">
         <h4 class="underLine">Life Time Interest Earned</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">10.00</span></h5>
-        <h5 class="nMediumSmallMarginTop">Amount: <span class="rainbowText">10.00</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">10.00</span></h5>
       </div>  
 
-      <div class="nMediumMarginTop">
+      <div class="nMediumMarginTop" style="margin-bottom: -2px">
         <h4 class="underLine">7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.11</span> A Week</h5>
-        <h5 class="nMediumSmallMarginTop">Amount: <span class="rainbowText">0.11</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.11</span> A Week</h5>
+      </div>
+
+      <div>
+        <Select
+          class="yearSelect mediumMarginBottom nSmallMarginTop"
+          v-model="yearSelect" 
+          :options="yearList" 
+          optionLabel="yearAvailable" 
+          optionValue="yearAvailable" 
+          placeholder="Select Year"
+          @change="$emit('changeYear', tokenMintAddress, yearSelect)">
+          </Select>
+          <ion-button v-if="ownerAddress==connectedWallet.addressString" fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
+          <ion-popover
+          :is-open="actionsPopoverOpen" 
+          :event="event" 
+          @didDismiss="actionsPopoverOpen=false"
+          side="top" 
+          alignment="center"
+          >
+            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress); actionsPopoverOpen=false">
+              <ion-label color="dark">Deposit</ion-label>
+            </ion-button>
+            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress); actionsPopoverOpen=false">
+              <ion-label color="dark">Withdraw</ion-label>
+            </ion-button>
+          </ion-popover>
       </div>
     </div>
 
@@ -96,14 +169,20 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
   import { IonButton, IonLabel, IonPopover, IonText } from '@ionic/vue'
+  import Select from 'primevue/select'
   import Chart from 'primevue/chart'
+  import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
+  import { lendingerUserAvailableYearsByTokenMintAddressHashMap, lendingerUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
+  import cloneDeep from 'lodash/cloneDeep'
 
-  const props = defineProps(['tokenMintAddress', 'tokenSVG', 'tokenName', 'chartData'])
+  const props = defineProps(['tokenMintAddress', 'tokenDecimal', 'tokenSVG', 'tokenName', 'ownerAddress', 'accountIndex', 'chartData'])
 
   var chartOptions = ref()
   var chartRef = ref<any>(null)
@@ -112,11 +191,50 @@
   var intervalId: any
 
   var tokenPopoverOpen = ref(false)
+  var actionsPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
+  var yearSelect = ref()
+  var yearList = ref()
+
+  var userBalance = ref()
+  var balanceValue = computed ( () =>
+  {
+    const price = priceObjectMap.data[props.tokenMintAddress].usdPrice
+    if(price)
+      return (userBalance.value * Number(price)).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })        
+    else
+      return (0).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })   
+  })
+
+  var activityDescriptions =
+  [
+    "Deposited",
+    "Withdrew",
+    "Borrowed",
+    "Repaid"
+  ]
+
   onMounted(() =>
   {
+    if(lendingerUserDepositBalanceHashMap.map)
+    {
+      const balance = lendingerUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+      if(balance)
+        userBalance.value = Number(balance)
+      else
+        userBalance.value = 0
+    }
+
+    getYearList()
+    yearList.value = getYearList()
+    yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
+
     chartOptions.value = setChartOptions()
     startGradientAnimation()
   })
@@ -124,6 +242,21 @@
   onUnmounted(() =>
   {
     stopGradientAnimation()
+  })
+
+  watch(lendingerUserAvailableYearsByTokenMintAddressHashMap, ()=>
+  {
+    const balance = lendingerUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    if(balance)
+      userBalance.value = Number(balance)
+    else
+      userBalance.value = 0
+  })
+
+  watch(lendingerUserAvailableYearsByTokenMintAddressHashMap, ()=>
+  {
+    yearList.value = getYearList()
+    yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
   })
 
   watch(darkTheme,() =>
@@ -135,6 +268,40 @@
 
     chartOptions.value = setChartOptions()
   })
+
+  watch(() => [props.ownerAddress, props.accountIndex], (() => 
+  {
+    const balance = lendingerUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    if(balance)
+      userBalance.value = Number(balance)
+    else
+      userBalance.value = 0
+
+    yearList.value = getYearList()
+    yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
+  }))
+
+  function getYearList()
+  {
+    const newDate = new Date()
+    const currentYear = newDate.getFullYear()
+
+    var initialList = lendingerUserAvailableYearsByTokenMintAddressHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    var firstYear = initialList[0].yearAvailable
+    var processedList = []
+
+    for(var year=firstYear; year<=currentYear; year++)
+    {
+      const availableYearObject =
+      {
+        yearAvailable: year
+      }
+
+      processedList.push(availableYearObject)
+    }
+
+    return processedList
+  }
 
   //1. Reactive value to shift the gradient position
   const gradientOffset = ref(0)
@@ -280,6 +447,12 @@
     tokenPopoverOpen.value = false
   }
 
+  function openActionsPopover(e: Event) 
+  {
+    event.value = e
+    actionsPopoverOpen.value = true
+  }
+
   function passByRefWrapperCopyAddress()
   {
     copyTokenMintAddress(copyTokenMintAddressButtonText, props.tokenMintAddress)
@@ -287,6 +460,12 @@
 </script>
 
 <style scoped>
+  .yearSelect
+  {
+    width: 125px;
+    padding-left: 20px
+  }
+
   .legend-item
   {
     display: flex;
@@ -318,6 +497,11 @@
     background-size: 150% auto;
     animation: rainbowAnimation 1.8s linear infinite
   }
+
+  .vChartLayout
+  {
+    height: 420px
+  } 
 
   @keyframes rainbowAnimation
   {
@@ -374,5 +558,4 @@
       gap: 4px
     }
   }
-
 </style>

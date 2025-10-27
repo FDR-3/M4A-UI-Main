@@ -5,7 +5,8 @@
   >
     <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
       <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
-        <component class="noClickEvent" id="withdrawSVG" :is="withdrawSVG" style="width: 44px; max-height: 40px"></component>
+        <img class="noClickEvent" v-if="selectedTokenMintAddress?.toString()==tokenAddressStringsMainNet.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <component class="noClickEvent" v-else :is="withdrawSVG" style="width: 44px"></component>
         <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
@@ -82,8 +83,9 @@
   import { copyTokenMintAddress,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveDevNetMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap, lendingerUserTabsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -158,7 +160,6 @@
       (event?.target?.id != "openCopyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressPopover") &&
-      (event?.target?.id != "withdrawSVG") &&
       (event?.target?.id != "withdrawalModal") &&
       (event?.target?.id != "openWithdrawalModal") &&
       (event?.target?.id != "maxButtonContainer") &&
@@ -200,7 +201,7 @@
     }
   }
 
-  function openWithdrawalModal(tokenMintAddress: string, decimalAmount: number, tokenSVG: Component, tokenName: string)
+  function openWithdrawalModal(tokenMintAddress: string)
   {
     addCloseListner()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
@@ -210,28 +211,26 @@
       const userAccountList = lendingerUserAccountsHashMap.map.get(connectedWallet.addressString)
       if(userAccountList)
       {
-
         accountList.value = userAccountList
         if(userAccountList.length >= 2)
           hasAtleast2Accounts.value = true
       }
       else
-      {
-
         hasAtleast2Accounts.value = false
-      }
     }
     else
-    {
-
       hasAtleast2Accounts.value = false
-    }
 
     const balance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else
       userBalance.value = 0
+
+    const tokenInfo = tokenReserveDevNetMap.get(tokenMintAddress)
+    const tokenName = tokenInfo.name
+    const decimalAmount = tokenInfo.decimalAmount
+    const tokenSVG = tokenInfo.svg
 
     withdrawAmount.value = 0
     withdrawIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
@@ -268,7 +267,7 @@
   function updateStoredSelectedAccount()
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-    localStorage.setItem(connectedWallet.addressString + "selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
   }
 
   async function withdrawTokens()

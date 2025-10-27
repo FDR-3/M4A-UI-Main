@@ -25,7 +25,7 @@
     map: undefined
   })
 
-  //Key: Lending User Address + Account Index + TokenMintAddress + Tax Year, Value: List of User Monthly Statement Accounts for a given TokenMintAddress and Tax Year
+  //Key: Lending User Address + Account Index + TokenMintAddress + Tax Year + Tax Month, Value: User Monthly Statement Accounts for a given TokenMintAddress and Tax Year and Tax Month
   export const lendingerUserMonthlyStatementsHashMap = reactive(
   {
     map: undefined
@@ -37,8 +37,8 @@
     map: undefined
   })
 
-  //Key: Lending User Address + Account Index + TokenMintAddress, Value: List of User Available Statement Tax Years
-  export const lendingerUserAvailableStatementYearsHashMap = reactive(
+  //Key: Lending User Address + Account Index + TokenMintAddress, Value: List of User Available Statement Tax Years by TokenMintAddress
+  export const lendingerUserAvailableYearsByTokenMintAddressHashMap = reactive(
   {
     map: undefined
   })

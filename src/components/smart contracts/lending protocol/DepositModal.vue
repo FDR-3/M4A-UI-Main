@@ -5,7 +5,8 @@
   >
     <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
       <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
-        <component class="noClickEvent" id="depositSVG" :is="depositSVG" style="width: 44px; max-height: 40px"></component>
+        <img class="noClickEvent" v-if="selectedTokenMintAddress?.toString()==tokenAddressStringsMainNet.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <component class="noClickEvent" v-else :is="depositSVG" style="width: 44px"></component>
         <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
@@ -78,7 +79,7 @@
       @input="(event: { value: any }) => depositAmount = event.value"
     />
     <div id="maxButtonContainer" class="alignSelfLeft">
-      <button id="maxButton" style="background-color: transparent" @click="depositAmount=userBalance">
+      <button id="maxButton" style="background-color: transparent" @click="selectedTokenMintAddress?.toString()!=tokenAddressStringsMainNet.solTokenMintAddress ? depositAmount=userBalance : depositAmount=userBalance-0.1">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
@@ -121,8 +122,9 @@
   import { copyTokenMintAddress,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveDevNetMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { lendingerUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -211,7 +213,6 @@
       (event?.target?.id != "copyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressPopover") &&
       (event?.target?.id != "accountNameEditInput") &&
-      (event?.target?.id != "depositSVG") &&
       (event?.target?.id != "depositModal") &&
       (event?.target?.id != "openDepositModal") &&
       (event?.target?.id != "maxButtonContainer") &&
@@ -268,7 +269,7 @@
     }
   }
 
-  function openDepositModal(tokenMintAddress: string, decimalAmount: number, tokenSVG: Component, tokenName: string)
+  function openDepositModal(tokenMintAddress: string)
   {
     addCloseListner()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
@@ -306,6 +307,11 @@
       userBalance.value = Number(balance)
     else
       userBalance.value = 0
+
+    const tokenInfo = tokenReserveDevNetMap.get(tokenMintAddress)
+    const tokenName = tokenInfo.name
+    const decimalAmount = tokenInfo.decimalAmount
+    const tokenSVG = tokenInfo.svg
 
     depositAmount.value = 0
     depositIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
@@ -381,7 +387,8 @@
     accountName.value = `Account ${userAccountList.length + 1}`
     previousAccountSelect = accountSelect.value
     accountSelect.value = userAccountList.length
-    localStorage.setItem(connectedWallet.addressString + "selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     addingAdditionalLendingAccount.value = true
   }
@@ -389,7 +396,8 @@
   function cancelAddingAdditionalLendingAccount()
   {
     accountSelect.value = previousAccountSelect
-    localStorage.setItem(connectedWallet.addressString + "selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     addingAdditionalLendingAccount.value = false
   }
@@ -397,7 +405,7 @@
   function updateStoredSelectedAccount()
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-    localStorage.setItem(connectedWallet.addressString + "selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
   }
 
   async function depositTokens()

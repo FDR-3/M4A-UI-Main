@@ -26,7 +26,7 @@
         placeholder="Enter Statement Year"
         type="number"
         step="1"
-        min="2024">
+        min="2022">
         </ion-input>
         <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentStatementMonthAndYear()" style="width:77px" :disabled="statementYearInput == ''">
           Update

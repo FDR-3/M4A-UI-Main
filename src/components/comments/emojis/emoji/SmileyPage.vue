@@ -371,7 +371,7 @@
   <ion-button class="emojiButton emojiFilter animals face cat" fill="clear" @click="$emit('emojiSelected', '🐱')" title="cat face">
     🐱
   </ion-button>
-  <ion-button class="emojiButton emojiFilter animals face lion" fill="clear" @click="$emit('emojiSelected', '🦁')" title="lion">
+  <ion-button class="emojiButton emojiFilter animals face lion brave" fill="clear" @click="$emit('emojiSelected', '🦁')" title="lion">
     🦁
   </ion-button>
   <ion-button class="emojiButton emojiFilter animals face tiger" fill="clear" @click="$emit('emojiSelected', '🐯')" title="tiger face">

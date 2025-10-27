@@ -48,6 +48,7 @@
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { PublicKey } from "@solana/web3.js"
+  import { isBrowserFireFox } from '/src/assets/helperFunctions/browserHelper.ts'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import KingobamaMobileT1 from '/src/components/fancy/poly/KingobamaMobileT1.vue'
   import KingobamaMobileT2 from '/src/components/fancy/poly/KingobamaMobileT2.vue'
@@ -220,16 +221,6 @@
       dynamicTableHeight.value = tokenReserveTableSizing + ownerTableSizing - numberToSubTractForBothTablesFireFox
     } 
   }
-
-  const isBrowserFireFox = () =>
-  {
-    // Check if we are in a browser environment (important for SSR/Node.js)
-    if (typeof window === 'undefined' || !window.navigator)
-       return false
-    
-    // Convert to lowercase and check for the "firefox" string
-    return window.navigator.userAgent.toLowerCase().includes('firefox')
-  }
 </script>
 
 <style scoped>
@@ -336,35 +327,35 @@
   { 
     .tableFlipContainer
     {
-      height: 1678px
+      height: 1705px
     }
   }
   @media screen and (min-width: 1037.1px) and (max-width: 1059px) 
   { 
     .tableFlipContainer
     {
-      height: 1707px
+      height: 1735px
     }
   }
   @media screen and (min-width: 965.1px) and (max-width: 1037px) 
   { 
     .tableFlipContainer
     {
-      height: 1734px
+      height: 1762px
     }
   }
   @media screen and (min-width: 926.1px) and (max-width: 965px) 
   { 
     .tableFlipContainer
     {
-      height: 1771px
+      height: 1798px
     }
   }
   @media screen and (max-width: 926px) 
   { 
     .tableFlipContainer
     {
-      height: 1800px
+      height: 1828px
     }
   }
   /*Set table height for Fire Fox*/
@@ -374,21 +365,21 @@
     { 
       .tableFlipContainer
       {
-        height: 1712px
+        height: 1739px
       }
     }
     @media screen and (min-width: 925.1px) and (max-width: 965px) 
     { 
       .tableFlipContainer
       {
-        height: 1748px
+        height: 1776px
       }
     }
     @media screen and (max-width: 925px) 
     { 
       .tableFlipContainer
       {
-        height: 1783px
+        height: 1809px
       }
     }
   }

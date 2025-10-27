@@ -134,11 +134,6 @@
   background-clip: padding-box
 }
 
-.p-datatable-thead:hover > tr > th
-{
-  background-clip: padding-box
-}
-
 .p-datatable-tbody > tr > td 
 {
   border-width: 2px !important;

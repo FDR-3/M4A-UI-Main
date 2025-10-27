@@ -28,9 +28,10 @@
       <template #loading> Loading Reserves. Please wait. </template>
       <Column field="name" header="Token Reserve" style="width: 0%" sortable>
         <template #body="slotProps">
-          <div class="flexCenterRowHeight">
+          <div class="flexCenterRowHeight" >
             <ion-button style="margin-left: -11px; margin-right: -5px" fill="clear" @click="openTokenReserveATAPopover($event, slotProps.data)">
-              <component :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
+              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress"  style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+              <component v-else :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.name }}</ion-label>
             </ion-button>
             <ion-popover 
@@ -222,6 +223,7 @@
   import { tokenReserves,
     tokenReserveDevNetMap, 
     priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveSubMarketListHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -438,7 +440,9 @@
       if(priceData)
         calculatedValue = (balance * priceData.usdPrice)
 
-      processedTableData[i].value = '$' + calculatedValue.toFixed(2)
+      processedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
       value += calculatedValue + value
 
       //Get SubMarket List And Count
@@ -460,7 +464,9 @@
             {
               const priceData = priceObjectMap.data[unProcessedTokenSubMarketList[j].tokenMintAddress.toBase58()]
               if(priceData)
-                unProcessedTokenSubMarketList[j].value = '$' + (unProcessedTokenSubMarketList[j].depositedAmount * priceData.usdPrice).toFixed(2)
+                unProcessedTokenSubMarketList[j].value = '$' + calculatedValue.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
             }
 
             tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])

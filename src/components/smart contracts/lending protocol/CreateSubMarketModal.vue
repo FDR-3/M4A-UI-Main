@@ -2,11 +2,11 @@
   <div v-if="creatingSubMarket"
     id="createSubMarketModal"
     class="thickBorder"
-
   >
     <div id="createSubMarketHeader" class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
       <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
-        <component class="noClickEvent" id="createSubMarketSVG" :is="createSubMarketSVG" style="width: 44px"></component>
+        <img class="noClickEvent" v-if="selectedTokenMintAddressString==tokenAddressStringsMainNet.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <component class="noClickEvent" v-else :is="createSubMarketSVG" style="width: 44px"></component>
         <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
@@ -82,6 +82,7 @@
     isValidSolanaPublicKey,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
 
   const toast = inject('toast')
@@ -95,6 +96,7 @@
   var subMarketTokenName = ref()
   var feeCollectorAddress = ref()
   var selectedTokenMintAddress: PublicKey
+  var selectedTokenMintAddressString: string
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -111,7 +113,6 @@
       (event?.target?.id != "openCopyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressPopover") &&
-      (event?.target?.id != "createSubMarketSVG") &&
       (event?.target?.id != "createSubMarketModal") &&
       (event?.target?.id != "openCreateSubMarketModal") &&
       (event?.target?.id != "createSubMarketButton") &&
@@ -141,6 +142,7 @@
     feeCollectorAddress.value = connectedWallet.addressString
     isValidPublicKey.value = isValidSolanaPublicKey(feeCollectorAddress.value)
     selectedTokenMintAddress = tokenMintAddress
+    selectedTokenMintAddressString = tokenMintAddress.toString()
     createSubMarketSVG.value = tokenSVG
     subMarketTokenName.value = tokenName
     creatingSubMarket.value = true
@@ -182,7 +184,7 @@
   {
     try
     {
-      const userNextSubMarketIndex = getUserNextSubMarketIndex(connectedWallet.addressString)
+      const userNextSubMarketIndex = getUserNextSubMarketIndex(connectedWallet.addressString, selectedTokenMintAddress.toString())
 
       const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
       (

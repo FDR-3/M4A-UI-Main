@@ -14,7 +14,6 @@
       <div class="stats thickBorder">
         <h1>CEO Profile</h1>
         <div class="standardFontSize">
-          <p>Name: xavier dillard</p>
           <p>CEO Name: fdr-3</p>
           <p>Email: fdr3@m4a.io</p>
           <a href="https://www.facebook.com/61578948853626/videos/757643450009117" target="_blank"><p>How I was illegally fired in retaliation<br>(Patriot put a privacy claim on my youtube video complaining

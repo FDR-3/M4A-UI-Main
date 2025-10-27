@@ -1,14 +1,18 @@
 <script lang="ts">
   import * as anchor from "@coral-xyz/anchor"
   import { tokenReserves, tokenReserveDevNetMap, tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap, tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { subMarkets,
+    subMarketsHashMap,
+    subMarketOwnerHashMap,
+    subMarketOwnerByTokenMintAddressHashMap,
+    tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingerUserHashMap,
     lendingerUserAccountsHashMap,
     lendingerUserDepositBalanceHashMap,
     lendingerUserTabsHashMap,
     lendingerUserAvailableTokenMintAddressesHashMap,
-    lendingerUserAvailableStatementYearsHashMap,
+    lendingerUserAvailableYearsByTokenMintAddressHashMap,
     lendingerUserMonthlyStatementsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
@@ -133,6 +137,7 @@
     var subMarketsList: any = []
     var subMarketsMap = new Map<string, any>()
     var subMarketOwnerMap = new Map<string, any>()
+    var subMarketOwnerByTokenMintAddressMap = new Map<string, any>()
     var tokenReserveMap = new Map<string, any>()
 
     const allSubMarkets = await getSubMarketsWrapper()
@@ -140,23 +145,25 @@
     //Create TokenReserve/SubMarket hash map and SubMarket list for tables
     for(var i=0; i<allSubMarkets.length; i++)
     {
+      const subMarket = allSubMarkets[i].account
+
       //Populate Token Reserve hash map
       var ownerTokenReserveList: any = []
 
       //Convert Deposit Amount To Decimal from Fixed Point
-      const decimalAmount = tokenDecimalHashMap.get(allSubMarkets[i].account.tokenMintAddress.toBase58())
-      allSubMarkets[i].account.depositedAmount = (Number(allSubMarkets[i].account.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+      const decimalAmount = tokenDecimalHashMap.get(subMarket.tokenMintAddress.toBase58())
+      subMarket.depositedAmount = (Number(subMarket.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
 
       //Convert Fee Percentage To Decimal from Fixed Point
-      allSubMarkets[i].account.feeOnInterestEarnedRate = (allSubMarkets[i].account.feeOnInterestEarnedRate / 100)
+      subMarket.feeOnInterestEarnedRate = (subMarket.feeOnInterestEarnedRate / 100)
 
-      const previousTokenReserveList = tokenReserveMap.get(allSubMarkets[i].account.tokenMintAddress.toBase58())
+      const previousTokenReserveList = tokenReserveMap.get(subMarket.tokenMintAddress.toBase58())
       if(previousTokenReserveList)
         ownerTokenReserveList = previousTokenReserveList
 
-      ownerTokenReserveList.push(allSubMarkets[i].account)
+      ownerTokenReserveList.push(subMarket)
 
-      tokenReserveMap.set(allSubMarkets[i].account.tokenMintAddress.toBase58(), ownerTokenReserveList)
+      tokenReserveMap.set(subMarket.tokenMintAddress.toBase58(), ownerTokenReserveList)
 
       //Populate SubMarket Owner hash map
       var subMarketOwner: SubMarketOwner = 
@@ -165,13 +172,13 @@
         ownerSubMarketList: []
       }
 
-      const previousSubMarketOwnerData = subMarketOwnerMap.get(allSubMarkets[i].account.owner.toBase58())
+      const previousSubMarketOwnerData = subMarketOwnerMap.get(subMarket.owner.toBase58())
       if(previousSubMarketOwnerData)
         subMarketOwner = previousSubMarketOwnerData
   
-      subMarketOwner.ownerSubMarketList.push(allSubMarkets[i].account)
+      subMarketOwner.ownerSubMarketList.push(subMarket)
 
-      const newIndex = subMarketOwner.ownerSubMarketList.length - 1
+      let newIndex = subMarketOwner.ownerSubMarketList.length - 1
 
       const tokenFrontEndProperties = tokenReserveDevNetMap.get(subMarketOwner.ownerSubMarketList[newIndex].tokenMintAddress.toBase58())
 
@@ -181,19 +188,29 @@
       subMarketOwner.ownerSubMarketList[newIndex].svgSource = tokenFrontEndProperties.source
       subMarketOwner.subMarketCount = subMarketOwner.ownerSubMarketList.length
 
-      subMarketOwnerMap.set(allSubMarkets[i].account.owner.toBase58(), subMarketOwner)
+      subMarketOwnerMap.set(subMarket.owner.toBase58(), subMarketOwner)
+
+      //Populate SubMarket Owner by TokenMintAddress hash map
+      var list = []
+
+      const previousSubMarketOwnerByTokenMintAddressData = subMarketOwnerByTokenMintAddressMap.get(subMarket.owner.toBase58() + subMarket.tokenMintAddress.toBase58())
+      if(previousSubMarketOwnerByTokenMintAddressData)
+        list = previousSubMarketOwnerByTokenMintAddressData
+  
+      list.push(subMarket)
+      subMarketOwnerByTokenMintAddressMap.set(subMarket.owner.toBase58() + subMarket.tokenMintAddress.toBase58(), list)
 
       //Populate SubMarket hash map
       subMarketsMap.set
       (
-        allSubMarkets[i].account.tokenMintAddress.toBase58() +
-        allSubMarkets[i].account.owner.toBase58() +
-        allSubMarkets[i].account.subMarketIndex.toString(), 
-        allSubMarkets[i].account
+        subMarket.tokenMintAddress.toBase58() +
+        subMarket.owner.toBase58() +
+        subMarket.subMarketIndex.toString(), 
+        subMarket
       )
 
       //Add SubMarket to overall list
-      subMarketsList.push(allSubMarkets[i].account)
+      subMarketsList.push(subMarket)
     }
 
     console.log("Setting SubMarket Hash Maps")
@@ -201,6 +218,7 @@
     tokenReserveSubMarketListHashMap.map = cloneDeep(tokenReserveMap)
     subMarketsHashMap.map = cloneDeep(subMarketsMap)
     subMarketOwnerHashMap.map = cloneDeep(subMarketOwnerMap)
+    subMarketOwnerByTokenMintAddressHashMap.map = cloneDeep(subMarketOwnerByTokenMintAddressMap) 
 
     subMarkets.ownerCount = subMarketOwnerHashMap.map.size
 
@@ -232,12 +250,12 @@
     }
   }
 
-  export function getUserNextSubMarketIndex(owner: string)
+  export function getUserNextSubMarketIndex(owner: string, tokenMintAddress: string)
   {
-    const userSubMarketList = subMarketOwnerHashMap.map.get(owner)
+    const userSubMarketListByTokenMintAddress = subMarketOwnerByTokenMintAddressHashMap.map.get(owner + tokenMintAddress)
 
-    if(userSubMarketList)
-      return userSubMarketList.ownerSubMarketList.length
+    if(userSubMarketListByTokenMintAddress)
+      return userSubMarketListByTokenMintAddress.length
     else
       return 0
   }
@@ -300,7 +318,7 @@
     var userTabListHashMap = new Map<string, any>()
     var depositBalanceHashMap = new Map<string, any>()
     const lendingUserTabs = await getLendingUserTabsWrapper()
-
+    
     for(var i=0; i<lendingUserTabs.length; i++)
     {
       const lendingUserTabAccount = lendingUserTabs[i].account
@@ -308,7 +326,7 @@
 
       //Set user tab list hash map
       var list = []
-      const previousLendingUserTabList = userTabListHashMap.get(lendingUserTabAccount.owner.toBase58())
+      const previousLendingUserTabList = userTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
 
       if(previousLendingUserTabList)
         list = previousLendingUserTabList
@@ -373,7 +391,7 @@
 
     var monthlyStatementsHashMap = new Map<string, any>()
     var availableTokenMintAddressesHashMap = new Map<string, any>()
-    var availableStatementYearsHashMap = new Map<string, any>()
+    var availableYearsByTokenMintAddressHashMap = new Map<string, any>()
 
     const lendingUserMonthlyStatementAccounts = await getLendingUserMonthlyStatementsWrapper()
 
@@ -385,57 +403,51 @@
       const tokenMintAddress = lendingUserMonthlyStatementAccount.tokenMintAddress.toString()
       const userAccountIndex = lendingUserMonthlyStatementAccount.userAccountIndex.toString()
       const statementYear = lendingUserMonthlyStatementAccount.statementYear.toString()
+      const statementMonth = lendingUserMonthlyStatementAccount.statementMonth.toString()
 
-      //Set user yearly Statements hash map
+      //Set User Monthly Statements hash map
+      monthlyStatementsHashMap.set(owner + userAccountIndex + tokenMintAddress + statementYear + statementMonth, lendingUserMonthlyStatementAccount)
+
+      //Set User available TokenMintAddress hash map
       var list = []
-      const previousLendingUserTabList = monthlyStatementsHashMap.get(owner + userAccountIndex + tokenMintAddress + statementYear)
-
-      if(previousLendingUserTabList)
-        list = previousLendingUserTabList
-
-      list.push(lendingUserMonthlyStatementAccount)
-      list = list.sort((a: any, b: any) => a.statementMonth - b.statementMonth)
-
-      monthlyStatementsHashMap.set(owner + userAccountIndex + tokenMintAddress + statementYear, list)
-
-      //Set user available TokenMintAddress hash map
-      var list = []
-
-      const previousLendingUserAvailableTokenMintAddressList = availableTokenMintAddressesHashMap.get(owner + userAccountIndex + tokenMintAddress)
+      const previousLendingUserAvailableTokenMintAddressList = availableTokenMintAddressesHashMap.get(owner + userAccountIndex)
 
       if(previousLendingUserAvailableTokenMintAddressList)
       {
         list = previousLendingUserAvailableTokenMintAddressList
-        if(!previousLendingUserTabList.includes(tokenMintAddress))
+        if(!list.includes(tokenMintAddress))
         {
           list.push(tokenMintAddress)
-          list = list.sort((a: any, b: any) => a - b) 
-          availableTokenMintAddressesHashMap.set(owner + userAccountIndex + tokenMintAddress, list) 
+          availableTokenMintAddressesHashMap.set(owner + userAccountIndex, list) 
         }
       }
       else
-        availableTokenMintAddressesHashMap.set(owner + userAccountIndex + tokenMintAddress, [tokenMintAddress]) 
+        availableTokenMintAddressesHashMap.set(owner + userAccountIndex, [tokenMintAddress]) 
 
-      //Set user available Statement Year hash map
+      //Set User available Statement Year by Token Mint Address hash map
       var list = []
-      const previousLendingUserAvailableYearList = availableStatementYearsHashMap.get(owner + userAccountIndex + tokenMintAddress)
-
-      if(previousLendingUserAvailableYearList)
+      const previousLendingUserAvailableYearByTokenMintAddressList = availableYearsByTokenMintAddressHashMap.get(owner + userAccountIndex + tokenMintAddress)
+      const availableYearByTokenMintAddressObject =
       {
-        list = previousLendingUserAvailableYearList
-        if(!previousLendingUserTabList.includes(lendingUserMonthlyStatementAccount.statementYear))
+        yearAvailable: lendingUserMonthlyStatementAccount.statementYear
+      }
+
+      if(previousLendingUserAvailableYearByTokenMintAddressList)
+      {
+        list = previousLendingUserAvailableYearByTokenMintAddressList
+        if(!list.some((obj: { yearAvailable: any }) => obj.yearAvailable == lendingUserMonthlyStatementAccount.statementYear))
         {
-          list.push(lendingUserMonthlyStatementAccount.statementYear)
-          list = list.sort((a: any, b: any) => a - b) 
-          availableStatementYearsHashMap.set(owner + lendingUserMonthlyStatementAccount.userAccountIndex.toString() + tokenMintAddress, list) 
+          list.push(availableYearByTokenMintAddressObject)
+          list = list.sort((a: any, b: any) => a.yearAvailable - b.yearAvailable) 
+          availableYearsByTokenMintAddressHashMap.set(owner + lendingUserMonthlyStatementAccount.userAccountIndex.toString() + tokenMintAddress, list) 
         }
       }
       else
-        availableStatementYearsHashMap.set(owner + lendingUserMonthlyStatementAccount.userAccountIndex.toString() + tokenMintAddress, [lendingUserMonthlyStatementAccount.statementYear]) 
+        availableYearsByTokenMintAddressHashMap.set(owner + lendingUserMonthlyStatementAccount.userAccountIndex.toString() + tokenMintAddress, [availableYearByTokenMintAddressObject])
     }
 
     lendingerUserAvailableTokenMintAddressesHashMap.map = availableTokenMintAddressesHashMap
-    lendingerUserAvailableStatementYearsHashMap.map = availableStatementYearsHashMap
+    lendingerUserAvailableYearsByTokenMintAddressHashMap.map = availableYearsByTokenMintAddressHashMap
     lendingerUserMonthlyStatementsHashMap.map = monthlyStatementsHashMap
   }
 

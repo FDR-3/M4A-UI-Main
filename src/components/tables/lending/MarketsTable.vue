@@ -1,13 +1,13 @@
 <template>
   <div class="tableContainer">
+    <!--Stable Coins-->
     <DataTable 
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines 
       sortField="supplyAPY" 
       :sortOrder="-1" 
-      size="small" 
-      scrollable
+      size="small"
       :value="StableCoins"
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
@@ -171,41 +171,46 @@
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
           <div class="flexCenterRow">
+            <ion-text v-if="!slotProps.data.isMainSubMarketReady">No Submarket</ion-text>
             <ion-button
+            v-else-if="slotProps.data.depositBalance == 0"
             class="tableDepositButton"
             color="dark"
-            @click="$emit('openDepositModal',
-            slotProps.data.tokenMintAddressString,
-            slotProps.data.decimalAmount,
-            slotProps.data.asset.svg,
-            slotProps.data.asset.name)"
-            :disabled="!slotProps.data.isMainSubMarketReady"
-            >
+            @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString)">
              Deposit
             </ion-button>
             <ion-button
-            v-if="slotProps.data.depositBalance"
+            v-else
             class="tableWithdrawButton"
             color="dark"
-            @click="$emit('openWithdrawalModal',
-            slotProps.data.tokenMintAddressString,
-            slotProps.data.decimalAmount,
-            slotProps.data.asset.svg,
-            slotProps.data.asset.name)"
-            >
-             Withdraw
+            @click="openActionsPopover($event, slotProps.data)">
+             Actions
             </ion-button>
+            <ion-popover
+            :is-open="actionsPopoverOpen" 
+            :event="event" 
+            @didDismiss="actionsPopoverOpen=false"
+            side="top" 
+            alignment="center"
+            >
+              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', event.tokenMintAddressString); actionsPopoverOpen=false">
+                <ion-label color="dark">Deposit</ion-label>
+              </ion-button>
+              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenMintAddressString); actionsPopoverOpen=false">
+                <ion-label color="dark">Withdraw</ion-label>
+              </ion-button>
+            </ion-popover>
           </div>
         </template>
       </Column>
     </DataTable>
 
+    <!--Crypto Currency-->
     <DataTable 
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines size="small" 
       :value="CryptoCurrency"
-      scrollable
       rowGroupMode="subheader" 
       groupRowsBy="asset.type"
       :globalFilterFields="
@@ -233,8 +238,8 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)" style="margin-left: -8px">
-                <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; margin-left: -8px; margin-right: -4px"/>
-                <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 24px; margin-right: 5px"/>
+                <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; margin-left: -8px; height: 32px; margin-right: -4px"/>
+                <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 32px; margin-right: 5px"/>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
           </div>
@@ -292,31 +297,36 @@
       </Column>
       <Column header="Actions" style="width: 0%">
         <template #body="slotProps">
-          <div class="flexCenterColumn">
+          <div class="flexCenterRow">
+            <ion-text v-if="!slotProps.data.isMainSubMarketReady">No Submarket</ion-text>
             <ion-button
+            v-else-if="slotProps.data.depositBalance == 0"
             class="tableDepositButton"
             color="dark"
-            @click="$emit('openDepositModal',
-            slotProps.data.tokenMintAddressString,
-            slotProps.data.decimalAmount,
-            slotProps.data.asset.svg,
-            slotProps.data.asset.name)"
-            :disabled="!slotProps.data.isMainSubMarketReady"
-            >
+            @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString)">
              Deposit
             </ion-button>
             <ion-button
-            v-if="slotProps.data.depositBalance"
+            v-else
             class="tableWithdrawButton"
             color="dark"
-            @click="$emit('openWithdrawalModal',
-            slotProps.data.tokenMintAddressString,
-            slotProps.data.decimalAmount,
-            slotProps.data.asset.svg,
-            slotProps.data.asset.name)"
-            >
-             Withdraw
+            @click="openActionsPopover($event, slotProps.data)">
+             Actions
             </ion-button>
+            <ion-popover
+            :is-open="actionsPopoverOpen" 
+            :event="event" 
+            @didDismiss="actionsPopoverOpen=false"
+            side="top" 
+            alignment="center"
+            >
+              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', event.tokenMintAddressString); actionsPopoverOpen=false">
+                <ion-label color="dark">Deposit</ion-label>
+              </ion-button>
+              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenMintAddressString); actionsPopoverOpen=false">
+                <ion-label color="dark">Withdraw</ion-label>
+              </ion-button>
+            </ion-popover>
           </div>
         </template>
       </Column>
@@ -325,7 +335,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, watch, inject } from 'vue'
+  import { ref, onMounted, watch, inject, computed } from 'vue'
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import { pencil, informationCircle, close } from 'ionicons/icons'
   import DataTable from 'primevue/datatable'
@@ -333,7 +343,7 @@
   import Select from 'primevue/select'
   import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
   import { FilterMatchMode } from '@primevue/core/api'
-  import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX, MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX, MAX_ACCOUNT_NAME_LENGTH, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { search } from 'ionicons/icons'
   import { copyTokenMintAddress,
@@ -343,7 +353,7 @@
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingerUserHashMap, lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
@@ -351,6 +361,7 @@
   const emits = defineEmits(['openDepositModal', 'openWithdrawalModal', 'marketTableHeightChange'])
 
   var tokenPopoverOpen = ref(false)
+  var actionsPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
@@ -360,7 +371,6 @@
   var hasAtleast1Account = ref()
   var editingAccountName = ref(false)
   var accountName = ref()
-  var hasAtleast1Account = ref()
   var accountNameEditInputRef = ref()
   var savedEmojiCursorPosition: any
   var overCommentByteSizeLimit = ref()
@@ -368,23 +378,49 @@
   onMounted(() =>
   {
     setLendingUserAccountList()
+    checkForLendingUserDeposits()
     updateStableCoinAndCurrencyData()
+    updateTokenReserveRelatedMarketData()
     
-    accountSelect.value = Number(localStorage.getItem(connectedWallet.addressString + "selectedLendingAccountIndex")) || 0
+    accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
   })
  
-  watch([lendingerUserAccountsHashMap, connectedWallet],() =>
+  watch(lendingerUserAccountsHashMap,() =>
   {
     setLendingUserAccountList()
-    accountSelect.value = Number(localStorage.getItem(connectedWallet.addressString + "selectedLendingAccountIndex")) || 0
-
+    accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
   })
 
-  watch([lendingerUserDepositBalanceHashMap, connectedWallet],() =>
+  watch(lendingerUserDepositBalanceHashMap,() =>
   {
     checkForLendingUserDeposits()
+  })
+
+  //Json string of wallet to detect object property changes
+  const walletWatch = computed(() =>
+  {
+    return JSON.stringify(connectedWallet)
+  })
+
+  watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
+  {
+    let newWallet = JSON.parse(newJSONObjectString)
+    let oldWallet= JSON.parse(oldJSONObjectString)
+
+    //This is here because of the "watch(lendingerUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily
+    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+      return
+
+    if(newWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
+    {
+      setLendingUserAccountList()
+      accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
+      connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
+
+      checkForLendingUserDeposits()
+    }
   })
 
   watch(tokenReservesHashMap, () =>
@@ -412,6 +448,14 @@
       {
         hasAtleast1Account.value = false
         emits("marketTableHeightChange", false, editingAccountName.value)
+      }
+
+      //Prevents starting on the wrong index when starting new contract deployments due to saved local storage values.
+      if(!hasAtleast1Account.value)
+      {
+        accountSelect.value = 0
+        connectedWallet.selectedLendingUserAccountIndex = 0
+        localStorage.setItem("selectedLendingAccountIndex", '0')
       }
     }
   }
@@ -441,14 +485,12 @@
           StableCoins[i].depositsString = StableCoins[i].deposits.toLocaleString('en-US', {
           minimumFractionDigits: StableCoins[i].decimalAmount,
           maximumFractionDigits: StableCoins[i].decimalAmount })
-          StableCoins[i].borrows = tokenReserve.borrowedAmount / Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
+          StableCoins[i].borrows = tokenReserve.borrowedAmount // Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
           StableCoins[i].borrowsString = StableCoins[i].borrows.toLocaleString('en-US', {
           minimumFractionDigits: StableCoins[i].decimalAmount,
           maximumFractionDigits: StableCoins[i].decimalAmount })
           StableCoins[i].globalLimit = Number(tokenReserve.globalLimit) / Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
-          StableCoins[i].globalLimitString = StableCoins[i].globalLimit.toLocaleString('en-US', {
-          minimumFractionDigits: StableCoins[i].decimalAmount,
-          maximumFractionDigits: StableCoins[i].decimalAmount })
+          StableCoins[i].globalLimitString = StableCoins[i].globalLimit.toLocaleString()
         }
         else
         {
@@ -490,18 +532,16 @@
           CryptoCurrency[i].utilizationRateString = CryptoCurrency[i].utilizationRate.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 }) + '%'
-          CryptoCurrency[i].deposits = tokenReserve.depositedAmount / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
+          CryptoCurrency[i].deposits = tokenReserve.depositedAmount // Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
           CryptoCurrency[i].depositsString = CryptoCurrency[i].deposits.toLocaleString('en-US', {
           minimumFractionDigits: CryptoCurrency[i].decimalAmount,
           maximumFractionDigits: CryptoCurrency[i].decimalAmount })
-          CryptoCurrency[i].borrows = tokenReserve.borrowedAmount / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
+          CryptoCurrency[i].borrows = tokenReserve.borrowedAmount // Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
           CryptoCurrency[i].borrowsString = CryptoCurrency[i].borrows.toLocaleString('en-US', {
           minimumFractionDigits: CryptoCurrency[i].decimalAmount,
           maximumFractionDigits: CryptoCurrency[i].decimalAmount })
           CryptoCurrency[i].globalLimit = Number(tokenReserve.globalLimit) / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
-          CryptoCurrency[i].globalLimitString = CryptoCurrency[i].globalLimit.toLocaleString('en-US', {
-          minimumFractionDigits: CryptoCurrency[i].decimalAmount,
-          maximumFractionDigits: CryptoCurrency[i].decimalAmount })
+          CryptoCurrency[i].globalLimitString = CryptoCurrency[i].globalLimit.toLocaleString()
         }
         else
         {
@@ -570,10 +610,10 @@
         if(depositBalance)
           StableCoins[i].depositBalance = depositBalance
         else
-          StableCoins[i].depositBalance = undefined
+          StableCoins[i].depositBalance = 0
       }
       else
-        StableCoins[i].depositBalance = undefined
+        StableCoins[i].depositBalance = 0
     }
 
     for(var i=0; i<CryptoCurrency.length; i++)
@@ -584,10 +624,10 @@
         if(depositBalance)
           CryptoCurrency[i].depositBalance = depositBalance
         else
-          CryptoCurrency[i].depositBalance = undefined
+          CryptoCurrency[i].depositBalance = 0
       }
       else
-        CryptoCurrency[i].depositBalance = undefined
+        CryptoCurrency[i].depositBalance = 0
     }
   }
 
@@ -751,7 +791,7 @@
   function updateStoredSelectedAccount()
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-    localStorage.setItem(connectedWallet.addressString + "selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
     checkForLendingUserDeposits()
   }
 
@@ -809,6 +849,14 @@
     tokenPopoverOpen.value = false
   }
 
+  function openActionsPopover(e: Event, rowData: any) 
+  {
+    event.value = e
+    event.value.tokenMintAddressString = rowData.tokenMintAddressString
+
+    actionsPopoverOpen.value = true
+  }
+
   function openUserLendingAccountInfo(e: Event) 
   {
     event.value = e
@@ -817,9 +865,7 @@
 
   function setInputFocus()
   {
-    const lendingUserAccount = lendingerUserHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
-    accountName.value = lendingUserAccount.accountName //This is more reliable. Which switching to a new deployed contract, it's possible that and old account index was saved in local storage
-    //accountName.value = accountList.value[accountSelect.value].accountName
+    accountName.value = accountList.value[accountSelect.value].accountName
 
     setTimeout(() =>
     {
@@ -868,6 +914,13 @@
   .tableMinWidth
   {
     min-width: 1375px
+  }
+  @-moz-document url-prefix()
+  {
+    .tableMinWidth
+    {
+      min-width: 1500px
+    }
   }
 
   #accountSelect

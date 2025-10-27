@@ -1,18 +1,40 @@
 <template>
-  <div class="mediumMarginTop">
+  <div class="mediumMarginTop flexCenterRow">
     <ion-button v-if="!adminAccounts.isChatCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
+      style="margin-top: 59px"
       @click="initializeChatProtocolAdminAccounts()"
       :color=colorName
     >
       <ion-label color="dark">Init Chat Admin Accounts</ion-label>
     </ion-button>
     <ion-button v-if="!adminAccounts.isAlertCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
+      style="margin-top: 59px"
       @click="initializeAlertProtocol()"
       :color=colorName
     >
       <ion-label color="dark">Init Alert Admin Accounts</ion-label>
     </ion-button>
     <div v-if="!adminAccounts.isLendingCEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress" class="flexCenterColumn">
+      <div class="flexCenterRow" style="gap: 10px">
+        <Select
+        class="tinyMarginBottom"
+        v-model="monthSelect" 
+        :options="monthList" 
+        optionLabel="monthName" 
+        optionValue="monthNumber" 
+        placeholder="Select Month"
+        appendTo="self">
+        </Select>
+        <ion-input
+        v-model="statementYearInput"
+        style="width: 100px"
+        fill="outline"
+        placeholder="Enter Statement Year"
+        type="number"
+        step="1"
+        min="2022">
+        </ion-input>
+      </div>
       <ion-button 
         @click="initializeLendingProtocol()"
         :color=colorName
@@ -20,26 +42,10 @@
       >
         <ion-label color="dark">Init Lending Admin Accounts</ion-label>
       </ion-button>
-      <Select
-      class="tinyMarginBottom"
-      v-model="monthSelect" 
-      :options="monthList" 
-      optionLabel="monthName" 
-      optionValue="monthNumber" 
-      placeholder="Select Month"
-      appendTo="self">
-      </Select>
-      <ion-input
-      v-model="statementYearInput"
-      style="width: 100px"
-      fill="outline"
-      placeholder="Enter Statement Year"
-      type="number"
-      step="1"
-      min="2024">
-      </ion-input>
+      
     </div>
     <ion-button v-if="!adminAccounts.isM4ACEOAccountReady && connectedWallet.addressString==adminAccounts.initialCEOAddress"
+      style="margin-top: 59px"
       @click="initializeM4AProtocolAdminAccounts()"
       :color=colorName
     >

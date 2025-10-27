@@ -112,7 +112,8 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button style="margin-left: -11px; margin-right: -11px" fill="clear" @click="openTokenPopover($event, slotProps.data)">
-              <component :is="slotProps.data.tokenSVG" style="width: 24px; margin-right: 5px"></component>
+              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress"  style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+              <component v-else :is="slotProps.data.tokenSVG" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.tokenName }}</ion-label>
             </ion-button>
             <ion-popover 
@@ -218,6 +219,7 @@
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
+  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
 
   const emits = defineEmits(['updateOwnerTableSizing'])

@@ -33,27 +33,28 @@
   export const tokenReserveMainnetMap: Map<string, tokenMapObject> = new Map(
   [
     //Key: Token Mint Address, Value: Token SVG
-    [tokenAddressStringsMainNet.daiTokenMintAddress, { name: "DAI", svg: markRaw(DAISVG), source: () => {sourceDAI()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.daiATA }],
-    [tokenAddressStringsMainNet.usdcTokenMintAddress, { name: "USDC", svg: markRaw(USDCSVG), source: () => {sourceUSDC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.usdcATA }],
-    [tokenAddressStringsMainNet.solTokenMintAddress, { name: "SOL", svg: markRaw(SOLSVG), source: () => {sourceSOL()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.solATA }],
-    [tokenAddressStringsMainNet.wethTokenMintAddress, { name: "WETH", svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wethATA }],
-    [tokenAddressStringsMainNet.wbtcTokenMintAddress, { name: "WBTC", svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wbtcATA }]
+    [tokenAddressStringsMainNet.daiTokenMintAddress, { name: "DAI", decimalAmount: 8, svg: markRaw(DAISVG), source: () => {sourceDAI()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.daiATA }],
+    [tokenAddressStringsMainNet.usdcTokenMintAddress, { name: "USDC", decimalAmount: 6, svg: markRaw(USDCSVG), source: () => {sourceUSDC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.usdcATA }],
+    [tokenAddressStringsMainNet.solTokenMintAddress, { name: "SOL", decimalAmount: 9, svg: markRaw(SOLSVG), source: () => {sourceSOL()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.solATA }],
+    [tokenAddressStringsMainNet.wethTokenMintAddress, { name: "WETH", decimalAmount: 8, svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wethATA }],
+    [tokenAddressStringsMainNet.wbtcTokenMintAddress, { name: "WBTC", decimalAmount: 8, svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wbtcATA }]
   ])
 
   //Dev Net
   export const tokenReserveDevNetMap: Map<string, tokenMapObject> = new Map(
   [ 
     //Key: Token Mint Address, Value: Token SVG
-    [tokenAddressStringsDevNet.daiTokenMintAddress, { name: "DAI-Dev", svg: markRaw(DAISVG), source: () => {sourceDAI()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.daiATA }],
-    [tokenAddressStringsDevNet.usdcTokenMintAddress, { name: "USDC-Dev", svg: markRaw(USDCSVG), source: () => {sourceUSDC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.usdcATA }],
-    [tokenAddressStringsDevNet.solTokenMintAddress, { name: "SOL-Dev", svg: markRaw(SOLSVG), source: () => {sourceSOL()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.solATA }],
-    [tokenAddressStringsDevNet.wethTokenMintAddress, { name: "WETH-Dev", svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wethATA }],
-    [tokenAddressStringsDevNet.wbtcTokenMintAddress, { name: "WBTC-Dev", svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wbtcATA }]
+    [tokenAddressStringsDevNet.daiTokenMintAddress, { name: "DAI-Dev", decimalAmount: 8, svg: markRaw(DAISVG), source: () => {sourceDAI()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.daiATA }],
+    [tokenAddressStringsDevNet.usdcTokenMintAddress, { name: "USDC-Dev", decimalAmount: 6, svg: markRaw(USDCSVG), source: () => {sourceUSDC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.usdcATA }],
+    [tokenAddressStringsDevNet.solTokenMintAddress, { name: "SOL-Dev", decimalAmount: 9, svg: markRaw(SOLSVG), source: () => {sourceSOL()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.solATA }],
+    [tokenAddressStringsDevNet.wethTokenMintAddress, { name: "WETH-Dev", decimalAmount: 8, svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wethATA }],
+    [tokenAddressStringsDevNet.wbtcTokenMintAddress, { name: "WBTC-Dev", decimalAmount: 8, svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wbtcATA }]
   ])
 
   type tokenMapObject =
   {
     name: string;
+    decimalAmount: number;
     svg: Component;
     source: () => void;
     ata: PublicKey

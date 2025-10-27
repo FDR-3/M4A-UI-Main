@@ -153,7 +153,7 @@
         svg: SOLSVG,
         source: () => {sourceSOL()}
       }
-    },
+    }
   ])
 
 export default StableCoins

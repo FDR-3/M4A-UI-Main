@@ -1,5 +1,5 @@
 {
-  "address": "647rEvxabMSeBVmnBB4pgqt4qTUQRNJu16ogWHF3PgC2",
+  "address": "3EdkWLvZttPawtx2V1GjisrM2BCwKw6BdnZW9XiFArHr",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -2902,8 +2902,8 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "mint"
               }
             ],
             "program": {
@@ -3036,8 +3036,15 @@
           }
         },
         {
+          "name": "mint"
+        },
+        {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         },
         {
           "name": "signer",

@@ -7,7 +7,7 @@
     <h1>{{ mapSelection.selectedStateName }} Hospitals</h1>
   </div>
   <div >
-    <USMap v-if="!mapSelection.isStateSelected" @stateSelect="(countryIndex:number, stateIndex:number, stateName:string) => showState(countryIndex, stateIndex, stateName)"/>
+    <USMap v-if="!mapSelection.isStateSelected" @stateSelect="(countryIndex :number, stateIndex: number, stateName: string) => showState(countryIndex, stateIndex, stateName)"/>
     <ion-button fill="clear" v-if="mapSelection.isStateSelected" @click="resetStateSelected()">
       <ion-label color="dark">Pick Different State</ion-label>
     </ion-button>
