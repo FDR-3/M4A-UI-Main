@@ -353,7 +353,7 @@
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAccountsHashMap, lendingUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
@@ -386,14 +386,14 @@
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
   })
  
-  watch(lendingerUserAccountsHashMap,() =>
+  watch(lendingUserAccountsHashMap,() =>
   {
     setLendingUserAccountList()
     accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
   })
 
-  watch(lendingerUserDepositBalanceHashMap,() =>
+  watch(lendingUserDepositBalanceHashMap,() =>
   {
     checkForLendingUserDeposits()
   })
@@ -409,7 +409,7 @@
     let newWallet = JSON.parse(newJSONObjectString)
     let oldWallet= JSON.parse(oldJSONObjectString)
 
-    //This is here because of the "watch(lendingerUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily
+    //This is here because of the "watch(lendingUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily
     if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
       return
 
@@ -435,9 +435,9 @@
 
   function setLendingUserAccountList()
   {
-    if(lendingerUserAccountsHashMap.map)
+    if(lendingUserAccountsHashMap.map)
     {
-      const userAccountList = lendingerUserAccountsHashMap.map.get(connectedWallet.addressString)
+      const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
       if(userAccountList)
       {
         accountList.value = userAccountList
@@ -604,9 +604,9 @@
   {
     for(var i=0; i<StableCoins.length; i++)
     {
-      if(lendingerUserDepositBalanceHashMap.map)
+      if(lendingUserDepositBalanceHashMap.map)
       {
-        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + StableCoins[i].tokenMintAddressString)
+        const depositBalance = lendingUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + StableCoins[i].tokenMintAddressString)
         if(depositBalance)
           StableCoins[i].depositBalance = depositBalance
         else
@@ -618,9 +618,9 @@
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
-      if(lendingerUserDepositBalanceHashMap.map)
+      if(lendingUserDepositBalanceHashMap.map)
       {
-        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + CryptoCurrency[i].tokenMintAddressString)
+        const depositBalance = lendingUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + CryptoCurrency[i].tokenMintAddressString)
         if(depositBalance)
           CryptoCurrency[i].depositBalance = depositBalance
         else
@@ -698,9 +698,9 @@
       else
         StableCoins[i].isMainSubMarketReady = false
 
-      if(lendingerUserDepositBalanceHashMap.map)
+      if(lendingUserDepositBalanceHashMap.map)
       {
-        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + StableCoins[i].tokenMintAddressString)
+        const depositBalance = lendingUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + StableCoins[i].tokenMintAddressString)
         if(depositBalance)
           StableCoins[i].depositBalance = depositBalance
         else
@@ -775,9 +775,9 @@
       else
         CryptoCurrency[i].isMainSubMarketReady = false
 
-      if(lendingerUserDepositBalanceHashMap.map)
+      if(lendingUserDepositBalanceHashMap.map)
       {
-        const depositBalance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + CryptoCurrency[i].tokenMintAddressString)
+        const depositBalance = lendingUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + CryptoCurrency[i].tokenMintAddressString)
         if(depositBalance)
           CryptoCurrency[i].depositBalance = depositBalance
         else
@@ -838,7 +838,7 @@
   function openTokenPopover(e: Event, rowData: any) 
   {
     event.value = e
-    event.value.tokenMintAddress = rowData.tokenMintAddress
+    event.value.tokenMintAddressString = rowData.tokenMintAddressString
 
     tokenPopoverOpen.value = true
   }
@@ -877,7 +877,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddressString)
   }
 
   async function editLendingUserAccountName()

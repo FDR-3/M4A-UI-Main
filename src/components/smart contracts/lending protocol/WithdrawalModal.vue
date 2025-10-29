@@ -84,7 +84,7 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveDevNetMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingerUserAccountsHashMap, lendingerUserDepositBalanceHashMap, lendingerUserTabsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAccountsHashMap, lendingUserDepositBalanceHashMap, lendingUserTabsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
 
@@ -127,9 +127,9 @@
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     withdrawAmount.value = 0
 
-    if(lendingerUserDepositBalanceHashMap.map)
+    if(lendingUserDepositBalanceHashMap.map)
     {
-      const balance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + selectedTokenMintAddress.toString())
+      const balance = lendingUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + selectedTokenMintAddress.toString())
       if(balance)
         userBalance.value = Number(balance)
       else
@@ -206,9 +206,9 @@
     addCloseListner()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
-    if(lendingerUserAccountsHashMap.map)
+    if(lendingUserAccountsHashMap.map)
     {
-      const userAccountList = lendingerUserAccountsHashMap.map.get(connectedWallet.addressString)
+      const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
       if(userAccountList)
       {
         accountList.value = userAccountList
@@ -221,7 +221,7 @@
     else
       hasAtleast2Accounts.value = false
 
-    const balance = lendingerUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + tokenMintAddress)
+    const balance = lendingUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else
@@ -272,7 +272,7 @@
 
   async function withdrawTokens()
   {
-    const lendingUserObligationAccounts = lendingerUserTabsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    const lendingUserObligationAccounts = lendingUserTabsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
 
     try
     {

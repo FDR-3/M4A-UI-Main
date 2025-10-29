@@ -123,7 +123,7 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveDevNetMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingerUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
 
@@ -274,9 +274,9 @@
     addCloseListner()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
-    if(lendingerUserAccountsHashMap.map)
+    if(lendingUserAccountsHashMap.map)
     {
-      const userAccountList = lendingerUserAccountsHashMap.map.get(connectedWallet.addressString)
+      const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
       if(userAccountList)
       {
         accountName.value = null
@@ -382,7 +382,7 @@
 
   function setNewAccountDefaultName()
   {
-    const userAccountList = lendingerUserAccountsHashMap.map.get(connectedWallet.addressString)
+    const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
 
     accountName.value = `Account ${userAccountList.length + 1}`
     previousAccountSelect = accountSelect.value

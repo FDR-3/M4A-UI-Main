@@ -2,46 +2,51 @@
   import { reactive } from 'vue'
 
   //Key: Lending User Address + Account Index, Value: Specific Lending User Account
-  export const lendingerUserHashMap = reactive(
+  export const lendingUserHashMap = reactive(
   {
     map: undefined
   })
 
   //Key: Lending User Address, Value: List of User Lending Accounts
-  export const lendingerUserAccountsHashMap = reactive(
+  export const lendingUserAccountsHashMap = reactive(
   {
     map: undefined
   })
 
   //Key: Lending User Address + Account Index, Value: Lending User Deposit Balance
-  export const lendingerUserDepositBalanceHashMap = reactive(
+  export const lendingUserDepositBalanceHashMap = reactive(
   {
     map: undefined
   })
 
   //Key: Lending User Address + Account Index, Value: List of User Account Tabs
-  export const lendingerUserTabsHashMap = reactive(
+  export const lendingUserTabsHashMap = reactive(
   {
     map: undefined
   })
 
   //Key: Lending User Address + Account Index + TokenMintAddress + Tax Year + Tax Month, Value: User Monthly Statement Accounts for a given TokenMintAddress and Tax Year and Tax Month
-  export const lendingerUserMonthlyStatementsHashMap = reactive(
+  export const lendingUserMonthlyStatementsHashMap = reactive(
   {
     map: undefined
   })
 
   //Key: Lending User Address + Account Index, Value: List of User Available TokenMintAddresses
-  export const lendingerUserAvailableTokenMintAddressesHashMap = reactive(
+  export const lendingUserAvailableTokenMintAddressesHashMap = reactive(
   {
     map: undefined
   })
 
   //Key: Lending User Address + Account Index + TokenMintAddress, Value: List of User Available Statement Tax Years by TokenMintAddress
-  export const lendingerUserAvailableYearsByTokenMintAddressHashMap = reactive(
+  export const lendingUserAvailableYearsByTokenMintAddressHashMap = reactive(
   {
     map: undefined
   })
 
-  export default lendingerUserAccountsHashMap
+  export const lendingLeaderBoardTable = reactive(
+  {
+    data: undefined
+  })
+
+  export default lendingUserAccountsHashMap
 </script>

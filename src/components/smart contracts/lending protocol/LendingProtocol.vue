@@ -12,7 +12,7 @@
   getSubMarkets,
   setLendingUserAccountHashMap,
   setLendingUserTabHashMaps,
-  setLendingUserMonthlyStatementHashMaps,
+  setLendingUserMonthlyStatementHashMapsAndLeaderBoard,
   getLendingProtocolPDA,
   getLendingProtocolCEOAccountPDA,
   getTokenReserveStatsPDA,
@@ -52,7 +52,7 @@
     //Lending Users
     await setLendingUserAccountHashMap()
     await setLendingUserTabHashMaps() //adminAccounts.lendingCEOAddressString needs to be set before this is called
-    await setLendingUserMonthlyStatementHashMaps()
+    await setLendingUserMonthlyStatementHashMapsAndLeaderBoard()
     await listenForLendingStatChanges()
     await listenForLendingUserStatChanges()
 
@@ -139,7 +139,7 @@
       subMarkets.data = await getSubMarkets()
       await setLendingUserAccountHashMap()
       await setLendingUserTabHashMaps()
-      await setLendingUserMonthlyStatementHashMaps()
+      await setLendingUserMonthlyStatementHashMapsAndLeaderBoard()
     })
   }
 

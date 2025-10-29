@@ -7,13 +7,14 @@
     subMarketOwnerByTokenMintAddressHashMap,
     tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingerUserHashMap,
-    lendingerUserAccountsHashMap,
-    lendingerUserDepositBalanceHashMap,
-    lendingerUserTabsHashMap,
-    lendingerUserAvailableTokenMintAddressesHashMap,
-    lendingerUserAvailableYearsByTokenMintAddressHashMap,
-    lendingerUserMonthlyStatementsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserHashMap,
+    lendingUserAccountsHashMap,
+    lendingUserDepositBalanceHashMap,
+    lendingUserTabsHashMap,
+    lendingUserAvailableTokenMintAddressesHashMap,
+    lendingUserAvailableYearsByTokenMintAddressHashMap,
+    lendingUserMonthlyStatementsHashMap,
+    lendingLeaderBoardTable } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -283,8 +284,8 @@
       lendingUserAccountListHashMap.set(lendingUserAccounts[i].account.owner.toBase58(), list)
     }
 
-    lendingerUserHashMap.map = lendingUserAccountHashMap
-    lendingerUserAccountsHashMap.map = lendingUserAccountListHashMap
+    lendingUserHashMap.map = lendingUserAccountHashMap
+    lendingUserAccountsHashMap.map = lendingUserAccountListHashMap
   }
 
   async function getLendingUserAccountsWrapper()
@@ -344,7 +345,7 @@
 
       userTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
 
-      //Set has deposited balance hash map
+      //Set deposit balance hash map
       if(lendingUserTabAccount.subMarketOwnerAddress.toString() == adminAccounts.lendingCEOAddressString &&
       lendingUserTabAccount.subMarketIndex == DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX &&
       lendingUserTabAccount.depositedAmount.gt(new anchor.BN(0)))
@@ -357,8 +358,8 @@
       }
     }
 
-    lendingerUserTabsHashMap.map = userTabListHashMap
-    lendingerUserDepositBalanceHashMap.map = depositBalanceHashMap
+    lendingUserTabsHashMap.map = userTabListHashMap
+    lendingUserDepositBalanceHashMap.map = depositBalanceHashMap
   }
 
   async function getLendingUserTabsWrapper()
@@ -385,13 +386,14 @@
     }
   }
 
-  export async function setLendingUserMonthlyStatementHashMaps()
+  export async function setLendingUserMonthlyStatementHashMapsAndLeaderBoard()
   {
-    console.log("Setting Lending User Monthly Statement Hashmaps")
+    console.log("Setting Lending User Monthly Statement Hashmaps And Lending Leader Board Data")
 
     var monthlyStatementsHashMap = new Map<string, any>()
     var availableTokenMintAddressesHashMap = new Map<string, any>()
     var availableYearsByTokenMintAddressHashMap = new Map<string, any>()
+    var leaderBoardData: any[] = []
 
     const lendingUserMonthlyStatementAccounts = await getLendingUserMonthlyStatementsWrapper()
 
@@ -435,20 +437,163 @@
       if(previousLendingUserAvailableYearByTokenMintAddressList)
       {
         list = previousLendingUserAvailableYearByTokenMintAddressList
-        if(!list.some((obj: { yearAvailable: any }) => obj.yearAvailable == lendingUserMonthlyStatementAccount.statementYear))
+        if(!list.some((obj: { yearAvailable: number }) => obj.yearAvailable == lendingUserMonthlyStatementAccount.statementYear))
         {
           list.push(availableYearByTokenMintAddressObject)
-          list = list.sort((a: any, b: any) => a.yearAvailable - b.yearAvailable) 
+          list = list.sort((a: any, b: any) => a.yearAvailable - b.yearAvailable)
           availableYearsByTokenMintAddressHashMap.set(owner + lendingUserMonthlyStatementAccount.userAccountIndex.toString() + tokenMintAddress, list) 
         }
       }
       else
         availableYearsByTokenMintAddressHashMap.set(owner + lendingUserMonthlyStatementAccount.userAccountIndex.toString() + tokenMintAddress, [availableYearByTokenMintAddressObject])
+
+      //Generate Lending Leader Board Data. For loop is always the fastest way, will replace all .some()s eventually if things get too slow
+      var existingOwner = undefined
+      var existingOwnerIndex = 0
+      var existingAccountEntry = undefined
+      var existingAccountEntryIndex = 0
+
+      for(var j=0; j<leaderBoardData.length; j++)
+      {
+        if(leaderBoardData[j].owner == lendingUserMonthlyStatementAccount.owner.toString())
+        {
+          existingOwner = leaderBoardData[j].owner
+          existingOwnerIndex = j
+
+          for(var k=0; k<leaderBoardData[j].accountListWithLastestMonthlyStatment.length; k++)
+          {
+            if(leaderBoardData[j].accountListWithLastestMonthlyStatment[k].accountIndex == lendingUserMonthlyStatementAccount.userAccountIndex &&
+            leaderBoardData[j].accountListWithLastestMonthlyStatment[k].tokenMintAddress == tokenMintAddress)
+            {
+              existingAccountEntry = leaderBoardData[j].accountListWithLastestMonthlyStatment[k]
+              existingAccountEntryIndex = k
+            } 
+          }
+        }
+      }
+
+      if(existingOwner)
+      {
+        if(existingAccountEntry)
+        {
+          //Replace Sub Account TokenMintAddres Monthly Statement with more recent one if found
+          if(lendingUserMonthlyStatementAccount.statementMonth > existingAccountEntry.statementMonth && lendingUserMonthlyStatementAccount.statementYear >= existingAccountEntry.statementYear)
+          {
+            const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
+
+            var moreRecentAccountEntry =
+            {
+              accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
+              accountName: lendingUserAccount.accountName,
+              tokenMintAddress: tokenMintAddress,
+              statmentMonth: lendingUserMonthlyStatementAccount.statmentMonth,
+              statementYear: lendingUserMonthlyStatementAccount.statementYear,
+              depositedAmount: lendingUserMonthlyStatementAccount.currentBalanceAmount,
+              depositedValue: 0,
+              depositedValueString: "$0.00",
+              interestedAmount: lendingUserMonthlyStatementAccount.lifeTimeinterestAccruedAmount,
+              interestedEarnedValue: 0,
+              interestedEarnedValueString: "$0.00",
+              borrowedAmount: lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount,
+              borrowedValue: 0,
+              borrowedValueString: "$0.00",
+              repaidAmount: lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount,
+              repaidValue: 0,
+              repaidValueString: "$0.00",
+              liquidatedAmount: lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount,
+              liquidatedValue: 0,
+              liquidatedValueString: "$0.00",
+            }
+
+            leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatment[existingAccountEntryIndex] = moreRecentAccountEntry
+          }
+        }
+        else
+        {
+          //Add New Sub Account for Existing User to Lending Leader Board
+          const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
+
+          var newAccountEntry =
+          {
+            accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
+            accountName: lendingUserAccount.accountName,
+            tokenMintAddress: tokenMintAddress,
+            statmentMonth: lendingUserMonthlyStatementAccount.statmentMonth,
+            statementYear: lendingUserMonthlyStatementAccount.statementYear,
+            depositedAmount: lendingUserMonthlyStatementAccount.currentBalanceAmount,
+            depositedValue: 0,
+            depositedValueString: "$0.00",
+            interestedAmount: lendingUserMonthlyStatementAccount.lifeTimeinterestAccruedAmount,
+            interestedEarnedValue: 0,
+            interestedEarnedValueString: "$0.00",
+            borrowedAmount: lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount,
+            borrowedValue: 0,
+            borrowedValueString: "$0.00",
+            repaidAmount: lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount,
+            repaidValue: 0,
+            repaidValueString: "$0.00",
+            liquidatedAmount: lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount,
+            liquidatedValue: 0,
+            liquidatedValueString: "$0.00",
+          }
+
+          leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatment.push(newAccountEntry)
+          leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatment =  leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatment.sort((a: any, b: any) => a.accountIndex - b.accountIndex)
+        }
+      }
+      else
+      {
+        //Add New User and their Sub Account to Lending Leader Board
+        const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
+
+        var newAccountEntry =
+        {
+          accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
+          accountName: lendingUserAccount.accountName,
+          tokenMintAddress: tokenMintAddress,
+          statmentMonth: lendingUserMonthlyStatementAccount.statmentMonth,
+          statementYear: lendingUserMonthlyStatementAccount.statementYear,
+          depositedAmount: lendingUserMonthlyStatementAccount.currentBalanceAmount,
+          depositedValue: 0,
+          depositedValueString: "$0.00",
+          interestedAmount: lendingUserMonthlyStatementAccount.lifeTimeinterestAccruedAmount,
+          interestedEarnedValue: 0,
+          interestedEarnedValueString: "$0.00",
+          borrowedAmount: lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount,
+          borrowedValue: 0,
+          borrowedValueString: "$0.00",
+          repaidAmount: lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount,
+          repaidValue: 0,
+          repaidValueString: "$0.00",
+          liquidatedAmount: lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount,
+          liquidatedValue: 0,
+          liquidatedValueString: "$0.00",
+        }
+
+        var newOwnerEntry = 
+        {
+          owner: lendingUserMonthlyStatementAccount.owner.toString(),
+          depositedValue: 0,
+          depositedValueString: "$0.00",
+          interestedEarnedValue: 0,
+          interestedEarnedValueString: "$0.00",
+          borrowedValue: 0,
+          borrowedValueString: "$0.00",
+          repaidValue: 0,
+          repaidValueString: "$0.00",
+          liquidatedValue: 0,
+          liquidatedValueString: "$0.00",
+          accountListWithLastestMonthlyStatment: [newAccountEntry]
+        }
+
+        leaderBoardData.push(newOwnerEntry)
+      }
     }
 
-    lendingerUserAvailableTokenMintAddressesHashMap.map = availableTokenMintAddressesHashMap
-    lendingerUserAvailableYearsByTokenMintAddressHashMap.map = availableYearsByTokenMintAddressHashMap
-    lendingerUserMonthlyStatementsHashMap.map = monthlyStatementsHashMap
+    lendingUserAvailableTokenMintAddressesHashMap.map = availableTokenMintAddressesHashMap
+    lendingUserAvailableYearsByTokenMintAddressHashMap.map = availableYearsByTokenMintAddressHashMap
+    lendingUserMonthlyStatementsHashMap.map = monthlyStatementsHashMap
+    lendingLeaderBoardTable.data = leaderBoardData
   }
 
   async function getLendingUserMonthlyStatementsWrapper()

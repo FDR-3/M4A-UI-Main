@@ -5,7 +5,7 @@
         <h2>Under Construction On Devnet<br>Monopoly Money</h2>
         <h1>Markets</h1>
     
-        <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
+        <ion-button @click="flipTable(); portfolioChartReRenderHelper+=1" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
         <MarketsTable @openDepositModal="openDepositAndCloseWithdraw" @openWithdrawalModal="openWithdrawAndCloseDeposit" @marketTableHeightChange="updateUserNameRelatedTableHeight"/>
       </div>
 
@@ -14,7 +14,8 @@
         <h1>Portfolios</h1>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Markets</ion-button>
-        <Portfolios @openDepositModal="openDepositAndCloseWithdraw" @openWithdrawalModal="openWithdrawAndCloseDeposit" @portfolioHeightChange="updatePortfolioRelatedHeight"/>
+        <Portfolios :portfolioChartReRenderHelper="portfolioChartReRenderHelper"
+        @openDepositModal="openDepositAndCloseWithdraw" @openWithdrawalModal="openWithdrawAndCloseDeposit" @portfolioHeightChange="updatePortfolioRelatedHeight"/>
       </div>
     </div>
   </div>
@@ -55,6 +56,8 @@
   var portfolioRelatedDynamicTableHeight = ref(0)
   var stableCoinRowCount = ref(0)
   var cryptoCurrencyRowCount = ref(0)
+
+  var portfolioChartReRenderHelper = ref(0)
 
   onMounted(() => 
   {

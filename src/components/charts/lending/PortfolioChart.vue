@@ -174,15 +174,14 @@
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { lendingerUserAvailableYearsByTokenMintAddressHashMap, lendingerUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAvailableYearsByTokenMintAddressHashMap, lendingUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
-  import cloneDeep from 'lodash/cloneDeep'
 
-  const props = defineProps(['tokenMintAddress', 'tokenDecimal', 'tokenSVG', 'tokenName', 'ownerAddress', 'accountIndex', 'chartData'])
+  const props = defineProps(['tokenMintAddress', 'tokenDecimal', 'tokenSVG', 'tokenName', 'ownerAddress', 'accountIndex', 'chartData', 'selectedYear'])
 
   var chartOptions = ref()
   var chartRef = ref<any>(null)
@@ -222,18 +221,23 @@
 
   onMounted(() =>
   {
-    if(lendingerUserDepositBalanceHashMap.map)
+    if(chartRef.value.chart)
     {
-      const balance = lendingerUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+      chartRef.value.chart.reset()
+      console.log("resetting")
+    }
+
+    if(lendingUserDepositBalanceHashMap.map)
+    {
+      const balance = lendingUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
       if(balance)
         userBalance.value = Number(balance)
       else
         userBalance.value = 0
     }
 
-    getYearList()
     yearList.value = getYearList()
-    yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
+    yearSelect.value = props.selectedYear
 
     chartOptions.value = setChartOptions()
     startGradientAnimation()
@@ -244,19 +248,13 @@
     stopGradientAnimation()
   })
 
-  watch(lendingerUserAvailableYearsByTokenMintAddressHashMap, ()=>
+  watch(lendingUserDepositBalanceHashMap,() =>
   {
-    const balance = lendingerUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    const balance = lendingUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else
       userBalance.value = 0
-  })
-
-  watch(lendingerUserAvailableYearsByTokenMintAddressHashMap, ()=>
-  {
-    yearList.value = getYearList()
-    yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
   })
 
   watch(darkTheme,() =>
@@ -271,7 +269,7 @@
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
   {
-    const balance = lendingerUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    const balance = lendingUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else
@@ -286,7 +284,7 @@
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
 
-    var initialList = lendingerUserAvailableYearsByTokenMintAddressHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    var initialList = lendingUserAvailableYearsByTokenMintAddressHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
     var firstYear = initialList[0].yearAvailable
     var processedList = []
 
@@ -316,7 +314,7 @@
     if (gradientOffset.value >= 1)
       gradientOffset.value = 0
 
-    if (chartRef.value.chart)
+    if(chartRef.value.chart)
       chartRef.value.chart.update("none")
   
     }, 55)

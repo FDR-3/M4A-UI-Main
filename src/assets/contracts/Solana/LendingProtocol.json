@@ -1,5 +1,5 @@
 {
-  "address": "3EdkWLvZttPawtx2V1GjisrM2BCwKw6BdnZW9XiFArHr",
+  "address": "EGDt48XGnZh5bPpJ8YBeCDggjFtM3kMMcw4LoV5fEKpF",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -3338,34 +3338,6 @@
           {
             "name": "tab_account_count",
             "type": "u32"
-          },
-          {
-            "name": "interest_accrued",
-            "type": "u128"
-          },
-          {
-            "name": "debt_repaid",
-            "type": "u128"
-          },
-          {
-            "name": "amount_liquidated",
-            "type": "u128"
-          },
-          {
-            "name": "last_lending_activity_token_mint_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "last_lending_activity_amount",
-            "type": "u128"
-          },
-          {
-            "name": "last_lending_activity_type",
-            "type": "u8"
-          },
-          {
-            "name": "last_lending_activity_time_stamp",
-            "type": "u64"
           }
         ]
       }
@@ -3400,11 +3372,7 @@
             "type": "bool"
           },
           {
-            "name": "life_time_balance_amount",
-            "type": "u128"
-          },
-          {
-            "name": "life_time_borrowed_amount",
+            "name": "current_balance_amount",
             "type": "u128"
           },
           {
@@ -3412,15 +3380,23 @@
             "type": "u128"
           },
           {
-            "name": "life_time_debt_repaid_amount",
+            "name": "life_time_borrowed_amount",
             "type": "u128"
           },
           {
-            "name": "life_time_liquidated_amount",
+            "name": "life_time_repaid_debt_amount",
+            "type": "u128"
+          },
+          {
+            "name": "life_time_user_was_liquidated_amount",
             "type": "u128"
           },
           {
             "name": "monthly_deposited_amount",
+            "type": "u128"
+          },
+          {
+            "name": "monthly_interest_accrued_amount",
             "type": "u128"
           },
           {
@@ -3432,11 +3408,11 @@
             "type": "u128"
           },
           {
-            "name": "monthly_repaid_amount",
+            "name": "monthly_repaid_debt_amount",
             "type": "u128"
           },
           {
-            "name": "monthly_liquidated_amount",
+            "name": "monthly_user_was_liquidated_amount",
             "type": "u128"
           },
           {
@@ -3500,19 +3476,11 @@
             "type": "bool"
           },
           {
-            "name": "interest_accrued",
-            "type": "u128"
-          },
-          {
-            "name": "debt_repaid",
-            "type": "u128"
-          },
-          {
-            "name": "amount_liquidated",
-            "type": "u128"
-          },
-          {
             "name": "deposited_amount",
+            "type": "u128"
+          },
+          {
+            "name": "interest_accrued_amount",
             "type": "u128"
           },
           {
@@ -3520,16 +3488,12 @@
             "type": "u128"
           },
           {
-            "name": "last_lending_activity_amount",
+            "name": "repaid_debt_amount",
             "type": "u128"
           },
           {
-            "name": "last_lending_activity_type",
-            "type": "u8"
-          },
-          {
-            "name": "last_lending_activity_time_stamp",
-            "type": "u64"
+            "name": "user_was_liquidated_amount",
+            "type": "u128"
           }
         ]
       }
@@ -3564,23 +3528,23 @@
             "type": "u16"
           },
           {
-            "name": "interest_accrued",
-            "type": "u128"
-          },
-          {
-            "name": "debt_repaid",
-            "type": "u128"
-          },
-          {
-            "name": "amount_liquidated",
-            "type": "u128"
-          },
-          {
             "name": "deposited_amount",
             "type": "u128"
           },
           {
+            "name": "interest_accrued_amount",
+            "type": "u128"
+          },
+          {
             "name": "borrowed_amount",
+            "type": "u128"
+          },
+          {
+            "name": "repaid_debt_amount",
+            "type": "u128"
+          },
+          {
+            "name": "liquidated_amount",
             "type": "u128"
           },
           {
@@ -3648,6 +3612,10 @@
             "type": "u128"
           },
           {
+            "name": "deposited_amount",
+            "type": "u128"
+          },
+          {
             "name": "accrued_interest_index",
             "type": "u128"
           },
@@ -3656,19 +3624,15 @@
             "type": "u128"
           },
           {
+            "name": "borrowed_amount",
+            "type": "u128"
+          },
+          {
             "name": "debt_repaid",
             "type": "u128"
           },
           {
-            "name": "amount_liquidated",
-            "type": "u128"
-          },
-          {
-            "name": "deposited_amount",
-            "type": "u128"
-          },
-          {
-            "name": "borrowed_amount",
+            "name": "liquidated_amount",
             "type": "u128"
           },
           {
