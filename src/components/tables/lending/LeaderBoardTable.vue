@@ -11,9 +11,10 @@
       v-model:filters="filters" 
       show-gridlines 
       size="small"
-      :sortOrder="1"
       :value="tableData"
       v-model:expandedRows="subTableData"
+      v-model:sortField="sortField"
+      v-model:sortOrder="sortOrder"
       :loading="isLoading"
       @sort="handleSort($event)"
       @row-expand="handleRowExpand($event)"
@@ -244,7 +245,9 @@
   var tableData = ref()
   var subTableData = ref()
   var isLoading = ref(true)
-  var sortField = "depositedValue"
+  var previousSortField = "depositedValue"
+  var sortField = ref("depositedValue")
+  var sortOrder = ref(-1)
   var totalNumberOfTopRows = 0
   var totalNumberOfSubRows = 0
 
@@ -263,7 +266,7 @@
     {
       updateLeaderBoardValues()
       updateLeaderBoardDisplayNames()
-      sortTable(sortField)
+      sortTable()
       emits('totalLendingUsers', totalNumberOfTopRows)
     }
   })
@@ -271,20 +274,20 @@
   watch(lendingLeaderBoardTable,() =>
   {
     updateLeaderBoardValues()
-    sortTable(sortField)
+    sortTable()
     emits('totalLendingUsers', totalNumberOfTopRows)
   })
 
   watch(priceObjectMap,() =>
   {
     updateLeaderBoardValues(false)
-    sortTable(sortField)//Sort again incase price changes cause a change in the rankings
+    sortTable()//Sort again incase price changes cause a change in the rankings
   })
 
   watch(customUserNameHashMap,() =>
   {
     updateLeaderBoardDisplayNames()
-    sortTable(sortField)//Sort again incase name change caused a change the rankings
+    sortTable()//Sort again incase name change caused a change the rankings
   })
 
   function updateLeaderBoardValues(newTableData = true)
@@ -422,14 +425,12 @@
       tableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(tableData.value[i].owner)
   }
 
-  function sortTable(columnToSortBy: string)
+  function sortTable()
   {
     if(tableData.value == undefined)
       return
 
-    sortField = columnToSortBy
-
-    switch (sortField)
+    switch (sortField.value)
     {
       case"displayName":
       {
@@ -554,7 +555,15 @@
 
   function handleSort(event: any)
   {
-    sortTable(event.sortField)
+    if(previousSortField != sortField.value)
+      setTimeout(() =>
+      {
+        sortOrder.value = event.sortOrder * -1
+      }, 0)
+
+    previousSortField = sortField.value
+
+    sortTable()
   }
 
   function handleRowExpand(event: any)
