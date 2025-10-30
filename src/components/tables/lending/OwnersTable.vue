@@ -13,7 +13,7 @@
       size="small" 
       :value="ownerTableData"
       :loading="isLoading"
-      :globalFilterFields="['owner', 'ownerData.displayName', 'ownerData.subMarketCount']"  
+      :globalFilterFields="['owner', 'ownerData.displayName', 'ownerData.ceoName', 'ownerData.subMarketCount']"  
     >
       <template #header>
         <div>
@@ -36,9 +36,13 @@
               </div>
               <StarWolf v-else class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
 
-              <ion-label color="dark">
+              <ion-label v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddressString" color="green">
+                fdr-3
+              </ion-label>
+              <ion-label v-else=" slotProps.data.owner==adminAccounts.lendingCEOAddressString" color="dark">
                 {{ slotProps.data.ownerData.displayName }}
               </ion-label>
+
             </ion-button>
             <ion-popover 
             :is-open="ownerPopoverOpen" 
@@ -48,7 +52,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
-                <ion-label color="dark">{{ copyFullAddressButtonText }}</ion-label>
+                <ion-label color="light">{{ copyFullAddressButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
 
@@ -124,7 +128,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+                <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -330,7 +334,7 @@
   function customFilter(filterString: string)
   {
     var filteredTable: any = []
-
+    console.log(filterString)
     for(var i=0; i<unfilteredTableData.length; i++)
     {
       if(unfilteredTableData[i].id.toString().toLowerCase().includes(filterString.toLowerCase()))
@@ -414,11 +418,15 @@
     {
       unprocessedData[i].ownerData.displayName = getCustomOrTrimmedUserDisplayName(unprocessedData[i].owner)
 
+      if(unprocessedData[i].owner.toString() == adminAccounts.lendingCEOAddressString)
+        unprocessedData[i].ownerData.ceoName = "fdr-3"
+      else
+        unprocessedData[i].ownerData.ceoName = ""
+
       //This has to be done here as opposed to in the LendingProtocol.vue file since it has to be after it's deep cloned
       for(var j=0; j<unprocessedData[i].ownerData.ownerSubMarketList.length; j++)
       {
         const tokenReserveFrontEndProperties = tokenReserveDevNetMap.get(unprocessedData[i].ownerData.ownerSubMarketList[j].tokenMintAddress.toString())
-
         unprocessedData[i].ownerData.ownerSubMarketList[j].tokenSVG = tokenReserveFrontEndProperties.svg
       }
 
@@ -652,7 +660,7 @@
   /*Set row height to higest possible value*/
   #submarketOwnersTable :deep(.p-datatable-tbody > tr)
   {
-    height: 84px !important
+    height: 84px
   }
 
   #tableTitle

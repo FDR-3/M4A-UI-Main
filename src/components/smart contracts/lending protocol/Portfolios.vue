@@ -1,8 +1,13 @@
 <template>
-
-  <div v-if="isBrowsingAllUsers" class="tableContainer">
-    <ion-button color="green" @click="isBrowsingAllUsers=false; emitPortfolioRelatedTableHeight()"> Return</ion-button>
-    <LeaderBoardTable/>
+  <div v-if="isBrowsingAllUsers">
+    <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false); emitPortfolioRelatedTableHeight()">
+      <ion-label color="green">Return</ion-label>
+    </ion-button>
+    <LeaderBoardTable
+    @viewPortfolio="viewPortfolio"
+    @totalLendingUsers="emitTotalLendingUsers"
+    @adjustLeaderBoardHeight="emitLeaderBoardHeightAdjust"
+    @setLeaderBoardHeight="emitLeaderBoardHeightSet"/>
   </div>
 
   <div v-if="!isBrowsingAllUsers" class="tableContainer">
@@ -17,7 +22,7 @@
     fill="outline"
     class="nSmallMarginTop"
     :class="{ 'invalid': !isValidPublicKey }"
-    @ion-input="isValidPublicKey = isValidSolanaPublicKey(addressToCheck)"
+    @ion-input="isValidPublicKey=isValidSolanaPublicKey(addressToCheck)"
     @keydown.enter="checkNewAddress()"
     ></ion-input>
 
@@ -31,7 +36,7 @@
         Check New Address
       </ion-button>
 
-      <ion-button color="green" @click="isBrowsingAllUsers=true; emitPortfolioRelatedTableHeight()">Browse All Users</ion-button>
+      <ion-button color="green" @click="setIsBrowsingAllLendingUsers(true); emitPortfolioRelatedTableHeight()">Browse All Users</ion-button>
     </div>
   </div>
 
@@ -131,7 +136,7 @@
     </div>
 
     <!--Crypto Charts-->
-    <div  v-if="userCryptoCurrencyTabCount" class=" largeMarginTop" :class="userStableCoinTabCount > 0 ? 'thinBorderTop' : ''">
+    <div  v-if="userCryptoCurrencyTabCount" class="largeMarginTop" :class="userStableCoinTabCount > 0 ? 'thinBorderTop' : ''">
       <div class="hHeaderDisplay smallMarginTop">
         <div>
           <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
@@ -180,7 +185,7 @@
 
 <script setup lang="ts">
   import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
-  import { IonInput, IonButton } from '@ionic/vue'
+  import { IonInput, IonButton, IonLabel } from '@ionic/vue'
   import Select from 'primevue/select'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { getUserDisplayName, getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
@@ -198,7 +203,15 @@
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(['portfolioChartReRenderHelper'])
-  const emits = defineEmits(['openDepositModal', 'openWithdrawalModal', 'portfolioHeightChange'])
+  const emits = defineEmits(
+  [
+    'openDepositModal',
+    'openWithdrawalModal',
+    'portfolioHeightChange',
+    'totalLendingUsers',
+    'leaderBoardHeightAdjust',
+    'leaderBoardHeightSet'
+  ])
 
   var displayName = ref()
   var possiblyTrimmedDisplayName = ref()
@@ -219,7 +232,7 @@
   var accountName = ref()
   var accountSelect = ref(0)
   var accountList = ref()
-  var isBrowsingAllUsers = ref(false)
+  var isBrowsingAllUsers = ref()
 
   var selectedYearHashMap = new Map<string, any>()
   var selectedUserChartDataHashMap = ref()
@@ -239,11 +252,22 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return getGradient(ctx, chartArea)
+          return setAnimatedGradient(ctx, chartArea)
         },
         borderWidth: 4,
         fill: false,
         tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: 'Interest Earned',
+        backgroundColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setGradient(ctx, chartArea)
+        },
         data: [] as any[]
       },
       {
@@ -257,6 +281,25 @@
         label: 'Withdrawals',
         backgroundColor: "#b5bbca",
         data: [] as any[]
+      },
+      
+      {
+        type: 'bar',
+        label: 'Borrows',
+        backgroundColor: "#557fcc",
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: 'Repays',
+        backgroundColor: "#ffd700",
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: 'Liquidations',
+        backgroundColor: "#ff0000",
+        data: [] as any[]
       }
     ]
   }
@@ -264,12 +307,18 @@
   enum ChartIndex
   {
     Balances = 0,
-    Deposits = 1,
-    Withdrawals = 2
+    InterestEarned = 1,
+    Deposits = 2,
+    Withdrawals = 3,
+    Borrows = 4,
+    Repays = 5,
+    Liquidations = 6,
   }
 
   onMounted(() =>
   {
+    isBrowsingAllUsers.value = localStorage.getItem("isBrowsingAllLendingUsers") == "true" || false
+
     searchAddress.value = connectedWallet.addressString
     addressToCheck.value = searchAddress.value
     isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
@@ -294,7 +343,7 @@
       userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
       if(userTabTokenMintAddressList.value)
         if(userTabTokenMintAddressList.value.length)
-          resetSelectedYearForTokenMintAddressHashMap(connectedWallet.addressString, connectedWallet.selectedLendingUserAccountIndex.toString(), userTabTokenMintAddressList.value)
+          resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
 
       countUserStableCoinAndCryptoCurrencyTabs()
       setChartData()
@@ -346,7 +395,7 @@
         userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
         if(userTabTokenMintAddressList.value)
           if(userTabTokenMintAddressList.value.length)
-            resetSelectedYearForTokenMintAddressHashMap(connectedWallet.addressString, connectedWallet.selectedLendingUserAccountIndex.toString(), userTabTokenMintAddressList.value)
+            resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
 
         countUserStableCoinAndCryptoCurrencyTabs()
         emitPortfolioRelatedTableHeight()
@@ -364,7 +413,7 @@
   {
     userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(searchAddress.value + accountSelect.value.toString())
     if(selectedYearHashMap.size == 0 && userTabTokenMintAddressList.value?.length)
-      resetSelectedYearForTokenMintAddressHashMap(searchAddress.value, accountSelect.value.toString(), userTabTokenMintAddressList.value)
+      resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
 
     countUserStableCoinAndCryptoCurrencyTabs()
     emitPortfolioRelatedTableHeight()
@@ -376,7 +425,7 @@
     chartReRenderKey.value += 1
   }))
 
-  function getGradient (ctx: any, chartArea:any)
+  function setAnimatedGradient(ctx: any, chartArea:any)
   {
     if(!chartArea)
       return
@@ -397,7 +446,22 @@
     return gradient
   }
 
-  function resetSelectedYearForTokenMintAddressHashMap(ownerAddress: string, accountIndex: string, tokenMintAddress: string[])
+  function setGradient(ctx: any, chartArea:any)
+  {
+    if(!chartArea)
+      return
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 170)
+
+    gradient.addColorStop((0), '#14ffe9')
+    gradient.addColorStop((0.25), '#ffc800')
+    gradient.addColorStop((0.50), '#ff00e0')
+    gradient.addColorStop((0.75) , '#14ffe9')
+
+    return gradient
+  }
+
+  function resetSelectedYearForTokenMintAddressHashMap(tokenMintAddress: string[])
   {
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
@@ -695,23 +759,21 @@
     }
   }
 
-  function checkNewAddress()
+  function checkNewAddress(accountSelected = 0)
   {
     if(addressToCheck.value == searchAddress.value)
       return
 
     searchAddress.value = addressToCheck.value
-
     displayName.value = getUserDisplayName(searchAddress.value)
     possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
 
     if(lendingUserMonthlyStatementsHashMap.map)
     {
-      userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(searchAddress.value + '0')
+      userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(searchAddress.value + accountSelected.toString())
+      accountSelect.value = accountSelected
 
-      accountSelect.value = 0
-
-      resetSelectedYearForTokenMintAddressHashMap(searchAddress.value, '0', userTabTokenMintAddressList.value)
+      resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
       countUserStableCoinAndCryptoCurrencyTabs()
       emitPortfolioRelatedTableHeight()
       setLendingUserAccountList()
@@ -742,6 +804,7 @@
     }
 
     userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
     countUserStableCoinAndCryptoCurrencyTabs()
     emitPortfolioRelatedTableHeight()
     setChartData()
@@ -767,6 +830,40 @@
   function emitPortfolioRelatedTableHeight()
   {
     emits("portfolioHeightChange", searchAddress.value, userStableCoinTabCount.value, userCryptoCurrencyTabCount.value, isBrowsingAllUsers.value)
+  }
+
+  function viewPortfolio(owner: string, accountIndex: number)
+  {
+    addressToCheck.value = owner
+    searchAddress.value = undefined
+    setLendingUserAccountList()
+    accountSelect.value = accountIndex
+    setIsBrowsingAllLendingUsers(false)
+    checkNewAddress(accountIndex)
+    isValidPublicKey.value = isValidSolanaPublicKey(owner)
+
+    document.getElementById("protfolioHeader")?.scrollIntoView() 
+  }
+
+  function emitTotalLendingUsers(userCount: number)
+  {
+    emits('totalLendingUsers', userCount)
+  }
+
+  function emitLeaderBoardHeightAdjust(rowCount: number)
+  {
+    emits('leaderBoardHeightAdjust', rowCount)
+  }
+
+  function emitLeaderBoardHeightSet(rowCount: number)
+  {
+    emits('leaderBoardHeightSet', rowCount)
+  }
+
+  function setIsBrowsingAllLendingUsers(flag: boolean)
+  {
+    isBrowsingAllUsers.value = flag
+    localStorage.setItem("isBrowsingAllLendingUsers", flag.toString())
   }
 
   function setInputFocus()

@@ -15,7 +15,8 @@
   --ion-background-color-light: light-dark(#000000, #eeeeee) !important;
   --ion-color-dark: light-dark(#000000, #ffffff) !important;
   --ion-color-light: light-dark(#ffffff, #000000) !important;
-  --ion-item-background: light-dark(#eeeeee, #000000) !important
+  --ion-item-background: light-dark(#eeeeee, #000000) !important;
+  color: 
 }
 
 /*Used for h1 elements on About-Stats page*/

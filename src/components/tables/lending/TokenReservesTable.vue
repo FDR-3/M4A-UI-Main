@@ -4,15 +4,14 @@
     <DataTable
       v-if="!showTokenSubMarkets"
       class="tableMinWidth my-custom-table"
-      v-model:filters="filters" 
+      v-model:filters="filters"
       show-gridlines
       sortField="tokenMintAddress" 
       :sortOrder="-1" 
       size="small" 
       :value="tokenReserveTableData"
       :loading="isLoading"
-      rowGroupMode="subheader" groupRowsBy="asset.type"
-      :globalFilterFields="['name', 'tokenMintAddress', 'tokenReserveATA', 'price', 'percentChange24h', 'quantity', 'value', 'subMarketCount']"  
+      :globalFilterFields="['name', 'tokenMintAddress', 'tokenReserveATA', 'price', 'percentChange24h', 'depositedAmount', 'value', 'subMarketCount']"  
     >
       <template #header>
         <div>
@@ -30,7 +29,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight" >
             <ion-button style="margin-left: -11px; margin-right: -5px" fill="clear" @click="openTokenReserveATAPopover($event, slotProps.data)">
-              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress"  style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
               <component v-else :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.name }}</ion-label>
             </ion-button>
@@ -42,7 +41,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenReserveATA()" @mouseleave="closeTokenReserveATAPopover($event)">
-                <ion-label color="dark">{{ copyTokenReserveATAButtonText }}</ion-label>
+                <ion-label color="light">{{ copyTokenReserveATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -54,7 +53,7 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="depositedAmount" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="depositedAmount" header="Amount" style="width: 0%" sortable></Column>
       <Column field="value" header="Value" style="width: 0%" sortable></Column>
       <Column field="subMarketCount" header="SubMarket Count" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
@@ -98,7 +97,12 @@
     >
       <template #header>
         <div>
-          <h2>USDC SubMarkets</h2>
+
+          <div class="flexCenterRow">
+            <img v-if="selectedTokenMintAddress.toString()==tokenAddressStringsMainNet.solTokenMintAddress" style="width: 70px; margin-left: -22px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+            <component v-else :is="subMarketTokenSVG" style="width: 40px; height: 40px; margin-right: 10px"></component>
+            <h2>{{subMarketTokenName}} SubMarkets</h2>
+          </div>
 
           <ion-button color="dark" class="mediumSmallMarginBottom nSmallMarginTop" @click="unShowSubMarkets()">Return</ion-button>
           <ion-input
@@ -127,9 +131,13 @@
               </div>
               <StarWolf v-else class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
 
-              <ion-label color="dark">
-                {{ slotProps.data.displayName }}
+              <ion-label v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddressString" color="green">
+                fdr-3
               </ion-label>
+              <ion-label v-else=" slotProps.data.owner==adminAccounts.lendingCEOAddressString" color="dark">
+                {{ slotProps.data.ownerData.displayName }}
+              </ion-label>
+              
             </ion-button>
             <ion-popover 
             :is-open="ownerPopoverOpen" 
@@ -139,7 +147,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
-                <ion-label color="dark">{{ copyFullAddressButtonText }}</ion-label>
+                <ion-label color="light">{{ copyFullAddressButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -240,37 +248,40 @@
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const emits = defineEmits(['createSubMarketModal', 'updateReserveTableSizing'])
+  var emits = defineEmits(['createSubMarketModal', 'updateReserveTableSizing'])
 
-  const toast = inject('toast')
-  const colorHexValue = inject('colorHexValue') as string
+  var toast = inject('toast')
+  var colorHexValue = inject('colorHexValue') as string
 
-  const tokenReserveTableData = ref()
-  const tokenMarketTableData = ref()
-  const showTokenSubMarkets = ref(false)
-  const isLoading = ref(true)
+  var tokenReserveTableData = ref()
+  var tokenMarketTableData = ref()
+  var showTokenSubMarkets = ref(false)
+  var isLoading = ref(true)
   var newTableData: any
   
-  const ownerPopoverOpen = ref(false)
-  const event = ref()
+  var ownerPopoverOpen = ref(false)
+  var event = ref()
 
   var selectedTokenMintAddress: PublicKey
   var publicKeyCheckColor = ref("#6fff7b")
   var isInvalidPublicKey = ref(false)
   var savedEditedRow: any 
   var isEditing = false
-  const isDataEdited = ref(false)
-  const copyFullAddressButtonText = ref("Copy Full Address")
+  var isDataEdited = ref(false)
+  var copyFullAddressButtonText = ref("Copy Full Address")
 
-  const tokenReserveATAPopoverOpen = ref(false)
+  var tokenReserveATAPopoverOpen = ref(false)
   var copyTokenReserveATAButtonText = ref("Copy Token Reserve ATA")
 
-  const inputFeeRefs = ref(new Map())
+  var inputFeeRefs = ref(new Map())
 
   var searchInput = ref("")
 
   var unfilteredTableData: any
   var sorting = false
+
+  var subMarketTokenSVG = ref("")
+  var subMarketTokenName = ref("")
   
   onMounted(() =>
   {
@@ -339,7 +350,7 @@
   function customFilter(filterString: string)
   {
     var filteredTable: any = []
-
+    console.log(filterString)
     for(var i=0; i<unfilteredTableData.length; i++)
     {
       if(unfilteredTableData[i].id.toString().toLowerCase().includes(filterString.toLowerCase()))
@@ -348,7 +359,9 @@
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].displayName.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
-      else if(unfilteredTableData[i].quantity.toLowerCase().includes(filterString.toLowerCase()))
+      else if(unfilteredTableData[i].ceoName.toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].depositedAmount.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].value.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
@@ -532,6 +545,11 @@
   {
     tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
     showTokenSubMarkets.value = true
+
+    const tokenFrontEndProperties = tokenReserveDevNetMap.get(selectedTokenMintAddress.toString())
+    subMarketTokenSVG.value = tokenFrontEndProperties.svg
+    subMarketTokenName.value = tokenFrontEndProperties.name
+
     emitReserveTableSizing()
   }
 

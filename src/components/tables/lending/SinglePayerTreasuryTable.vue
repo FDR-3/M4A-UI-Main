@@ -4,11 +4,8 @@
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines
-      sortField="apy" 
-      :sortOrder="-1" 
       size="small" 
       :value="stableCoinTableData"
-      rowGroupMode="subheader" groupRowsBy="asset.type"
       :globalFilterFields="['tokenMintAddress', 'singlePayerATA', 'asset.name', 'chain.name', 'priceString','percentChange24h', 'quantity', 'value']"  
     >
       <template #header>
@@ -38,7 +35,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="dark">{{ copyTreasuryATAButtonText }}</ion-label>
+                <ion-label color="light">{{ copyTreasuryATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -73,8 +70,6 @@
       v-model:filters="filters" 
       show-gridlines size="small" 
       :value="CryptoCurrencyTableData"
-      rowGroupMode="subheader" 
-      groupRowsBy="asset.type"
       :globalFilterFields="['tokenMintAddress', 'singlePayerATA', 'asset.name', 'chain.name', 'priceString', 'percentChange24h', 'quantity', 'value']"
     >
       <template #header>
@@ -99,7 +94,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="dark">{{ copyTreasuryATAButtonText }}</ion-label>
+                <ion-label color="light">{{ copyTreasuryATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -231,7 +226,9 @@
           calculatedValue = (tokenAmount * priceData.usdPrice)
 
         unprocessedTableData[i].quantity = tokenAmount
-        unprocessedTableData[i].value = '$' + calculatedValue.toFixed(2)
+        unprocessedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
 
         value += calculatedValue
       }
@@ -267,7 +264,9 @@
           calculatedValue = (tokenAmount * priceData.usdPrice)
 
         unprocessedTableData[i].quantity = tokenAmount
-        unprocessedTableData[i].value = '$' + calculatedValue.toFixed(2)
+        unprocessedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
 
         value += calculatedValue
       }

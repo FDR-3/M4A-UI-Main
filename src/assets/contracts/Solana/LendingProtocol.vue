@@ -15,6 +15,7 @@
     lendingUserAvailableYearsByTokenMintAddressHashMap,
     lendingUserMonthlyStatementsHashMap,
     lendingLeaderBoardTable } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -157,6 +158,10 @@
 
       //Convert Fee Percentage To Decimal from Fixed Point
       subMarket.feeOnInterestEarnedRate = (subMarket.feeOnInterestEarnedRate / 100)
+
+      //Add ceo name for filtering
+      if(subMarket.owner.toBase58() == adminAccounts.lendingCEOAddressString)
+        subMarket.ceoName = "fdr-3"
 
       const previousTokenReserveList = tokenReserveMap.get(subMarket.tokenMintAddress.toBase58())
       if(previousTokenReserveList)
@@ -480,27 +485,32 @@
           if(lendingUserMonthlyStatementAccount.statementMonth > existingAccountEntry.statementMonth && lendingUserMonthlyStatementAccount.statementYear >= existingAccountEntry.statementYear)
           {
             const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
+            const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+            const tokenFrontEndProperties = tokenReserveDevNetMap.get(tokenMintAddress)
 
             var moreRecentAccountEntry =
             {
+              owner: lendingUserMonthlyStatementAccount.owner.toString(),
               accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
               accountName: lendingUserAccount.accountName,
               tokenMintAddress: tokenMintAddress,
-              statmentMonth: lendingUserMonthlyStatementAccount.statmentMonth,
+              tokenSVG: tokenFrontEndProperties.svg,
+              tokenName: tokenFrontEndProperties.name,
+              statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
               statementYear: lendingUserMonthlyStatementAccount.statementYear,
-              depositedAmount: lendingUserMonthlyStatementAccount.currentBalanceAmount,
+              depositedAmount: (Number(lendingUserMonthlyStatementAccount.currentBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               depositedValue: 0,
               depositedValueString: "$0.00",
-              interestedAmount: lendingUserMonthlyStatementAccount.lifeTimeinterestAccruedAmount,
-              interestedEarnedValue: 0,
-              interestedEarnedValueString: "$0.00",
-              borrowedAmount: lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount,
+              interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+              interestEarnedValue: 0,
+              interestEarnedValueString: "$0.00",
+              borrowedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               borrowedValue: 0,
               borrowedValueString: "$0.00",
-              repaidAmount: lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount,
+              repaidAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               repaidValue: 0,
               repaidValueString: "$0.00",
-              liquidatedAmount: lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount,
+              liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               liquidatedValue: 0,
               liquidatedValueString: "$0.00",
             }
@@ -512,27 +522,32 @@
         {
           //Add New Sub Account for Existing User to Lending Leader Board
           const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
+          const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+          const tokenFrontEndProperties = tokenReserveDevNetMap.get(tokenMintAddress)
 
           var newAccountEntry =
           {
+            owner: lendingUserMonthlyStatementAccount.owner.toString(),
             accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
             accountName: lendingUserAccount.accountName,
             tokenMintAddress: tokenMintAddress,
-            statmentMonth: lendingUserMonthlyStatementAccount.statmentMonth,
+            tokenSVG: tokenFrontEndProperties.svg,
+            tokenName: tokenFrontEndProperties.name,
+            statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
             statementYear: lendingUserMonthlyStatementAccount.statementYear,
-            depositedAmount: lendingUserMonthlyStatementAccount.currentBalanceAmount,
+            depositedAmount: (Number(lendingUserMonthlyStatementAccount.currentBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             depositedValue: 0,
             depositedValueString: "$0.00",
-            interestedAmount: lendingUserMonthlyStatementAccount.lifeTimeinterestAccruedAmount,
-            interestedEarnedValue: 0,
-            interestedEarnedValueString: "$0.00",
-            borrowedAmount: lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount,
+            interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            interestEarnedValue: 0,
+            interestEarnedValueString: "$0.00",
+            borrowedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             borrowedValue: 0,
             borrowedValueString: "$0.00",
-            repaidAmount: lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount,
+            repaidAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             repaidValue: 0,
             repaidValueString: "$0.00",
-            liquidatedAmount: lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount,
+            liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             liquidatedValue: 0,
             liquidatedValueString: "$0.00",
           }
@@ -545,38 +560,52 @@
       {
         //Add New User and their Sub Account to Lending Leader Board
         const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
+        const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+        const tokenFrontEndProperties = tokenReserveDevNetMap.get(tokenMintAddress)
 
         var newAccountEntry =
         {
+          owner: lendingUserMonthlyStatementAccount.owner.toString(),
           accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
           accountName: lendingUserAccount.accountName,
           tokenMintAddress: tokenMintAddress,
-          statmentMonth: lendingUserMonthlyStatementAccount.statmentMonth,
+          tokenSVG: tokenFrontEndProperties.svg,
+          tokenName: tokenFrontEndProperties.name,
+          statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
           statementYear: lendingUserMonthlyStatementAccount.statementYear,
-          depositedAmount: lendingUserMonthlyStatementAccount.currentBalanceAmount,
+          depositedAmount: (Number(lendingUserMonthlyStatementAccount.currentBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           depositedValue: 0,
           depositedValueString: "$0.00",
-          interestedAmount: lendingUserMonthlyStatementAccount.lifeTimeinterestAccruedAmount,
-          interestedEarnedValue: 0,
-          interestedEarnedValueString: "$0.00",
-          borrowedAmount: lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount,
+          interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+          interestEarnedValue: 0,
+          interestEarnedValueString: "$0.00",
+          borrowedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           borrowedValue: 0,
           borrowedValueString: "$0.00",
-          repaidAmount: lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount,
+          repaidAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           repaidValue: 0,
           repaidValueString: "$0.00",
-          liquidatedAmount: lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount,
+          liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           liquidatedValue: 0,
           liquidatedValueString: "$0.00",
         }
 
+        var displayName = getCustomOrTrimmedUserDisplayName(lendingUserMonthlyStatementAccount.owner.toString())
+        var ceoName = ""
+
+        if(lendingUserMonthlyStatementAccount.owner.toString() == adminAccounts.lendingCEOAddressString)
+          ceoName = "fdr-3"
+
         var newOwnerEntry = 
         {
+          id: leaderBoardData.length + 1,
           owner: lendingUserMonthlyStatementAccount.owner.toString(),
+          displayName: displayName,
+          ceoName: ceoName, 
           depositedValue: 0,
           depositedValueString: "$0.00",
-          interestedEarnedValue: 0,
-          interestedEarnedValueString: "$0.00",
+          interestEarnedValue: 0,
+          interestEarnedValueString: "$0.00",
           borrowedValue: 0,
           borrowedValueString: "$0.00",
           repaidValue: 0,

@@ -42,7 +42,7 @@
       placeholder="Check New Address"
       fill="outline"
       :class="{ 'invalid': !isValidPublicKey }"
-      @ion-input="isValidPublicKey = isValidSolanaPublicKey(addressToCheck)"
+      @ion-input="isValidPublicKey=isValidSolanaPublicKey(addressToCheck)"
       ></ion-input>
       <ion-button
       id="checkNewAddressButton"

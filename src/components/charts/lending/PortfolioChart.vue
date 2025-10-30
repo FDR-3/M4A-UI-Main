@@ -22,7 +22,7 @@
           alignment="center"
           >
             <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-              <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+              <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
             </ion-button>
           </ion-popover>
         </div>
@@ -83,7 +83,7 @@
       alignment="center"
       >
         <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-          <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+          <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
 
@@ -109,7 +109,7 @@
 
       <div>
         <Select
-          class="yearSelect mediumMarginBottom nSmallMarginTop"
+          class="yearSelect "
           v-model="yearSelect" 
           :options="yearList" 
           optionLabel="yearAvailable" 
@@ -135,30 +135,102 @@
       </div>
     </div>
 
-    <div class="chartLegend">
-      <div 
-      v-for="(dataset, index) in chartData?.datasets" 
-      :key="index" 
-      class="legend-item"
-      @click="toggleDataset(index, chartRef)"
-      >
-        <div class="swatch-wrapper">
+    <div class="normalChartLegend">
+      <div class="flexCenterColumn">
+        <div class="chartLegend">
           <div 
-            v-if="dataset.label === 'Balance'" 
-            class="swatch animatedRainbow"
-          ></div>
-          <div 
-            v-else 
-            class="swatch solid-color" 
-            :style="{ backgroundColor: dataset.backgroundColor }"
-          ></div>
+          v-for="(dataset, index) in chartData?.datasets" 
+          :key="index" 
+          class="legend-item"
+          @click="toggleDataset(index, chartRef)"
+          >
+            <div class="swatch-wrapper">
+              <div 
+                v-if="dataset.label === 'Balance'" 
+                class="swatch animatedRainbow"
+              ></div>
+              <div 
+                v-else-if="dataset.label === 'Interest Earned'" 
+                class="swatch rainbowBackGround"
+              ></div>
+              <div 
+                v-else 
+                class="swatch solid-color" 
+                :style="{ backgroundColor: dataset.backgroundColor }"
+              ></div>
+            </div>
+            <span 
+              class="legend-label" 
+              :class="{'hiddenLabel': legenHiddenArray[index] }"
+            >
+              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+            </span>
+          </div>
         </div>
-        <span 
-          class="legend-label" 
-          :class="{ ' hiddenLabel': legenHiddenArray[index] }"
+      </div>
+    </div>
+
+    <div class="midChartLegend">
+      <div class="flexCenterRow" style="gap: 10px">
+        <div 
+        v-for="(dataset, index) in chartData?.datasets.slice(0, 3)" 
+        :key="index" 
+        class="legend-item"
+        @click="toggleDataset(index, chartRef)"
         >
-          <ion-label color="dark">{{ dataset.label }}</ion-label>
+          <div class="swatch-wrapper">
+            <div 
+              v-if="dataset.label === 'Balance'" 
+              class="swatch animatedRainbow"
+            ></div>
+            <div 
+              v-else-if="dataset.label === 'Interest Earned'" 
+              class="swatch rainbowBackGround"
+            ></div>
+            <div 
+              v-else 
+              class="swatch solid-color" 
+              :style="{ backgroundColor: dataset.backgroundColor }"
+            ></div>
+          </div>
+          <span 
+            class="legend-label" 
+            :class="{'hiddenLabel': legenHiddenArray[index] }"
+          >
+            <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
         </span>
+        </div>
+      </div>
+      <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
+        <div 
+        v-for="(dataset, index) in chartData?.datasets.slice(3)" 
+        :key="index + 3" 
+        class="legend-item"
+        @click="toggleDataset(index+3, chartRef)"
+        >
+          <div class="swatch-wrapper">
+            <div 
+              v-if="dataset.label === 'Balance'" 
+              class="swatch animatedRainbow"
+            ></div>
+            <div 
+              v-else-if="dataset.label === 'Interest Earned'" 
+              class="swatch rainbowBackGround"
+            ></div>
+            <div 
+              v-else 
+              class="swatch solid-color" 
+              :style="{ backgroundColor: dataset.backgroundColor }"
+            ></div>
+          </div>
+          <span 
+            class="legend-label" 
+            :class="{'hiddenLabel': legenHiddenArray[index+3] }"
+          >
+            <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+          </span>
+          <br v-if="index==2"> 
+        </div>
       </div>
     </div>
 
@@ -221,22 +293,17 @@
 
   onMounted(() =>
   {
-    if(chartRef.value.chart)
-    {
-      chartRef.value.chart.reset()
-      console.log("resetting")
-    }
-
-    if(lendingUserDepositBalanceHashMap.map)
+    if(lendingUserDepositBalanceHashMap.map && props.tokenMintAddress && (props.accountIndex != undefined))
     {
       const balance = lendingUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
       if(balance)
         userBalance.value = Number(balance)
       else
         userBalance.value = 0
+
+      yearList.value = getYearList()
     }
 
-    yearList.value = getYearList()
     yearSelect.value = props.selectedYear
 
     chartOptions.value = setChartOptions()
@@ -255,6 +322,9 @@
       userBalance.value = Number(balance)
     else
       userBalance.value = 0
+
+    //yearList.value = getYearList()
+    //yearSelect.value = props.selectedYear
   })
 
   watch(darkTheme,() =>
@@ -285,18 +355,23 @@
     const currentYear = newDate.getFullYear()
 
     var initialList = lendingUserAvailableYearsByTokenMintAddressHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
-    var firstYear = initialList[0].yearAvailable
+
+    var firstYear = undefined
     var processedList = []
 
-    for(var year=firstYear; year<=currentYear; year++)
-    {
-      const availableYearObject =
-      {
-        yearAvailable: year
-      }
+    if(initialList)
+      var firstYear = initialList[0].yearAvailable
 
-      processedList.push(availableYearObject)
-    }
+    if(firstYear)
+      for(var year=firstYear; year<=currentYear; year++)
+      {
+        const availableYearObject =
+        {
+          yearAvailable: year
+        }
+
+        processedList.push(availableYearObject)
+      }
 
     return processedList
   }
@@ -493,7 +568,14 @@
   {
     background: repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
     background-size: 150% auto;
-    animation: rainbowAnimation 1.8s linear infinite
+    animation: rainbowXAnimation 1.8s linear infinite
+  }
+
+  .rainbowBackGround
+  {
+    background: repeating-linear-gradient(0deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
+    background-size: auto 200%;
+    animation: rainbowYAnimation 1.8s linear infinite
   }
 
   .vChartLayout
@@ -501,11 +583,19 @@
     height: 420px
   } 
 
-  @keyframes rainbowAnimation
+  @keyframes rainbowXAnimation
   {
     to
     {
       background-position: 150% center
+    }
+  }
+
+  @keyframes rainbowYAnimation
+  {
+    to
+    {
+      background-position: center 200%
     }
   }
 
@@ -537,23 +627,60 @@
     } 
   }
 
-  @media screen and (min-width: 444.1px)
-  { 
-    .chartLegend
-    {
-      display: flex;
-      justify-content: center;
-      gap: 20px
-    }
-  }
-  @media screen and (max-width: 444px)
-  { 
-    .chartLegend
+  @media screen and (min-width: 900.1px)
+  {  
+    .normalChartLegend
     {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px
+    }
+    .midChartLegend
+    {
+      display: none
+    }
+    .chartLegend
+    {
+      display: flex;
+      justify-content: center;
+      gap: 10px
+    }
+  }
+  @media screen and (min-width: 500.1px) and (max-width: 900px)
+  { 
+    .normalChartLegend
+    {
+      display: none
+    }
+    .midChartLegend
+    {
+      display: flex;
+      flex-direction: column
+    }
+    .chartLegend
+    {
+      display: flex;
+      flex-direction: column;
+      align-items: left;
+    }
+  }
+  @media screen and (max-width: 500.1px)
+  { 
+    .normalChartLegend
+    {
+      display: flex;
+      flex-direction: column;
+      margin-top: -70px
+    }
+    .midChartLegend
+    {
+      display: none
+    }
+    .chartLegend
+    {
+      display: flex;
+      flex-direction: column;
+      align-items: left;
     }
   }
 </style>

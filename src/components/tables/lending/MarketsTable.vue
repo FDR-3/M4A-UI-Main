@@ -9,8 +9,6 @@
       :sortOrder="-1" 
       size="small"
       :value="StableCoins"
-      rowGroupMode="subheader" 
-      groupRowsBy="asset.type"
       :globalFilterFields="
       [
         'tokenMintAddress',
@@ -39,17 +37,7 @@
 
           <div v-if="hasAtleast1Account" class="nMediumSmallMarginBottom">
             <div class="flexCenterRow">
-              <ion-button fill="clear" @click="openUserLendingAccountInfo($event)">
-                <ion-icon :src="informationCircle" color="dark"></ion-icon>
-              </ion-button>
-              <ion-popover
-              :is-open="userLendingInfo" 
-              :event="event" 
-              @didDismiss="userLendingInfo=false"
-              side="top" 
-              alignment="center">
-                <ion-text align="center">Create new accounts while making a deposit</ion-text>
-              </ion-popover>
+              <InfoButton :infoMessage="userLendingInfoMSG"/>
 
               <Select
               v-if="!editingAccountName"
@@ -112,7 +100,7 @@
             alignment="center"
             >
               <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
+                <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -211,8 +199,6 @@
       v-model:filters="filters" 
       show-gridlines size="small" 
       :value="CryptoCurrency"
-      rowGroupMode="subheader" 
-      groupRowsBy="asset.type"
       :globalFilterFields="
       [
         'tokenMintAddress',
@@ -337,7 +323,7 @@
 <script setup lang="ts">
   import { ref, onMounted, watch, inject, computed } from 'vue'
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
-  import { pencil, informationCircle, close } from 'ionicons/icons'
+  import { pencil, close } from 'ionicons/icons'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import Select from 'primevue/select'
@@ -350,10 +336,11 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
+  import { StableCoins, CryptoCurrency } from '/src/components/tables/lending/Assets.vue'
   import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap, lendingUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
@@ -364,8 +351,7 @@
   var actionsPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
-
-  var userLendingInfo = ref(false)
+  const userLendingInfoMSG = "Create new accounts while making a deposit"
   var accountSelect = ref(0)
   var accountList = ref()
   var hasAtleast1Account = ref()
@@ -855,12 +841,6 @@
     event.value.tokenMintAddressString = rowData.tokenMintAddressString
 
     actionsPopoverOpen.value = true
-  }
-
-  function openUserLendingAccountInfo(e: Event) 
-  {
-    event.value = e
-    userLendingInfo.value = true
   }
 
   function setInputFocus()
