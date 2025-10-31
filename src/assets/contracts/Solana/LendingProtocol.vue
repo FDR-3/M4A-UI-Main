@@ -465,12 +465,12 @@
           existingOwner = leaderBoardData[j].owner
           existingOwnerIndex = j
 
-          for(var k=0; k<leaderBoardData[j].accountListWithLastestMonthlyStatment.length; k++)
+          for(var k=0; k<leaderBoardData[j].accountListWithLastestMonthlyStatement.length; k++)
           {
-            if(leaderBoardData[j].accountListWithLastestMonthlyStatment[k].accountIndex == lendingUserMonthlyStatementAccount.userAccountIndex &&
-            leaderBoardData[j].accountListWithLastestMonthlyStatment[k].tokenMintAddress == tokenMintAddress)
+            if(leaderBoardData[j].accountListWithLastestMonthlyStatement[k].accountIndex == lendingUserMonthlyStatementAccount.userAccountIndex &&
+            leaderBoardData[j].accountListWithLastestMonthlyStatement[k].tokenMintAddress == tokenMintAddress)
             {
-              existingAccountEntry = leaderBoardData[j].accountListWithLastestMonthlyStatment[k]
+              existingAccountEntry = leaderBoardData[j].accountListWithLastestMonthlyStatement[k]
               existingAccountEntryIndex = k
             } 
           }
@@ -515,7 +515,7 @@
               liquidatedValueString: "$0.00",
             }
 
-            leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatment[existingAccountEntryIndex] = moreRecentAccountEntry
+            leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatement[existingAccountEntryIndex] = moreRecentAccountEntry
           }
         }
         else
@@ -552,8 +552,8 @@
             liquidatedValueString: "$0.00",
           }
 
-          leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatment.push(newAccountEntry)
-          leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatment =  leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatment.sort((a: any, b: any) => a.accountIndex - b.accountIndex)
+          leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatement.push(newAccountEntry)
+          leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatement =  leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatement.sort((a: any, b: any) => a.accountIndex - b.accountIndex)
         }
       }
       else
@@ -612,7 +612,7 @@
           repaidValueString: "$0.00",
           liquidatedValue: 0,
           liquidatedValueString: "$0.00",
-          accountListWithLastestMonthlyStatment: [newAccountEntry]
+          accountListWithLastestMonthlyStatement: [newAccountEntry]
         }
 
         leaderBoardData.push(newOwnerEntry)

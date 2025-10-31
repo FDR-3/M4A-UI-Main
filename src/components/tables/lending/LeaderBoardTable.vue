@@ -30,7 +30,7 @@
         'borrowedValueString',
         'repaidValueString',
         'liquidatedValueString',
-        'accountListWithLastestMonthlyStatment.accountName'
+        'accountListWithLastestMonthlyStatement.accountName'
       ]"
     >
       <template #header>
@@ -130,7 +130,7 @@
         </template>
       </Column>
       <template #expansion="slotProps">
-        <DataTable id="lendingLeaderBoardTable" :value="slotProps.data.accountListWithLastestMonthlyStatment" >
+        <DataTable id="lendingLeaderBoardTable" :value="slotProps.data.accountListWithLastestMonthlyStatement" >
           <Column field="accountName" header="Account" style="width: 0%" sortable>
             <template #body="slotProps">
               <ion-button fill="clear" @click="openViewPortfolioPopover($event, slotProps.data)">
@@ -226,7 +226,7 @@
   import KingStarWolf from '/src/components/fancy/KingStarWolf.vue'
   import RIPKingStarWolf from '/src/components/fancy/rip/RIPKingStarWolf.vue' 
   import { FilterMatchMode } from '@primevue/core/api'
-  import { lendingLeaderBoardTable } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingLeaderBoardTable, lendingUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { copyFullAddress, copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
@@ -266,6 +266,10 @@
     {
       updateLeaderBoardValues()
       updateLeaderBoardDisplayNames()
+
+      if(lendingUserHashMap.map)
+        updateLeaderBoardAccountNames()
+
       sortTable()
       emits('totalLendingUsers', totalNumberOfTopRows)
     }
@@ -288,6 +292,11 @@
   {
     updateLeaderBoardDisplayNames()
     sortTable()//Sort again incase name change caused a change the rankings
+  })
+
+  watch(lendingUserHashMap,() =>
+  {
+    updateLeaderBoardAccountNames()
   })
 
   function updateLeaderBoardValues(newTableData = true)
@@ -323,53 +332,53 @@
         var userAccountLiquidatedTotalValue = 0
         topRowCount += 1
 
-        for(var j=0; j<tempData[i].accountListWithLastestMonthlyStatment.length; j++)
+        for(var j=0; j<tempData[i].accountListWithLastestMonthlyStatement.length; j++)
         {
           var calculatedValue = 0
           subRowCount += 1
 
-          const priceData = priceObjectMap.data[tempData[i].accountListWithLastestMonthlyStatment[j].tokenMintAddress]
+          const priceData = priceObjectMap.data[tempData[i].accountListWithLastestMonthlyStatement[j].tokenMintAddress]
           if(priceData)
           {
             //Remarking SVG Raw to preview overhead and warnings
-            tempData[i].accountListWithLastestMonthlyStatment[j].tokenSVG = markRaw(tempData[i].accountListWithLastestMonthlyStatment[j].tokenSVG)
+            tempData[i].accountListWithLastestMonthlyStatement[j].tokenSVG = markRaw(tempData[i].accountListWithLastestMonthlyStatement[j].tokenSVG)
 
             //Calculate Deposited Value
-            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatment[j].depositedAmount * priceData.usdPrice)
-            tempData[i].accountListWithLastestMonthlyStatment[j].depositedValue = calculatedValue
-            tempData[i].accountListWithLastestMonthlyStatment[j].depositedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].depositedAmount * priceData.usdPrice)
+            tempData[i].accountListWithLastestMonthlyStatement[j].depositedValue = calculatedValue
+            tempData[i].accountListWithLastestMonthlyStatement[j].depositedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
             userAccountDepositedTotalValue += calculatedValue
 
             //Calculate Interest Earned Value
-            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatment[j].interestEarnedAmount * priceData.usdPrice)
-            tempData[i].accountListWithLastestMonthlyStatment[j].interestEarnedValue = calculatedValue
-            tempData[i].accountListWithLastestMonthlyStatment[j].interestEarnedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedAmount * priceData.usdPrice)
+            tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedValue = calculatedValue
+            tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
             userAccountInterestEarnedTotalValue += calculatedValue
 
             //Calculate Borrowed Value
-            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatment[j].borrowedAmount * priceData.usdPrice)
-            tempData[i].accountListWithLastestMonthlyStatment[j].borrowedValue = calculatedValue
-            tempData[i].accountListWithLastestMonthlyStatment[j].borrowedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].borrowedAmount * priceData.usdPrice)
+            tempData[i].accountListWithLastestMonthlyStatement[j].borrowedValue = calculatedValue
+            tempData[i].accountListWithLastestMonthlyStatement[j].borrowedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
             userAccountBorrowedTotalValue += calculatedValue
 
             //Calculate Repaid Value
-            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatment[j].repaidAmount * priceData.usdPrice)
-            tempData[i].accountListWithLastestMonthlyStatment[j].repaidValue = calculatedValue
-            tempData[i].accountListWithLastestMonthlyStatment[j].repaidValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].repaidAmount * priceData.usdPrice)
+            tempData[i].accountListWithLastestMonthlyStatement[j].repaidValue = calculatedValue
+            tempData[i].accountListWithLastestMonthlyStatement[j].repaidValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
             userAccountRepaidTotalValue += calculatedValue
 
             //Calculate Liquidated Value
-            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatment[j].liquidatedAmount * priceData.usdPrice)
-            tempData[i].accountListWithLastestMonthlyStatment[j].liquidatedValue = calculatedValue
-            tempData[i].accountListWithLastestMonthlyStatment[j].liquidatedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].liquidatedAmount * priceData.usdPrice)
+            tempData[i].accountListWithLastestMonthlyStatement[j].liquidatedValue = calculatedValue
+            tempData[i].accountListWithLastestMonthlyStatement[j].liquidatedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
             userAccountLiquidatedTotalValue += calculatedValue
@@ -423,6 +432,19 @@
 
     for(var i=0; i<tableData.value.length; i++)
       tableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(tableData.value[i].owner)
+  }
+
+  function updateLeaderBoardAccountNames()
+  {
+    if(tableData.value == undefined)
+      return
+
+    for(var i=0; i<tableData.value.length; i++)
+      for(var j=0; j<tableData.value[i].accountListWithLastestMonthlyStatement.length; j++)
+      {
+        const lendingUserAccount = lendingUserHashMap.map.get(tableData.value[i].owner + tableData.value[i].accountListWithLastestMonthlyStatement[j].accountIndex.toString())
+        tableData.value[i].accountListWithLastestMonthlyStatement[j].accountName = lendingUserAccount.accountName
+      }
   }
 
   function sortTable()
@@ -568,12 +590,12 @@
 
   function handleRowExpand(event: any)
   {
-    emits("adjustLeaderBoardHeight", event.data.accountListWithLastestMonthlyStatment.length)
+    emits("adjustLeaderBoardHeight", event.data.accountListWithLastestMonthlyStatement.length)
   }
 
   function handleRowCollapse(event: any)
   {
-    emits("adjustLeaderBoardHeight", -event.data.accountListWithLastestMonthlyStatment.length)
+    emits("adjustLeaderBoardHeight", -event.data.accountListWithLastestMonthlyStatement.length)
   }
 
   const filters = ref(
