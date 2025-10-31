@@ -8,7 +8,11 @@
         <RIPLightModeStarWolfBannerSignal id="banner" v-if="adminAccounts.ceoIsDead"/>
         <LightModeStarWolfBannerSignal id="banner" v-else/>
       </div>
-      <p>M4A Protocol is a decentrally funded, single payer health care system. 
+      <p>M4A Protocol is the world's first attempt at universal healthcare using smart contracts.
+        By making hospital bills transparent and public, M4A Protocol will force hospitals to compete with each other instead of hiding behind charge masters.
+        The majority of the funds for paying people's medical bills will come from fees generated from an over collateralized lending protocol such as Aave or Margin Fi.
+        Other developers will be able to build on top of M4A protocol to pay other people's medical bills or any bills that they might choose.
+        M4A Protocol makes it profitable to pay other people's bills.
         Please check out our open source sections to learn more.
         <span class="rainbowText"><br> We are 110% open sourced!!!</span>
       </p>
