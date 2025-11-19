@@ -6,9 +6,9 @@
   :is-open="infoPopoverOpen" 
   :event="event" 
   @didDismiss="infoPopoverOpen=false"
-  side="top" 
+  side="top"
   alignment="center">
-    <ion-text align="center">{{ infoMessage }}</ion-text>
+    <ion-text align="center" class="preserveWhiteSpace">{{ infoMessage }}</ion-text>
   </ion-popover>
 </template>
 

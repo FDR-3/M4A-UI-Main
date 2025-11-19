@@ -74,7 +74,7 @@
   {
     try
     {
-      const account = await anchorPrograms.chat.chatProgram.provider.connection.getAccountInfo(new PublicKey("9qc5AnmfyXivyCivqfvUPEbRR2UEQMKYQzL96WNP9PBy"))
+      const account = await anchorPrograms.chat.chatProgram.provider.connection.getAccountInfo(new PublicKey("6mCqLNhzXQbpGVnwxTC8K4YoQBz2BwXfBXUZVfPtUA4G"))
       const maxWithdraw = account.lamports//Use this to get the lamports that are in the account
 
       //2. Wrap instructions into a transaction, only 1 instruction in this case
@@ -83,7 +83,7 @@
         //1. Create instructions that you want to add to transaction
         StakeProgram.withdraw(
         {
-          stakePubkey: new PublicKey("9qc5AnmfyXivyCivqfvUPEbRR2UEQMKYQzL96WNP9PBy"),
+          stakePubkey: new PublicKey("6mCqLNhzXQbpGVnwxTC8K4YoQBz2BwXfBXUZVfPtUA4G"),
           authorizedPubkey: new PublicKey("Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg"),
           toPubkey: new PublicKey("Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg"),
           lamports: maxWithdraw// Specify the amount of SOL to withdraw (in lamports)

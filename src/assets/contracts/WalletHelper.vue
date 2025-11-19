@@ -64,19 +64,19 @@
       if(confirmation.value.err)
       {
         toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-        detail: `${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
+        detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
         toast.add({ severity: 'success', summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
-        detail: `The UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        detail: `TX_ID: ${transaction}\n\nThe UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
     catch(error)
     {
       toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-      detail: `${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
+      detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
     }
   }
 
@@ -90,19 +90,19 @@
       if(confirmation.value.err)
       {
         toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-        detail: `${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
+        detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
         toast.add({ severity: 'success', summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
-        detail: `The UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        detail: `TX_ID: ${transaction}\n\nThe UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
     catch(error)
     {
       toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-      detail: `${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
+      detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
     }
   }
 
@@ -116,19 +116,19 @@
       if(confirmation.value.err)
       {
         toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-        detail: `${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
+        detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
         toast.add({ severity: 'success', summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
-        detail: `The UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        detail: `TX_ID: ${transaction}\n\nThe UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
     catch(error)
     {
       toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-      detail: `${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
+      detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
     }
   }
 
@@ -142,19 +142,19 @@
       if(confirmation.value.err)
       {
         toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-        detail: `${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
+        detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
         toast.add({ severity: 'success', summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
-        detail: `The UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        detail: `TX_ID: ${transaction}\n\nThe UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
     catch(error)
     {
       toast.add({ severity: 'error', summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-      detail: `${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
+      detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
     }
   }
 

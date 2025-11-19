@@ -13,14 +13,14 @@
     map: undefined
   })
 
-  //Key: Lending User Address + Account Index, Value: Lending User Deposit Balance
-  export const lendingUserDepositBalanceHashMap = reactive(
+  //Key: TokenMintAddress + SubMarketOwnerAddress + SubMarketIndex + Lending User Address + Account Index, Value: Specific Lending User Tab account for a specific SubMarket
+  export const lendingUserTabAccountsHashMap = reactive(
   {
     map: undefined
   })
 
-  //Key: Lending User Address + Account Index, Value: List of User Account Tabs
-  export const lendingUserTabsHashMap = reactive(
+  //Key: Lending User Address + Account Index, Value: List of User Remaining Account Tabs
+  export const lendingUserRemainingTabAccountsHashMap = reactive(
   {
     map: undefined
   })

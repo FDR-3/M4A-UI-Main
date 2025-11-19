@@ -95,8 +95,8 @@
           side="top" 
           alignment="center"
           >
-            <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
-              <ion-label color="light">{{ copyFullAddressButtonText }}</ion-label>
+            <ion-button class="copyAddressButton thinBorder" color="light" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
+              <ion-label color="green">{{ copyFullAddressButtonText }}</ion-label>
             </ion-button>
           </ion-popover>
         </template>
@@ -237,7 +237,7 @@
   import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const emits = defineEmits(['viewPortfolio', 'totalLendingUsers', 'adjustLeaderBoardHeight', 'setLeaderBoardHeight'])
+  const emits = defineEmits(['viewPortfolio', 'totalLendingUsers', 'adjustLeaderBoardHeight', 'setLeaderBoardHeight', 'isDoneLoading'])
 
   const colorHexValue = inject('colorHexValue') as string
   
@@ -421,7 +421,10 @@
       tableData.value = tempData
 
       if(isLoading.value)
+      {
         isLoading.value = false
+        emits("isDoneLoading")
+      }
     }
   }
 

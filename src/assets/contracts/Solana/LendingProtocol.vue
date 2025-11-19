@@ -4,13 +4,13 @@
   import { subMarkets,
     subMarketsHashMap,
     subMarketOwnerHashMap,
-    subMarketOwnerByTokenMintAddressHashMap,
+    subMarketByTokenMintAddressAndOwnerHashMap,
     tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserHashMap,
     lendingUserAccountsHashMap,
-    lendingUserDepositBalanceHashMap,
-    lendingUserTabsHashMap,
+    lendingUserTabAccountsHashMap,
+    lendingUserRemainingTabAccountsHashMap,
     lendingUserAvailableTokenMintAddressesHashMap,
     lendingUserAvailableYearsByTokenMintAddressHashMap,
     lendingUserMonthlyStatementsHashMap,
@@ -38,7 +38,7 @@
         if(!error.message.includes(ERROR_429))
         {
           console.log("Lending Protocol Not Initialized")
-          return []
+          return undefined
         }
         else
         {
@@ -204,7 +204,8 @@
         list = previousSubMarketOwnerByTokenMintAddressData
   
       list.push(subMarket)
-      subMarketOwnerByTokenMintAddressMap.set(subMarket.owner.toBase58() + subMarket.tokenMintAddress.toBase58(), list)
+      list = list.sort((a: any, b: any) => a.subMarketIndex - b.subMarketIndex) 
+      subMarketOwnerByTokenMintAddressMap.set(subMarket.tokenMintAddress.toBase58() + subMarket.owner.toBase58(), list)
 
       //Populate SubMarket hash map
       subMarketsMap.set
@@ -224,7 +225,7 @@
     tokenReserveSubMarketListHashMap.map = cloneDeep(tokenReserveMap)
     subMarketsHashMap.map = cloneDeep(subMarketsMap)
     subMarketOwnerHashMap.map = cloneDeep(subMarketOwnerMap)
-    subMarketOwnerByTokenMintAddressHashMap.map = cloneDeep(subMarketOwnerByTokenMintAddressMap) 
+    subMarketByTokenMintAddressAndOwnerHashMap.map = cloneDeep(subMarketOwnerByTokenMintAddressMap) 
 
     subMarkets.ownerCount = subMarketOwnerHashMap.map.size
 
@@ -256,9 +257,9 @@
     }
   }
 
-  export function getUserNextSubMarketIndex(owner: string, tokenMintAddress: string)
+  export function getUserNextSubMarketIndex(tokenMintAddress: string, subMarketOwner: string)
   {
-    const userSubMarketListByTokenMintAddress = subMarketOwnerByTokenMintAddressHashMap.map.get(owner + tokenMintAddress)
+    const userSubMarketListByTokenMintAddress = subMarketByTokenMintAddressAndOwnerHashMap.map.get(tokenMintAddress + subMarketOwner)
 
     if(userSubMarketListByTokenMintAddress)
       return userSubMarketListByTokenMintAddress.length
@@ -321,8 +322,9 @@
   {
     console.log("Setting Lending User Tab Hashmaps")
 
-    var userTabListHashMap = new Map<string, any>()
+    var userRemainingAccountsTabListHashMap = new Map<string, any>()
     var depositBalanceHashMap = new Map<string, any>()
+    var userTabAccountsHashMap = new Map<string, any>()
     const lendingUserTabs = await getLendingUserTabsWrapper()
     
     for(var i=0; i<lendingUserTabs.length; i++)
@@ -330,9 +332,16 @@
       const lendingUserTabAccount = lendingUserTabs[i].account
       const lendingUserTabAccountPDA = lendingUserTabs[i].publicKey
 
+      //Set user tab hash map
+      userTabAccountsHashMap.set(lendingUserTabAccount.tokenMintAddress.toBase58() +
+      lendingUserTabAccount.subMarketOwnerAddress.toBase58() +
+      lendingUserTabAccount.subMarketIndex.toString() +
+      lendingUserTabAccount.owner.toBase58() +
+      lendingUserTabAccount.userAccountIndex.toString(), lendingUserTabAccount)
+
       //Set user tab list hash map
       var list = []
-      const previousLendingUserTabList = userTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
+      const previousLendingUserTabList = userRemainingAccountsTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
 
       if(previousLendingUserTabList)
         list = previousLendingUserTabList
@@ -340,7 +349,9 @@
       const lendingUserTabRemainingAccount = 
       {
         pubkey: lendingUserTabAccountPDA,
+        pythFeedAddress: lendingUserTabAccount.pythFeedAddress,
         userTabAccountIndex: lendingUserTabAccount.userTabAccountIndex,
+        tokenMintAddress: lendingUserTabAccount.tokenMintAddress.toString(),
         isSigner: false,
         isWritable: true
       }
@@ -348,23 +359,21 @@
       list.push(lendingUserTabRemainingAccount)
       list = list.sort((a: any, b: any) => a.userTabAccountIndex - b.userTabAccountIndex) 
 
-      userTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
+      userRemainingAccountsTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
 
       //Set deposit balance hash map
-      if(lendingUserTabAccount.subMarketOwnerAddress.toString() == adminAccounts.lendingCEOAddressString &&
-      lendingUserTabAccount.subMarketIndex == DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX &&
-      lendingUserTabAccount.depositedAmount.gt(new anchor.BN(0)))
-      {
-        const decimalAmount = tokenDecimalHashMap.get(lendingUserTabAccount.tokenMintAddress.toBase58())
+      /*const decimalAmount = tokenDecimalHashMap.get(lendingUserTabAccount.tokenMintAddress.toBase58())
 
-        depositBalanceHashMap.set(lendingUserTabAccount.owner.toBase58() +
-        lendingUserTabAccount.userAccountIndex.toString() +
-        lendingUserTabAccount.tokenMintAddress.toBase58(), Number(lendingUserTabAccount.depositedAmount  / Math.pow(10, decimalAmount)))//Convert from fixed point notation to decimal
-      }
+      depositBalanceHashMap.set(lendingUserTabAccount.tokenMintAddress.toBase58() +
+      lendingUserTabAccount.subMarketOwnerAddress.toBase58() +
+      lendingUserTabAccount.subMarketIndex.toBase58() +
+      lendingUserTabAccount.owner.toBase58() +
+      lendingUserTabAccount.userAccountIndex.toString(), Number(lendingUserTabAccount.depositedAmount  / Math.pow(10, decimalAmount)))//Convert from fixed point notation to decimal */
     }
 
-    lendingUserTabsHashMap.map = userTabListHashMap
-    lendingUserDepositBalanceHashMap.map = depositBalanceHashMap
+    lendingUserRemainingTabAccountsHashMap.map = userRemainingAccountsTabListHashMap
+    //lendingUserTabAccountsHashMap.map = depositBalanceHashMap
+    lendingUserTabAccountsHashMap.map = userTabAccountsHashMap
   }
 
   async function getLendingUserTabsWrapper()
@@ -391,6 +400,30 @@
     }
   }
 
+  export function generateTabAndPythRemainingAccounts(lendingUserAddress: string, lendingUserAccountIndex: number)
+  {
+    var remainingAccounts = []
+    const lendingUserTabAccounts = lendingUserRemainingTabAccountsHashMap.map.get(lendingUserAddress + lendingUserAccountIndex.toString())
+
+    for(var i=0; i<lendingUserTabAccounts.length; i++)
+    {
+      const tabRemainingAccount = cloneDeep(lendingUserTabAccounts[i])
+
+      remainingAccounts.push(tabRemainingAccount)
+
+      const pythPriceUpdateRemainingAccount = 
+      {
+        pubkey: lendingUserTabAccounts[i].pythFeedAddress,
+        isSigner: false,
+        isWritable: true
+      }
+
+      remainingAccounts.push(pythPriceUpdateRemainingAccount)  
+    }
+
+    return remainingAccounts
+  }
+
   export async function setLendingUserMonthlyStatementHashMapsAndLeaderBoard()
   {
     console.log("Setting Lending User Monthly Statement Hashmaps And Lending Leader Board Data")
@@ -406,8 +439,8 @@
     {
       const lendingUserMonthlyStatementAccount = lendingUserMonthlyStatementAccounts[i].account
 
-      const owner = lendingUserMonthlyStatementAccount.owner.toString()
       const tokenMintAddress = lendingUserMonthlyStatementAccount.tokenMintAddress.toString()
+      const owner = lendingUserMonthlyStatementAccount.owner.toString()
       const userAccountIndex = lendingUserMonthlyStatementAccount.userAccountIndex.toString()
       const statementYear = lendingUserMonthlyStatementAccount.statementYear.toString()
       const statementMonth = lendingUserMonthlyStatementAccount.statementMonth.toString()
@@ -498,19 +531,19 @@
               tokenName: tokenFrontEndProperties.name,
               statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
               statementYear: lendingUserMonthlyStatementAccount.statementYear,
-              depositedAmount: (Number(lendingUserMonthlyStatementAccount.currentBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+              depositedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               depositedValue: 0,
               depositedValueString: "$0.00",
-              interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+              interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               interestEarnedValue: 0,
               interestEarnedValueString: "$0.00",
-              borrowedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+              borrowedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               borrowedValue: 0,
               borrowedValueString: "$0.00",
-              repaidAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+              repaidAmount: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               repaidValue: 0,
               repaidValueString: "$0.00",
-              liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+              liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               liquidatedValue: 0,
               liquidatedValueString: "$0.00",
             }
@@ -535,19 +568,19 @@
             tokenName: tokenFrontEndProperties.name,
             statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
             statementYear: lendingUserMonthlyStatementAccount.statementYear,
-            depositedAmount: (Number(lendingUserMonthlyStatementAccount.currentBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            depositedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             depositedValue: 0,
             depositedValueString: "$0.00",
-            interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             interestEarnedValue: 0,
             interestEarnedValueString: "$0.00",
-            borrowedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            borrowedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             borrowedValue: 0,
             borrowedValueString: "$0.00",
-            repaidAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            repaidAmount: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             repaidValue: 0,
             repaidValueString: "$0.00",
-            liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             liquidatedValue: 0,
             liquidatedValueString: "$0.00",
           }
@@ -573,19 +606,19 @@
           tokenName: tokenFrontEndProperties.name,
           statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
           statementYear: lendingUserMonthlyStatementAccount.statementYear,
-          depositedAmount: (Number(lendingUserMonthlyStatementAccount.currentBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+          depositedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           depositedValue: 0,
           depositedValueString: "$0.00",
-          interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+          interestEarnedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           interestEarnedValue: 0,
           interestEarnedValueString: "$0.00",
-          borrowedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+          borrowedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotBorrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           borrowedValue: 0,
           borrowedValueString: "$0.00",
-          repaidAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+          repaidAmount: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           repaidValue: 0,
           repaidValueString: "$0.00",
-          liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.lifeTimeUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+          liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           liquidatedValue: 0,
           liquidatedValueString: "$0.00",
         }
@@ -732,6 +765,28 @@
       anchorPrograms.lending.lendingProgram.programId
     )
     return lendingUserStatsPDA
+  }
+
+  export function getLendingUserTabAccountPDA(
+    tokenMintAddress: PublicKey,
+    subMarketOwner: PublicKey,
+    subMarketIndex: number,
+    lendingUserAddress: PublicKey,
+    lendingUserAccountIndex: number)
+  {
+    const [lendingUserTabAccountPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("lendingUserTabAccount"),
+        tokenMintAddress.toBuffer(),
+        subMarketOwner.toBuffer(),
+        new anchor.BN(subMarketIndex).toArrayLike(Uint8Array, "le", 2),
+        lendingUserAddress.toBuffer(),
+        new anchor.BN(lendingUserAccountIndex).toArrayLike(Uint8Array, "le", 1)
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return lendingUserTabAccountPDA
   }
 
   export default getLendingProtocolCEOAccount

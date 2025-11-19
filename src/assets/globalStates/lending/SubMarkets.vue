@@ -20,7 +20,7 @@
   })
 
   //Key: SubMarket Owner PublicKey + TokenMintAddress, Value: List of SubMarket Accounts that the owner has for a specific TokenMintAddress
-  export const subMarketOwnerByTokenMintAddressHashMap = reactive(
+  export const subMarketByTokenMintAddressAndOwnerHashMap = reactive(
   {
     map: undefined
   })

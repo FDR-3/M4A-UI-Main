@@ -184,7 +184,7 @@
   {
     try
     {
-      const userNextSubMarketIndex = getUserNextSubMarketIndex(connectedWallet.addressString, selectedTokenMintAddress.toString())
+      const userNextSubMarketIndex = getUserNextSubMarketIndex(selectedTokenMintAddress.toString(), connectedWallet.addressString)
 
       const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
       (

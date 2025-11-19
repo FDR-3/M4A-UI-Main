@@ -246,10 +246,10 @@
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { lendingUserAvailableYearsByTokenMintAddressHashMap, lendingUserDepositBalanceHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAvailableYearsByTokenMintAddressHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStringsMainNet, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
 
@@ -293,9 +293,14 @@
 
   onMounted(() =>
   {
-    if(lendingUserDepositBalanceHashMap.map && props.tokenMintAddress && (props.accountIndex != undefined))
+    if(lendingUserTabAccountsHashMap.map && props.tokenMintAddress && (props.accountIndex != undefined))
     {
-      const balance = lendingUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+      /*const decimalAmount = tokenDecimalHashMap.get(props.tokenMintAddress)
+      const userTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
+      props.ownerAddress + props.accountIndex.toString())
+      const balance = Number(lendingUserTabAccount.depositedAmount  / Math.pow(10, decimalAmount)))//Convert from fixed point notation to decimal */
+
+      const balance = lendingUserTabAccountsHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
       if(balance)
         userBalance.value = Number(balance)
       else
@@ -315,9 +320,9 @@
     stopGradientAnimation()
   })
 
-  watch(lendingUserDepositBalanceHashMap,() =>
+  watch(lendingUserTabAccountsHashMap,() =>
   {
-    const balance = lendingUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    const balance = lendingUserTabAccountsHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else
@@ -339,7 +344,7 @@
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
   {
-    const balance = lendingUserDepositBalanceHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    const balance = lendingUserTabAccountsHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else

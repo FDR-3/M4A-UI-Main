@@ -66,6 +66,8 @@ import { initChatWorkspace, useChatWorkspace } from '/src/assets/contracts/Solan
 import { initLendingWorkspace, useLendingWorkspace } from '/src/assets/contracts/Solana/AnchorLendingWorkSpace.vue'
 import { initAlertWorkspace, useAlertWorkspace } from '/src/assets/contracts/Solana/AnchorAlertWorkSpace.vue'
 import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+import { Program } from "@coral-xyz/anchor"
+import { type LendingProtocol } from "./lending.ts"
 
 const walletOptions = 
 {

@@ -57,6 +57,26 @@
       <ion-text>Value: ${{ withdrawValue }}</ion-text>
     </div>
 
+     <div class="flexCenterRow largeMarginTop nMediumMarginBottom progressCircleWrapper">
+      <div style="margin-left: -55px">
+      <InfoButton :infoMessage="withdrawOrBorrowInfo"/>
+      </div>
+      <div title="Interest Earned and Accrued Snapshot" class="progressCircleWrapper nMediumSmallMarginLeft">
+        <div class="noClickEvent nMediumSmallMarginTop"><ion-label>0</ion-label></div>
+        <div v-if="snapShotTimeDiffValid" class="finishedCircle"></div>
+        <div v-else class="inProgressCircle"></div>
+      </div>
+      <div title="Generate Pyth Price Update" class="progressCircleWrapper">
+        <div class="noClickEvent nMediumSmallMarginTop"><ion-label>0</ion-label></div>
+        <div v-if="pythTimeDiffValid" class="finishedCircle"></div>
+        <div v-else class="inProgressCircle"></div>
+      </div>
+      <div title="Withdraw" class="progressCircleWrapper">
+        <div v-if="withdrawSuccessful" class="finishedCircle"></div>
+        <div v-else class="inProgressCircle"></div>
+      </div>
+    </div>
+
     <ion-button
       id="withdrawButton"
       color="dark"
@@ -70,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, watch, computed, type Component } from 'vue'
+  import { ref, inject, watch, computed } from 'vue'
   import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
@@ -84,9 +104,13 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveDevNetMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingUserAccountsHashMap, lendingUserDepositBalanceHashMap, lendingUserTabsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { generateTabAndPythRemainingAccounts, getLendingUserTabAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+  import { PythSolanaReceiver, InstructionWithEphemeralSigners } from "@pythnetwork/pyth-solana-receiver"
+  import { HermesClient } from "@pythnetwork/hermes-client"
   import * as anchor from "@coral-xyz/anchor"
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
@@ -100,6 +124,7 @@
   var withdrawSVG = ref()
   var subMarketTokenName = ref()
   var userBalance = ref()
+  var userLasterInterestChangeTimeStamp = ref()
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
 
@@ -108,6 +133,35 @@
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
   var overCommentByteSizeLimit = ref()
+
+  const withdrawOrBorrowInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n(Snapshots are\ngenerated automatically\nafter Deposits, Repayments,\nand Liquidations, but can\nbe generated before\nwithdrawals or borrows if\nstale)\n2. Pyth prices of tokens\ncan be no older than 30\nseconds.\n3. Withdraw tokens while\nSnapshots and Pyth prices\nare still valid."
+  var withdrawSuccessful = ref(false)
+
+  var snapShotTimeDiffValid = computed ( () =>
+  {
+    const price = priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice
+    if(price)
+      return (withdrawAmount.value * Number(price)).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })        
+    else
+      return (0).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })   
+  })
+
+  var pythTimeDiffValid = computed ( () =>
+  {
+    const price = priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice
+    if(price)
+      return (withdrawAmount.value * Number(price)).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })        
+    else
+      return (0).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })   
+  })
 
   var withdrawValue = computed ( () =>
   {
@@ -121,15 +175,15 @@
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })   
   })
-  
+
   watch(connectedWallet, () =>
   {
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     withdrawAmount.value = 0
 
-    if(lendingUserDepositBalanceHashMap.map)
+    if(lendingUserTabAccountsHashMap.map)
     {
-      const balance = lendingUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + selectedTokenMintAddress.toString())
+      const balance = lendingUserTabAccountsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + selectedTokenMintAddress.toString())
       if(balance)
         userBalance.value = Number(balance)
       else
@@ -186,6 +240,9 @@
       !event?.target?.classList.contains("p-select-list-container") &&
       !event?.target?.classList.contains("p-inputtext") &&
       !event?.target?.classList.contains("p-icon") &&
+      !event?.target?.classList.contains("progressCircleWrapper") &&
+      !event?.target?.classList.contains("finishedCircle") &&
+      !event?.target?.classList.contains("inProgressCircle") &&
       !event?.target?.classList.contains("p-inputnumber") &&
       !event?.target?.classList.contains("p-inputnumber-button") &&
       !event?.target?.classList.contains("p-inputnumber-button-group") &&
@@ -221,11 +278,13 @@
     else
       hasAtleast2Accounts.value = false
 
-    const balance = lendingUserDepositBalanceHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + tokenMintAddress)
+    const balance = lendingUserTabAccountsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + tokenMintAddress)
     if(balance)
       userBalance.value = Number(balance)
     else
       userBalance.value = 0
+
+    //userLasterInterestChangeTimeStamp.value = .interestChangeLastUpdatedTimeStamp
 
     const tokenInfo = tokenReserveDevNetMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
@@ -272,28 +331,117 @@
 
   async function withdrawTokens()
   {
-    const lendingUserObligationAccounts = lendingUserTabsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    console.log(connectedWallet.addressString)
+    console.log(accountSelect.value)
+    const remainingAccounts = generateTabAndPythRemainingAccounts(connectedWallet.addressString, accountSelect.value)
+    var pythIdArray = []
 
+    console.log(remainingAccounts)
+    for(var i=0; i<remainingAccounts.length; i+=2)
+    {
+      console.log(remainingAccounts)
+      const tokenInfo = tokenReserveDevNetMap.get(remainingAccounts[i].tokenMintAddress)
+      pythIdArray.push(tokenInfo.pythId)
+    }
+
+    const hermesClient = new HermesClient("https://hermes.pyth.network/")
+
+    const pythSolanaReceiver = new PythSolanaReceiver(
+    {
+      connection: anchorPrograms.lending.connection,
+      wallet: anchorPrograms.lending.wallet,
+    })
+    console.log(pythIdArray)
+    //const solPythFeedIdByteArray = Buffer.from("ef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d", 'hex')
+    const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
+
+    const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
+
+    await transactionBuilder.addPostPriceUpdates(priceUpdateData.binary.data)
+
+    /*const withdrawInstruction = await anchorPrograms.lending.lendingProgram.methods.withdrawTokens
+    (
+      selectedTokenMintAddress,
+      adminAccounts.lendingCEOAddressKey,
+      DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX,
+      accountSelect.value,
+      new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
+    )
+    .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
+    .remainingAccounts(remainingAccounts)
+    .instruction()
+
+    transactionBuilder.addInstruction(withdrawInstruction)*/
+
+    await transactionBuilder.addPriceConsumerInstructions(
+      async (
+        getPriceUpdateAccount: (priceFeedId: string) => PublicKey
+      ): Promise<InstructionWithEphemeralSigners[]> => {
+        return [
+          {
+            instruction: await anchorPrograms.lending.lendingProgram.methods.withdrawTokens
+              (
+                selectedTokenMintAddress,
+                adminAccounts.lendingCEOAddressKey,
+                DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX,
+                accountSelect.value,
+                new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
+              )
+              .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
+              .remainingAccounts(remainingAccounts)
+              .instruction(),
+            signers: []
+          },
+        ]
+      }
+    )
+    const tabAccountPDA = getLendingUserTabAccountPDA(
+     selectedTokenMintAddress,
+     adminAccounts.lendingCEOAddressKey,
+     DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX,
+     connectedWallet.publicKey,
+     accountSelect.value
+    )
+    const tabAccount = await anchorPrograms.lending.lendingProgram.account.lendingUserTabAccount.fetch(tabAccountPDA)
+    console.log(Number(tabAccount.depositedAmount))
+    console.log(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value))
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.withdrawTokens
+      const tx = await pythSolanaReceiver.provider.sendAll
+      (
+        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 }), { skipPreflight: true }
+      )
+
+      /*await anchorPrograms.lending.lendingProgram.methods.withdrawTokens
       (
         selectedTokenMintAddress,
         adminAccounts.lendingCEOAddressKey,
         DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX,
         accountSelect.value,
-        new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
+        new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
       )
       .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
-      .remainingAccounts(lendingUserObligationAccounts)
-      .rpc()
+      .remainingAccounts(remainingAccounts)
+      .rpc()*/
 
-      await confirmLendingTransaction(tx, toast, "withdraw_tokens")
+
+    
+      if(tx.length)
+        for(var i=0; i<tx.length; i++)
+          await confirmLendingTransaction(tx[i], toast, "withdraw_tokens")
+      else
+        await confirmLendingTransaction(tx, toast, "withdraw_tokens")
+
       withdrawing.value = false
     }
-    catch(error)
-    {
-      toastPreTransactionError(error, toast, "withdraw_tokens")
+    catch(error: any)
+    {console.log(error)
+      if(error.message.includes("\"Custom\":6000"))
+        toastPreTransactionError("StalePriceData: The price data was stale", toast, "withdraw_tokens")
+      else if(error.message.includes("\"Custom\":6001"))
+        toastPreTransactionError("InsufficientFunds: You can't withdraw more funds than you've deposited or an amount that would expose you to liquidation on purpose", toast, "withdraw_tokens")
+      else
+        toastPreTransactionError(error, toast, "withdraw_tokens")  
     }
   }
 
@@ -330,5 +478,24 @@
   {
     border-color: v-bind(colorHexValue) !important;
     caret-color: v-bind(colorHexValue) !important
+  }
+
+    .flexCenterRow 
+  {
+    gap: 10px
+  }
+
+  .inProgressCircle 
+  {
+    width: 20px;
+    height: 20px;
+    border: thin solid v-bind(colorHexValue);
+  }
+
+  .finishedCircle 
+  {
+    width: 20px;
+    height: 20px;
+    background-color: v-bind(colorHexValue);
   }
 </style>

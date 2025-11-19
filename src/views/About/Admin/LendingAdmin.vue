@@ -38,10 +38,21 @@
   <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
       <h2>Add Lending Token Reserve Account</h2>
+      <div class="nMediumMarginTop smallMarginBottom">
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStringsDevNet.usdcTokenMintAddress)">
+          <component :is="tokenReserveDevNetMap.get(tokenAddressStringsDevNet.usdcTokenMintAddress).svg"> </component>
+          <ion-label> </ion-label>Init USDC Token Reserve
+        </ion-button>
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStringsDevNet.solTokenMintAddress)">
+          <component :is="tokenReserveDevNetMap.get(tokenAddressStringsDevNet.solTokenMintAddress).svg" style="width: 48px; margin-left: -20px; margin-right: -8px"> </component>
+          <ion-label> </ion-label>Init SOL Token Reserve
+        </ion-button>
+      </div>
     </div>
     <div class=" flexCenterRow">
       <div style="width: 90%">
         <ion-input v-model="tokenMintAddressInput" class="mediumMarginBottom" fill="outline" placeholder="Enter The Mint Address"></ion-input>
+        <ion-input v-model="pythUpdateKeyInput" class="mediumMarginBottom" fill="outline" placeholder="Enter The Pyth Price Update Key"></ion-input>
         <ion-input v-model="tokenDecmialCountInput" class="mediumMarginBottom" fill="outline" type="number" min="0" max="10" step="1" placeholder="Enter The Token Decimal"></ion-input>
         
         <ion-label >Borrow APY:</ion-label>
@@ -75,12 +86,14 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, Component, onMounted } from 'vue'
+  import { ref, inject, type Component, onMounted } from 'vue'
   import { IonButton, IonInput, IonText, IonLabel } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { tokenAddressStringsDevNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
   import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
@@ -91,6 +104,7 @@
   const toast = inject('toast')
 
   var tokenMintAddressInput = ref()
+  var pythUpdateKeyInput = ref()
   var tokenDecmialCountInput = ref()
   var createSubMarketModal = ref()
   var monthSelect = ref()
@@ -123,20 +137,34 @@
     }
   }
 
+  async function addTokenReserveQuick(tokenAddress: String)
+  {
+    const tokenInfo = tokenReserveDevNetMap.get(tokenAddress)
+    
+    tokenMintAddressInput.value = tokenAddress
+    pythUpdateKeyInput.value = tokenInfo.pythKey.toBase58()
+    tokenDecmialCountInput.value = tokenInfo.decimalAmount
+
+    await addTokenReserve()
+  }
+
   async function addTokenReserve()
   {
     try
     {
       const mintAddressKey = new PublicKey(tokenMintAddressInput.value)
+
       const tx = await anchorPrograms.lending.lendingProgram.methods.addTokenReserve(
         mintAddressKey,
         tokenDecmialCountInput.value,
+        new PublicKey(pythUpdateKeyInput.value),
         borrowAPY.value * 100,//convert to fixedpoint notation
         new anchor.BN(globalLimitInput.value * Math.pow(10, tokenDecmialCountInput.value)))//convert to fixedpoint notation
       .accounts({mint: mintAddressKey})
       .rpc()
 
       tokenMintAddressInput.value = ""
+      pythUpdateKeyInput.value = ""
       tokenDecmialCountInput.value = ""
       await confirmLendingTransaction(tx, toast, "add_token_reserve")
     }

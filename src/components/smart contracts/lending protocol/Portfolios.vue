@@ -7,14 +7,16 @@
     @viewPortfolio="viewPortfolio"
     @totalLendingUsers="emitTotalLendingUsers"
     @adjustLeaderBoardHeight="emitLeaderBoardHeightAdjust"
-    @setLeaderBoardHeight="emitLeaderBoardHeightSet"/>
+    @setLeaderBoardHeight="emitLeaderBoardHeightSet"
+    @isDoneLoading="isLeaderBoardDoneLoading=true"/>
   </div>
 
   <div v-if="!isBrowsingAllUsers" class="tableContainer">
     <h1 class="yellow displayLongName">{{ displayName }}</h1>
     <h1 class="yellow displayShortName">{{ possiblyTrimmedDisplayName }}</h1>
 
-    <p v-if="searchAddress==SYSTEM_PROGRAM_ADDRESS_STRING">Connect Wallet or Search for a Different Public Key</p>
+    <p v-if="connectedWallet.addressString==SYSTEM_PROGRAM_ADDRESS_STRING && !isValidPublicKey">Connect Wallet or Search for a Different Public Key</p>
+    <p v-else-if="!isValidPublicKey">Search for a Valid Different Public Key</p>
 
     <ion-input
     v-model="addressToCheck"
@@ -22,16 +24,14 @@
     fill="outline"
     class="nSmallMarginTop"
     :class="{ 'invalid': !isValidPublicKey }"
-    @ion-input="isValidPublicKey=isValidSolanaPublicKey(addressToCheck)"
-    @keydown.enter="checkNewAddress()"
+    @keydown.enter="isValidPublicKey=isValidSolanaPublicKey(addressToCheck); checkNewAddress()"
     ></ion-input>
 
     <div class="smallMarginTop">
       <ion-button
       id="checkNewAddressButton"
-      @click="checkNewAddress()"
+      @click="isValidPublicKey=isValidSolanaPublicKey(addressToCheck); checkNewAddress()"
       color="green"
-      :disabled="!isValidPublicKey"
       >
         Check New Address
       </ion-button>
@@ -118,6 +118,23 @@
       </div>
     </div>
 
+    <!--<div class="nMediumMarginTop mediumSmallMarginBottom">
+      <div v-for="token in StableCoins">
+        <PortfolioChart v-if="userTabTokenMintAddressList?.includes(token.tokenMintAddressString)"
+        :key="chartReRenderKey"
+        :tokenMintAddress="token.tokenMintAddressString"
+        :tokenSVG="token.asset.svg"
+        :tokenName="token.asset.name"
+        :ownerAddress="searchAddress"
+        :accountIndex="accountSelect"
+        :chartData="getChartData(token.tokenMintAddressString)"
+        :selectedYear="getSelectedYearForOnMounted(token.tokenMintAddressString)"
+        @changeYear="(tokenMintAddress: string, yearSelect: number) => updateSelectedYearForTokenMintAddressHashMap(tokenMintAddress, yearSelect)"
+        @openDepositModal="(tokenMintAddress: string) => $emit('openDepositModal', tokenMintAddress)"
+        @openWithdrawalModal="(tokenMintAddress: string) => $emit('openWithdrawalModal', tokenMintAddress)"/>
+      </div>
+    </div>-->
+
     <div class="nMediumMarginTop mediumSmallMarginBottom">
       <div v-for="token in StableCoins">
         <PortfolioChart v-if="userTabTokenMintAddressList?.includes(token.tokenMintAddressString)"
@@ -180,7 +197,7 @@
     </div>
   </div>
 
-  <div v-else-if="!isBrowsingAllUsers" class="mediumMarginTop">No User Found At That PublicKey</div>
+  <div v-else-if="!isBrowsingAllUsers" class="mediumMarginTop">No Lending User Found At That PublicKey</div>
 </template>
 
 <script setup lang="ts">
@@ -200,6 +217,7 @@
   import LeaderBoardTable from '/src/components/tables/lending/LeaderBoardTable.vue'
   import PortfolioChart from '/src/components/charts/lending/PortfolioChart.vue'
   import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(['portfolioChartReRenderHelper'])
@@ -233,6 +251,7 @@
   var accountSelect = ref(0)
   var accountList = ref()
   var isBrowsingAllUsers = ref()
+  var isLeaderBoardDoneLoading = ref(false)
 
   var selectedYearHashMap = new Map<string, any>()
   var selectedUserChartDataHashMap = ref()
@@ -420,6 +439,12 @@
     setChartData()
   })
 
+  watch(customUserNameHashMap,() =>
+  {
+    displayName.value = getUserDisplayName(searchAddress.value)
+    possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
+  })
+
   watch(() => props.portfolioChartReRenderHelper, (() => 
   {
     chartReRenderKey.value += 1
@@ -461,16 +486,19 @@
     return gradient
   }
 
-  function resetSelectedYearForTokenMintAddressHashMap(tokenMintAddress: string[])
+  function resetSelectedYearForTokenMintAddressHashMap(tokenMintAddressArray: string[])
   {
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
     var tempHashMap = new Map<string, any>()
 
-    for(var i=0; i<tokenMintAddress.length; i++)
-      tempHashMap.set(tokenMintAddress[i], currentYear)
+    if(tokenMintAddressArray)
+    {
+      for(var i=0; i<tokenMintAddressArray.length; i++)
+        tempHashMap.set(tokenMintAddressArray[i], currentYear)
 
-    selectedYearHashMap = tempHashMap
+      selectedYearHashMap = tempHashMap
+    }
   }
 
   function updateSelectedYearForTokenMintAddressHashMap(tokenMintAddress: string, selectedYear: number)
@@ -531,7 +559,7 @@
               lastKnownActionType = userMontlyStatement.lastLendingActivityType
               lastKnownActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
               lastKnownActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              previousBalance = Number(userMontlyStatement.currentBalanceAmount) / Math.pow(10, decimalAmount)
+              previousBalance = Number(userMontlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
 
               tempChartData.lastActionType = userMontlyStatement.lastLendingActivityType
               tempChartData.lastActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
@@ -576,7 +604,7 @@
               lastKnownActionType = userMontlyStatement.lastLendingActivityType
               lastKnownActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
               lastKnownActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              previousBalance = Number(userMontlyStatement.currentBalanceAmount) / Math.pow(10, decimalAmount)
+              previousBalance = Number(userMontlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
 
               tempChartData.lastActionType = userMontlyStatement.lastLendingActivityType
               tempChartData.lastActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
@@ -648,7 +676,7 @@
               lastKnownActionType = userMontlyStatement.lastLendingActivityType
               lastKnownActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
               lastKnownActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              previousBalance = Number(userMontlyStatement.currentBalanceAmount) / Math.pow(10, decimalAmount)
+              previousBalance = Number(userMontlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
 
               tempChartData.lastActionType = userMontlyStatement.lastLendingActivityType
               tempChartData.lastActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
@@ -693,7 +721,7 @@
               lastKnownActionType = userMontlyStatement.lastLendingActivityType
               lastKnownActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
               lastKnownActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              previousBalance = Number(userMontlyStatement.currentBalanceAmount) / Math.pow(10, decimalAmount)
+              previousBalance = Number(userMontlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
 
               tempChartData.lastActionType = userMontlyStatement.lastLendingActivityType
               tempChartData.lastActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
@@ -775,10 +803,11 @@
 
       resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
       countUserStableCoinAndCryptoCurrencyTabs()
-      emitPortfolioRelatedTableHeight()
       setLendingUserAccountList()
       setChartData()
-    } 
+    }
+
+    emitPortfolioRelatedTableHeight()
   }
 
   function countUserStableCoinAndCryptoCurrencyTabs()
@@ -828,8 +857,8 @@
   }
 
   function emitPortfolioRelatedTableHeight()
-  {
-    emits("portfolioHeightChange", searchAddress.value, userStableCoinTabCount.value, userCryptoCurrencyTabCount.value, isBrowsingAllUsers.value)
+  {console.log("here")
+    emits("portfolioHeightChange", searchAddress.value, userStableCoinTabCount.value, userCryptoCurrencyTabCount.value, isBrowsingAllUsers.value, isLeaderBoardDoneLoading.value)
   }
 
   function viewPortfolio(owner: string, accountIndex: number)

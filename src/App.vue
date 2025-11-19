@@ -28,7 +28,7 @@
                   class="thinBorder"
                   :class="{ selected: navigation.menuIndex==index }"
                 >
-                  <component :is="menuButton.svg" class="menuIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"></component>
+                  <component :is="menuButton.svg" class="menuIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'" :style="{marginRight: menuButton.url == '/PLI' ? 4 : 0}"></component>
          
                   <ion-label v-if="MAINTENANCE_MODE">{{ "Maintenance Mode" }}</ion-label>
                   <ion-label v-else>{{ menuButton.title }}</ion-label>
@@ -318,17 +318,11 @@
     text-decoration-thickness: 2px
   }
 
-  .menuIcon
-    {
-     margin-left: -1px;
-     margin-right: 1px
-    }
-
   @media screen and (min-width: 629px) 
   { 
     .menuIcon
     {
-     width: 50px;
+     width: 45px;
      height: 80px
     }
   }

@@ -46,6 +46,18 @@ const TOKEN_RESERVE_SOL_ASSOCIATED_TOKEN_ADDRESS_DEVNET = SYSTEM_PROGRAM_ADDRESS
 const TOKEN_RESERVE_WETH_ASSOCIATED_TOKEN_ADDRESS_DEVNET = SYSTEM_PROGRAM_ADDRESS_STRING
 const TOKEN_RESERVE_WBTC_ASSOCIATED_TOKEN_ADDRESS_DEVNET = SYSTEM_PROGRAM_ADDRESS_STRING
 
+const PYTH_PRICE_UPDATE_KEY_DAI = new PublicKey("FmfrxJ7YH8yVxoYpJ9ZDMeb8gUceYXYaSrQiBJ1uSZjN")
+const PYTH_PRICE_UPDATE_KEY_USDC = new PublicKey("Dpw1EAVrSB1ibxiDQyTAW6Zip3J4Btk2x4SgApQCeFbX")
+const PYTH_PRICE_UPDATE_KEY_SOL = new PublicKey("7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE")
+const PYTH_PRICE_UPDATE_KEY_WETH = new PublicKey("4TQ1VVWkrYUvyQ6hMmjepwr7swvqsyvLi75BiJi13Tf3")
+const PYTH_PRICE_UPDATE_KEY_WBTC = new PublicKey("9gNX5vguzarZZPjTnE1hWze3s6UsZ7dsU3UnAmKPnMHG")
+
+const PYTH_HEX_ID_DAI = "0xb0948a5e5313200c632b51bb5ca32f6de0d36e9950a942d19751e833f70dabfd" //0X left off for byte array conversion later
+const PYTH_HEX_ID_USDC= "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+const PYTH_HEX_ID_SOL = "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d"
+const PYTH_HEX_ID_WETH = "0x9d4294bbcd1174d6f2003ec365831e64cc31d9f6f15a2b85399db8d5000960f6"
+const PYTH_HEX_ID_WBTC = "0xc9d8b075a5c69303365ae23633d4e085199bf5c520a3b90fed1322a0342ffc33"
+
 export const tokenAddressStringsMainNet = 
 {
     daiTokenMintAddress: DAI_TOKEN_MINT_ADDRESS_MAINNET,
@@ -146,3 +158,21 @@ export const tokenDecimalHashMap: Map<string, number> = new Map(
     [tokenAddressStringsMainNet.wethTokenMintAddress,8],
     [tokenAddressStringsMainNet.wbtcTokenMintAddress,8]
 ])
+
+export const pythPriceUpdateKeys =
+{
+    daiPythId: PYTH_PRICE_UPDATE_KEY_DAI,
+    usdcPythId: PYTH_PRICE_UPDATE_KEY_USDC,
+    solPythId: PYTH_PRICE_UPDATE_KEY_SOL,
+    wethPythId: PYTH_PRICE_UPDATE_KEY_WETH,
+    wbtcPythId: PYTH_PRICE_UPDATE_KEY_WBTC
+}
+
+export const pythIds =
+{
+    daiPythId: PYTH_HEX_ID_DAI,
+    usdcPythId: PYTH_HEX_ID_USDC,
+    solPythId: PYTH_HEX_ID_SOL,
+    wethPythId: PYTH_HEX_ID_WETH,
+    wbtcPythId: PYTH_HEX_ID_WBTC
+}

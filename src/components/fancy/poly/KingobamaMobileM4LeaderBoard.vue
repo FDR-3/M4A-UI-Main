@@ -256,7 +256,7 @@
   {
     .mobileSpaceFiller
     {
-      margin-top: -28vw
+      margin-top: -26vw
     }
   }
   @media screen and (min-width: 285.1px) and (max-width: 305px)
@@ -270,54 +270,61 @@
   {
     .mobileSpaceFiller
     {
-      margin-top: -40vw
+      margin-top: -38vw
     }
   }
   @media screen and (min-width: 252.1px) and (max-width: 268px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -47vw
+      margin-top: -42vw
     }
   }
   @media screen and (min-width: 227.1px) and (max-width: 252px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -53vw
+      margin-top: -46vw
     }
   }
   @media screen and (min-width: 215.1px) and (max-width: 227px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -66vw
+      margin-top: -54vw
     }
   }
   @media screen and (min-width: 204.1px) and (max-width: 215px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -71vw
+      margin-top: -58vw
     }
   }
   @media screen and (min-width: 193.1px) and (max-width: 204px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -77vw
+      margin-top: -62vw
     }
   }
   @media screen and (max-width: 193px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -83vw
+      margin-top: -68vw
     }
   }
   /*Set margin-top for Fire Fox*/
   @-moz-document url-prefix()
   {
+    @media screen and (min-width: 285.1px) and (max-width: 305px)
+    {
+      .mobileSpaceFiller
+      {
+        margin-top: -30vw
+      }
+    }
     @media screen and (min-width: 268.1px) and (max-width: 285px)
     {
       .mobileSpaceFiller

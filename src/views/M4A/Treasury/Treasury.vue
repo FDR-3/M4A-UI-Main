@@ -599,14 +599,14 @@
       height: v-bind('(dynamicTableHeight + 14) + "px"')
     }
   }
-  @media screen and (min-width: 1271.1px) and (max-width: 1430px)
+  @media screen and (min-width: 1277.1px) and (max-width: 1430px)
   { 
     .tableFlipContainer.flipped.viewingOwnerMarkets
     {
       height: v-bind('(dynamicTableHeight + 29) + "px"')
     }
   }
-  @media screen and (min-width: 1227.1px) and (max-width: 1271px)
+  @media screen and (min-width: 1227.1px) and (max-width: 1277px)
   { 
     .tableFlipContainer.flipped.viewingOwnerMarkets
     {

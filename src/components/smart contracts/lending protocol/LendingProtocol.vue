@@ -68,8 +68,11 @@
 
     //Lending Protocol (Current Statement Info)
     const lendingProtocol = await getLendingProtocol()
-    anchorPrograms.currentStatementMonth = monthList[lendingProtocol.currentStatementMonth-1].monthName
-    anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
+    if(lendingProtocol)
+    {
+      anchorPrograms.currentStatementMonth = monthList[lendingProtocol.currentStatementMonth-1].monthName
+      anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
+    }
     await listenForLendingProtocolChanges()
   })
 
