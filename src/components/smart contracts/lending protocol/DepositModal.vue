@@ -23,6 +23,17 @@
       </ion-popover>
     </div>
 
+    <Select
+    class="standardFontSize mediumMarginTop nTinyMarginBottom"
+    v-model="subMarketSelect" 
+    :options="subMarketList" 
+    optionLabel="mainM4ASubMarkets" 
+    optionValue="subMarketIndex" 
+    placeholder="Select fdr-3 SubMarket"
+    appendTo="self"
+    @change="updateStoredSelectedSubMarketIndex(selectedTokenMintAddress.toString(), subMarketSelect.toString())">
+    </Select>
+
     <div class="flexCenterRow accountNameActionContainer">
       <ion-button v-if="addingAdditionalLendingAccount" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
         <ion-icon :src="close" color="dark"></ion-icon>
@@ -53,7 +64,7 @@
       v-model="accountName"
       ref="accountNameEditInputRef"
       id="accountNameEditInput"
-      class="mediumMarginTop mediumMarginBottom"
+      class="mediumMarginTop smallMarginBottom"
       :class="{ 'invalid': overCommentByteSizeLimit }"
       fill="outline"
       :counter="true"
@@ -62,6 +73,7 @@
         <EmojiButton
         :marginTop="'4px'"
         :colorHexValue="colorHexValue"
+        :openSide="'right'"
         @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
       </ion-input>
     </div>
@@ -114,8 +126,7 @@
   import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
   import { anchorPrograms,
     SYSTEM_PROGRAM_ADDRESS_STRING,
-    MAX_ACCOUNT_NAME_LENGTH,
-    DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
+    MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
@@ -130,6 +141,8 @@
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
+  var subMarketSelect = ref()
+  var subMarketList = ref()
   var accountName = ref()
   var accountSelect = ref()
   var previousAccountSelect: number
@@ -269,11 +282,14 @@
     }
   }
 
-  function openDepositModal(tokenMintAddress: string)
+  function openDepositModal(tokenMintAddress: string, fdr3SubMarkets: any[])
   {
     addCloseListner()
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
+    subMarketList.value = fdr3SubMarkets
+    subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
+    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+    
     if(lendingUserAccountsHashMap.map)
     {
       const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
@@ -412,18 +428,24 @@
   {
     try
     {
+      console.log(selectedTokenMintAddress.toString())
+      console.log(adminAccounts.lendingCEOAddressKey.toString())
+      console.log(subMarketSelect.value)
+      console.log(accountSelect.value)
+
+
       const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
         selectedTokenMintAddress,
         adminAccounts.lendingCEOAddressKey,
-        DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX,
+        subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
         accountName.value
       ).accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey }).rpc()
 
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
-      //updateStoredSelectedAccount()//Do this incase inbetween deployed contracts and there is a dead account index saved to local storage
+
       depositing.value = false
       addingAdditionalLendingAccount.value = false
     }
@@ -431,6 +453,11 @@
     {
       toastPreTransactionError(error, toast, "deposit_tokens")
     }
+  }
+
+  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
+  {
+    localStorage.setItem(tokenMintAddress + "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(

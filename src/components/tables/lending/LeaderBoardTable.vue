@@ -109,6 +109,14 @@
           {{ slotProps.data.interestEarnedValueString }}
         </template>
       </Column>
+      <Column field="interestAccruedValue" style="width: 0%" class="poopText" sortable>
+        <template #header>
+          <span class="poopText">Interest Accrued Value</span>
+        </template>
+        <template #body="slotProps">
+          {{ slotProps.data.interestAccruedValueString }}
+        </template>
+      </Column>
       <Column field="depositedValue" header="Deposited Value" style="width: 0%" :style="{color: colorHexValue}" sortable>
         <template #body="slotProps">
           {{ slotProps.data.depositedValueString }}
@@ -130,7 +138,7 @@
         </template>
       </Column>
       <template #expansion="slotProps">
-        <DataTable id="lendingLeaderBoardTable" :value="slotProps.data.accountListWithLastestMonthlyStatement" >
+        <DataTable id="lendingLeaderBoardTable" :value="slotProps.data.accountListWithLastestMonthlyStatement" style="font-size: 5px">
           <Column field="accountName" header="Account" style="width: 0%" sortable>
             <template #body="slotProps">
               <ion-button fill="clear" @click="openViewPortfolioPopover($event, slotProps.data)">
@@ -165,9 +173,13 @@
                 side="top" 
                 alignment="center"
                 >
-                  <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
-                    <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
-                  </ion-button>
+                  <div class="flexCenterColumn" style="margin: 5px" @mouseleave="closeTokenPopover($event)"> 
+                    <ion-text class="wrapText">SubMarket Owner: {{ event.trimmedSubMarketOwnerAddress }}</ion-text><br>
+                    <ion-text>SubMarket Index: {{ event.subMarketIndex }}</ion-text>
+                    <ion-button class="copyAddressButton thinBorder" color="light" @click="passByRefWrapperCopyTokenMintAddress()">
+                      <ion-label color="green">{{ copyTokenMintAddressButtonText }}</ion-label>
+                    </ion-button>
+                  </div>
                 </ion-popover>
               </div>
             </template>
@@ -183,6 +195,19 @@
             </template>
             <template #body="slotProps">
               {{ slotProps.data.interestEarnedValueString }}
+            </template>
+          </Column>
+          <Column field="interestAccruedAmount" style="width: 0%" class="poopText" sortable>
+            <template #header>
+              <span class="poopText">Interest Accrued Amount</span>
+            </template>
+          </Column>
+          <Column field="interestAccruedValue" style="width: 0%" class="poopText" sortable>
+            <template #header>
+              <span class="poopText">Interest Accrued Value</span>
+            </template>
+            <template #body="slotProps">
+              {{ slotProps.data.interestAccruedValueString }}
             </template>
           </Column>
           <Column field="depositedAmount" header="Deposited Amount" style="width: 0%" :style="{color: colorHexValue}" sortable></Column>
@@ -217,7 +242,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted, watch, inject, type Component, markRaw } from 'vue'
-  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover } from '@ionic/vue'
+  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import { search, download } from 'ionicons/icons'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
@@ -251,7 +276,7 @@
   var totalNumberOfTopRows = 0
   var totalNumberOfSubRows = 0
 
-  const lendingLeaderBoardInfoMSG = "You can copy a User's address by clicking on them. \n You can view an Account by clicking on them."
+  const lendingLeaderBoardInfoMSG = "You can copy a User's\naddress by clicking on\nthem.\nYou can view an Account by\nclicking on them."
 
   var event = ref()
   var viewPortfolioPopoverOpen = ref(false)
@@ -262,6 +287,8 @@
 
   onMounted(() =>
   {
+    subTableData.value = {}
+
     if(lendingLeaderBoardTable.data)
     {
       updateLeaderBoardValues()
@@ -531,6 +558,8 @@
   {
     event.value = e
     event.value.tokenMintAddress = rowData.tokenMintAddress
+    event.value.trimmedSubMarketOwnerAddress = rowData.trimmedSubMarketOwnerAddress
+    event.value.subMarketIndex = rowData.subMarketIndex
 
     tokenPopoverOpen.value = true
   }
@@ -618,26 +647,30 @@
 </script>
 
 <style scoped>
-  .tableMinWidth
+ion-input
   {
-    min-width:1520px
+    --highlight-color: var(--ion-color-green)
   }
-
-  /*Set row height to higest possible value*/
   
-
+  
   #test :deep(.p-datatable-tbody > tr)
   {
     height: 75px
   }
 
+  /*Set row height to higest possible value*/
   #lendingLeaderBoardTable :deep(.p-datatable-tbody > tr)
   {
     height: 64px
   }
 
-  ion-input
+  #lendingLeaderBoardTable :deep(th)
   {
-    --highlight-color: var(--ion-color-green)
+    font-size: min(4vw, 14px)
+  }
+
+  .tableMinWidth
+  {
+    min-width:1664px
   }
 </style>

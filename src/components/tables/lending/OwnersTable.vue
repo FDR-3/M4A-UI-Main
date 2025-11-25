@@ -78,6 +78,7 @@
     <DataTable
       v-if="showOwnerSubMarkets"
       ref="tableRef"
+      id="submarketOwnersInnerTable"
       class="tableMinWidth"
       v-model:filters="filters" 
       paginator 
@@ -134,6 +135,8 @@
           </div>
         </template>
       </Column>
+      <Column field="feesGeneratedAmount" header="Fees Generated" style="width: 0%" sortable></Column>
+      <Column field="uncollectedFeesAmount" header="Uncollected Fees" style="width: 0%" sortable></Column>
       <Column field="feeCollectorAddress" header="Fee Collector Address" style="width: 0%" sortable>
         <template #editor="{ index, data, field }">
           <InputText
@@ -176,10 +179,10 @@
           <div class="flexCenterColumn">
             <div v-if="connectedWallet.addressString==slotProps.data.owner">
               <ion-label v-if="slotProps.data.isEditingRow" color="yellow">
-                Table Updates Paused While Editing
+                Updates Paused
               </ion-label>
               <ion-label v-else-if="isDataEdited && !slotProps.data.isRowDataEdited && !slotProps.data.isEditingRow">
-                You can only edit one row at a time
+                Editing Another Row
               </ion-label>
               <ion-label v-else-if="!slotProps.data.isRowDataEdited">No Edits Detected</ion-label>
               <ion-button
@@ -191,7 +194,48 @@
                 Edit Market
               </ion-button>
             </div>
-            <ion-text v-else align="center">Only the owner can edit their sub market</ion-text>
+            <ion-text v-else align="center">Owner Not Detected</ion-text>
+
+            <ion-button
+            v-if="connectedWallet.addressString==slotProps.data.feeCollectorAddress && !isDataEdited"
+            color="dark"
+            @click="openCollectFeesPopover($event, slotProps.data)"
+            >
+              Collect Fees
+            </ion-button>
+            <ion-popover 
+            :is-open="collectFeesPopoverOpen" 
+            :event="event" 
+            @didDismiss="collectFeesPopoverOpen=false"
+            side="top" 
+            alignment="center"
+            >
+              <div style="margin: 5px" class="flexCenterColumn">
+                <div>
+                  <div>
+                    <ion-text v-if="accountList==undefined">Create Accounts While Depositing</ion-text>
+                  </div>
+                  <Select
+                  id="accountSelect"
+                  class="standardFontSize mediumMarginTop"
+                  style="margin-bottom: 40px"
+                  v-model="accountSelect" 
+                  :options="accountList" 
+                  optionLabel="accountName" 
+                  optionValue="userAccountIndex" 
+                  placeholder="No Accounts"
+                  appendTo="self">
+                  </Select>
+                </div>
+                <ion-button
+                class="copyAddressButton"
+                color="dark"
+                :disabled="accountSelect==undefined"
+                @click="claimSubMarketFees()">
+                  Collect Fees
+                </ion-button>
+              </div>
+            </ion-popover>
           </div>
         </template>
       </Column>
@@ -204,6 +248,7 @@
   import { IonLabel, IonIcon, IonInput, IonButton, IonText, IonPopover } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
+  import Select from 'primevue/select'
   import { FilterMatchMode } from '@primevue/core/api'
   import InputText from 'primevue/inputtext'
   import InputNumber from 'primevue/inputnumber'
@@ -223,6 +268,7 @@
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
+  import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
 
@@ -239,8 +285,13 @@
   var showOwnerSubMarkets = ref(false)
   var subMarketsOwnedByUser = ref()
   var subMarketOwnerDisplayName = ref()
+
   var ownerPopoverOpen = ref(false)
+  var collectFeesPopoverOpen = ref(false)
   var event = ref()
+
+  var accountSelect = ref()
+  var accountList = ref()
 
   var selectedOwnerAddress: PublicKey
   var publicKeyCheckColor = ref("#6fff7b")
@@ -370,6 +421,32 @@
   {
     showOwnerSubMarkets.value = false
     emitReserveTableSizing()
+  }
+
+  function openCollectFeesPopover(e: Event, rowData: any) 
+  {
+    if(lendingUserAccountsHashMap.map)
+    {
+      const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
+      console.log(userAccountList)
+      if(userAccountList)
+      {
+        accountList.value = userAccountList
+        accountSelect.value = 0
+      }
+      else
+      {
+        accountList.value = undefined
+        accountSelect.value = undefined
+      }
+    }
+
+    event.value = e
+    event.value.tokenMintAddress = rowData.tokenMintAddress
+    event.value.owner = rowData.owner
+    event.value.subMarketIndex = rowData.subMarketIndex
+    
+    collectFeesPopoverOpen.value = true
   }
 
   function emitReserveTableSizing()
@@ -649,6 +726,27 @@
       toastPreTransactionError(error, toast, "edit_sub_market")
     }
   }
+
+  async function claimSubMarketFees()
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFees
+      (
+        event.value.tokenMintAddress,
+        event.value.owner,
+        event.value.subMarketIndex,
+        accountSelect.value
+      ).rpc()
+      await confirmLendingTransaction(tx, toast, "claim_sub_market_fees")
+
+      collectFeesPopoverOpen.value = false
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "claim_sub_market_fees")
+    }
+  }
 </script>
 
 <style scoped>
@@ -663,6 +761,11 @@
     height: 84px
   }
 
+  #submarketOwnersInnerTable :deep(.p-datatable-tbody > tr)
+  {
+    height: 90px
+  }
+
   #tableTitle
   {
     margin: 20px
@@ -670,15 +773,7 @@
 
   .tableMinWidth
   {
-    min-width: 1120px
-  }
-
-  @-moz-document url-prefix()
-  {
-    .tableMinWidth
-    {
-      min-width: 1300px
-    }
+    min-width: 1495px
   }
 
   ion-input

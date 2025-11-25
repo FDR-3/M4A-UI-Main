@@ -3,7 +3,7 @@
     <!--TokenReserveTable-->
     <DataTable
       v-if="!showTokenSubMarkets"
-      class="tableMinWidth my-custom-table"
+      class="tableMinWidth"
       v-model:filters="filters"
       show-gridlines
       sortField="tokenMintAddress" 
@@ -14,15 +14,22 @@
       :globalFilterFields="['name', 'tokenMintAddress', 'tokenReserveATA', 'price', 'percentChange24h', 'depositedAmount', 'value', 'subMarketCount']"  
     >
       <template #header>
-        <div>
-          <h2>Token Reserves Value: $<span class="rainbowText">{{ tvl.tokenReserveTVL.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}</span></h2>
-          <ion-input v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
-            <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
-          </ion-input>
+        <div class="flexCenterRow">
+          <div class="tinyMarginBottom" style="margin-right: -10px">
+            <InfoButton :infoMessage="subMarketInfoMSG"/>
+          </div>
+          <h2>Token Reserves Value: $<span class="rainbowText">{{ tvl.tokenReserveTVL.toLocaleString('en-US',
+              {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 
+              }) }}
+            </span>
+          </h2>
           <br>
         </div>
+        <ion-input v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
+          <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
+        </ion-input><br>
       </template>
       <template #loading> Loading Reserves. Please wait. </template>
       <Column field="name" header="Token Reserve" style="width: 0%" sortable>
@@ -53,7 +60,7 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="depositedAmount" header="Amount" style="width: 0%" sortable></Column>
+      <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable></Column>
       <Column field="value" header="Value" style="width: 0%" sortable></Column>
       <Column field="subMarketCount" header="SubMarket Count" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
@@ -153,8 +160,10 @@
           </div>
         </template>
       </Column>
-      <Column field="depositedAmount" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable></Column>
       <Column field="value" header="Value" style="width: 0%" sortable></Column>
+      <Column field="feesGeneratedAmount" header="Fees Generated" style="width: 0%" sortable></Column>
+      <Column field="uncollectedFeesAmount" header="Uncollected Fees" style="width: 0%" sortable></Column>
       <Column field="feeCollectorAddress" header="Fee Collector Address" style="width: 0%" sortable>
         <template #editor="{ index, data, field }">
           <InputText
@@ -194,10 +203,10 @@
           <div class="flexCenterColumn">
             <div v-if="connectedWallet.addressString==slotProps.data.owner">
               <ion-label v-if="slotProps.data.isEditingRow" color="yellow">
-                Table Updates Paused While Editing
+                Updates Paused
               </ion-label>
               <ion-label v-else-if="isDataEdited && !slotProps.data.isRowDataEdited && !slotProps.data.isEditingRow">
-                You can only edit one row at a time
+                Editing Another Row
               </ion-label>
               <ion-label v-else-if="!slotProps.data.isRowDataEdited">No Edits Detected</ion-label>
               <ion-button
@@ -209,7 +218,48 @@
                 Edit Market
               </ion-button>
             </div>
-            <ion-text v-else align="center">Only the owner can edit their sub market</ion-text>
+            <ion-text v-else align="center">Owner Not Detected</ion-text>
+            
+            <ion-button
+            v-if="connectedWallet.addressString==slotProps.data.feeCollectorAddress && !isDataEdited"
+            color="dark"
+            @click="openCollectFeesPopover($event, slotProps.data)"
+            >
+              Collect Fees
+            </ion-button>
+            <ion-popover 
+            :is-open="collectFeesPopoverOpen" 
+            :event="event" 
+            @didDismiss="collectFeesPopoverOpen=false"
+            side="top" 
+            alignment="center"
+            >
+              <div style="margin: 5px" class="flexCenterColumn">
+                <div>
+                  <div>
+                    <ion-text v-if="accountList==undefined">Create Accounts While Depositing</ion-text>
+                  </div>
+                  <Select
+                  id="accountSelect"
+                  class="standardFontSize mediumMarginTop"
+                  style="margin-bottom: 40px"
+                  v-model="accountSelect" 
+                  :options="accountList" 
+                  optionLabel="accountName" 
+                  optionValue="userAccountIndex" 
+                  placeholder="No Accounts"
+                  appendTo="self">
+                  </Select>
+                </div>
+                <ion-button
+                class="copyAddressButton"
+                color="dark"
+                :disabled="accountSelect==undefined"
+                @click="claimSubMarketFees()">
+                  Collect Fees
+                </ion-button>
+              </div>
+            </ion-popover>
           </div>
         </template>
       </Column>
@@ -222,6 +272,7 @@
   import { IonLabel, IonIcon, IonInput, IonButton, IonText, IonPopover } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
+  import Select from 'primevue/select'
   import { FilterMatchMode } from '@primevue/core/api'
   import InputNumber from 'primevue/inputnumber'
   import InputText from 'primevue/inputtext'
@@ -245,8 +296,10 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
+  import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   var emits = defineEmits(['createSubMarketModal', 'updateReserveTableSizing'])
 
@@ -258,8 +311,12 @@
   var showTokenSubMarkets = ref(false)
   var isLoading = ref(true)
   var newTableData: any
+
+  var accountSelect = ref()
+  var accountList = ref()
   
   var ownerPopoverOpen = ref(false)
+  var collectFeesPopoverOpen = ref(false)
   var event = ref()
 
   var selectedTokenMintAddress: PublicKey
@@ -272,6 +329,7 @@
 
   var tokenReserveATAPopoverOpen = ref(false)
   var copyTokenReserveATAButtonText = ref("Copy Token Reserve ATA")
+  const subMarketInfoMSG = "Developers can create\nSubMarkets to generate\ninterest for their\nusers while collecting fees\nto pay what ever bill they\nchoose. Developers will\nneed to build their own UIs\nfor their user deposits,\netc."
 
   var inputFeeRefs = ref(new Map())
 
@@ -350,7 +408,7 @@
   function customFilter(filterString: string)
   {
     var filteredTable: any = []
-    console.log(filterString)
+
     for(var i=0; i<unfilteredTableData.length; i++)
     {
       if(unfilteredTableData[i].id.toString().toLowerCase().includes(filterString.toLowerCase()))
@@ -364,6 +422,10 @@
       else if(unfilteredTableData[i].depositedAmount.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].value.toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].feesGeneratedAmount.toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].uncollectedFeesAmount.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].feeCollectorAddress.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
@@ -410,6 +472,32 @@
   function passByRefWrapperCopyTokenReserveATA()
   {
     copyTokenReserveATA(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
+  }
+
+  function openCollectFeesPopover(e: Event, rowData: any) 
+  {
+    if(lendingUserAccountsHashMap.map)
+    {
+      const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
+      console.log(userAccountList)
+      if(userAccountList)
+      {
+        accountList.value = userAccountList
+        accountSelect.value = 0
+      }
+      else
+      {
+        accountList.value = undefined
+        accountSelect.value = undefined
+      }
+    }
+
+    event.value = e
+    event.value.tokenMintAddress = rowData.tokenMintAddress
+    event.value.owner = rowData.owner
+    event.value.subMarketIndex = rowData.subMarketIndex
+    
+    collectFeesPopoverOpen.value = true
   }
 
   const filters = ref(
@@ -475,11 +563,16 @@
 
             if(priceObjectMap.data)
             {
-              const priceData = priceObjectMap.data[unProcessedTokenSubMarketList[j].tokenMintAddress.toBase58()]
+              const balance = unProcessedTokenSubMarketList[j].depositedAmount
+              var calculatedValue = 0
+
+              const priceData = priceObjectMap.data[tokenMintAddressString]
               if(priceData)
+                calculatedValue = (balance * priceData.usdPrice)
+
                 unProcessedTokenSubMarketList[j].value = '$' + calculatedValue.toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2 })
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 })
             }
 
             tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
@@ -713,6 +806,27 @@
       toastPreTransactionError(error, toast, "edit_sub_market")
     }
   }
+
+  async function claimSubMarketFees()
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFees
+      (
+        event.value.tokenMintAddress,
+        event.value.owner,
+        event.value.subMarketIndex,
+        accountSelect.value
+      ).rpc()
+      await confirmLendingTransaction(tx, toast, "claim_sub_market_fees")
+
+      collectFeesPopoverOpen.value = false
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "claim_sub_market_fees")
+    }
+  }
 </script>
 
 <style scoped>
@@ -734,7 +848,7 @@
 
   .tableMinWidth
   {
-    min-width: 1075px
+    min-width: 1340px
   }
 
   ion-input

@@ -14,7 +14,6 @@
     singlePayerAssociatedTokenAddressKeysMainNet,
     hodlAssociatedTokenAddressKeysDevNet,
     singlePayerAssociatedTokenAddressKeysDevNet } from '/src/assets/constants/Addresses.ts'
-  import { PublicKey } from "@solana/web3.js"
 
   export const StableCoins = reactive(
   [

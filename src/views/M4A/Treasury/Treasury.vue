@@ -73,7 +73,13 @@
   var display2ndTable = ref("none")
 
   var createSubMarketModal = ref()
-  var dynamicTableHeight = ref(1353)
+
+  var dynamicTableHeight = ref()
+  if(!isBrowserFireFox())
+    dynamicTableHeight.value = 743
+  else
+    dynamicTableHeight.value = 747
+
   var tokenReserveTableSizing = 0
   var ownerTableSizing = 0
   const numberToSubTractForBothTables = 110
@@ -134,7 +140,7 @@
     {
       if(showTokenSubMarkets)
       {
-        tokenReserveTableSizing = 469 + tokenSubMarketCount * 104
+        tokenReserveTableSizing = 485 + tokenSubMarketCount * 104
         viewingTokenMarkets.value = "viewingTokenMarkets"
       }
       else
@@ -188,7 +194,7 @@
     {
       if(showOwnerSubMarkets)
       {
-        ownerTableSizing = 491 + ownerSubMarketCount * 70
+        ownerTableSizing = 505 + ownerSubMarketCount * 90
         viewingOwnerMarkets.value = "viewingOwnerMarkets"
       }
       else
@@ -206,7 +212,7 @@
     {
       if(showOwnerSubMarkets)
       {
-        ownerTableSizing = 496 + ownerSubMarketCount * 70
+        ownerTableSizing = 496 + ownerSubMarketCount * 90
         viewingOwnerMarkets.value = "viewingOwnerMarkets"
       }
       else
@@ -440,142 +446,121 @@
   }
 
   /*Table Flip Container Back NOT ViewingTokenMarkets*/
-  @media screen and (min-width: 1430.1px)
+  @media screen and (min-width: 1693.1px)
   { 
     .tableFlipContainer.flipped
     {
       height: v-bind('dynamicTableHeight + "px"')
     }
   }
-  @media screen and (min-width: 1277.1px) and (max-width: 1430px) 
+  @media screen and (min-width: 1521.1px) and (max-width: 1693px) 
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(dynamicTableHeight + 14) + "px"')
+      height: v-bind('(dynamicTableHeight + 15) + "px"')
     }
   }
-  @media screen and (min-width: 1227.1px) and (max-width: 1277px) 
+  @media screen and (max-width: 1521px) 
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(dynamicTableHeight + 29) + "px"')
-    }
-  }
-  @media screen and (max-width: 1227px) 
-  { 
-    .tableFlipContainer.flipped
-    {
-      height: v-bind('(dynamicTableHeight + 45) + "px"')
+      height: v-bind('(dynamicTableHeight + 30) + "px"')
     }
   }
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 1476.1px) 
+    @media screen and (min-width: 1693.1px) 
     { 
       .tableFlipContainer.flipped
       {
         height: v-bind('dynamicTableHeight + "px"')/*1353px*/
       }
     }
-    @media screen and (min-width: 1291.1px) and (max-width: 1476px) 
+    @media screen and (min-width: 1521.1px) and (max-width: 1693px) 
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(dynamicTableHeight + 18) + "px"')/*1353px*/
+        height: v-bind('(dynamicTableHeight + 18) + "px"')
       }
     }
-    @media screen and (min-width: 1226.1px) and (max-width: 1291px) 
+    @media screen and (max-width: 1521px) 
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(dynamicTableHeight + 36) + "px"')
-      }
-    }
-    @media screen and (max-width: 1226px) 
-    { 
-      .tableFlipContainer.flipped
-      {
-        height: v-bind('(dynamicTableHeight + 53) + "px"')
+        height: v-bind('(dynamicTableHeight + 35) + "px"')/*1353px*/
       }
     }
   }
 
   /*Table Flip Container Back ViewingTokenMarkets*/
-  @media screen and (min-width: 1691.1px)
+  @media screen and (min-width: 1762.1px)
   { 
     .tableFlipContainer.flipped.viewingTokenMarkets
     {
       height: v-bind('dynamicTableHeight + "px"')
     }
   }
-  @media screen and (min-width: 1402.1px) and (max-width: 1691px) 
+  @media screen and (min-width: 1693.1px) and (max-width: 1762px) 
   { 
     .tableFlipContainer.flipped.viewingTokenMarkets
     {
-      height: v-bind('(dynamicTableHeight + 17) + "px"')
+      height: v-bind('(dynamicTableHeight + 15) + "px"')
     }
   }
-  @media screen and (min-width: 1277.1px) and (max-width: 1402px) 
+  @media screen and (min-width: 1521.1px) and (max-width: 1693px) 
   { 
     .tableFlipContainer.flipped.viewingTokenMarkets
     {
-      height: v-bind('(dynamicTableHeight + 31) + "px"')
+      height: v-bind('(dynamicTableHeight + 29) + "px"')
     }
   }
-  @media screen and (min-width: 1227.1px) and (max-width: 1277px) 
+  @media screen and (max-width: 1521px) 
   { 
     .tableFlipContainer.flipped.viewingTokenMarkets
     {
       height: v-bind('(dynamicTableHeight + 45) + "px"')
     }
   }
-  @media screen and (max-width: 1227px) 
-  { 
-    .tableFlipContainer.flipped.viewingTokenMarkets
-    {
-      height: v-bind('(dynamicTableHeight + 60) + "px"')
-    }
-  }
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 1803.1px)
+    @media screen and (min-width: 1864.1px)
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
         height: v-bind('dynamicTableHeight + "px"')
       }
     }
-    @media screen and (min-width: 1476.1px) and (max-width: 1803px) 
+    @media screen and (min-width: 1693.1px) and (max-width: 1864px) 
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
         height: v-bind('(dynamicTableHeight + 18) + "px"')
       }
     }
-    @media screen and (min-width: 1413.1px) and (max-width: 1476px) 
+    @media screen and (min-width: 1612.1px) and (max-width: 1693px) 
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
-        height: v-bind('(dynamicTableHeight + 35) + "px"')
+        height: v-bind('(dynamicTableHeight + 36) + "px"')
       }
     }
-    @media screen and (min-width: 1283.1px) and (max-width: 1413px) 
+    @media screen and (min-width: 1528.1px) and (max-width: 1612px) 
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
-        height: v-bind('(dynamicTableHeight + 52) + "px"')
+        height: v-bind('(dynamicTableHeight + 53) + "px"')
       }
     }
-    @media screen and (min-width: 1226.1px) and (max-width: 1283px) 
+    @media screen and (min-width: 1521.1px) and (max-width: 1528px) 
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
-        height: v-bind('(dynamicTableHeight + 72) + "px"')
+        height: v-bind('(dynamicTableHeight + 71) + "px"')
       }
     }
-    @media screen and (max-width: 1226px) 
+    @media screen and (max-width: 1521px) 
     { 
       .tableFlipContainer.flipped.viewingTokenMarkets
       {
@@ -585,153 +570,139 @@
   }
 
   /*Table Flip Container Back ViewingOwnerMarkets*/
-  @media screen and (min-width: 1890.1px)
+  @media screen and (min-width: 1746.1px)
   { 
     .tableFlipContainer.flipped.viewingOwnerMarkets
     {
       height: v-bind('dynamicTableHeight + "px"')
     }
   }
-  @media screen and (min-width: 1430.1px) and (max-width: 1890px)
+  @media screen and (min-width: 1693.1px) and (max-width: 1746px)
   { 
     .tableFlipContainer.flipped.viewingOwnerMarkets
     {
       height: v-bind('(dynamicTableHeight + 14) + "px"')
     }
   }
-  @media screen and (min-width: 1277.1px) and (max-width: 1430px)
+  @media screen and (min-width: 1521.1px) and (max-width: 1693px)
   { 
     .tableFlipContainer.flipped.viewingOwnerMarkets
     {
-      height: v-bind('(dynamicTableHeight + 29) + "px"')
+      height: v-bind('(dynamicTableHeight + 30) + "px"')
     }
   }
-  @media screen and (min-width: 1227.1px) and (max-width: 1277px)
+  @media screen and (max-width: 1521px)
   { 
     .tableFlipContainer.flipped.viewingOwnerMarkets
     {
-      height: v-bind('(dynamicTableHeight + 44) + "px"')
-    }
-  }
-  @media screen and (max-width: 1227px)
-  { 
-    .tableFlipContainer.flipped.viewingOwnerMarkets
-    {
-      height: v-bind('(dynamicTableHeight + 59) + "px"')
+      height: v-bind('(dynamicTableHeight + 45) + "px"')
     }
   }
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 1476.1px)
+    @media screen and (min-width: 1693.1px)
     { 
       .tableFlipContainer.flipped.viewingOwnerMarkets
       {
-        height: v-bind('dynamicTableHeight + "px"')
+        height: v-bind('(dynamicTableHeight) + "px"')
       }
     }
-    @media screen and (min-width: 1291.1px) and (max-width: 1476px)
+    @media screen and (min-width: 1521.1px) and (max-width: 1693px)
     { 
       .tableFlipContainer.flipped.viewingOwnerMarkets
       {
-        height: v-bind('(dynamicTableHeight + 17) + "px"')
+        height: v-bind('(dynamicTableHeight + 18) + "px"')
       }
     }
-    @media screen and (min-width: 1226.1px) and (max-width: 1291px) 
+    @media screen and (max-width: 1521px)
     { 
       .tableFlipContainer.flipped.viewingOwnerMarkets
       {
         height: v-bind('(dynamicTableHeight + 36) + "px"')
       }
     }
-    @media screen and (max-width: 1226px)
-    { 
-      .tableFlipContainer.flipped.viewingOwnerMarkets
-      {
-        height: v-bind('(dynamicTableHeight + 53) + "px"')
-      }
-    }
   }
 
   /*Table Flip Container Back ViewingTokenMarkets and ViewingOwnerMarkets*/
-  @media screen and (min-width: 1691.1px)
+  @media screen and (min-width: 1762.1px)
   { 
     .tableFlipContainer.flipped.viewingBothMarkets
     {
       height: v-bind('dynamicTableHeight + "px"')
     }
   }
-  @media screen and (min-width: 1402.1px) and (max-width: 1691px)
+  @media screen and (min-width: 1746.1px) and (max-width: 1762px)
   { 
     .tableFlipContainer.flipped.viewingBothMarkets
     {
-      height: v-bind('(dynamicTableHeight + 30) + "px"')
+      height: v-bind('(dynamicTableHeight + 15) + "px"')
     }
   }
-  @media screen and (min-width: 1277.1px) and (max-width: 1402px)
+  @media screen and (min-width: 1693.1px) and (max-width: 1746px)
+  { 
+    .tableFlipContainer.flipped.viewingBothMarkets
+    {
+      height: v-bind('(dynamicTableHeight + 29) + "px"')
+    }
+  }
+  @media screen and (min-width: 1521.1px) and (max-width: 1693px)
   { 
     .tableFlipContainer.flipped.viewingBothMarkets
     {
       height: v-bind('(dynamicTableHeight + 45) + "px"')
     }
   }
-  @media screen and (min-width: 1227.1px) and (max-width: 1277px)
+  @media screen and (max-width: 1521px)
   { 
     .tableFlipContainer.flipped.viewingBothMarkets
     {
-      height: v-bind('(dynamicTableHeight + 59) + "px"')
-    }
-  }
-  @media screen and (max-width: 1227px)
-  { 
-    .tableFlipContainer.flipped.viewingBothMarkets
-    {
-      height: v-bind('(dynamicTableHeight + 74) + "px"')
+      height: v-bind('(dynamicTableHeight + 60) + "px"')
     }
   }
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 1803.1px)
+    @media screen and (min-width: 1864.1px)
     { 
-      .tableFlipContainer.flipped.viewingBothMarkets
+      .tableFlipContainer.flipped.viewingTokenMarkets
       {
         height: v-bind('dynamicTableHeight + "px"')
       }
     }
-    @media screen and (min-width: 1476.1px) and (max-width: 1803px) 
+    @media screen and (min-width: 1693.1px) and (max-width: 1864px) 
     { 
-      .tableFlipContainer.flipped.viewingBothMarkets
+      .tableFlipContainer.flipped.viewingTokenMarkets
       {
         height: v-bind('(dynamicTableHeight + 18) + "px"')
       }
     }
-    @media screen and (min-width: 1413.1px) and (max-width: 1476px)
+    @media screen and (min-width: 1612.1px) and (max-width: 1693px)
     { 
       .tableFlipContainer.flipped.viewingBothMarkets
       {
-        height: v-bind('(dynamicTableHeight + 35) + "px"')
+        height: v-bind('(dynamicTableHeight + 36) + "px"')
       }
     }
-    @media screen and (min-width: 1283.1px) and (max-width: 1413px) 
-    { 
-      .tableFlipContainer.flipped.viewingTokenMarkets
-      {
-        height: v-bind('(dynamicTableHeight + 53) + "px"')
-      }
-    }
-    @media screen and (min-width: 1226.1px) and (max-width: 1283px) 
-    { 
-      .tableFlipContainer.flipped.viewingTokenMarkets
-      {
-        height: v-bind('(dynamicTableHeight + 71) + "px"')
-      }
-    }
-    @media screen and (max-width: 1226px)
+    @media screen and (min-width: 1528.1px) and (max-width: 1612px) 
     { 
       .tableFlipContainer.flipped.viewingBothMarkets
       {
-        height: v-bind('(dynamicTableHeight + 88) + "px"')
+        height: v-bind('(dynamicTableHeight + 52) + "px"')
+      }
+    }
+    @media screen and (min-width: 1521.1px) and (max-width: 1528px) 
+    { 
+      .tableFlipContainer.flipped.viewingBothMarkets
+      {
+        height: v-bind('(dynamicTableHeight + 72) + "px"')
+      }
+    }
+    @media screen and (max-width: 1521px)
+    { 
+      .tableFlipContainer.flipped.viewingBothMarkets
+      {
+        height: v-bind('(dynamicTableHeight + 89) + "px"')
       }
     }
   }

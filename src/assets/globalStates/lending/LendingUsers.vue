@@ -19,10 +19,22 @@
     map: undefined
   })
 
-  //Key: Lending User Address + Account Index, Value: List of User Remaining Account Tabs
-  export const lendingUserRemainingTabAccountsHashMap = reactive(
+  //Key: Lending User Address + Account Index, Value: List of User Tab Accounts
+  export const lendingUserTabAccountListHashMap = reactive(
   {
     map: undefined
+  })
+
+  //Key: Lending User Address + Account Index, Value: List of User Remaining Account Tabs
+  export const lendingUserRemainingTabAccountListHashMap = reactive(
+  {
+    map: undefined
+  })
+
+  //Key: Lending User Monthly Statement Data
+  export const lendingUserMonthlyStatements = reactive(
+  {
+    data: undefined
   })
 
   //Key: Lending User Address + Account Index + TokenMintAddress + Tax Year + Tax Month, Value: User Monthly Statement Accounts for a given TokenMintAddress and Tax Year and Tax Month
@@ -31,14 +43,26 @@
     map: undefined
   })
 
-  //Key: Lending User Address + Account Index, Value: List of User Available TokenMintAddresses
-  export const lendingUserAvailableTokenMintAddressesHashMap = reactive(
+  //Key: Lending User Address + Account Index, Value: List of User Available Stable Coin SubMarkets
+  export const lendingUserAvailableStableCoinStatementsBySubMarketsHashMap = reactive(
   {
     map: undefined
   })
 
-  //Key: Lending User Address + Account Index + TokenMintAddress, Value: List of User Available Statement Tax Years by TokenMintAddress
-  export const lendingUserAvailableYearsByTokenMintAddressHashMap = reactive(
+  //Key: Lending User Address + Account Index + TokenMintAddress, Value: List of User Available Stable Coin Statement Tax Years by SubMarket
+  export const lendingUserAvailableStableCoinYearsBySubMarketHashMap = reactive(
+  {
+    map: undefined
+  })
+
+  //Key: Lending User Address + Account Index, Value: List of User Available Crypto Currency SubMarkets
+  export const lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap = reactive(
+  {
+    map: undefined
+  })
+
+  //Key: Lending User Address + Account Index + TokenMintAddress, Value: List of User Available Crypto Currency Statement Tax Years by SubMarket
+  export const lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap = reactive(
   {
     map: undefined
   })

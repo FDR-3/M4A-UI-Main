@@ -39,8 +39,8 @@
       <ion-button color="green" @click="setIsBrowsingAllLendingUsers(true); emitPortfolioRelatedTableHeight()">Browse All Users</ion-button>
     </div>
   </div>
-
-  <div v-if="(userStableCoinTabCount  > 0 || userCryptoCurrencyTabCount  > 0) && !isBrowsingAllUsers" class="thickBorder smallMarginTop">
+ 
+  <div v-if="(userTabStableCoinSubMarketList?.length > 0 || userTabCryptoCurrencySubMarketList?.length > 0) && !isBrowsingAllUsers" class="thickBorder smallMarginTop">
     <div class="hHeaderDisplay thinBorderBottom" style="justify-content:space-around !important">
       <div>
         <h2 class="underLine">7 Day Projection Rate</h2>
@@ -90,7 +90,7 @@
     </div>
 
     <!--Stable Coin Charts-->
-    <div v-if="userStableCoinTabCount > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
+    <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
       <div>
         <h4 class="underLine" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
@@ -104,7 +104,7 @@
       </div>  
     </div>
 
-    <div v-if="userStableCoinTabCount > 0" class="smallMarginTop vHeaderDisplay">
+    <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay">
       <div>
         <h4 class="underLine" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
@@ -118,42 +118,27 @@
       </div>
     </div>
 
-    <!--<div class="nMediumMarginTop mediumSmallMarginBottom">
-      <div v-for="token in StableCoins">
-        <PortfolioChart v-if="userTabTokenMintAddressList?.includes(token.tokenMintAddressString)"
-        :key="chartReRenderKey"
-        :tokenMintAddress="token.tokenMintAddressString"
-        :tokenSVG="token.asset.svg"
-        :tokenName="token.asset.name"
-        :ownerAddress="searchAddress"
-        :accountIndex="accountSelect"
-        :chartData="getChartData(token.tokenMintAddressString)"
-        :selectedYear="getSelectedYearForOnMounted(token.tokenMintAddressString)"
-        @changeYear="(tokenMintAddress: string, yearSelect: number) => updateSelectedYearForTokenMintAddressHashMap(tokenMintAddress, yearSelect)"
-        @openDepositModal="(tokenMintAddress: string) => $emit('openDepositModal', tokenMintAddress)"
-        @openWithdrawalModal="(tokenMintAddress: string) => $emit('openWithdrawalModal', tokenMintAddress)"/>
-      </div>
-    </div>-->
-
     <div class="nMediumMarginTop mediumSmallMarginBottom">
-      <div v-for="token in StableCoins">
-        <PortfolioChart v-if="userTabTokenMintAddressList?.includes(token.tokenMintAddressString)"
+      <div v-for="subMarketTab in userTabStableCoinSubMarketList">
+        <PortfolioChart
         :key="chartReRenderKey"
-        :tokenMintAddress="token.tokenMintAddressString"
-        :tokenSVG="token.asset.svg"
-        :tokenName="token.asset.name"
+        :isStableCoin="true"
+        :tokenMintAddress="subMarketTab.tokenMintAddress"
+        :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
+        :subMarketIndex="subMarketTab.subMarketIndex"
         :ownerAddress="searchAddress"
         :accountIndex="accountSelect"
-        :chartData="getChartData(token.tokenMintAddressString)"
-        :selectedYear="getSelectedYearForOnMounted(token.tokenMintAddressString)"
-        @changeYear="(tokenMintAddress: string, yearSelect: number) => updateSelectedYearForTokenMintAddressHashMap(tokenMintAddress, yearSelect)"
+        :subMarketFee="subMarketTab.subMarketFee"
+        :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        @changeYear="updateSelectedYearForTokenMintAddressHashMap"
         @openDepositModal="(tokenMintAddress: string) => $emit('openDepositModal', tokenMintAddress)"
         @openWithdrawalModal="(tokenMintAddress: string) => $emit('openWithdrawalModal', tokenMintAddress)"/>
       </div>
     </div>
 
     <!--Crypto Charts-->
-    <div  v-if="userCryptoCurrencyTabCount" class="largeMarginTop" :class="userStableCoinTabCount > 0 ? 'thinBorderTop' : ''">
+    <div  v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="largeMarginTop" :class="userTabStableCoinSubMarketList?.length > 0 ? 'thinBorderTop' : ''">
       <div class="hHeaderDisplay smallMarginTop">
         <div>
           <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
@@ -167,7 +152,7 @@
       </div>
     </div>
 
-    <div  v-if="userCryptoCurrencyTabCount" class="mediumSmallMarginTop nMediumMarginBottom" >
+    <div  v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="mediumSmallMarginTop nMediumMarginBottom" >
       <div class="vHeaderDisplay smallMarginTop">
         <div>
           <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
@@ -181,19 +166,23 @@
       </div>
     </div>
 
-    <div v-for="token in CryptoCurrency">
-      <PortfolioChart v-if="userTabTokenMintAddressList?.includes(token.tokenMintAddressString)"
-      :key="chartReRenderKey"
-      :tokenMintAddress="token.tokenMintAddressString"
-      :tokenSVG="token.asset.svg"
-      :tokenName="token.asset.name"
-      :ownerAddress="searchAddress"
-      :accountIndex="accountSelect"
-      :chartData="getChartData(token.tokenMintAddressString)"
-      :selectedYear="getSelectedYearForOnMounted(token.tokenMintAddressString)"
-      @changeYear="(tokenMintAddress: string, yearSelect: number) => updateSelectedYearForTokenMintAddressHashMap(tokenMintAddress, yearSelect)"
-      @openDepositModal="(tokenMintAddress: string) => $emit('openDepositModal', tokenMintAddress)"
-      @openWithdrawalModal="(tokenMintAddress: string) => $emit('openWithdrawalModal', tokenMintAddress)"/>
+    <div class="nMediumMarginTop mediumSmallMarginBottom">
+      <div v-for="subMarketTab in userTabCryptoCurrencySubMarketList">
+        <PortfolioChart
+        :key="chartReRenderKey"
+        :isStableCoin="true"
+        :tokenMintAddress="subMarketTab.tokenMintAddress"
+        :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
+        :subMarketIndex="subMarketTab.subMarketIndex"
+        :ownerAddress="searchAddress"
+        :accountIndex="accountSelect"
+        :subMarketFee="subMarketTab.subMarketFee"
+        :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        @changeYear="updateSelectedYearForTokenMintAddressHashMap"
+        @openDepositModal="(tokenMintAddress: string) => $emit('openDepositModal', tokenMintAddress)"
+        @openWithdrawalModal="(tokenMintAddress: string) => $emit('openWithdrawalModal', tokenMintAddress)"/>
+      </div>
     </div>
   </div>
 
@@ -207,10 +196,11 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { getUserDisplayName, getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { lendingUserAccountsHashMap,
-    lendingUserAvailableYearsByTokenMintAddressHashMap,
-    lendingUserAvailableTokenMintAddressesHashMap,
+    lendingUserAvailableStableCoinStatementsBySubMarketsHashMap,
+    lendingUserAvailableStableCoinYearsBySubMarketHashMap,
+    lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap,
+    lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap,
     lendingUserMonthlyStatementsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { trimAddress, isValidSolanaPublicKey } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
@@ -237,9 +227,8 @@
   var addressToCheck = ref()
   var isValidPublicKey = ref(false)
 
-  var userTabTokenMintAddressList = ref()
-  var userStableCoinTabCount = ref(0)
-  var userCryptoCurrencyTabCount = ref(0)
+  var userTabStableCoinSubMarketList = ref()
+  var userTabCryptoCurrencySubMarketList = ref()
 
   var intervalId: any
 
@@ -271,7 +260,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setAnimatedGradient(ctx, chartArea)
+          return setRainbowAnimatedGradient(ctx, chartArea)
         },
         borderWidth: 4,
         fill: false,
@@ -285,7 +274,32 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setGradient(ctx, chartArea)
+          return setRainbowGradient(ctx, chartArea)
+        },
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Debt',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setPoopAnimatedGradient(ctx, chartArea)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: 'Interest Accrued',
+        backgroundColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setPoopGradient(ctx, chartArea)
         },
         data: [] as any[]
       },
@@ -301,7 +315,6 @@
         backgroundColor: "#b5bbca",
         data: [] as any[]
       },
-      
       {
         type: 'bar',
         label: 'Borrows',
@@ -327,11 +340,13 @@
   {
     Balances = 0,
     InterestEarned = 1,
-    Deposits = 2,
-    Withdrawals = 3,
-    Borrows = 4,
-    Repays = 5,
-    Liquidations = 6,
+    Debt = 2,
+    InterestAccrued = 3,
+    Deposits = 4,
+    Withdrawals = 5,
+    Borrows = 6,
+    Repays = 7,
+    Liquidations = 8,
   }
 
   onMounted(() =>
@@ -359,12 +374,16 @@
 
     if(lendingUserMonthlyStatementsHashMap.map)
     {
-      userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
-      if(userTabTokenMintAddressList.value)
-        if(userTabTokenMintAddressList.value.length)
-          resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
+      userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+      if(userTabStableCoinSubMarketList.value)
+        if(userTabStableCoinSubMarketList.value.length)
+          resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
 
-      countUserStableCoinAndCryptoCurrencyTabs()
+      userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+      if(userTabCryptoCurrencySubMarketList.value)
+        if(userTabCryptoCurrencySubMarketList.value.length)
+          resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
+
       setChartData()
     }
 
@@ -377,7 +396,6 @@
     stopGradientAnimation()
   })
 
-
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
   {
@@ -389,8 +407,9 @@
     let newWallet = JSON.parse(newJSONObjectString)
     let oldWallet= JSON.parse(oldJSONObjectString)
 
-    //This is here because of the "watch(lendingUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily
-    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+    //This is here because of the "watch(lendingUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily.
+    //The isBrowisngAllUsers check keeps the leaderboard height from being messed up when changing the selected account index when the leader board isn't visible.
+    if((newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex) || isBrowsingAllUsers)
       return
 
     if(newWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
@@ -411,12 +430,16 @@
     {
       if(lendingUserMonthlyStatementsHashMap.map)
       {
-        userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
-        if(userTabTokenMintAddressList.value)
-          if(userTabTokenMintAddressList.value.length)
-            resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
+        userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+        if(userTabStableCoinSubMarketList.value)
+          if(userTabStableCoinSubMarketList.value.length)
+            resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
 
-        countUserStableCoinAndCryptoCurrencyTabs()
+        userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+        if(userTabCryptoCurrencySubMarketList.value)
+          if(userTabCryptoCurrencySubMarketList.value.length)
+            resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
+
         emitPortfolioRelatedTableHeight()
         setChartData()
       }
@@ -430,11 +453,14 @@
 
   watch(lendingUserMonthlyStatementsHashMap, () =>
   {
-    userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    if(selectedYearHashMap.size == 0 && userTabTokenMintAddressList.value?.length)
-      resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
+    userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    if(selectedYearHashMap.size == 0 && userTabStableCoinSubMarketList.value?.length)
+      resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
 
-    countUserStableCoinAndCryptoCurrencyTabs()
+    userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    if(selectedYearHashMap.size == 0 && userTabCryptoCurrencySubMarketList.value?.length)
+      resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
+
     emitPortfolioRelatedTableHeight()
     setChartData()
   })
@@ -450,7 +476,7 @@
     chartReRenderKey.value += 1
   }))
 
-  function setAnimatedGradient(ctx: any, chartArea:any)
+  function setRainbowAnimatedGradient(ctx: any, chartArea:any)
   {
     if(!chartArea)
       return
@@ -471,7 +497,7 @@
     return gradient
   }
 
-  function setGradient(ctx: any, chartArea:any)
+  function setRainbowGradient(ctx: any, chartArea:any)
   {
     if(!chartArea)
       return
@@ -486,24 +512,53 @@
     return gradient
   }
 
-  function resetSelectedYearForTokenMintAddressHashMap(tokenMintAddressArray: string[])
+  function setPoopAnimatedGradient(ctx: any, chartArea:any)
+  {
+    if(!chartArea)
+      return
+
+    const offset = gradientOffset.value
+    const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0)
+
+    gradient.addColorStop((0 - offset + 1) % 1, '#851717')
+    gradient.addColorStop((0.50 - offset + 1) % 1, '#0f8332')
+    gradient.addColorStop((0.95 - offset + 1) % 1, '#851717')
+
+    return gradient
+  }
+
+  function setPoopGradient(ctx: any, chartArea:any)
+  {
+    if(!chartArea)
+      return
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 170)
+
+    gradient.addColorStop((0), '#851717')
+    gradient.addColorStop((0.50), '#0f8332')
+    gradient.addColorStop((0.75) , '#851717')
+
+    return gradient
+  }
+
+  function resetSelectedYearForTokenMintAddressHashMap(subMarketArray: any[])
   {
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
     var tempHashMap = new Map<string, any>()
 
-    if(tokenMintAddressArray)
+    if(subMarketArray)
     {
-      for(var i=0; i<tokenMintAddressArray.length; i++)
-        tempHashMap.set(tokenMintAddressArray[i], currentYear)
+      for(var i=0; i<subMarketArray.length; i++)
+        tempHashMap.set(subMarketArray[i].tokenMintAddress + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex, currentYear)
 
       selectedYearHashMap = tempHashMap
     }
   }
 
-  function updateSelectedYearForTokenMintAddressHashMap(tokenMintAddress: string, selectedYear: number)
+  function updateSelectedYearForTokenMintAddressHashMap(tokenMintAddress: string, subMarketOwnerAddress: string, subMarketIndex: number, selectedYear: number)
   {
-    selectedYearHashMap.set(tokenMintAddress, selectedYear)
+    selectedYearHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString(), selectedYear)
     chartReRenderKey.value += 1
   }
 
@@ -515,253 +570,266 @@
     var tempHashMap = new Map<string, any>()
 
     //Get Stable Coin Yearly Chart Data
-    for(var i=0; i<StableCoins.length; i++)
-    {
-      if(!userTabTokenMintAddressList.value)
-        return
-
-      //Skip Token if User has no Tabs of it
-      if(!userTabTokenMintAddressList.value.includes(StableCoins[i].tokenMintAddressString))
-        continue
-
-      var lastKnownActionType = 0
-      var lastKnownActionAmount = 0
-      var lastKnownActionTimeStamp = 0
-      var previousBalance = 0
-      const userAvailableYearsByTokenMintAddressList = lendingUserAvailableYearsByTokenMintAddressHashMap.map.get(searchAddress.value +
-      accountSelect.value.toString() +
-      StableCoins[i].tokenMintAddressString)
-
-      for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
+    if(userTabStableCoinSubMarketList.value)
+      for(var i=0; i<userTabStableCoinSubMarketList.value.length; i++)
       {
-        var labels = []
-        var balances = []
-        var deposits = []
-        var withdrawals = []
-        var tempChartData = cloneDeep(baseChartData)
-      
-        //If current year, go up until the current month, otherwise cover the whole year
-        if(year == currentYear)
+        const tokenMintAddress = userTabStableCoinSubMarketList.value[i].tokenMintAddress
+        const subMarketOwnerAddress = userTabStableCoinSubMarketList.value[i].subMarketOwnerAddress
+        const subMarketIndex = userTabStableCoinSubMarketList.value[i].subMarketIndex
+
+        var lastKnownActionType = 0
+        var lastKnownActionAmount = 0
+        var lastKnownActionTimeStamp = 0
+        var previousBalance = 0
+
+        const userAvailableYearsByTokenMintAddressList = lendingUserAvailableStableCoinYearsBySubMarketHashMap.map.get(tokenMintAddress +
+        subMarketOwnerAddress +
+        subMarketIndex.toString() +
+        searchAddress.value +
+        accountSelect.value.toString())
+
+        for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
         {
-          for(var month=1; month<=currentMonth; month++)
+          var labels = []
+          var balances = []
+          var deposits = []
+          var withdrawals = []
+          var tempChartData = cloneDeep(baseChartData)
+        
+          //If current year, go up until the current month, otherwise cover the whole year
+          if(year == currentYear)
           {
-            labels.push(monthList[month-1].monthName)
-
-            const userMontlyStatement = lendingUserMonthlyStatementsHashMap.map.get(searchAddress.value +
-            accountSelect.value.toString() +
-            StableCoins[i].tokenMintAddressString +
-            year.toString() +
-            month.toString())
-
-            if(userMontlyStatement)
+            for(var month=1; month<=currentMonth; month++)
             {
-              const decimalAmount = tokenDecimalHashMap.get(StableCoins[i].tokenMintAddressString)
-              lastKnownActionType = userMontlyStatement.lastLendingActivityType
-              lastKnownActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-              lastKnownActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              previousBalance = Number(userMontlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+              labels.push(monthList[month-1].monthName)
 
-              tempChartData.lastActionType = userMontlyStatement.lastLendingActivityType
-              tempChartData.lastActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-              tempChartData.lastActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              balances.push(previousBalance)
-              deposits.push(Number(userMontlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
-              withdrawals.push(Number(userMontlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(tokenMintAddress +
+              subMarketOwnerAddress +
+              subMarketIndex.toString() +
+              searchAddress.value +
+              accountSelect.value.toString() +
+              year.toString() +
+              month.toString())
+
+              if(userMonthlyStatement)
+              {
+                const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
+                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
+                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+
+                tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
+                tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
+                tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                balances.push(previousBalance)
+                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
+                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+              }
+              else
+              {
+                tempChartData.lastActionType = lastKnownActionType
+                tempChartData.lastActionAmount = lastKnownActionAmount
+                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                balances.push(previousBalance)
+                deposits.push(0)
+                withdrawals.push(0)
+              }
             }
-            else
-            {
-              tempChartData.lastActionType = lastKnownActionType
-              tempChartData.lastActionAmount = lastKnownActionAmount
-              tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
-              balances.push(previousBalance)
-              deposits.push(0)
-              withdrawals.push(0)
-            }
+
+            tempChartData.labels = labels
+            tempChartData.datasets[ChartIndex.Balances].data = balances
+            tempChartData.datasets[ChartIndex.Deposits].data = deposits
+            tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
+
+            tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
-
-          tempChartData.labels = labels
-          tempChartData.datasets[ChartIndex.Balances].data = balances
-          tempChartData.datasets[ChartIndex.Deposits].data = deposits
-          tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-
-          tempHashMap.set(StableCoins[i].tokenMintAddressString + year.toString(), tempChartData)
-        }
-        else
-        {
-          for(var month=1; month<=12; month++)
+          else
           {
-            labels.push(monthList[month-1].monthName)
-
-            const userMontlyStatement = lendingUserMonthlyStatementsHashMap.map.get(searchAddress.value +
-            accountSelect.value.toString() +
-            StableCoins[i].tokenMintAddressString +
-            year.toString() +
-            month.toString())
-
-            if(userMontlyStatement)
+            for(var month=1; month<=12; month++)
             {
-              const decimalAmount = tokenDecimalHashMap.get(StableCoins[i].tokenMintAddressString)
-              lastKnownActionType = userMontlyStatement.lastLendingActivityType
-              lastKnownActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-              lastKnownActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              previousBalance = Number(userMontlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+              labels.push(monthList[month-1].monthName)
 
-              tempChartData.lastActionType = userMontlyStatement.lastLendingActivityType
-              tempChartData.lastActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-              tempChartData.lastActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              balances.push(previousBalance)
-              deposits.push(Number(userMontlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
-              withdrawals.push(Number(userMontlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(tokenMintAddress +
+              subMarketOwnerAddress +
+              subMarketIndex.toString() +
+              searchAddress.value +
+              accountSelect.value.toString() +
+              year.toString() +
+              month.toString())
+
+              if(userMonthlyStatement)
+              {
+                const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
+                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
+                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+
+                tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
+                tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
+                tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                balances.push(previousBalance)
+                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
+                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+              }
+              else
+              {
+                tempChartData.lastActionType = lastKnownActionType
+                tempChartData.lastActionAmount = lastKnownActionAmount
+                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                balances.push(previousBalance)
+                deposits.push(0)
+                withdrawals.push(0)
+              }
             }
-            else
-            {
-              tempChartData.lastActionType = lastKnownActionType
-              tempChartData.lastActionAmount = lastKnownActionAmount
-              tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
-              balances.push(previousBalance)
-              deposits.push(0)
-              withdrawals.push(0)
-            }
+
+            tempChartData.labels = labels
+            tempChartData.datasets[ChartIndex.Balances].data = balances
+            tempChartData.datasets[ChartIndex.Deposits].data = deposits
+            tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
+
+            tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
-
-          tempChartData.labels = labels
-          tempChartData.datasets[ChartIndex.Balances].data = balances
-          tempChartData.datasets[ChartIndex.Deposits].data = deposits
-          tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-
-          tempHashMap.set(StableCoins[i].tokenMintAddressString + year.toString(), cloneDeep(tempChartData))
         }
       }
-    }
-    
-    //Get CryptoCurrency Yearly Chart Data
-    for(var i=0; i<CryptoCurrency.length; i++)
-    {
-      //Skip Token if User has no Tabs of it
-      if(!userTabTokenMintAddressList.value.includes(CryptoCurrency[i].tokenMintAddressString) || !userTabTokenMintAddressList.value)
-        continue
 
-      var lastKnownActionType = 0
-      var lastKnownActionAmount = 0
-      var lastKnownActionTimeStamp = 0
-      var previousBalance = 0
-      const userAvailableYearsByTokenMintAddressList = lendingUserAvailableYearsByTokenMintAddressHashMap.map.get(searchAddress.value +
-      accountSelect.value.toString() +
-      CryptoCurrency[i].tokenMintAddressString)
-
-      for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
+    //Get Crypto Currency Yearly Chart Data
+    if(userTabCryptoCurrencySubMarketList.value)
+      for(var i=0; i<userTabCryptoCurrencySubMarketList.value.length; i++)
       {
-        var labels = []
-        var balances = []
-        var deposits = []
-        var withdrawals = []
-        var tempChartData = baseChartData
+        const tokenMintAddress = userTabCryptoCurrencySubMarketList.value[i].tokenMintAddress
+        const subMarketOwnerAddress = userTabCryptoCurrencySubMarketList.value[i].subMarketOwnerAddress
+        const subMarketIndex = userTabCryptoCurrencySubMarketList.value[i].subMarketIndex
 
-        //If current year, go up until the current month, otherwise cover the whole year
-        if(year == currentYear)
+        var lastKnownActionType = 0
+        var lastKnownActionAmount = 0
+        var lastKnownActionTimeStamp = 0
+        var previousBalance = 0
+
+        const userAvailableYearsByTokenMintAddressList = lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map.get(tokenMintAddress +
+        subMarketOwnerAddress +
+        subMarketIndex.toString() +
+        searchAddress.value +
+        accountSelect.value.toString())
+
+        for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
         {
-          for(var month=1; month<=currentMonth; month++)
+          var labels = []
+          var balances = []
+          var deposits = []
+          var withdrawals = []
+          var tempChartData = cloneDeep(baseChartData)
+        
+          //If current year, go up until the current month, otherwise cover the whole year
+          if(year == currentYear)
           {
-            labels.push(monthList[month-1].monthName)
-
-            const userMontlyStatement = lendingUserMonthlyStatementsHashMap.map.get(searchAddress.value +
-            accountSelect.value.toString() +
-            CryptoCurrency[i].tokenMintAddressString +
-            year.toString() +
-            month.toString())
-
-            if(userMontlyStatement)
+            for(var month=1; month<=currentMonth; month++)
             {
-              const decimalAmount = tokenDecimalHashMap.get(CryptoCurrency[i].tokenMintAddressString)
-              lastKnownActionType = userMontlyStatement.lastLendingActivityType
-              lastKnownActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-              lastKnownActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              previousBalance = Number(userMontlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+              labels.push(monthList[month-1].monthName)
 
-              tempChartData.lastActionType = userMontlyStatement.lastLendingActivityType
-              tempChartData.lastActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-              tempChartData.lastActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              balances.push(previousBalance)
-              deposits.push(Number(userMontlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
-              withdrawals.push(Number(userMontlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(tokenMintAddress +
+              subMarketOwnerAddress +
+              subMarketIndex.toString() +
+              searchAddress.value +
+              accountSelect.value.toString() +
+              year.toString() +
+              month.toString())
+
+              if(userMonthlyStatement)
+              {
+                const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
+                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
+                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+
+                tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
+                tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
+                tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                balances.push(previousBalance)
+                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
+                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+              }
+              else
+              {
+                tempChartData.lastActionType = lastKnownActionType
+                tempChartData.lastActionAmount = lastKnownActionAmount
+                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                balances.push(previousBalance)
+                deposits.push(0)
+                withdrawals.push(0)
+              }
             }
-            else
-            {
-              tempChartData.lastActionType = lastKnownActionType
-              tempChartData.lastActionAmount = lastKnownActionAmount
-              tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
-              balances.push(previousBalance)
-              deposits.push(0)
-              withdrawals.push(0)
-            }
+
+            tempChartData.labels = labels
+            tempChartData.datasets[ChartIndex.Balances].data = balances
+            tempChartData.datasets[ChartIndex.Deposits].data = deposits
+            tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
+
+            tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
-
-          tempChartData.labels = labels
-          tempChartData.datasets[ChartIndex.Balances].data = balances
-          tempChartData.datasets[ChartIndex.Deposits].data = deposits
-          tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-
-          tempHashMap.set(CryptoCurrency[i].tokenMintAddressString + year.toString(), tempChartData)
-        }
-        else
-        {
-          for(var month=1; month<=12; month++)
+          else
           {
-            labels.push(monthList[month-1].monthName)
-
-            const userMontlyStatement = lendingUserMonthlyStatementsHashMap.map.get(searchAddress.value +
-            accountSelect.value.toString() +
-            CryptoCurrency[i].tokenMintAddressString +
-            year.toString() +
-            month.toString())
-
-            if(userMontlyStatement)
+            for(var month=1; month<=12; month++)
             {
-              const decimalAmount = tokenDecimalHashMap.get(CryptoCurrency[i].tokenMintAddressString)
-              lastKnownActionType = userMontlyStatement.lastLendingActivityType
-              lastKnownActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-              lastKnownActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              previousBalance = Number(userMontlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+              labels.push(monthList[month-1].monthName)
 
-              tempChartData.lastActionType = userMontlyStatement.lastLendingActivityType
-              tempChartData.lastActionAmount = Number(userMontlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-              tempChartData.lastActionTimeStamp = Number(userMontlyStatement.lastLendingActivityTimeStamp)
-              balances.push(previousBalance)
-              deposits.push(Number(userMontlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
-              withdrawals.push(Number(userMontlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(tokenMintAddress +
+              subMarketOwnerAddress +
+              subMarketIndex.toString() +
+              searchAddress.value +
+              accountSelect.value.toString() +
+              year.toString() +
+              month.toString())
+
+              if(userMonthlyStatement)
+              {
+                const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
+                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
+                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+
+                tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
+                tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
+                tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                balances.push(previousBalance)
+                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
+                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+              }
+              else
+              {
+                tempChartData.lastActionType = lastKnownActionType
+                tempChartData.lastActionAmount = lastKnownActionAmount
+                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                balances.push(previousBalance)
+                deposits.push(0)
+                withdrawals.push(0)
+              }
             }
-            else
-            {
-              tempChartData.lastActionType = lastKnownActionType
-              tempChartData.lastActionAmount = lastKnownActionAmount
-              tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
-              balances.push(previousBalance)
-              deposits.push(0)
-              withdrawals.push(0)
-            }
+
+            tempChartData.labels = labels
+            tempChartData.datasets[ChartIndex.Balances].data = balances
+            tempChartData.datasets[ChartIndex.Deposits].data = deposits
+            tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
+
+            tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
-
-          tempChartData.labels = labels
-          tempChartData.datasets[ChartIndex.Balances].data = balances
-          tempChartData.datasets[ChartIndex.Deposits].data = deposits
-          tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-
-          tempHashMap.set(CryptoCurrency[i].tokenMintAddressString + year.toString(), cloneDeep(tempChartData))
         }
       }
-    }
 
     selectedUserChartDataHashMap.value = tempHashMap
   }
 
-  function getChartData(tokenMintAddress: string)
+  function getChartData(tokenMintAddress: string, subMarketOwnerAddress: string, subMarketIndex: number)
   {
-    return selectedUserChartDataHashMap.value.get(tokenMintAddress + selectedYearHashMap.get(tokenMintAddress))
+    return selectedUserChartDataHashMap.value.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + selectedYearHashMap.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString()))
   }
 
-  function getSelectedYearForOnMounted(tokenMintAddress: string)
+  function getSelectedYearForOnMounted(tokenMintAddress: string, subMarketOwnerAddress: string, subMarketIndex: number)
   {
-    return selectedYearHashMap.get(tokenMintAddress)
+    return selectedYearHashMap.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString())
   }
 
   const gradientOffset = ref(0)
@@ -798,30 +866,17 @@
 
     if(lendingUserMonthlyStatementsHashMap.map)
     {
-      userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(searchAddress.value + accountSelected.toString())
+      userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelected.toString())
+      userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelected.toString())
       accountSelect.value = accountSelected
 
-      resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
-      countUserStableCoinAndCryptoCurrencyTabs()
+      resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
+      resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
       setLendingUserAccountList()
       setChartData()
     }
 
     emitPortfolioRelatedTableHeight()
-  }
-
-  function countUserStableCoinAndCryptoCurrencyTabs()
-  {
-    userStableCoinTabCount.value = 0
-    userCryptoCurrencyTabCount.value = 0
-
-    for(var i=0; i<StableCoins.length; i++)
-      if(userTabTokenMintAddressList.value?.includes(StableCoins[i].tokenMintAddressString))
-        userStableCoinTabCount.value += 1
-
-    for(var i=0; i<CryptoCurrency.length; i++)
-      if(userTabTokenMintAddressList.value?.includes(CryptoCurrency[i].tokenMintAddressString))
-        userCryptoCurrencyTabCount.value += 1
   }
 
   function updateStoredSelectedAccount()
@@ -832,9 +887,11 @@
       localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
     }
 
-    userTabTokenMintAddressList.value = lendingUserAvailableTokenMintAddressesHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    resetSelectedYearForTokenMintAddressHashMap(userTabTokenMintAddressList.value)
-    countUserStableCoinAndCryptoCurrencyTabs()
+    userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+
+    resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
+    resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
     emitPortfolioRelatedTableHeight()
     setChartData()
   }
@@ -857,8 +914,17 @@
   }
 
   function emitPortfolioRelatedTableHeight()
-  {console.log("here")
-    emits("portfolioHeightChange", searchAddress.value, userStableCoinTabCount.value, userCryptoCurrencyTabCount.value, isBrowsingAllUsers.value, isLeaderBoardDoneLoading.value)
+  {
+    var stableCoinChartCount = 0
+    var cryptoCurrencyChartCount = 0
+
+    if(userTabStableCoinSubMarketList.value)
+      stableCoinChartCount = userTabStableCoinSubMarketList.value.length
+
+    if(userTabCryptoCurrencySubMarketList.value)
+      cryptoCurrencyChartCount = userTabCryptoCurrencySubMarketList.value.length
+
+    emits("portfolioHeightChange", searchAddress.value, stableCoinChartCount, cryptoCurrencyChartCount, isBrowsingAllUsers.value, isLeaderBoardDoneLoading.value)
   }
 
   function viewPortfolio(owner: string, accountIndex: number)

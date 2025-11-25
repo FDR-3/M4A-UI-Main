@@ -23,17 +23,30 @@
       </ion-popover>
     </div>
 
-    <Select
-    id="accountSelect"
-    class="standardFontSize mediumMarginTop mediumMarginBottom"
-    v-model="accountSelect" 
-    :options="accountList" 
-    optionLabel="accountName" 
-    optionValue="userAccountIndex" 
-    placeholder="Select Account"
-    appendTo="self"
-    @change="updateStoredSelectedAccount()">
-    </Select>
+    <div class="flexCenterColumn">
+      <Select
+      class="standardFontSize mediumMarginTop nTinyMarginBottom"
+      v-model="subMarketSelect" 
+      :options="subMarketList" 
+      optionLabel="mainM4ASubMarkets" 
+      optionValue="subMarketIndex" 
+      placeholder="Select fdr-3 SubMarket"
+      appendTo="self"
+      @change="updateStoredSelectedSubMarketIndex(selectedTokenMintAddress.toString(), subMarketSelect.toString())">
+      </Select>
+
+      <Select
+      id="accountSelect"
+      class="standardFontSize mediumMarginTop mediumMarginBottom"
+      v-model="accountSelect" 
+      :options="accountList" 
+      optionLabel="accountName" 
+      optionValue="userAccountIndex" 
+      placeholder="Select Account"
+      appendTo="self"
+      @change="updateStoredSelectedAccount()">
+      </Select>
+    </div>
 
     <ion-label class="alignSelfLeft noClickEvent">Bal: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <InputNumber
@@ -57,32 +70,38 @@
       <ion-text>Value: ${{ withdrawValue }}</ion-text>
     </div>
 
-     <div class="flexCenterRow largeMarginTop nMediumMarginBottom progressCircleWrapper">
-      <div style="margin-left: -55px">
+     <div class="flexCenterRow mediumSmallMarginTop nMediumMarginBottom progressCircleWrapper">
+      <div style="margin-left: -15px; margin-right: -4px">
       <InfoButton :infoMessage="withdrawOrBorrowInfo"/>
       </div>
-      <div title="Interest Earned and Accrued Snapshot" class="progressCircleWrapper nMediumSmallMarginLeft">
-        <div class="noClickEvent nMediumSmallMarginTop"><ion-label>0</ion-label></div>
-        <div v-if="snapShotTimeDiffValid" class="finishedCircle"></div>
+      <div title="Interest Earned and Accrued Snapshot" class="progressBarStep flexCenterColumn progressCircleWrapper nMediumSmallMarginLeft">
+        <div class="noClickEvent nMediumSmallMarginTop"><ion-label>{{ snapShotValidCountDown }}</ion-label></div>
+        <div v-if="snapShotValidCountDown!=0" class="finishedCircle"></div>
         <div v-else class="inProgressCircle"></div>
       </div>
-      <div title="Generate Pyth Price Update" class="progressCircleWrapper">
-        <div class="noClickEvent nMediumSmallMarginTop"><ion-label>0</ion-label></div>
-        <div v-if="pythTimeDiffValid" class="finishedCircle"></div>
-        <div v-else class="inProgressCircle"></div>
-      </div>
-      <div title="Withdraw" class="progressCircleWrapper">
+      <div title="Withdraw" class="progressBarStep flexCenterColumn progressCircleWrapper">
         <div v-if="withdrawSuccessful" class="finishedCircle"></div>
         <div v-else class="inProgressCircle"></div>
       </div>
     </div>
 
     <ion-button
-      id="withdrawButton"
+      v-if="snapShotValidCountDown==0"
+      id="withdrawModalButton"
+      color="dark"
+      @click="updateUserSnapShots()"
+      class="mediumSmallMarginTop nTinyMarginBottom"
+    >
+      Update SnapShots
+    </ion-button>
+
+    <ion-button
+      v-else
+      id="withdrawModalButton"
       color="dark"
       @click="withdrawTokens()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="withdrawAmount == 0 || overCommentByteSizeLimit"
+      :disabled="withdrawAmount==0 || snapShotValidCountDown==0"
     >
       Withdraw
     </ion-button>
@@ -95,18 +114,17 @@
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
   import { anchorPrograms,
-    SYSTEM_PROGRAM_ADDRESS_STRING,
-    DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX } from '/src/assets/globalStates/AnchorPrograms.vue'
+    SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey } from "@solana/web3.js"
+  import { PublicKey, Transaction } from "@solana/web3.js"
   import { copyTokenMintAddress,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveDevNetMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { generateTabAndPythRemainingAccounts, getLendingUserTabAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStringsMainNet, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { PythSolanaReceiver, InstructionWithEphemeralSigners } from "@pythnetwork/pyth-solana-receiver"
   import { HermesClient } from "@pythnetwork/hermes-client"
   import * as anchor from "@coral-xyz/anchor"
@@ -115,7 +133,9 @@
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
-  var accountSelect = ref()
+  var subMarketSelect = ref(0)
+  var subMarketList = ref()
+  var accountSelect = ref(0)
   var accountList = ref()
   var hasAtleast2Accounts = ref()
   var withdrawAmount = ref()
@@ -124,7 +144,6 @@
   var withdrawSVG = ref()
   var subMarketTokenName = ref()
   var userBalance = ref()
-  var userLasterInterestChangeTimeStamp = ref()
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
 
@@ -132,36 +151,12 @@
   var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
-  var overCommentByteSizeLimit = ref()
-
-  const withdrawOrBorrowInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n(Snapshots are\ngenerated automatically\nafter Deposits, Repayments,\nand Liquidations, but can\nbe generated before\nwithdrawals or borrows if\nstale)\n2. Pyth prices of tokens\ncan be no older than 30\nseconds.\n3. Withdraw tokens while\nSnapshots and Pyth prices\nare still valid."
+  const withdrawOrBorrowInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
   var withdrawSuccessful = ref(false)
 
-  var snapShotTimeDiffValid = computed ( () =>
-  {
-    const price = priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice
-    if(price)
-      return (withdrawAmount.value * Number(price)).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })        
-    else
-      return (0).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })   
-  })
-
-  var pythTimeDiffValid = computed ( () =>
-  {
-    const price = priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice
-    if(price)
-      return (withdrawAmount.value * Number(price)).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })        
-    else
-      return (0).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })   
-  })
+  var snapShotValidCountDown = ref(0)
+  var snapShotCountDownIntervalId: any
+  var pythAccountCountDownIntervalId: any
 
   var withdrawValue = computed ( () =>
   {
@@ -176,16 +171,46 @@
         maximumFractionDigits: 2 })   
   })
 
-  watch(connectedWallet, () =>
+  //Json string of wallet to detect object property changes
+  const walletWatch = computed(() =>
   {
+    return JSON.stringify(connectedWallet)
+  })
+
+  watch(lendingUserTabAccountListHashMap, async() =>
+  {
+    if(withdrawing.value)//Don't start another count down if on the deposit modal since the withdrawal modal can still be mounted even when not visible
+    {
+      clearSnapShotIntervalCountDown()
+      await setSnapShotIntervalCountDown()
+    }
+  })
+
+  watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
+  {
+    let newWallet = JSON.parse(newJSONObjectString)
+    let oldWallet= JSON.parse(oldJSONObjectString)
+
+    //Only want this running if the connected Wallet Address String is changing
+    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+      return
+
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     withdrawAmount.value = 0
 
     if(lendingUserTabAccountsHashMap.map)
     {
-      const balance = lendingUserTabAccountsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + selectedTokenMintAddress.toString())
-      if(balance)
-        userBalance.value = Number(balance)
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+      adminAccounts.lendingCEOAddressString +
+      subMarketSelect.value.toString() +
+      connectedWallet.addressString +
+      accountSelect.value.toString())
+
+      if(lendingUserTabAccount)
+      {
+        const decimalAmount = tokenDecimalHashMap.get(selectedTokenMintAddress.toString())
+        userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+      }
       else
         userBalance.value = 0
     }
@@ -218,7 +243,7 @@
       (event?.target?.id != "openWithdrawalModal") &&
       (event?.target?.id != "maxButtonContainer") &&
       (event?.target?.id != "maxButton") &&
-      (event?.target?.id != "withdrawButton") &&
+      (event?.target?.id != "withdrawModalButton") &&
       (event?.target?.id != "themeButton") &&
       !event?.target?.classList.contains("tableWithdrawButton") &&
       !event?.target?.classList.contains("native-wrapper") &&
@@ -250,18 +275,34 @@
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
+      {
+        clearSnapShotIntervalCountDown()
+        clearPythAccountIntervalCountDown()
         withdrawing.value = false
-
+      }  
+      
       //Close modal when clicking into input search's behind Modal
       if((event?.target?.placeholder == "Market Search     "))
+      {
+        clearSnapShotIntervalCountDown()
+        clearPythAccountIntervalCountDown()
         withdrawing.value = false
+      }  
     }
   }
 
-  function openWithdrawalModal(tokenMintAddress: string)
+  async function openWithdrawalModal(tokenMintAddress: string, fdr3SubMarkets: any[])
   {
     addCloseListner()
+
+    subMarketList.value = fdr3SubMarkets
+    subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+
+    const tokenInfo = tokenReserveDevNetMap.get(tokenMintAddress)
+    const tokenName = tokenInfo.name
+    const decimalAmount = tokenInfo.decimalAmount
+    const tokenSVG = tokenInfo.svg
 
     if(lendingUserAccountsHashMap.map)
     {
@@ -278,18 +319,18 @@
     else
       hasAtleast2Accounts.value = false
 
-    const balance = lendingUserTabAccountsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString() + tokenMintAddress)
-    if(balance)
-      userBalance.value = Number(balance)
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
+    adminAccounts.lendingCEOAddressString +
+    subMarketSelect.value.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    if(lendingUserTabAccount)
+      userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     else
       userBalance.value = 0
 
-    //userLasterInterestChangeTimeStamp.value = .interestChangeLastUpdatedTimeStamp
-
-    const tokenInfo = tokenReserveDevNetMap.get(tokenMintAddress)
-    const tokenName = tokenInfo.name
-    const decimalAmount = tokenInfo.decimalAmount
-    const tokenSVG = tokenInfo.svg
+    await setSnapShotIntervalCountDown()
 
     withdrawAmount.value = 0
     withdrawIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
@@ -304,6 +345,59 @@
   {
     withdrawing.value = false
     removeCloseListner()
+
+    clearSnapShotIntervalCountDown()
+    clearPythAccountIntervalCountDown()
+  }
+  
+  async function setSnapShotIntervalCountDown()
+  {
+    const allUserTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
+    const currentBlockTimeStamp = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
+    var oldestSnapShot = Number(allUserTabAccounts[0].interestChangeLastUpdatedTimeStamp)
+
+    for(var i=0; i<allUserTabAccounts.length; i++)
+    {
+      if(allUserTabAccounts[i].interestChangeLastUpdatedTimeStamp < oldestSnapShot)
+        oldestSnapShot = Number(allUserTabAccounts[i].interestChangeLastUpdatedTimeStamp)
+    }
+    
+    const timeDiff = currentBlockTimeStamp - oldestSnapShot
+
+    if(timeDiff < 120)
+    {
+      snapShotValidCountDown.value = 120 - timeDiff
+
+      snapShotCountDownIntervalId = setInterval(() =>
+      {
+        snapShotValidCountDown.value--
+
+        if(snapShotValidCountDown.value <= 0)
+          clearSnapShotIntervalCountDown()
+
+      }, 1000)
+    }
+    else
+      snapShotValidCountDown.value = 0
+  }
+
+  function clearSnapShotIntervalCountDown()
+  {
+    if(snapShotCountDownIntervalId != undefined)
+    {
+      clearInterval(snapShotCountDownIntervalId)
+      snapShotCountDownIntervalId = undefined
+    }
+  }
+
+  function clearPythAccountIntervalCountDown()
+  {
+    if(pythAccountCountDownIntervalId != undefined)
+    {
+      clearInterval(pythAccountCountDownIntervalId)
+      pythAccountCountDownIntervalId = undefined
+    }
   }
 
   function openTokenPopover(e: Event) 
@@ -323,23 +417,50 @@
     copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
 
-  function updateStoredSelectedAccount()
+  async function updateStoredSelectedAccount()
   {
+    clearSnapShotIntervalCountDown()
+    await setSnapShotIntervalCountDown()
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
   }
 
+  async function updateUserSnapShots()
+  {
+    const lendingUserTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    const transaction = new Transaction();
+
+    try
+    {
+      for(var i=0; i<lendingUserTabAccounts.length; i++)
+      {
+        const instruction = await anchorPrograms.lending.lendingProgram.methods.updateUserSnapShot
+        (
+          lendingUserTabAccounts[i].tokenMintAddress,
+          lendingUserTabAccounts[i].subMarketOwnerAddress,
+          lendingUserTabAccounts[i].subMarketIndex,
+          accountSelect.value
+        ).instruction()
+
+        transaction.add(instruction);
+      }
+
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, []);
+      await confirmLendingTransaction(tx, toast, "update_user_snap_shots")
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "update_user_snap_shots")
+    }
+  }
+
   async function withdrawTokens()
   {
-    console.log(connectedWallet.addressString)
-    console.log(accountSelect.value)
     const remainingAccounts = generateTabAndPythRemainingAccounts(connectedWallet.addressString, accountSelect.value)
     var pythIdArray = []
 
-    console.log(remainingAccounts)
     for(var i=0; i<remainingAccounts.length; i+=2)
     {
-      console.log(remainingAccounts)
       const tokenInfo = tokenReserveDevNetMap.get(remainingAccounts[i].tokenMintAddress)
       pythIdArray.push(tokenInfo.pythId)
     }
@@ -351,8 +472,7 @@
       connection: anchorPrograms.lending.connection,
       wallet: anchorPrograms.lending.wallet,
     })
-    console.log(pythIdArray)
-    //const solPythFeedIdByteArray = Buffer.from("ef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d", 'hex')
+
     const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
 
     const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
@@ -383,7 +503,7 @@
               (
                 selectedTokenMintAddress,
                 adminAccounts.lendingCEOAddressKey,
-                DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX,
+                subMarketSelect.value,
                 accountSelect.value,
                 new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
               )
@@ -395,16 +515,7 @@
         ]
       }
     )
-    const tabAccountPDA = getLendingUserTabAccountPDA(
-     selectedTokenMintAddress,
-     adminAccounts.lendingCEOAddressKey,
-     DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX,
-     connectedWallet.publicKey,
-     accountSelect.value
-    )
-    const tabAccount = await anchorPrograms.lending.lendingProgram.account.lendingUserTabAccount.fetch(tabAccountPDA)
-    console.log(Number(tabAccount.depositedAmount))
-    console.log(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value))
+
     try
     {
       const tx = await pythSolanaReceiver.provider.sendAll
@@ -423,8 +534,6 @@
       .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
       .remainingAccounts(remainingAccounts)
       .rpc()*/
-
-
     
       if(tx.length)
         for(var i=0; i<tx.length; i++)
@@ -432,17 +541,43 @@
       else
         await confirmLendingTransaction(tx, toast, "withdraw_tokens")
 
+      clearSnapShotIntervalCountDown()
       withdrawing.value = false
     }
     catch(error: any)
-    {console.log(error)
-      if(error.message.includes("\"Custom\":6000"))
+    {
+      if(error.message.includes("\"Custom\":6000"))//These error code numbers don't match the idl exactly for some reason, but I've confirmed these are the proper error messages
         toastPreTransactionError("StalePriceData: The price data was stale", toast, "withdraw_tokens")
-      else if(error.message.includes("\"Custom\":6001"))
-        toastPreTransactionError("InsufficientFunds: You can't withdraw more funds than you've deposited or an amount that would expose you to liquidation on purpose", toast, "withdraw_tokens")
+      else if(error.message.includes("\"Custom\":6001"))//These error code numbers don't match the idl exactly for some reason, but I've confirmed these are the proper error messages
+        toastPreTransactionError("StaleSnapShot: The Lending User snap shot data was stale", toast, "withdraw_tokens")
       else
         toastPreTransactionError(error, toast, "withdraw_tokens")  
     }
+  }
+
+  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
+  {
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
+    adminAccounts.lendingCEOAddressString +
+    mainSubMarketIndex +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    if(lendingUserTabAccount)
+    {
+      const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+      console.log(Number(lendingUserTabAccount.depositedAmount))
+      if(lendingUserTabAccount)
+        userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+      else
+        userBalance.value = 0
+    }
+    else
+      userBalance.value = 0
+
+    withdrawAmount.value = 0
+
+    localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(
@@ -497,5 +632,10 @@
     width: 20px;
     height: 20px;
     background-color: v-bind(colorHexValue);
+  }
+
+  .progressBarStep
+  {
+    width: 20px
   }
 </style>

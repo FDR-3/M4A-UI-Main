@@ -13,7 +13,7 @@
     :event="event"
     @didDismiss="popoverOpen=false"
     @didPresent="movePopoverIntoView($event)"
-    side="top" 
+    :side="openSide" 
     alignment="center"
     size="auto"
   >
@@ -139,6 +139,11 @@
     colorHexValue:
     {
       type: String
+    },
+    openSide:
+    {
+      type: String,
+      default: 'top'
     }
   })
   defineEmits(['emojiSelected'])

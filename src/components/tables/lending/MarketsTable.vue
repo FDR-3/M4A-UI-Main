@@ -37,7 +37,9 @@
 
           <div v-if="hasAtleast1Account" class="nMediumSmallMarginBottom">
             <div class="flexCenterRow">
-              <InfoButton :infoMessage="userLendingInfoMSG"/>
+              <div style="margin-right: -3px">
+                <InfoButton :infoMessage="userLendingInfoMSG"/>
+              </div>
 
               <Select
               v-if="!editingAccountName"
@@ -67,6 +69,7 @@
                 <EmojiButton
                 :marginTop="'4px'"
                 :colorHexValue="colorHexValue"
+                :openSide="'right'"
                 @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
               </ion-input>
 
@@ -161,23 +164,11 @@
           <div class="flexCenterRow">
             <ion-text v-if="!slotProps.data?.subMarketList?.length" class="noWrapText">No fdr-3 Submarkets</ion-text>
             <div v-else>
-              <Select
-              class="standardFontSize mediumMarginTop"
-              style="margin-bottom: 17px"
-              v-model="slotProps.data.subMarketIndexSelect" 
-              :options="slotProps.data.subMarketList" 
-              optionLabel="mainM4ASubMarkets" 
-              optionValue="subMarketIndex" 
-              placeholder="Select fdr-3 SubMarket"
-              appendTo="self"
-              @change="updateStoredSelectedSubMarketIndex(slotProps.data.tokenMintAddressString, slotProps.data.subMarketIndexSelect)">
-              </Select>
-
               <ion-button
               v-if="slotProps.data.depositBalance == 0"
               class="tableDepositButton"
               color="dark"
-              @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString)">
+              @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
               Deposit
               </ion-button>
               
@@ -195,10 +186,10 @@
               side="top" 
               alignment="center"
               >
-                <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', event.tokenMintAddressString); actionsPopoverOpen=false">
+                <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label color="dark">Deposit</ion-label>
                 </ion-button>
-                <ion-button class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenMintAddressString); actionsPopoverOpen=false">
+                <ion-button class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label color="dark">Withdraw</ion-label>
                 </ion-button>
               </ion-popover>
@@ -301,23 +292,11 @@
           <div class="flexCenterRow">
             <ion-text v-if="!slotProps.data?.subMarketList?.length" class="noWrapText">No fdr-3 Submarkets</ion-text>
             <div v-else>
-              <Select
-              class="standardFontSize mediumMarginTop"
-              style="margin-bottom: 17px"
-              v-model="slotProps.data.subMarketIndexSelect" 
-              :options="slotProps.data.subMarketList" 
-              optionLabel="mainM4ASubMarkets" 
-              optionValue="subMarketIndex" 
-              placeholder="Select fdr-3 SubMarket"
-              appendTo="self"
-              @change="updateStoredSelectedSubMarketIndex(slotProps.data.tokenMintAddressString, slotProps.data.subMarketIndexSelect)">
-              </Select>
-
               <ion-button
               v-if="slotProps.data.depositBalance == 0"
               class="tableDepositButton"
               color="dark"
-              @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString)">
+              @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
               Deposit
               </ion-button>
               
@@ -335,10 +314,10 @@
               side="top" 
               alignment="center"
               >
-                <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', event.tokenMintAddressString); actionsPopoverOpen=false">
+                <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label color="dark">Deposit</ion-label>
                 </ion-button>
-                <ion-button class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenMintAddressString); actionsPopoverOpen=false">
+                <ion-button class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label color="dark">Withdraw</ion-label>
                 </ion-button>
               </ion-popover>
@@ -359,7 +338,7 @@
   import Select from 'primevue/select'
   import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
   import { FilterMatchMode } from '@primevue/core/api'
-  import { anchorPrograms, DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX, MAX_ACCOUNT_NAME_LENGTH, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, MAX_ACCOUNT_NAME_LENGTH, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { search } from 'ionicons/icons'
   import { copyTokenMintAddress,
@@ -396,14 +375,18 @@
   {
     checkForMainSubMarkets()
     setLendingUserAccountList()
-    console.log("on mounted")
     checkForLendingUserDeposits()
     updateTokenReserveRelatedMarketData()
     
     accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
-    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
+    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value 
   })
- 
+
+  watch(subMarketByTokenMintAddressAndOwnerHashMap,() =>
+  {
+    checkForMainSubMarkets()
+  })
+
   watch(lendingUserAccountsHashMap,() =>
   {
     setLendingUserAccountList()
@@ -413,8 +396,12 @@
 
   watch(lendingUserTabAccountsHashMap,() =>
   {
-    console.log("on watch")
     checkForLendingUserDeposits()
+  })
+
+  watch(tokenReservesHashMap, () =>
+  {
+    updateTokenReserveRelatedMarketData()
   })
 
   //Json string of wallet to detect object property changes
@@ -437,19 +424,10 @@
       setLendingUserAccountList()
       accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
       connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-      console.log("on wallet")
       checkForLendingUserDeposits()
     }
-  })
-
-  watch(tokenReservesHashMap, () =>
-  {
-    updateTokenReserveRelatedMarketData()
-  })
-
-  watch(subMarketByTokenMintAddressAndOwnerHashMap,() =>
-  {
-    checkForMainSubMarkets()
+    else
+      setLendingUserAccountList()
   })
 
   function setLendingUserAccountList()
@@ -588,37 +566,34 @@
   {
     for(var i=0; i<StableCoins.length; i++)
     {
+      StableCoins[i].subMarketList = []
+
       if(subMarketByTokenMintAddressAndOwnerHashMap.map)
       {
+        //Only M4A Protocol Submarkets can be use in the M4A UI (Developers have to make their own UI for their own SubMarkets)
         const subMarketEntries = subMarketByTokenMintAddressAndOwnerHashMap.map.get(StableCoins[i].tokenMintAddressString +
         adminAccounts.lendingCEOAddressKey)
 
         if(subMarketEntries)
         {
-          StableCoins[i].subMarketList = []
-
-          for(var i=0; i<subMarketEntries.length; i++)
+          for(var j=0; j<subMarketEntries.length; j++)
           {
             const option = 
             {
-              mainM4ASubMarkets: (subMarketEntries[i].feeOnInterestEarnedRate * 100).toString() + '%' + " fee on interest market",
-              subMarketIndex: subMarketEntries[i].subMarketIndex
+              mainM4ASubMarkets: (subMarketEntries[j].feeOnInterestEarnedRate).toString() + "% Fee Market",
+              subMarketIndex: subMarketEntries[j].subMarketIndex
             }
             StableCoins[i].subMarketList.push(option)
           }
-
-          StableCoins[i].subMarketIndexSelect = Number(localStorage.getItem(StableCoins[i].tokenMintAddressString +
-          "selectedMainSubMarketIndex")) || 0
         }
-        else
-          StableCoins[i].subMarketList = []
       }
-      else
-        StableCoins[i].subMarketList = []
     }
+
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
+      CryptoCurrency[i].subMarketList = []
+
       if(subMarketByTokenMintAddressAndOwnerHashMap.map)
       {
         const subMarketEntries = subMarketByTokenMintAddressAndOwnerHashMap.map.get(CryptoCurrency[i].tokenMintAddressString +
@@ -626,26 +601,17 @@
 
         if(subMarketEntries)
         {
-          CryptoCurrency[i].subMarketList = []
-
-          for(var i=0; i<subMarketEntries.length; i++)
+          for(var j=0; j<subMarketEntries.length; j++)
           {
             const option = 
             {
-              mainM4ASubMarkets: (subMarketEntries[i].feeOnInterestEarnedRate * 100).toString() + '%' + " fee on interest market",
-              subMarketIndex: subMarketEntries[i].subMarketIndex
+              mainM4ASubMarkets: (subMarketEntries[j].feeOnInterestEarnedRate).toString() + "% Fee Market",
+              subMarketIndex: subMarketEntries[j].subMarketIndex
             }
             CryptoCurrency[i].subMarketList.push(option)
           }
-
-          CryptoCurrency[i].subMarketIndexSelect = ref(Number(localStorage.getItem(StableCoins[i].tokenMintAddressString +
-          "selectedMainSubMarketIndex")) || 0) 
         }
-        else
-          CryptoCurrency[i].subMarketList = []
       }
-      else
-        CryptoCurrency[i].subMarketList = []
     }
   }
 
@@ -656,45 +622,53 @@
 
     for(var i=0; i<StableCoins.length; i++)
     {
-      if(StableCoins[i].subMarketIndexSelect)
-      {
-        const decimalAmount = tokenDecimalHashMap.get(StableCoins[i].tokenMintAddressString)
-        const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(StableCoins[i].tokenMintAddressString +
-        adminAccounts.lendingCEOAddressKey + StableCoins[i].subMarketIndexSelect.toString())
+      StableCoins[i].depositBalance = 0
 
-        const depositBalance = Number(lendingUserTabAccount.depositedAmount  / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-        if(depositBalance)
-          StableCoins[i].depositBalance = depositBalance
-        else
-          StableCoins[i].depositBalance = 0
+      if(StableCoins[i].subMarketList)
+      {
+        for(var j=0; j<StableCoins[i].subMarketList.length; j++)
+        {
+          const decimalAmount = tokenDecimalHashMap.get(StableCoins[i].tokenMintAddressString)
+          const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(StableCoins[i].tokenMintAddressString +
+          adminAccounts.lendingCEOAddressKey +
+          StableCoins[i].subMarketList[j].subMarketIndex.toString() +
+          connectedWallet.addressString +
+          accountSelect.value.toString())
+
+          if(lendingUserTabAccount)
+          {
+            const depositBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+            if(depositBalance)
+              StableCoins[i].depositBalance += depositBalance
+          }
+        }
       }
-      else
-        StableCoins[i].depositBalance = 0
     }
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
-      if(CryptoCurrency[i].subMarketIndexSelect)
+      CryptoCurrency[i].depositBalance = 0
+
+      if(CryptoCurrency[i].subMarketList)
       {
-        const decimalAmount = tokenDecimalHashMap.get(CryptoCurrency[i].tokenMintAddressString)
-        const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(CryptoCurrency[i].tokenMintAddressString +
-        adminAccounts.lendingCEOAddressKey + CryptoCurrency[i].subMarketIndexSelect.toString())
+        for(var j=0; j<CryptoCurrency[i].subMarketList.length; j++)
+        {
+          const decimalAmount = tokenDecimalHashMap.get(CryptoCurrency[i].tokenMintAddressString)
+          const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(CryptoCurrency[i].tokenMintAddressString +
+          adminAccounts.lendingCEOAddressKey +
+          CryptoCurrency[i].subMarketList[j].subMarketIndex.toString() +
+          connectedWallet.addressString +
+          accountSelect.value.toString())
 
-        const depositBalance = Number(lendingUserTabAccount.depositedAmount  / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-        if(depositBalance)
-          CryptoCurrency[i].depositBalance = depositBalance
-        else
-          CryptoCurrency[i].depositBalance = 0
+          if(lendingUserTabAccount)
+          {
+            const depositBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+            if(depositBalance)
+              CryptoCurrency[i].depositBalance += depositBalance
+          }
+        }
       }
-      else
-        CryptoCurrency[i].depositBalance = 0
     }
-  }
-
-  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: number)
-  {
-    localStorage.setItem(tokenMintAddress + "selectedMainSubMarketIndex", mainSubMarketIndex.toString())
-    ///checkForLendingUserDeposits()
   }
 
   function updateStoredSelectedUserAccountIndex()
@@ -762,6 +736,7 @@
   {
     event.value = e
     event.value.tokenMintAddressString = rowData.tokenMintAddressString
+    event.value.subMarketList = rowData.subMarketList
 
     actionsPopoverOpen.value = true
   }

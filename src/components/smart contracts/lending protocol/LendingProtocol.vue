@@ -10,9 +10,11 @@
   getTokenReserves,
   setTokenReserveHashMap,
   getSubMarkets,
+  getLendingUserMonthlyStatementsWrapper,
   setLendingUserAccountHashMap,
   setLendingUserTabHashMaps,
-  setLendingUserMonthlyStatementHashMapsAndLeaderBoard,
+  setLendingUserPortfolioHashMaps,
+  setMonthlyStementHashMapAndLendingLeaderBoard,
   getLendingProtocolPDA,
   getLendingProtocolCEOAccountPDA,
   getTokenReserveStatsPDA,
@@ -21,10 +23,13 @@
   getUserLendingStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenReserves } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { lendingUserMonthlyStatements } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import PriceUpdater from './PriceUpdater.vue'
   import BalanceUpdater from './BalanceUpdater.vue'
+
+  //
 
   var lendingProtocolWatcherId: any
   var lendingProtocolCEOAccountWatcherId: any
@@ -49,13 +54,6 @@
       await listenForLendingCEOAccountInitialization()
     }
 
-    //Lending Users
-    await setLendingUserAccountHashMap()
-    await setLendingUserTabHashMaps() //adminAccounts.lendingCEOAddressString needs to be set before this is called
-    await setLendingUserMonthlyStatementHashMapsAndLeaderBoard()
-    await listenForLendingStatChanges()
-    await listenForLendingUserStatChanges()
-
     //Token Reserves
     tokenReserves.data = await getTokenReserves()
     
@@ -65,6 +63,15 @@
     //SubMarkets
     subMarkets.data = await getSubMarkets()
     await listenForSubMarketChanges()
+
+    //Lending Users
+    await setLendingUserAccountHashMap()
+    await setLendingUserTabHashMaps() //adminAccounts.lendingCEOAddressString needs to be set before this is called
+    lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
+    await setLendingUserPortfolioHashMaps()
+    await setMonthlyStementHashMapAndLendingLeaderBoard()
+    await listenForLendingStatChanges()
+    await listenForLendingUserStatChanges()
 
     //Lending Protocol (Current Statement Info)
     const lendingProtocol = await getLendingProtocol()
@@ -140,9 +147,12 @@
       tokenReserves.data = await getTokenReserves()
       setTokenReserveHashMap()
       subMarkets.data = await getSubMarkets()
+      lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
+    
       await setLendingUserAccountHashMap()
       await setLendingUserTabHashMaps()
-      await setLendingUserMonthlyStatementHashMapsAndLeaderBoard()
+      await setLendingUserPortfolioHashMaps()
+      await setMonthlyStementHashMapAndLendingLeaderBoard()
     })
   }
 

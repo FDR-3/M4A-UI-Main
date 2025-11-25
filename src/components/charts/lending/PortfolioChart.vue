@@ -27,6 +27,16 @@
           </ion-popover>
         </div>
 
+        
+        <div class="nSmallMarginTop smallMarginBottom">
+          <ion-text>SubMarket Owner: {{ subMarketOwnerAddress }}</ion-text><br>
+          <ion-text>SubMarket Index: {{ subMarketIndex }}</ion-text><br>
+          <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text>
+        </div>
+        <div class="flexCebnterColumn nSmallMarginTop smallMarginBottom">
+          
+        </div>
+
         <ion-label class="smallMarginBottom">Balance: <span class="rainbowText">{{ userBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValue }} </span></ion-label>
  
         <ion-label >Last Action: {{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount + ' ' + tokenName}}
@@ -42,7 +52,7 @@
           optionLabel="yearAvailable" 
           optionValue="yearAvailable" 
           placeholder="Select Year"
-          @change="$emit('changeYear', tokenMintAddress, yearSelect)">
+          @change="$emit('changeYear', tokenMintAddress, subMarketOwnerAddress, subMarketIndex, yearSelect)">
           </Select>
           <ion-button v-if="ownerAddress==connectedWallet.addressString" fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
           <ion-popover
@@ -115,7 +125,7 @@
           optionLabel="yearAvailable" 
           optionValue="yearAvailable" 
           placeholder="Select Year"
-          @change="$emit('changeYear', tokenMintAddress, yearSelect)">
+          @change="$emit('changeYear', tokenMintAddress, subMarketOwnerAddress, subMarketIndex, yearSelect)">
           </Select>
           <ion-button v-if="ownerAddress==connectedWallet.addressString" fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
           <ion-popover
@@ -146,13 +156,21 @@
           >
             <div class="swatch-wrapper">
               <div 
-                v-if="dataset.label === 'Balance'" 
-                class="swatch animatedRainbow"
-              ></div>
+                v-if="dataset.label=='Balance'" 
+                class="swatch animatedRainbow">
+              </div>
               <div 
-                v-else-if="dataset.label === 'Interest Earned'" 
-                class="swatch rainbowBackGround"
-              ></div>
+                v-else-if="dataset.label=='Interest Earned'" 
+                class="swatch rainbowBackGround">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Debt'" 
+                class="swatch animatedPoop">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Interest Accrued'" 
+                class="swatch poopBackGround">
+              </div>
               <div 
                 v-else 
                 class="swatch solid-color" 
@@ -180,18 +198,26 @@
         >
           <div class="swatch-wrapper">
             <div 
-              v-if="dataset.label === 'Balance'" 
-              class="swatch animatedRainbow"
-            ></div>
+              v-if="dataset.label=='Balance'" 
+              class="swatch animatedRainbow">
+            </div>
             <div 
-              v-else-if="dataset.label === 'Interest Earned'" 
-              class="swatch rainbowBackGround"
-            ></div>
+              v-else-if="dataset.label=='Interest Earned'" 
+              class="swatch rainbowBackGround">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Debt'" 
+              class="swatch animatedPoop">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Interest Accrued'" 
+              class="swatch poopBackGround">
+            </div>
             <div 
               v-else 
               class="swatch solid-color" 
-              :style="{ backgroundColor: dataset.backgroundColor }"
-            ></div>
+              :style="{ backgroundColor: dataset.backgroundColor }">
+            </div>
           </div>
           <span 
             class="legend-label" 
@@ -210,18 +236,26 @@
         >
           <div class="swatch-wrapper">
             <div 
-              v-if="dataset.label === 'Balance'" 
-              class="swatch animatedRainbow"
-            ></div>
+              v-if="dataset.label=='Balance'" 
+              class="swatch animatedRainbow">
+            </div>
             <div 
-              v-else-if="dataset.label === 'Interest Earned'" 
-              class="swatch rainbowBackGround"
-            ></div>
+              v-else-if="dataset.label=='Interest Earned'" 
+              class="swatch rainbowBackGround">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Debt'" 
+              class="swatch animatedPoop">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Interest Accrued'" 
+              class="swatch poopBackGround">
+            </div>
             <div 
               v-else 
               class="swatch solid-color" 
-              :style="{ backgroundColor: dataset.backgroundColor }"
-            ></div>
+              :style="{ backgroundColor: dataset.backgroundColor }">
+            </div>
           </div>
           <span 
             class="legend-label" 
@@ -246,14 +280,14 @@
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { lendingUserAvailableYearsByTokenMintAddressHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAvailableStableCoinYearsBySubMarketHashMap, lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStringsMainNet, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveDevNetMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
 
-  const props = defineProps(['tokenMintAddress', 'tokenDecimal', 'tokenSVG', 'tokenName', 'ownerAddress', 'accountIndex', 'chartData', 'selectedYear'])
+  const props = defineProps(['isStableCoin', 'tokenMintAddress', 'subMarketOwnerAddress', 'subMarketIndex', 'ownerAddress', 'accountIndex', 'subMarketFee', 'chartData', 'selectedYear'])
 
   var chartOptions = ref()
   var chartRef = ref<any>(null)
@@ -265,6 +299,9 @@
   var actionsPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+
+  var tokenName = ref()
+  var tokenSVG = ref()
 
   var yearSelect = ref()
   var yearList = ref()
@@ -295,16 +332,17 @@
   {
     if(lendingUserTabAccountsHashMap.map && props.tokenMintAddress && (props.accountIndex != undefined))
     {
-      /*const decimalAmount = tokenDecimalHashMap.get(props.tokenMintAddress)
-      const userTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
-      props.ownerAddress + props.accountIndex.toString())
-      const balance = Number(lendingUserTabAccount.depositedAmount  / Math.pow(10, decimalAmount)))//Convert from fixed point notation to decimal */
+      const tokenInfo = tokenReserveDevNetMap.get(props.tokenMintAddress)
+      tokenName.value = tokenInfo.name
+      tokenSVG.value = tokenInfo.svg
 
-      const balance = lendingUserTabAccountsHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
-      if(balance)
-        userBalance.value = Number(balance)
-      else
-        userBalance.value = 0
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
+      props.subMarketOwnerAddress +
+      props.subMarketIndex.toString() +
+      props.ownerAddress +
+      props.accountIndex.toString())
+
+      userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
 
       yearList.value = getYearList()
     }
@@ -322,14 +360,17 @@
 
   watch(lendingUserTabAccountsHashMap,() =>
   {
-    const balance = lendingUserTabAccountsHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
-    if(balance)
-      userBalance.value = Number(balance)
-    else
-      userBalance.value = 0
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
+    props.subMarketOwnerAddress +
+    props.subMarketIndex.toString() +
+    props.ownerAddress +
+    props.accountIndex.toString())
 
-    //yearList.value = getYearList()
-    //yearSelect.value = props.selectedYear
+    const decimalAmount = tokenDecimalHashMap.get(props.tokenMintAddress)
+    userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+
+    yearList.value = getYearList()
+    yearSelect.value = props.selectedYear
   })
 
   watch(darkTheme,() =>
@@ -344,11 +385,14 @@
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
   {
-    const balance = lendingUserTabAccountsHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
-    if(balance)
-      userBalance.value = Number(balance)
-    else
-      userBalance.value = 0
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
+    props.subMarketOwnerAddress +
+    props.subMarketIndex.toString() +
+    props.ownerAddress +
+    props.accountIndex.toString())
+
+    const decimalAmount = tokenDecimalHashMap.get(props.tokenMintAddress)
+    userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
 
     yearList.value = getYearList()
     yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
@@ -359,7 +403,19 @@
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
 
-    var initialList = lendingUserAvailableYearsByTokenMintAddressHashMap.map.get(props.ownerAddress + props.accountIndex.toString() + props.tokenMintAddress)
+    var initialList
+    if(props.isStableCoin)
+      initialList = lendingUserAvailableStableCoinYearsBySubMarketHashMap.map.get(props.tokenMintAddress +
+      props.subMarketOwnerAddress +
+      props.subMarketIndex +
+      props.ownerAddress +
+      props.accountIndex.toString())
+    else
+      initialList = lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map.get(props.tokenMintAddress +
+      props.subMarketOwnerAddress +
+      props.subMarketIndex +
+      props.ownerAddress +
+      props.accountIndex.toString())
 
     var firstYear = undefined
     var processedList = []
@@ -563,12 +619,6 @@
     justify-content: center
   }
 
-  .rainbowGradient
-  {
-    background: linear-gradient(to right, #14ffe9 0%, #ffc800 25%, #ff00e0 50%, #14ffe9 100%);
-    background-size: 150% auto
-  }
-
   .animatedRainbow
   {
     background: repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
@@ -579,6 +629,20 @@
   .rainbowBackGround
   {
     background: repeating-linear-gradient(0deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
+    background-size: auto 200%;
+    animation: rainbowYAnimation 1.8s linear infinite
+  }
+
+  .animatedPoop
+  {
+    background: repeating-linear-gradient(90deg, #851717 0%, #0f8332 25%, #851717 50.0%);
+    background-size: 150% auto;
+    animation: rainbowXAnimation 1.8s linear infinite
+  }
+
+  .poopBackGround
+  {
+    background: repeating-linear-gradient(0deg, #851717 0%, #0f8332 25%, #851717 50.0%);
     background-size: auto 200%;
     animation: rainbowYAnimation 1.8s linear infinite
   }

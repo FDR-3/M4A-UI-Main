@@ -91,7 +91,5 @@
   export const MAX_ACCOUNT_NAME_LENGTH = 25
   export const DEFAULT_3_PERCENT_FEE_SUBMARKET_INDEX = 0
 
-  
-
   export default anchorPrograms
 </script>
