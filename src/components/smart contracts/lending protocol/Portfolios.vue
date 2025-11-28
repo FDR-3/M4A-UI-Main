@@ -118,13 +118,14 @@
       </div>
     </div>
 
-    <div class="nMediumMarginTop mediumSmallMarginBottom">
+    <div v-if="userTabStableCoinSubMarketList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
       <div v-for="subMarketTab in userTabStableCoinSubMarketList">
         <PortfolioChart
         :key="chartReRenderKey"
         :isStableCoin="true"
         :tokenMintAddress="subMarketTab.tokenMintAddress"
         :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
+        :subMarketOwnerAddressTrimmed="subMarketTab.subMarketOwnerAddressTrimmed"
         :subMarketIndex="subMarketTab.subMarketIndex"
         :ownerAddress="searchAddress"
         :accountIndex="accountSelect"
@@ -138,41 +139,44 @@
     </div>
 
     <!--Crypto Charts-->
-    <div  v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="largeMarginTop" :class="userTabStableCoinSubMarketList?.length > 0 ? 'thinBorderTop' : ''">
-      <div class="hHeaderDisplay smallMarginTop">
-        <div>
-          <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
-          <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
-        </div>
+    <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay" :class="userTabStableCoinSubMarketList?.length > 0 ? 'thinBorderTop' : ''"
+      :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '14px' : '0px'}">
+      <div>
+        <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.15</span> A Week</h5>
+      </div>
 
-        <div>
-          <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
-          <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
-        </div>
+      <div>
+        <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">15.00</span></h5>
       </div>
     </div>
 
-    <div  v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="mediumSmallMarginTop nMediumMarginBottom" >
-      <div class="vHeaderDisplay smallMarginTop">
-        <div>
-          <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
-          <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
-        </div>
+    <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay" :class="userTabStableCoinSubMarketList?.length > 0 ? 'thinBorderTop' : ''"
+      :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '4px' : '0px'}">
+      <div>
+        <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">15.00</span></h5>
+      </div>
 
-        <div style="margin-top: -47px">
-          <h4 class="underLine" style="line-height: 27px">Life Time Interest Earned</h4>
-          <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
-        </div>
+      <div style="margin-top: -47px">
+        <h4 class="underLine" style="line-height: 27px">7 Day Projection Rate</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.15</span> A Week</h5>
       </div>
     </div>
 
-    <div class="nMediumMarginTop mediumSmallMarginBottom">
+    <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
       <div v-for="subMarketTab in userTabCryptoCurrencySubMarketList">
         <PortfolioChart
         :key="chartReRenderKey"
-        :isStableCoin="true"
+        :isStableCoin="false"
         :tokenMintAddress="subMarketTab.tokenMintAddress"
         :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
+        :subMarketOwnerAddressTrimmed="subMarketTab.subMarketOwnerAddressTrimmed"
         :subMarketIndex="subMarketTab.subMarketIndex"
         :ownerAddress="searchAddress"
         :accountIndex="accountSelect"
@@ -409,7 +413,7 @@
 
     //This is here because of the "watch(lendingUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily.
     //The isBrowisngAllUsers check keeps the leaderboard height from being messed up when changing the selected account index when the leader board isn't visible.
-    if((newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex) || isBrowsingAllUsers)
+    if((newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex) || isBrowsingAllUsers.value)
       return
 
     if(newWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
@@ -545,14 +549,13 @@
   {
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
-    var tempHashMap = new Map<string, any>()
 
     if(subMarketArray)
     {
       for(var i=0; i<subMarketArray.length; i++)
-        tempHashMap.set(subMarketArray[i].tokenMintAddress + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex, currentYear)
-
-      selectedYearHashMap = tempHashMap
+      {
+        selectedYearHashMap.set(subMarketArray[i].tokenMintAddress + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex, currentYear)
+      }
     }
   }
 
@@ -833,15 +836,17 @@
   }
 
   const gradientOffset = ref(0)
+
   function startGradientAnimation()
   {
-    intervalId = setInterval(() => {
-    //Increment the offset slightly.
-    gradientOffset.value += 0.07
-    
-    //Ensure the offset wraps around (e.g., from 1.0 back to 0.0)
-    if (gradientOffset.value >= 1)
-      gradientOffset.value = 0
+    intervalId = setInterval(() =>
+    {
+      //Increment the offset slightly.
+      gradientOffset.value += 0.07
+      
+      //Ensure the offset wraps around (e.g., from 1.0 back to 0.0)
+      if (gradientOffset.value >= 1)
+        gradientOffset.value = 0
 
     }, 55)
   }
@@ -994,6 +999,26 @@
 </script>
 
 <style scoped>
+  h2
+  {
+    font-size: min(6vw, 30px)
+  }
+
+  h3
+  {
+    font-size: min(5vw, 27px)
+  }
+
+  h4
+  {
+    font-size: min(4.5vw, 26px)
+  }
+
+  h5
+  {
+    font-size: min(4vw, 25px)
+  }
+
   .custom-chart-legend
   {
     display: flex;

@@ -299,7 +299,7 @@
   <ion-button class="emojiButton emojiFilter alien monster  scary creepy spooky halloween" fill="clear" @click="$emit('emojiSelected', '👾')" title="alien monster">
     👾
   </ion-button>
-  <ion-button class="emojiButton emojiFilter robot" fill="clear" @click="$emit('emojiSelected', '🤖')" title="robot">
+  <ion-button class="emojiButton emojiFilter robot chrome" fill="clear" @click="$emit('emojiSelected', '🤖')" title="robot">
     🤖
   </ion-button>
   <ion-button class="emojiButton emojiFilter poop shit turd pile" fill="clear" @click="$emit('emojiSelected', '💩')" title="pile of poo">

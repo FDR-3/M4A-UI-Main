@@ -10,8 +10,8 @@
       <div class="flexCenterColumn">
         <div class="flexCenterRow">
           <ion-button fill="clear" @click="openTokenPopover($event)">
-            <img v-if="tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px;  height: 35px; margin-right: -7px"/>
-            <component v-else :is="tokenSVG" style="width: 44px; height: 35px; max-height: 40px"></component>
+            <img v-if="tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; height: 35px; ; max-height: 40px; margin-right: -7px"/>
+            <component v-else :is="tokenSVG"style="width: 44px; height: 35px; max-height: 40px"></component>
             <ion-text color="dark">{{ tokenName }}</ion-text>
           </ion-button>
           <ion-popover
@@ -29,12 +29,10 @@
 
         
         <div class="nSmallMarginTop smallMarginBottom">
-          <ion-text>SubMarket Owner: {{ subMarketOwnerAddress }}</ion-text><br>
+          <div class="showTrimmedAddress"><ion-text >SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br></div>
+          <div class="showNonTrimmedAddress"><ion-text>SubMarket Owner: {{ subMarketOwnerAddress }}</ion-text><br></div>
           <ion-text>SubMarket Index: {{ subMarketIndex }}</ion-text><br>
           <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text>
-        </div>
-        <div class="flexCebnterColumn nSmallMarginTop smallMarginBottom">
-          
         </div>
 
         <ion-label class="smallMarginBottom">Balance: <span class="rainbowText">{{ userBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValue }} </span></ion-label>
@@ -81,8 +79,8 @@
 
     <div class="vChartLayout">
       <ion-button fill="clear" @click="openTokenPopover($event)">
-        <img v-if="tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress"src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; margin-right: -7px"/>
-        <component v-else :is="tokenSVG" style="width: 44px; max-height: 40px"></component>
+        <img v-if="tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress"src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; height: 35px; ; max-height: 40px; margin-right: -7px"/>
+        <component v-else :is="tokenSVG" style="width: 44px; height: 35px; max-height: 40px"></component>
         <ion-text color="dark">{{ tokenName }}</ion-text>
       </ion-button>
       <ion-popover
@@ -95,7 +93,11 @@
         <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
-      </ion-popover>
+      </ion-popover><br>
+
+      <ion-text >SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br>
+      <ion-text>SubMarket Index: {{ subMarketIndex }}</ion-text><br>
+      <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text><br>
 
       <br><ion-label>Balance: <span class="rainbowText">{{ userBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValue }} </span></ion-label>
 
@@ -117,9 +119,9 @@
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.11</span> A Week</h5>
       </div>
 
-      <div>
+      <div class="nMediumMarginTop">
         <Select
-          class="yearSelect "
+          class="yearSelect smallMarginBottom"
           v-model="yearSelect" 
           :options="yearList" 
           optionLabel="yearAvailable" 
@@ -151,10 +153,10 @@
           <div 
           v-for="(dataset, index) in chartData?.datasets" 
           :key="index" 
-          class="legend-item"
+          class="legendItem"
           @click="toggleDataset(index, chartRef)"
           >
-            <div class="swatch-wrapper">
+            <div class="swatchWrapper">
               <div 
                 v-if="dataset.label=='Balance'" 
                 class="swatch animatedRainbow">
@@ -173,12 +175,12 @@
               </div>
               <div 
                 v-else 
-                class="swatch solid-color" 
+                class="swatch" 
                 :style="{ backgroundColor: dataset.backgroundColor }"
               ></div>
             </div>
             <span 
-              class="legend-label" 
+              class="legendLabel" 
               :class="{'hiddenLabel': legenHiddenArray[index] }"
             >
               <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
@@ -189,14 +191,15 @@
     </div>
 
     <div class="midChartLegend">
+      <!--Render First 4 Legend Items-->
       <div class="flexCenterRow" style="gap: 10px">
         <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(0, 3)" 
+        v-for="(dataset, index) in chartData?.datasets.slice(0, 4)" 
         :key="index" 
-        class="legend-item"
+        class="legendItem"
         @click="toggleDataset(index, chartRef)"
         >
-          <div class="swatch-wrapper">
+          <div class="swatchWrapper">
             <div 
               v-if="dataset.label=='Balance'" 
               class="swatch animatedRainbow">
@@ -215,26 +218,27 @@
             </div>
             <div 
               v-else 
-              class="swatch solid-color" 
+              class="swatch" 
               :style="{ backgroundColor: dataset.backgroundColor }">
             </div>
           </div>
           <span 
-            class="legend-label" 
+            class="legendLabel" 
             :class="{'hiddenLabel': legenHiddenArray[index] }"
           >
             <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
         </span>
         </div>
       </div>
+      <!--Render Remaining Legend Items, Skipping First 4-->
       <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
         <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(3)" 
-        :key="index + 3" 
-        class="legend-item"
-        @click="toggleDataset(index+3, chartRef)"
+        v-for="(dataset, index) in chartData?.datasets.slice(4)" 
+        :key="index + 4" 
+        class="legendItem"
+        @click="toggleDataset(index+4, chartRef)"
         >
-          <div class="swatch-wrapper">
+          <div class="swatchWrapper">
             <div 
               v-if="dataset.label=='Balance'" 
               class="swatch animatedRainbow">
@@ -253,13 +257,13 @@
             </div>
             <div 
               v-else 
-              class="swatch solid-color" 
+              class="swatch" 
               :style="{ backgroundColor: dataset.backgroundColor }">
             </div>
           </div>
           <span 
-            class="legend-label" 
-            :class="{'hiddenLabel': legenHiddenArray[index+3] }"
+            class="legendLabel" 
+            :class="{'hiddenLabel': legenHiddenArray[index+4] }"
           >
             <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
           </span>
@@ -287,7 +291,7 @@
   import { tokenReserveDevNetMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
 
-  const props = defineProps(['isStableCoin', 'tokenMintAddress', 'subMarketOwnerAddress', 'subMarketIndex', 'ownerAddress', 'accountIndex', 'subMarketFee', 'chartData', 'selectedYear'])
+  const props = defineProps(['isStableCoin', 'tokenMintAddress', 'subMarketOwnerAddress', 'subMarketOwnerAddressTrimmed', 'subMarketIndex', 'ownerAddress', 'accountIndex', 'subMarketFee', 'chartData', 'selectedYear'])
 
   var chartOptions = ref()
   var chartRef = ref<any>(null)
@@ -594,13 +598,23 @@
 </script>
 
 <style scoped>
+  h4
+  {
+    font-size: min(4.5vw, 26px)
+  }
+
+  h5
+  {
+    font-size: min(4vw, 25px)
+  }
+  
   .yearSelect
   {
     width: 125px;
     padding-left: 20px
   }
 
-  .legend-item
+  .legendItem
   {
     display: flex;
     align-items: center;
@@ -647,11 +661,6 @@
     animation: rainbowYAnimation 1.8s linear infinite
   }
 
-  .vChartLayout
-  {
-    height: 420px
-  } 
-
   @keyframes rainbowXAnimation
   {
     to
@@ -671,6 +680,31 @@
   .hiddenLabel
   {
     text-decoration: line-through
+  }
+
+  
+  @media screen and (min-width: 1450.1px)
+  { 
+    .showTrimmedAddress
+    {
+      display: none
+    }
+    .showNonTrimmedAddress
+    {
+      display: flex
+    }
+  }
+
+  @media screen and (max-width: 1450px)
+  { 
+    .showTrimmedAddress
+    {
+      display: flex
+    }
+    .showNonTrimmedAddress
+    {
+      display: none
+    }
   }
 
   @media screen and (min-width: 1285.1px)
@@ -693,10 +727,10 @@
     .vChartLayout
     {
       display: block
-    } 
+    }
   }
 
-  @media screen and (min-width: 900.1px)
+  @media screen and (min-width: 1160.1px)
   {  
     .normalChartLegend
     {
@@ -715,7 +749,7 @@
       gap: 10px
     }
   }
-  @media screen and (min-width: 500.1px) and (max-width: 900px)
+  @media screen and (min-width: 620.1px) and (max-width: 1160px)
   { 
     .normalChartLegend
     {
@@ -733,13 +767,12 @@
       align-items: left;
     }
   }
-  @media screen and (max-width: 500.1px)
+  @media screen and (max-width: 620.1px)
   { 
     .normalChartLegend
     {
       display: flex;
-      flex-direction: column;
-      margin-top: -70px
+      flex-direction: column
     }
     .midChartLegend
     {

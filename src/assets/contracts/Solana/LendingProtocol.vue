@@ -471,6 +471,7 @@
         {
           tokenMintAddress: tokenMintAddress,
           subMarketOwnerAddress: subMarketOwnerAddress,
+          subMarketOwnerAddressTrimmed: trimAddress(subMarketOwnerAddress),
           subMarketIndex: subMarketIndex,
           subMarketFee: subMarket.feeOnInterestEarnedRate
         }
@@ -551,16 +552,19 @@
           continue
 
         const subMarketOwnerAddress = lendingUserMonthlyStatementAccount.subMarketOwnerAddress.toString()
-        const subMarketIndex = lendingUserMonthlyStatementAccount.subMarketIndex.toString()
+        const subMarketIndex = lendingUserMonthlyStatementAccount.subMarketIndex
         const owner = lendingUserMonthlyStatementAccount.owner.toString()
         const userAccountIndex = lendingUserMonthlyStatementAccount.userAccountIndex.toString()
+        const subMarket= subMarketsHashMap.map.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString())
 
         //Set User Available SubMarket Hash Map
         var availableStatementsBySubMarketData = 
         {
           tokenMintAddress: tokenMintAddress,
           subMarketOwnerAddress: subMarketOwnerAddress,
-          subMarketIndex: subMarketIndex
+          subMarketOwnerAddressTrimmed: trimAddress(subMarketOwnerAddress),
+          subMarketIndex: subMarketIndex,
+          subMarketFee: subMarket.feeOnInterestEarnedRate
         }
         var list = []
         const previousLendingUserAvailableSubMarketList = availableCryptoCurrencyStatementsBySubMarketsHashMap.get(owner + userAccountIndex)

@@ -189,281 +189,137 @@
       display: none !important
     }
   }
-  @media screen and (min-width: 600.1px) and (max-width: 670px)
+  @media screen and (min-width: 620.1px) and (max-width: 670px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -6vw
+      margin-top: -2vw
     }
   }
-  @media screen and (min-width: 550.1px) and (max-width: 600px)
+  @media screen and (min-width: 555.1px) and (max-width: 620px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -10vw
+      margin-top: -2vw
     }
   }
-  @media screen and (min-width: 510.1px) and (max-width: 550px)
+  @media screen and (min-width: 527.1px) and (max-width: 555px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -18vw
+      margin-top: -9vw
     }
   }
-  @media screen and (min-width: 470.1px) and (max-width: 510px)
+  @media screen and (min-width: 470.1px) and (max-width: 527px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -25vw
+      margin-top: -7vw
     }
   }
   @media screen and (min-width: 450.1px) and (max-width: 470px)
   {
     .mobileSpaceFiller
     {
+      margin-top: -20vw
+    }
+  }
+  @media screen and (min-width: 425.1px) and (max-width: 450px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -21vw
+    }
+  }
+  @media screen and (min-width: 410.1px) and (max-width: 425px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -29vw
+    }
+  }
+  @media screen and (min-width: 380.1px) and (max-width: 410px)
+  {
+    .mobileSpaceFiller
+    {
       margin-top: -34vw
     }
   }
-  @media screen and (min-width: 410.1px) and (max-width: 450px)
+  @media screen and (min-width: 364.1px) and (max-width: 380px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -28vw
+      margin-top: -41vw
     }
   }
-  @media screen and (min-width: 377.1px) and (max-width: 410px)
+  @media screen and (min-width: 345.1px) and (max-width: 364px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -38vw
+      margin-top: -47vw
     }
   }
-  @media screen and (min-width: 353.1px) and (max-width: 377px)
+  @media screen and (min-width: 332.1px) and (max-width: 345px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -48vw
+      margin-top: -55vw
     }
   }
-  @media screen and (min-width: 328.1px) and (max-width: 353px)
+  @media screen and (min-width: 315.1px) and (max-width: 332px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -60vw
+      margin-top: -62vw
     }
   }
-  @media screen and (min-width: 305.1px) and (max-width: 328px)
+  @media screen and (min-width: 300.1px) and (max-width: 315px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -70vw
+      margin-top: -71vw
     }
   }
-  @media screen and (min-width: 285.1px) and (max-width: 305px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -80vw
-    }
-  }
-  @media screen and (min-width: 268.1px) and (max-width: 285px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -91vw
-    }
-  }
-  @media screen and (min-width: 252.1px) and (max-width: 268px)
+  @media screen and (min-width: 288.1px) and (max-width: 300px)
   {
     .mobileSpaceFiller
     {
       margin-top: -101vw
     }
   }
-  @media screen and (min-width: 227.1px) and (max-width: 252px)
+  @media screen and (min-width: 275.1px) and (max-width: 288px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -113vw
+      margin-top: -110vw
     }
   }
-  @media screen and (min-width: 215.1px) and (max-width: 227px)
+  @media screen and (min-width: 264.1px) and (max-width: 275px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -126vw
+      margin-top: -120vw
     }
   }
-  @media screen and (min-width: 204.1px) and (max-width: 215px)
+  @media screen and (min-width: 255.1px) and (max-width: 264px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -136vw
+      margin-top: -130vw
     }
   }
-  @media screen and (min-width: 193.1px) and (max-width: 204px)
+  @media screen and (min-width: 240.1px) and (max-width: 255px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -148vw
+      margin-top: -140vw
     }
   }
-  @media screen and (max-width: 193px)
+  @media screen and (max-width: 240px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -160vw
-    }
-  }
-  /*Set margin-top for Fire Fox*/
-  @-moz-document url-prefix()
-  {
-    @media screen and (min-width: 670.1px)
-    {
-      .mobileSpaceFiller
-      {
-        display: none !important
-      }
-    }
-    @media screen and (min-width: 617.1px) and (max-width: 670px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -4vw
-      }
-    }
-    @media screen and (min-width: 558.1px) and (max-width: 617px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -8vw
-      }
-    }
-    @media screen and (min-width: 515.1px) and (max-width: 558px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -14vw
-      }
-    }
-    @media screen and (min-width: 478.1px) and (max-width: 515px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -20vw
-      }
-    }
-    @media screen and (min-width: 450.1px) and (max-width: 478px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -24vw
-      }
-    }
-    @media screen and (min-width: 444.1px) and (max-width: 450px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -20vw
-      }
-    }
-    @media screen and (min-width: 410.1px) and (max-width: 444px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -21vw
-      }
-    }
-    @media screen and (min-width: 377.1px) and (max-width: 410px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -28vw
-      }
-    }
-    @media screen and (min-width: 353.1px) and (max-width: 377px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -36vw
-      }
-    }
-    @media screen and (min-width: 328.1px) and (max-width: 353px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -45vw
-      }
-    }
-    @media screen and (min-width: 305.1px) and (max-width: 328px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -53vw
-      }
-    }
-    @media screen and (min-width: 285.1px) and (max-width: 305px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -62vw
-      }
-    }
-    @media screen and (min-width: 268.1px) and (max-width: 285px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -71vw
-      }
-    }
-    @media screen and (min-width: 252.1px) and (max-width: 268px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -80vw
-      }
-    }
-    @media screen and (min-width: 227.1px) and (max-width: 252px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -89vw
-      }
-    }
-    @media screen and (min-width: 215.1px) and (max-width: 227px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -99vw
-      }
-    }
-    @media screen and (min-width: 204.1px) and (max-width: 215px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -108vw
-      }
-    }
-    @media screen and (min-width: 193.1px) and (max-width: 204px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -117vw
-      }
-    }
-    @media screen and (min-width: 155.1px) and (max-width: 193px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -127vw
-      }
-    }
-    @media screen and (max-width: 155px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -151vw
-      }
+      margin-top: -130vw
     }
   }
 </style>

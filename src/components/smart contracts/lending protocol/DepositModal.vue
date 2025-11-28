@@ -428,12 +428,6 @@
   {
     try
     {
-      console.log(selectedTokenMintAddress.toString())
-      console.log(adminAccounts.lendingCEOAddressKey.toString())
-      console.log(subMarketSelect.value)
-      console.log(accountSelect.value)
-
-
       const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
         selectedTokenMintAddress,

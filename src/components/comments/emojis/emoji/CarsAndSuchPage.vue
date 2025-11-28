@@ -569,7 +569,7 @@
   <ion-button class="emojiButton emojiFilter snowman winter ice frozen cold chirstmas" fill="clear" @click="$emit('emojiSelected', '⛄')" title="snowman">
     ⛄
   </ion-button>
-  <ion-button class="emojiButton emojiFilter fire heat hot flame summer burn" fill="clear" @click="$emit('emojiSelected', '🔥')" title="fire">
+  <ion-button class="emojiButton emojiFilter firefox heat hot flame summer burn" fill="clear" @click="$emit('emojiSelected', '🔥')" title="fire">
     🔥
   </ion-button>
   <ion-button class="emojiButton emojiFilter droplet water" fill="clear" @click="$emit('emojiSelected', '💧')" title="droplet">

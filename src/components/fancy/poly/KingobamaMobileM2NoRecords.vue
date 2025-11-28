@@ -214,227 +214,136 @@
   {
     .mobileSpaceFiller
     {
-      margin-top: -2vw
+      margin-top: -18vw
     }
   }
-  @media screen and (min-width: 377.1px) and (max-width: 417px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: 1vw
-    }
-  }
-  @media screen and (min-width: 314.1px) and (max-width: 377px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -2vw
-    }
-  }
-  @media screen and (min-width: 282.1px) and (max-width: 314px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -11vw
-    }
-  }
-  @media screen and (min-width: 258.1px) and (max-width: 282px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -17vw
-    }
-  }
-  @media screen and (min-width: 236.1px) and (max-width: 258px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -23vw
-    }
-  }
-  @media screen and (min-width: 224.1px) and (max-width: 236px)
+  @media screen and (min-width: 400.1px) and (max-width: 417px)
   {
     .mobileSpaceFiller
     {
       margin-top: -20vw
     }
   }
-  @media screen and (min-width: 218.1px) and (max-width: 224px)
+  @media screen and (min-width: 377.1px) and (max-width: 400px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -15vw
+      margin-top: -28vw
     }
   }
-  @media screen and (min-width: 203.1px) and (max-width: 218px)
+  @media screen and (min-width: 364.1px) and (max-width: 377px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -17vw
+      margin-top: -32vw
     }
   }
-  @media screen and (min-width: 164.1px) and (max-width: 203px)
+  @media screen and (min-width: 332.1px) and (max-width: 364px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -18vw
+      margin-top: -42vw
     }
   }
-  @media screen and (min-width: 153.1px) and (max-width: 164px)
+  @media screen and (min-width: 305.1px) and (max-width: 332px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -4vw
+      margin-top: -50vw
     }
   }
-  @media screen and (max-width: 153px)
+  @media screen and (min-width: 300.1px) and (max-width: 305px)
   {
     .mobileSpaceFiller
     {
-      margin-top: 0vw
+      margin-top: -58vw
+    }
+  }
+  @media screen and (min-width: 284.1px) and (max-width: 300px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -98vw
+    }
+  }
+  @media screen and (min-width: 267.1px) and (max-width: 284px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -107vw
+    }
+  }
+  @media screen and (min-width: 250.1px) and (max-width: 267px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -117vw
+    }
+  }
+  @media screen and (min-width: 230.1px) and (max-width: 250px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -127vw
+    }
+  }
+  @media screen and (min-width: 224.1px) and (max-width: 230px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -134vw
+    }
+  }
+  @media screen and (min-width: 213.1px) and (max-width: 224px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -130vw
+    }
+  }
+  @media screen and (min-width: 200.1px) and (max-width: 213px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -140vw
+    }
+  }
+  @media screen and (max-width: 200px)
+  {
+    .mobileSpaceFiller
+    {
+      margin-top: -150vw
     }
   }
   /*Set margin-top for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 670.1px)
+    @media screen and (min-width: 230.1px) and (max-width: 250px)
     {
       .mobileSpaceFiller
       {
-        display: none !important
+        margin-top: -125vw
       }
     }
-    @media screen and (min-width: 505.1px) and (max-width: 670px)
+    @media screen and (min-width: 224.1px) and (max-width: 230px)
     {
       .mobileSpaceFiller
       {
-        margin-top: -2vw
+        margin-top: -130vw
       }
     }
-    @media screen and (min-width: 450.1px) and (max-width: 505px)
+    @media screen and (min-width: 200.1px) and (max-width: 224px)
     {
       .mobileSpaceFiller
       {
-        margin-top: -5vw
+        margin-top: -128vw
       }
     }
-    @media screen and (min-width: 417.1px) and (max-width: 450px)
+    @media screen and (max-width: 200px)
     {
       .mobileSpaceFiller
       {
-        margin-top: 0vw
-      }
-    }
-    @media screen and (min-width: 384.1px) and (max-width: 417px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: 3vw
-      }
-    }
-    @media screen and (min-width: 349.1px) and (max-width: 384px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: 0vw
-      }
-    }
-    @media screen and (min-width: 331.1px) and (max-width: 349px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -5vw
-      }
-    }
-    @media screen and (min-width: 285.1px) and (max-width: 331px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -7vw
-      }
-    }
-    @media screen and (min-width: 247.1px) and (max-width: 285px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -15vw
-      }
-    }
-    @media screen and (min-width: 224.1px) and (max-width: 247px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -18vw
-      }
-    }
-    @media screen and (min-width: 211.1px) and (max-width: 224px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -12vw
-      }
-    }
-    @media screen and (min-width: 171.1px) and (max-width: 211px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -15vw
-      }
-    }
-    @media screen and (min-width: 164.1px) and (max-width: 171px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -20vw
-      }
-    }
-    @media screen and (min-width: 149.1px) and (max-width: 164px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: -5vw
-      }
-    }
-    @media screen and (min-width: 139.1px) and (max-width: 149px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: 5vw
-      }
-    }
-    @media screen and (min-width: 131.1px) and (max-width: 139px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: 1vw
-      }
-    }
-    @media screen and (min-width: 113.1px) and (max-width: 131px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: 12vw
-      }
-    }
-    @media screen and (min-width: 107.1px) and (max-width: 113px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: 18vw
-      }
-    }
-    @media screen and (min-width: 74.1px) and (max-width: 107px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: 55vw
-      }
-    }
-    @media screen and (max-width: 74px)
-    {
-      .mobileSpaceFiller
-      {
-        margin-top: 85vw
+        margin-top: -144vw
       }
     }
   }
