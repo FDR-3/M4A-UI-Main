@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as anchor from "@coral-xyz/anchor"
-  import { tokenReserves, tokenReserveDevNetMap, tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserves, tokenReserveHashMap, tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets,
     subMarketsHashMap,
     subMarketOwnerHashMap,
@@ -95,6 +95,7 @@
       //Convert Deposit Amount To Decimal from Fixed Point
       const decimalAmount = tokenDecimalHashMap.get(tokenReserve.tokenMintAddress.toBase58())
       tokenReserve.depositedAmount = (Number(tokenReserve.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+      tokenReserve.borrowedAmount = (Number(tokenReserve.borrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
 
       list.push(tokenReserve)
     }
@@ -194,7 +195,7 @@
 
       let newIndex = subMarketOwner.ownerSubMarketList.length - 1
 
-      const tokenFrontEndProperties = tokenReserveDevNetMap.get(subMarketOwner.ownerSubMarketList[newIndex].tokenMintAddress.toBase58())
+      const tokenFrontEndProperties = tokenReserveHashMap.get(subMarketOwner.ownerSubMarketList[newIndex].tokenMintAddress.toBase58())
 
       subMarketOwner.ownerSubMarketList[newIndex].feeCollectorAddress = subMarketOwner.ownerSubMarketList[newIndex].feeCollectorAddress.toBase58()
       //subMarketOwner.ownerSubMarketList[newIndex].tokenSVG = tokenFrontEndProperties.svg//This has to be marked raw in the Owners Table since it is cloned at the end of this fuction. The cloning is for allowing users to edit the table without updating the original hashmap. It was originally marked Raw in the TokenReserves.vue file
@@ -473,7 +474,11 @@
           subMarketOwnerAddress: subMarketOwnerAddress,
           subMarketOwnerAddressTrimmed: trimAddress(subMarketOwnerAddress),
           subMarketIndex: subMarketIndex,
-          subMarketFee: subMarket.feeOnInterestEarnedRate
+          subMarketFee: subMarket.feeOnInterestEarnedRate,
+          sevenDayCalculatedUserInterestEarned: 0,
+          sevenDayInterestEarnedValue: 0,
+          calculatedUserInterestEarned: 0,
+          interestEarnedValue: 0
         }
         var list = []
         const previousLendingUserAvailableSubMarketList = availableStableCoinStatementsBySubMarketsHashMap.get(owner + userAccountIndex)
@@ -564,7 +569,11 @@
           subMarketOwnerAddress: subMarketOwnerAddress,
           subMarketOwnerAddressTrimmed: trimAddress(subMarketOwnerAddress),
           subMarketIndex: subMarketIndex,
-          subMarketFee: subMarket.feeOnInterestEarnedRate
+          subMarketFee: subMarket.feeOnInterestEarnedRate,
+          sevenDayCalculatedUserInterestEarned: 0,
+          sevenDayInterestEarnedValue: 0,
+          calculatedUserInterestEarned: 0,
+          interestEarnedValue: 0
         }
         var list = []
         const previousLendingUserAvailableSubMarketList = availableCryptoCurrencyStatementsBySubMarketsHashMap.get(owner + userAccountIndex)
@@ -704,7 +713,7 @@
           {
             const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
             const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-            const tokenFrontEndProperties = tokenReserveDevNetMap.get(tokenMintAddress)
+            const tokenFrontEndProperties = tokenReserveHashMap.get(tokenMintAddress)
       
             var moreRecentAccountEntry =
             {
@@ -747,7 +756,7 @@
           //Add New Sub Account for Existing User to Lending Leader Board
           const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
           const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-          const tokenFrontEndProperties = tokenReserveDevNetMap.get(tokenMintAddress)
+          const tokenFrontEndProperties = tokenReserveHashMap.get(tokenMintAddress)
 
           var newAccountEntry =
           {
@@ -791,7 +800,7 @@
         //Add New User and their Sub Account to Lending Leader Board
         const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
         const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-        const tokenFrontEndProperties = tokenReserveDevNetMap.get(tokenMintAddress)
+        const tokenFrontEndProperties = tokenReserveHashMap.get(tokenMintAddress)
 
         var newAccountEntry =
         {
@@ -827,17 +836,12 @@
         }
 
         var displayName = getCustomOrTrimmedUserDisplayName(lendingUserMonthlyStatementAccount.owner.toString())
-        var ceoName = ""
-
-        if(lendingUserMonthlyStatementAccount.owner.toString() == adminAccounts.lendingCEOAddressString)
-          ceoName = "fdr-3"
 
         var newOwnerEntry = 
         {
           id: leaderBoardData.length + 1,
           owner: lendingUserMonthlyStatementAccount.owner.toString(),
           displayName: displayName,
-          ceoName: ceoName,
           interestEarnedValue: 0,
           interestEarnedValueString: "$0.00",
           interestAccruedValue: 0,

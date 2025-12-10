@@ -48,6 +48,7 @@
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { PublicKey } from "@solana/web3.js"
+  import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { isBrowserFireFox } from '/src/assets/helperFunctions/browserHelper.ts'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import KingobamaMobileT1 from '/src/components/fancy/poly/KingobamaMobileT1.vue'
@@ -73,6 +74,7 @@
   var display2ndTable = ref("none")
 
   var createSubMarketModal = ref()
+  var tokenRelatedDynamicTableHeight = ref(0)
 
   var dynamicTableHeight = ref()
   if(!isBrowserFireFox())
@@ -87,6 +89,8 @@
 
   onMounted(() => 
   {
+    updateTokenRelatedTreasuryTableHeight()
+    
     flipped = localStorage.getItem("treasuryTableSelect") || ""
     if(flipped == "")
     {
@@ -132,6 +136,29 @@
         flipping.value = false
       }, 500) //500 milliseconds == 0.5 seconds
     }   
+  }
+
+  function updateTokenRelatedTreasuryTableHeight()
+  {
+    var baseTableHeight
+    var tokenRelatedHeight = 0
+
+    if(!isBrowserFireFox())
+      baseTableHeight = 939
+    else
+      baseTableHeight = 972
+    
+    if(StableCoins.length == 0)
+      tokenRelatedHeight += 14 * 2
+    else
+      tokenRelatedHeight += StableCoins.length * 70 * 2
+
+    if(CryptoCurrency.length == 0)
+      tokenRelatedHeight += 14 * 2
+    else
+      tokenRelatedHeight += CryptoCurrency.length * 70 * 2
+
+    tokenRelatedDynamicTableHeight.value = baseTableHeight + tokenRelatedHeight
   }
 
   function updateTokenTableSizing(tokenReserveCount: number, tokenSubMarketCount: number, showTokenSubMarkets: boolean)
@@ -329,63 +356,70 @@
   }
   
   /*Table Flip Container Front*/
-  @media screen and (min-width: 1059.1px)
+  @media screen and (min-width: 1421.1px)
   { 
     .tableFlipContainer
     {
-      height: 1705px
+      height: v-bind('(0 + tokenRelatedDynamicTableHeight) + "px"')
     }
   }
-  @media screen and (min-width: 1037.1px) and (max-width: 1059px) 
+  @media screen and (min-width: 1262.1px) and (max-width: 1421px) 
   { 
     .tableFlipContainer
     {
-      height: 1735px
+      height: v-bind('(13 + tokenRelatedDynamicTableHeight) + "px"')
     }
   }
-  @media screen and (min-width: 965.1px) and (max-width: 1037px) 
+  @media screen and (min-width: 1249.1px) and (max-width: 1262px) 
   { 
     .tableFlipContainer
     {
-      height: 1762px
+      height: v-bind('(41 + tokenRelatedDynamicTableHeight) + "px"')
     }
   }
-  @media screen and (min-width: 926.1px) and (max-width: 965px) 
+  @media screen and (min-width: 1010.1px) and (max-width: 1249px) 
   { 
     .tableFlipContainer
     {
-      height: 1798px
+      height: v-bind('(55 + tokenRelatedDynamicTableHeight) + "px"')
     }
   }
-  @media screen and (max-width: 926px) 
+  @media screen and (max-width: 1010px) 
   { 
     .tableFlipContainer
     {
-      height: 1828px
+      height: v-bind('(86 + tokenRelatedDynamicTableHeight) + "px"')
     }
   }
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 965.1px)
+    @media screen and (min-width: 1144.1px)
     { 
       .tableFlipContainer
       {
-        height: 1739px
+        height: v-bind('(0 + tokenRelatedDynamicTableHeight) + "px"')
       }
     }
-    @media screen and (min-width: 925.1px) and (max-width: 965px) 
+    @media screen and (max-width: 1144px)  and (min-width: 1024.1px)
     { 
       .tableFlipContainer
       {
-        height: 1776px
+        height: v-bind('(17 + tokenRelatedDynamicTableHeight) + "px"')
       }
     }
-    @media screen and (max-width: 925px) 
+    @media screen and (max-width: 1024px)  and (min-width: 1010.1px)
     { 
       .tableFlipContainer
       {
-        height: 1809px
+        height: v-bind('(35 + tokenRelatedDynamicTableHeight) + "px"')
+      }
+    }
+    @media screen and (max-width: 1010px) 
+    { 
+      .tableFlipContainer
+      {
+        height: v-bind('(70 + tokenRelatedDynamicTableHeight) + "px"')
       }
     }
   }

@@ -156,7 +156,9 @@
     const contributionTotalObject = props.uniqueCanidateHashMap.get(rowData.canidateAddress)
     event.value.contributionTotal = contributionTotalObject.contributionTotal
     event.value.contributionTotalString = contributionTotalObject.contributionTotalString
-    event.value.amountSpent = contributionTotalObject.amountSpent
+    event.value.amountSpent = contributionTotalObject.amountSpent.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
 
     popoverOpen.value = true  
   }

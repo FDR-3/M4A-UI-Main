@@ -155,6 +155,11 @@ h3, h4
   margin-left: -20px
 }
 
+.mediumMarginRight
+{
+  margin-right: 20px !important
+}
+
 .nMediumMarginRight
 {
   margin-right: -20px !important

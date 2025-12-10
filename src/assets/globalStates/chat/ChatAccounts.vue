@@ -16,5 +16,10 @@
     map: undefined
   })
 
+  export const chatLeaderBoard = reactive(
+  {
+    data: undefined
+  })
+
   export default chatAccounts
 </script>

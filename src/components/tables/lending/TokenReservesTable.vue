@@ -36,7 +36,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight" >
             <ion-button style="margin-left: -11px; margin-right: -5px" fill="clear" @click="openTokenReserveATAPopover($event, slotProps.data)">
-              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStrings.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
               <component v-else :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.name }}</ion-label>
             </ion-button>
@@ -106,7 +106,7 @@
         <div>
 
           <div class="flexCenterRow">
-            <img v-if="selectedTokenMintAddress.toString()==tokenAddressStringsMainNet.solTokenMintAddress" style="width: 70px; margin-left: -22px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+            <img v-if="selectedTokenMintAddress.toString()==tokenAddressStrings.solTokenMintAddress" style="width: 70px; margin-left: -22px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
             <component v-else :is="subMarketTokenSVG" style="width: 40px; height: 40px; margin-right: 10px"></component>
             <h2>{{subMarketTokenName}} SubMarkets</h2>
           </div>
@@ -280,9 +280,9 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { tokenReserves,
-    tokenReserveDevNetMap, 
+    tokenReserveHashMap, 
     priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveSubMarketListHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -519,7 +519,7 @@
       processedTableData.push(newTableData.data[i])
 
       const tokenMintAddressString = processedTableData[i].tokenMintAddress.toString()
-      const tokenReserveFrontEndProperties = tokenReserveDevNetMap.get(tokenMintAddressString)//These are static and don't need to be reactive
+      const tokenReserveFrontEndProperties = tokenReserveHashMap.get(tokenMintAddressString)//These are static and don't need to be reactive
       processedTableData[i].name = tokenReserveFrontEndProperties.name
       processedTableData[i].svg = tokenReserveFrontEndProperties.svg
       processedTableData[i].source = tokenReserveFrontEndProperties.source
@@ -639,7 +639,7 @@
     tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
     showTokenSubMarkets.value = true
 
-    const tokenFrontEndProperties = tokenReserveDevNetMap.get(selectedTokenMintAddress.toString())
+    const tokenFrontEndProperties = tokenReserveHashMap.get(selectedTokenMintAddress.toString())
     subMarketTokenSVG.value = tokenFrontEndProperties.svg
     subMarketTokenName.value = tokenFrontEndProperties.name
 

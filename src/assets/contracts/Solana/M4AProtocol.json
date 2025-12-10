@@ -1,5 +1,5 @@
 {
-  "address": "EmKwXWsa1GeEBqYmmUMADWrVRy5W64FSV9yb2EkeKZ4t",
+  "address": "6eu3x8PR19s83TNbquQPXNbPSbYeTKkmU64VnGout4bG",
   "metadata": {
     "name": "m_4_a_protocol",
     "version": "1.0.0",
@@ -8506,6 +8506,7 @@
         },
         {
           "name": "patient",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -10487,8 +10488,53 @@
   "errors": [
     {
       "code": 6000,
-      "name": "HospitalTypeInvalid",
-      "msg": "Hospital type must be General, Dental, Vision, or Mental (0,1,2,3)"
+      "name": "PatientFirstNameTooLong",
+      "msg": "Patient First Name can't be longer than 52 characters"
+    },
+    {
+      "code": 6001,
+      "name": "PatientLastNameTooLong",
+      "msg": "Patient Last Name can't be longer than 52 characters"
+    },
+    {
+      "code": 6002,
+      "name": "HospitalNameTooLong",
+      "msg": "Hospital Name can't be longer than 100 characters"
+    },
+    {
+      "code": 6003,
+      "name": "HospitalAddressTooLong",
+      "msg": "Hospital Address can't be longer than 100 characters"
+    },
+    {
+      "code": 6004,
+      "name": "HospitalCityTooLong",
+      "msg": "Hospital City can't be longer than 40 characters"
+    },
+    {
+      "code": 6005,
+      "name": "HospitalPhoneNumberTooLong",
+      "msg": "Hospital Phone Number can't be longer than 20 characters"
+    },
+    {
+      "code": 6006,
+      "name": "HospitalBillInvoiceNumberTooLong",
+      "msg": "Hospital Bill Invoice Number can't be longer than 20 characters"
+    },
+    {
+      "code": 6007,
+      "name": "AilmentTooLong",
+      "msg": "Ailment can't be longer than 45 characters"
+    },
+    {
+      "code": 6008,
+      "name": "NoteTooLong",
+      "msg": "Note can't be longer than 140 characters"
+    },
+    {
+      "code": 6009,
+      "name": "InsuranceCompanyNameTooLong",
+      "msg": "Insurance company name can't be longer than 35 characters"
     }
   ],
   "types": [

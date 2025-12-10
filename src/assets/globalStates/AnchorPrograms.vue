@@ -62,7 +62,7 @@
     chat: undefined,
     lending: undefined,
     alert: undefined,
-    secondsUntilDeadMansBreakTrips: 3888000, //86,400 seconds/day * 45 days = 3,888,000 seconds.
+    secondsUntilDeadMansBreakTrips: 3_888_000, //86,400 seconds/day * 45 days = 3,888,000 seconds.
     deadMansBreakTimeStamp: 0,
     isDeadMansBreakTripped: false,
     hasWebSiteBeenUpdated: false,

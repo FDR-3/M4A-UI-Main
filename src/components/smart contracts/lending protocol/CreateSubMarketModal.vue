@@ -5,7 +5,7 @@
   >
     <div id="createSubMarketHeader" class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
       <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
-        <img class="noClickEvent" v-if="selectedTokenMintAddressString==tokenAddressStringsMainNet.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <img class="noClickEvent" v-if="selectedTokenMintAddressString==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
         <component class="noClickEvent" v-else :is="createSubMarketSVG" style="width: 44px"></component>
         <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
@@ -82,7 +82,7 @@
     isValidSolanaPublicKey,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
 
   const toast = inject('toast')

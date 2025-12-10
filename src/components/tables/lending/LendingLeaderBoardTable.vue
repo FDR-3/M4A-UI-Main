@@ -2,7 +2,7 @@
   <div class="tableContainer">
     <DataTable
       ref="tableRef"
-      id="test"
+      id="lendingLeaderBoardTable"
       class="tableMinWidth"
       paginator 
       :rows="10" 
@@ -24,7 +24,6 @@
         'id',
         'displayName',
         'owner',
-        'ceoName',
         'depositedValueString',
         'interestEarnedValueString',
         'borrowedValueString',
@@ -42,7 +41,7 @@
             <h2>Lending Leader Board</h2>
           </div>
 
-          <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Leader Board Search     ">
+          <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Lending Leader Board Search     ">
             <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
 
@@ -68,23 +67,23 @@
             <div class="flexCenterRowHeight">
               <div class="smallMarginLeft" >
                 <div v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddressString">
-                  <RIPKingStarWolf v-if="adminAccounts.ceoIsDead && slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px"/>
+                  <RIPKingStarWolf v-if="adminAccounts.ceoIsDead && slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <RIPStarWolf v-else-if="adminAccounts.ceoIsDead" class="starWolfButton" :fill="slotProps.data.ranking==1 ? '#ffd700' :
                   slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' : colorHexValue"/>
-                  <KingStarWolf v-else-if="slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px"/>
+                  <KingStarWolf v-else-if="slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <StarWolf v-else class="starWolfButton" :fill="slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' : colorHexValue"/>
                 </div>
                 <div v-else>
-                  <KingStarWolf v-if="slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px"/>
+                  <KingStarWolf v-if="slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <StarWolf v-else class="starWolfButton" :fill="slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' :
                   darkTheme.value ? '#FFFFFF' : '#000000'"/>
                 </div>
               </div>
 
-              <ion-label v-if="slotProps.data.owner != adminAccounts.lendingCEOAddressString" color="dark" class="noWrapText">{{ slotProps.data.displayName }}</ion-label>
+              <ion-label v-if="slotProps.data.owner!=adminAccounts.lendingCEOAddressString" color="dark" class="noWrapText">{{ slotProps.data.displayName }}</ion-label>
               <ion-label v-else color="green" class="noWrapText">fdr-3</ion-label>
             </div>
           </ion-button>
@@ -138,7 +137,7 @@
         </template>
       </Column>
       <template #expansion="slotProps">
-        <DataTable id="lendingLeaderBoardTable" :value="slotProps.data.accountListWithLastestMonthlyStatement" style="font-size: 5px">
+        <DataTable id="lendingLeaderBoardInnerTable" :value="slotProps.data.accountListWithLastestMonthlyStatement" style="font-size: 5px">
           <Column field="accountName" header="Account" style="width: 0%" sortable>
             <template #body="slotProps">
               <ion-button fill="clear" @click="openViewPortfolioPopover($event, slotProps.data)">
@@ -162,9 +161,9 @@
             <template #body="slotProps">
               <div class="flexCenterRowHeight">
                 <ion-button fill="clear" class="marginZero" @click="openTokenPopover($event, slotProps.data)">
-                  <img v-if="slotProps.data.tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -22px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+                  <img v-if="slotProps.data.tokenMintAddress==tokenAddressStrings.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -10px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
                   <Component v-else style="width: 32px; height: 28px; margin-left: -17px" :is="slotProps.data.tokenSVG"></Component>
-                  <ion-label class="noWrapText" color="dark">{{ slotProps.data.tokenName }}</ion-label>
+                  <ion-label class="noWrapText" color="dark" style="font-size: 11px">{{ slotProps.data.tokenName }}</ion-label>
                 </ion-button>
                 <ion-popover 
                 :is-open="tokenPopoverOpen" 
@@ -256,13 +255,13 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { copyFullAddress, copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const emits = defineEmits(['viewPortfolio', 'totalLendingUsers', 'adjustLeaderBoardHeight', 'setLeaderBoardHeight', 'isDoneLoading'])
+  const emits = defineEmits(['viewPortfolio', 'totalLeaderBoardLendingUsers', 'adjustLeaderBoardHeight', 'setLeaderBoardHeight', 'isDoneLoading'])
 
   const colorHexValue = inject('colorHexValue') as string
   
@@ -298,7 +297,8 @@
         updateLeaderBoardAccountNames()
 
       sortTable()
-      emits('totalLendingUsers', totalNumberOfTopRows)
+      emits('totalLeaderBoardLendingUsers', totalNumberOfTopRows)
+      console.log(totalNumberOfTopRows)
     }
   })
 
@@ -306,7 +306,7 @@
   {
     updateLeaderBoardValues()
     sortTable()
-    emits('totalLendingUsers', totalNumberOfTopRows)
+    emits('totalLeaderBoardLendingUsers', totalNumberOfTopRows)
   })
 
   watch(priceObjectMap,() =>
@@ -352,8 +352,9 @@
 
       for(var i=0; i<tempData.length; i++)
       {
-        var userAccountDepositedTotalValue = 0
         var userAccountInterestEarnedTotalValue = 0
+        var userAccountInterestAccruedTotalValue = 0
+        var userAccountDepositedTotalValue = 0
         var userAccountBorrowedTotalValue = 0
         var userAccountRepaidTotalValue = 0
         var userAccountLiquidatedTotalValue = 0
@@ -370,14 +371,6 @@
             //Remarking SVG Raw to preview overhead and warnings
             tempData[i].accountListWithLastestMonthlyStatement[j].tokenSVG = markRaw(tempData[i].accountListWithLastestMonthlyStatement[j].tokenSVG)
 
-            //Calculate Deposited Value
-            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].depositedAmount * priceData.usdPrice)
-            tempData[i].accountListWithLastestMonthlyStatement[j].depositedValue = calculatedValue
-            tempData[i].accountListWithLastestMonthlyStatement[j].depositedValueString = '$' + calculatedValue.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 })
-            userAccountDepositedTotalValue += calculatedValue
-
             //Calculate Interest Earned Value
             calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedAmount * priceData.usdPrice)
             tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedValue = calculatedValue
@@ -385,6 +378,22 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
             userAccountInterestEarnedTotalValue += calculatedValue
+
+            //Calculate Interest Accrued Value
+            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].interestAccruedAmount * priceData.usdPrice)
+            tempData[i].accountListWithLastestMonthlyStatement[j].interestAccruedValue = calculatedValue
+            tempData[i].accountListWithLastestMonthlyStatement[j].interestAccruedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })
+            userAccountInterestAccruedTotalValue += calculatedValue
+
+            //Calculate Deposited Value
+            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].depositedAmount * priceData.usdPrice)
+            tempData[i].accountListWithLastestMonthlyStatement[j].depositedValue = calculatedValue
+            tempData[i].accountListWithLastestMonthlyStatement[j].depositedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })
+            userAccountDepositedTotalValue += calculatedValue
 
             //Calculate Borrowed Value
             calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].borrowedAmount * priceData.usdPrice)
@@ -412,15 +421,21 @@
           }
         }
 
-        //Set Total Deposited Value
-        tempData[i].depositedValue = userAccountDepositedTotalValue
-        tempData[i].depositedValueString = '$' + userAccountDepositedTotalValue.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })
-
         //Set Total Interest Earned Value
         tempData[i].interestEarnedValue = userAccountInterestEarnedTotalValue
         tempData[i].interestEarnedValueString = '$' + userAccountInterestEarnedTotalValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
+
+        //Set Total Interest Accrued Value
+        tempData[i].interestAccruedValue = userAccountInterestAccruedTotalValue
+        tempData[i].interestAccruedValueString = '$' + userAccountInterestAccruedTotalValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
+
+        //Set Total Deposited Value
+        tempData[i].depositedValue = userAccountDepositedTotalValue
+        tempData[i].depositedValueString = '$' + userAccountDepositedTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
@@ -486,8 +501,8 @@
     {
       case"displayName":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.displayName.localeCompare(a.displayName))
-        setRankingColumn()
+        tableData.value = tableData.value.sort((a: any, b: any) => a.displayName.localeCompare(b.displayName))
+        setRankingColumn(true)
         break
       }
       case "depositedValue":
@@ -529,10 +544,13 @@
     }
   }
 
-  function setRankingColumn()
+  function setRankingColumn(reverse = false)
   {
     for(var i=0; i<tableData.value.length; i++)
       tableData.value[i].ranking = i + 1
+
+    if(reverse)
+      sortOrder.value = -1
   }
 
   function openOwnerPopover(e: Event, rowData: any) 
@@ -587,12 +605,12 @@
   //Used to close popover once user hovers over it and then moves away
   function closeViewPortfolioPopover(e: Event) 
   {
-    //Need this delay so that emits("viewPortfolio") data doesn't get over written
+    //Need this delay so that emits("viewPortfolio") data doesn't get over ruled
     setTimeout(() =>
     {
       event.value = e
       viewPortfolioPopoverOpen.value = false
-    }, 100) 
+    }, 100)
   }
 
   function openSelectedPortfolio()
@@ -653,18 +671,23 @@ ion-input
   }
   
   
-  #test :deep(.p-datatable-tbody > tr)
+  #lendingLeaderBoardTable :deep(.p-datatable-tbody > tr)
   {
     height: 75px
   }
 
   /*Set row height to higest possible value*/
-  #lendingLeaderBoardTable :deep(.p-datatable-tbody > tr)
+  #lendingLeaderBoardInnerTable :deep(.p-datatable-tbody > tr)
   {
-    height: 64px
+    height: 64px;
   }
 
-  #lendingLeaderBoardTable :deep(th)
+  #lendingLeaderBoardInnerTable :deep(th)
+  {
+    font-size: min(4vw, 14px)
+  }
+
+  #lendingLeaderBoardInnerTable :deep(td)
   {
     font-size: min(4vw, 14px)
   }

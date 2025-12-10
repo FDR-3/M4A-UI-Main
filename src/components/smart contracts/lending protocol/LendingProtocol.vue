@@ -1,6 +1,6 @@
 <template>
     <Suspense><PriceUpdater/></Suspense>
-    <Suspense><BalanceUpdater/></Suspense>
+    <Suspense><WalletBalanceUpdater/></Suspense>
 </template>
 
 <script setup lang="ts">
@@ -27,7 +27,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import PriceUpdater from './PriceUpdater.vue'
-  import BalanceUpdater from './BalanceUpdater.vue'
+  import WalletBalanceUpdater from './WalletBalanceUpdater.vue'
 
   //
 

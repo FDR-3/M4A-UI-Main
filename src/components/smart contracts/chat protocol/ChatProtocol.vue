@@ -14,6 +14,7 @@
   getAboutChat,
   setChatAccountHashMap,
   setChatAccountAndUserNameHashMap,
+  setChatProtocolLeaderBoard,
   getCommentSections,
   getChatProtocolCEOAccount,
   getChatProtocolTreasurerAccount,
@@ -95,6 +96,7 @@
     //Chat Accounts
     //Chat Protocol Quality Of Life Accounts
     await setChatAccountAndUserNameHashMap()
+    setChatProtocolLeaderBoard()
     await listenForChatAccountStatChanges()
 
     const chatAccountStats = await getChatAccountStats() 
@@ -317,6 +319,7 @@
         //Handle account change...
         anchorPrograms.areChatQOLAccountsReady = true
         await setChatAccountAndUserNameHashMap()
+        setChatProtocolLeaderBoard()
       })
     }
     catch(error)
@@ -338,6 +341,7 @@
         anchorPrograms.isM4AChatReady = true
 
         await setChatAccountHashMap()
+        setChatProtocolLeaderBoard()
       })
     }
     catch(error)
@@ -360,6 +364,7 @@
         anchorPrograms.isPLIChatReady = true
 
         await setChatAccountHashMap()
+        setChatProtocolLeaderBoard()
       })
     }
     catch(error)
@@ -382,6 +387,7 @@
         anchorPrograms.isAboutChatReady = true
 
         await setChatAccountHashMap()
+        setChatProtocolLeaderBoard()
       })
     }
     catch(error)

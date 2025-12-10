@@ -2,20 +2,21 @@
   <div class="statContainer">
     <RIPRainbowStarWolf v-if="adminAccounts.ceoIsDead" id="rainbowStarWolf"/>
     <RainbowStarWolf v-else id="rainbowStarWolf"/>
-    <div class="statsContainer thickBorder">
+
+    <div v-if="!browsingChatLeaderBoard && !browsingM4ALeaderBoard" class="statsContainer thickBorder">
       <h1 class="yellow">{{ displayName }}</h1>
       <div class="protocolWrapper">
         <div>
           <h2 class="underLine">M4A Protocol</h2>
           <p class="statsLineHeight">Approved Health Care Claim Total: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></p>
+          <p class="statsLineHeight">Approved Claims: {{ approvedClaimCount }}</p>
           <p class="statsLineHeight">Total Patients: {{ patientCount }}</p>
           <p class="statsLineHeight">Submitted Claims: {{ submittedClaimCount }}</p>
           <p class="statsLineHeight">Submitted Appeals: {{ submittedAppealCount }}</p>
-          <p class="statsLineHeight">Approved Claims: {{ approvedClaimCount }}</p>
           <p class="statsLineHeight">Denied Claims: {{ deniedClaimCount }}</p>
           <p class="statsLineHeight">Denied Appeals: {{ deniedAppealCount }}</p>
-          <p class="statsLineHeight">Undenied Claims: {{ undeniedClaimCount }}</p>
           <p class="statsLineHeight">Max Denied Claims: {{ maxDeniedClaimCount }}</p>
+          <p class="statsLineHeight">Undenied Claims: {{ undeniedClaimCount }}</p>
           <p class="statsLineHeight">Revoked Approvals: {{ revokedApprovalCount }}</p>
         </div>
         <div>
@@ -44,19 +45,44 @@
       :class="{ 'invalid': !isValidPublicKey }"
       @ion-input="isValidPublicKey=isValidSolanaPublicKey(addressToCheck)"
       ></ion-input>
-      <ion-button
-      id="checkNewAddressButton"
-      class="nTinyMarginBottom"
-      @click="checkNewAddress()"
-      :color="colorName"
-      :disabled="!isValidPublicKey"
-      >
-        Check New Address
-      </ion-button>
+      <div class="browsingButtonContainer">
+        <ion-button
+        id="searchButton"
+        class="nTinyMarginBottom"
+        @click="browsingM4ALeaderBoard=true"
+        :color="colorName"
+        >
+          Browse M4A Users
+        </ion-button>
+        <ion-button
+        id="searchButton"
+        class="nTinyMarginBottom"
+        @click="checkNewAddress()"
+        :color="colorName"
+        :disabled="!isValidPublicKey"
+        >
+          Check New Address
+        </ion-button>
+        <ion-button
+        id="searchButton"
+        class="nTinyMarginBottom"
+        @click="browsingChatLeaderBoard=true"
+        :color="colorName"
+        >
+          Browse Chat Users
+        </ion-button>
+      </div>
     </div>
   </div>
 
-  <div>
+  <ion-button v-if="browsingChatLeaderBoard || browsingM4ALeaderBoard" fill="clear" class="thinBorder" @click="browsingChatLeaderBoard=false; browsingM4ALeaderBoard=false">
+    <ion-label color="gray">Return To Search</ion-label>
+  </ion-button>
+
+  <ChatLeaderBoardTable v-if="browsingChatLeaderBoard" @viewSelectedUser="viewSelectedAccount"/>
+  <M4ALeaderBoardTable v-if="browsingM4ALeaderBoard" @viewSelectedSubmitter="viewSelectedAccount"/>
+
+  <div v-if="!browsingChatLeaderBoard && !browsingM4ALeaderBoard">
     <PatientRecordsTable :submitterAccount="submitterAccount" :searchAddress="searchAddress"/>
     <VoterRecordTable 
       v-if="!toggleVoterCanidateTable && !toggleUniqueTable"
@@ -109,12 +135,14 @@
 
 <script setup lang="ts">
   import { ref, watch, onMounted, computed, inject } from 'vue'
-  import { IonButton, IonInput } from '@ionic/vue'
+  import { IonButton, IonInput, IonLabel } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import RainbowStarWolf from '/src/components/fancy/RainbowStarWolf.vue' 
-  import PatientRecordsTable from '/src/components/tables/m4a/PatientRecordsTable.vue' 
+  import RainbowStarWolf from '/src/components/fancy/RainbowStarWolf.vue'
+  import ChatLeaderBoardTable from '/src/components/tables/chat/ChatLeaderBoardTable.vue'
+  import M4ALeaderBoardTable from '/src/components/tables/m4a/M4ALeaderBoardTable.vue'
+  import PatientRecordsTable from '/src/components/tables/m4a/PatientRecordsTable.vue'
   import VoterRecordTable from '/src/components/tables/chat/VoterRecordTable.vue'
-  import CanidateRecordTable from '/src/components/tables/chat/CanidateRecordTable.vue' 
+  import CanidateRecordTable from '/src/components/tables/chat/CanidateRecordTable.vue'
   import UniqueVoterTable from '/src/components/tables/chat/UniqueVoterTable.vue'
   import UniqueCanidateTable from '/src/components/tables/chat/UniqueCanidateTable.vue'
   import { VOTE_COST,
@@ -123,7 +151,8 @@
     parseDollarAmountStringFromDecimalNoDollarSign,
     parseDollarAmountStringFromFixed2PointNotationNoDollarSign } from '/src/assets/contracts/WalletHelper.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
-  import { submitterHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
+  import { submitterHashMap, submitterPatientListHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
+  import { getSubmitterPatientList } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { getUserDisplayName, getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { chatAccountHashMap, customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { postVoteRecords } from '/src/assets/globalStates/chat/PostVoteRecords.vue'
@@ -133,6 +162,9 @@
   import cloneDeep from 'lodash/cloneDeep'
 
   const colorName = inject('colorName') as string
+
+  var browsingChatLeaderBoard = ref(false)
+  var browsingM4ALeaderBoard = ref(false)
 
   var uniqueVoterHashMap = ref()
   var uniqueCanidateHashMap = ref()
@@ -219,7 +251,7 @@
     }
   })
 
-  watch(submitterHashMap, () =>
+  watch([submitterHashMap, submitterPatientListHashMap], () =>
   {
     getSubmitterAccountStats(searchAddress.value)
   })
@@ -316,32 +348,36 @@
 
   function getSubmitterAccountStats(searchAddress: string)
   {
+    if(!submitterHashMap.map || !submitterPatientListHashMap.map)
+      return
+
     submitterAccount.value = submitterHashMap.map.get(searchAddress)
+    const patientList = getSubmitterPatientList(searchAddress)
 
     if(submitterAccount.value)
     {
       approvedClaimAmountString.value = parseDollarAmountStringFromFixed2PointNotationNoDollarSign(submitterAccount.value.approvedClaimAmount)
-      patientCount.value = submitterAccount.value.patientCount
+      approvedClaimCount.value = submitterAccount.value.approvedClaimCount
+      patientCount.value = patientList.length
       submittedClaimCount.value = submitterAccount.value.submittedClaimCount
       submittedAppealCount.value = submitterAccount.value.submittedAppealCount
-      approvedClaimCount.value = submitterAccount.value.approvedClaimCount
-      undeniedClaimCount.value = submitterAccount.value.undeniedClaimCount
       deniedClaimCount.value = submitterAccount.value.deniedClaimCount
       deniedAppealCount.value = submitterAccount.value.deniedAppealCount
       maxDeniedClaimCount.value = submitterAccount.value.maxDeniedClaimCount
+      undeniedClaimCount.value = submitterAccount.value.undeniedClaimCount
       revokedApprovalCount.value = submitterAccount.value.revokedApprovalCount
     }
     else
     {
       approvedClaimAmountString.value = "0.00"
+      approvedClaimCount.value = 0
       patientCount.value = 0
       submittedClaimCount.value = 0
       submittedAppealCount.value = 0
-      approvedClaimCount.value = 0
-      undeniedClaimCount.value = 0
       deniedClaimCount.value = 0
       deniedAppealCount.value = 0
       maxDeniedClaimCount.value = 0
+      undeniedClaimCount.value = 0
       revokedApprovalCount.value = 0
     }
   }
@@ -628,6 +664,15 @@
 
     return castedVoteRecords 
   }
+
+  function viewSelectedAccount(leaderBoardAddress: String)
+  {
+    browsingChatLeaderBoard.value = false
+    browsingM4ALeaderBoard.value = false
+    isValidPublicKey.value = true
+    addressToCheck.value = leaderBoardAddress
+    checkNewAddress()
+  }
 </script>
 
 <style scoped>
@@ -660,9 +705,9 @@
     margin-top: -20px
   }
 
-  #checkNewAddressButton
+  #searchButton
   {
-    width: min(30vw, 150px) !important
+    width: min(50vw, 150px)
   }
 
   ion-input
@@ -693,7 +738,6 @@
       width: min(80vw, 1174px)
     }
   }
-
   @media screen and (max-width: 1700px) 
   { 
     .statContainer
@@ -722,13 +766,32 @@
       gap: 25px
     }
   }
-
   @media screen and (max-width: 1474px) 
   { 
     .protocolWrapper
     {
       display: flex;
       flex-direction: column;
+    }
+  }
+
+  @media screen and (min-width: 500.1px) 
+  { 
+    .browsingButtonContainer
+    {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      gap: 25px
+    }
+  }
+  @media screen and (max-width: 500px) 
+  { 
+    .browsingButtonContainer
+    {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   }
 </style>

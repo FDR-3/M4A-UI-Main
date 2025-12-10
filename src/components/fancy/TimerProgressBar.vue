@@ -1,6 +1,6 @@
 <template>
-  <div class="progress-bar-container">
-    <div class="progress-bar" :style="{ width: progress + '%' }"></div>
+  <div class="progressBarContainer ">
+    <div class="progressBar" :style="{ width: progress + '%' }"></div>
     <ion-label class="timer" color="dark">{{ formattedTime }}</ion-label>
   </div>
 </template>
@@ -53,7 +53,7 @@
 </script>
 
 <style scoped>
-  .progress-bar-container 
+  .progressBarContainer 
   {
     width: 100%;
     border: 1px solid light-dark(#000000,#ffffff);
@@ -62,7 +62,7 @@
     overflow: hidden
   }
 
-  .progress-bar 
+  .progressBar
   {
     height: 20px;
     background-color: v-bind(colorHexValue) !important;

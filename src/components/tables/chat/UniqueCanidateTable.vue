@@ -143,7 +143,9 @@
     event.value.canidateDisplayName = rowData.displayName
     event.value.canidateAddress = rowData.canidateAddress
     event.value.contributionTotal = rowData.contributionTotal
-    event.value.amountSpent = rowData.amountSpent.toFixed(2)
+    event.value.amountSpent = rowData.amountSpent.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
 
     popoverOpen.value = true
   }

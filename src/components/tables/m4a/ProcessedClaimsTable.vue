@@ -80,14 +80,12 @@
       <Column field="claimId" header="Claim Id" style="width: 0%" sortable></Column>
       <Column field="submitterAddress" header="Submitter" style="width: 35%" sortable>
         <template #body="slotProps">
-          <div class="flexCenterRow">
-            <ion-button class="submitterButton" fill="clear" @click="openUserPopover($event, slotProps.data)">
-              <StarWolf class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
-              <ion-label color="dark">
-                {{ slotProps.data.submitterDisplayName }}
-              </ion-label>
-            </ion-button>
-          </div>
+          <ion-button class="submitterButton" fill="clear" @click="openUserPopover($event, slotProps.data)">
+            <StarWolf class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+            <ion-label color="dark">
+              {{ slotProps.data.submitterDisplayName }}
+            </ion-label>
+          </ion-button>
           <ion-popover 
             :is-open="userPopoverOpen" 
             :event="event" 

@@ -70,7 +70,10 @@
         <!--Quality Of Life Bar-->
         <div>
           <div class="flexCenterRow">
-            <ion-button fill="clear" @click="openPostInSolanaExplorer()">
+            <ion-button fill="clear" @click="openReplyInSolanaExplorer(commentSectionNamePrefix,
+              commentSectionName,
+              chatAccountPostCountIndex,
+              postOwnerAddress)">
               <SolanaSVG slot="icon-only"/>
             </ion-button>
 
@@ -258,7 +261,10 @@
         <!--Quality Of Life Bar-->
         <div>
           <div class="flexCenterRow">
-            <ion-button fill="clear" @click="openPostInSolanaExplorer()">
+            <ion-button fill="clear" @click="openReplyInSolanaExplorer(commentSectionNamePrefix,
+              commentSectionName,
+              chatAccountPostCountIndex,
+              postOwnerAddress)">
               <SolanaSVG slot="icon-only"/>
             </ion-button>
 
@@ -454,7 +460,7 @@
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { getM4AReplyPDA, getPLIReplyPDA, getAboutReplyPDA } from '/src/assets/contracts/Solana/ChatProtocol.vue'
+  import { openReplyInSolanaExplorer } from '/src/assets/helperFunctions/browserHelper.ts'
   import SolanaSVG from '/src/assets/svg/solana-svg.vue'
 
   const props = defineProps(
@@ -701,25 +707,6 @@
     catch(error)
     {
       toastPreTransactionError(error, toast, "create_chat_account")
-    }
-  }
-
-  function openPostInSolanaExplorer()
-  {
-    if(navigation.menuIndex == MenuIndex.M4A)
-    {
-      const postPDA = getM4AReplyPDA(props.commentSectionNamePrefix, props.commentSectionName, props.chatAccountPostCountIndex, props.postOwnerAddress).toBase58()
-      window.open(`https://explorer.solana.com/address/${postPDA}?cluster=devnet`, "_blank")
-    }
-    else if(navigation.menuIndex == MenuIndex.PLI)
-    {
-      const postPDA = getPLIReplyPDA(props.commentSectionNamePrefix, props.commentSectionName, props.chatAccountPostCountIndex, props.postOwnerAddress).toBase58()
-      window.open(`https://explorer.solana.com/address/${postPDA}?cluster=devnet`, "_blank")
-    }
-    else if(navigation.menuIndex == MenuIndex.About)
-    {
-      const postPDA = getAboutReplyPDA(props.commentSectionNamePrefix, props.commentSectionName, props.chatAccountPostCountIndex, props.postOwnerAddress).toBase58()
-      window.open(`https://explorer.solana.com/address/${postPDA}?cluster=devnet`, "_blank")
     }
   }
 

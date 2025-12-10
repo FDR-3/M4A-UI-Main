@@ -1,6 +1,11 @@
 <script lang="ts">
   import { reactive } from 'vue'
 
+  export const submitterAccounts = reactive(
+  {
+    data: undefined
+  })
+
   export const submitterHashMap = reactive(
   {
     //Key: submitterAddress, Value: submitterData
@@ -25,5 +30,10 @@
     map: undefined
   })
 
-  export default submitterHashMap
+  export const m4aLeaderBoard = reactive(
+  {
+    data: undefined
+  })
+
+  export default submitterAccounts
 </script>

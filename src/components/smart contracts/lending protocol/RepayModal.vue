@@ -1,12 +1,12 @@
 <template>
-  <div v-if="depositing"
-    id="depositModal"
+  <div v-if="repaying"
+    id="repayModal"
     class="thickBorder"
   >
     <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
       <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
         <img class="noClickEvent" v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component class="noClickEvent" v-else :is="depositSVG" style="width: 44px"></component>
+        <component class="noClickEvent" v-else :is="repaySVG" style="width: 44px"></component>
         <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
@@ -34,13 +34,8 @@
     @change="updateStoredSelectedSubMarketIndex(selectedTokenMintAddress.toString(), subMarketSelect.toString())">
     </Select>
 
-    <div class="flexCenterRow accountNameActionContainer">
-      <ion-button v-if="addingAdditionalLendingAccount" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
-        <ion-icon :src="close" color="dark"></ion-icon>
-      </ion-button>
-
+    <div class="flexCenterRow">
       <Select
-      v-if="hasAtleast1Account && !addingAdditionalLendingAccount"
       id="accountSelect"
       class="standardFontSize mediumMarginTop mediumMarginBottom"
       v-model="accountSelect" 
@@ -50,84 +45,49 @@
       placeholder="Select Account"
       appendTo="self"
       @change="updateStoredSelectedAccount()">
-        <template #footer>
-          <div class="flexCenterRow accountNameActionContainer">
-            <ion-button @click="setNewAccountDefaultName()" color="dark">
-              <ion-label color="light">New</ion-label>
-            </ion-button>
-          </div>
-        </template>
       </Select>
-
-      <ion-input
-      v-else
-      v-model="accountName"
-      ref="accountNameEditInputRef"
-      id="accountNameEditInput"
-      class="mediumMarginTop smallMarginBottom"
-      :class="{ 'invalid': overCommentByteSizeLimit }"
-      fill="outline"
-      :counter="true"
-      :counter-formatter="customFormatter"
-      :maxlength=MAX_ACCOUNT_NAME_LENGTH>
-        <EmojiButton
-        :marginTop="'4px'"
-        :colorHexValue="colorHexValue"
-        :openSide="'right'"
-        @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
-      </ion-input>
     </div>
 
-    <ion-label class="alignSelfLeft noClickEvent">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
+    <ion-label class="alignSelfLeft noClickEvent">Debt: {{ userDebt.toFixed(tokenDecimalAmount) }}</ion-label>
     <InputNumber
-      v-model="depositAmount"
+      v-model="repayAmount"
       :inputStyle="{'text-align': 'center'}"
       :minFractionDigits="tokenDecimalAmount" :maxFractionDigits="tokenDecimalAmount"
-      :max="userBalance"
+      :max="userDebt"
       :min="0"
-      :step="depositIncrementAmount"
+      :step="repayIncrementAmount"
       showButtons
       fluid
-      @input="(event: { value: any }) => depositAmount = event.value"
+      @input="(event: { value: any }) => repayAmount = event.value"
     />
     <div id="maxButtonContainer" class="alignSelfLeft">
-      <!--If it's the SOL Token, leave some SOL when hitting the Max button for transactions-->
-      <button id="maxButton" style="background-color: transparent" @click="selectedTokenMintAddress?.toString()!=tokenAddressStrings.solTokenMintAddress ? depositAmount=userBalance : depositAmount=userBalance-0.1">
+      <button id="maxButton" style="background-color: transparent" @click="repayAmount=userDebt">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
 
     <div class="smallMarginTop noClickEvent">
-      <ion-text>Value: ${{ depositValue }}</ion-text>
+      <ion-text>Value: ${{ repayValue }}</ion-text>
     </div>
 
-    <ion-text v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom noClickEvent" style="font-size: 11px"
-    >
-      Connect wallet to deposit
-    </ion-text>
     <ion-button
-      v-else
-      id="depositButton"
+      id="repayButton"
       color="dark"
-      @click="depositTokens()"
+      @click="repayTokens()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="depositAmount == 0 || overCommentByteSizeLimit"
+      :disabled="repayAmount == 0"
     >
-      Deposit
+      Repay
     </ion-button>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, watch, computed, onUpdated, type Component } from 'vue'
-  import { IonButton, IonText, IonPopover, IonLabel, IonInput, IonIcon } from '@ionic/vue'
-  import { close } from 'ionicons/icons'
+  import { ref, inject, watch, computed, type Component } from 'vue'
+  import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
-  import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
-  import { anchorPrograms,
-    SYSTEM_PROGRAM_ADDRESS_STRING,
-    MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
@@ -135,8 +95,8 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -146,17 +106,13 @@
   var subMarketList = ref()
   var accountName = ref()
   var accountSelect = ref()
-  var previousAccountSelect: number
   var accountList = ref()
-  var hasAtleast1Account = ref()
-  var accountNameEditInputRef = ref()
-  var addingAdditionalLendingAccount = ref(false)
-  var depositAmount = ref()
-  var depositIncrementAmount = ref()
-  var depositing = ref(false)
-  var depositSVG = ref()
+  var repayAmount = ref()
+  var repayIncrementAmount = ref()
+  var repaying = ref(false)
+  var repaySVG = ref()
   var subMarketTokenName = ref()
-  var userBalance = ref()
+  var userDebt = ref(0)
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
 
@@ -164,20 +120,23 @@
   var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
-  var savedEmojiCursorPosition: any
-  var overCommentByteSizeLimit = ref()
-
-  var depositValue = computed(() =>
+  var repayValue = computed ( () =>
   {
     const price = priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice
     if(price)
-      return (depositAmount.value * Number(price)).toLocaleString('en-US', {
+      return (repayAmount.value * Number(price)).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })        
     else
       return (0).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })   
+  })
+  
+  watch(connectedWallet, () =>
+  {
+    setDebtBalance()
+    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
   })
 
   //Json string of wallet to detect object property changes
@@ -195,27 +154,13 @@
     if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
       return
 
-    const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
-    if(balance)
-      userBalance.value = Number(balance)
-    else
-      userBalance.value = 0
-
+    setDebtBalance()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
   })
 
-  //Move cursor back after emoji insert
-  onUpdated(() => 
+  watch(lendingUserTabAccountsHashMap, () =>
   {
-    //Move cursor back after inserting emoji in reply
-    const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
-    if(savedEmojiCursorPosition != undefined)
-      if(inputElement)
-      {
-        inputElement.setSelectionRange(savedEmojiCursorPosition, savedEmojiCursorPosition)
-        inputElement.focus()
-        savedEmojiCursorPosition = undefined
-      }
+    setDebtBalance()
   })
 
   function addCloseListner()
@@ -231,7 +176,7 @@
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = function(event: any) 
   {
-    if(depositing.value)
+    if(repaying.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
       
@@ -239,14 +184,13 @@
       (event?.target?.id != "openCopyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressPopover") &&
-      (event?.target?.id != "accountNameEditInput") &&
-      (event?.target?.id != "depositModal") &&
-      (event?.target?.id != "openDepositModal") &&
+      (event?.target?.id != "repayModal") &&
+      (event?.target?.id != "openRepayModal") &&
       (event?.target?.id != "maxButtonContainer") &&
       (event?.target?.id != "maxButton") &&
-      (event?.target?.id != "depositButton") &&
+      (event?.target?.id != "repayButton") &&
       (event?.target?.id != "themeButton") &&
-      !event?.target?.classList.contains("tableDepositButton") &&
+      !event?.target?.classList.contains("tableRepayButton") &&
       !event?.target?.classList.contains("native-wrapper") &&
       !event?.target?.classList.contains("native-input") &&
       !event?.target?.classList.contains("input-outline-container") &&
@@ -256,7 +200,6 @@
       !event?.target?.classList.contains("emojiButton") &&
       !event?.target?.classList.contains("sc-ion-label-md-h") &&
       !event?.target?.classList.contains("button") &&
-      !event?.target?.classList.contains("accountNameActionContainer") &&
       !event?.target?.classList.contains("p-select") &&
       !event?.target?.classList.contains("p-select-list") &&
       !event?.target?.classList.contains("p-select-label") &&
@@ -274,29 +217,15 @@
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
-      {
-        depositing.value = false
-        if(addingAdditionalLendingAccount.value)
-        {
-          cancelAddingAdditionalLendingAccount()
-          addingAdditionalLendingAccount.value = false
-        }
-      }
+        repaying.value = false
 
       //Close modal when clicking into input search's behind Modal
       if((event?.target?.placeholder == "Market Search     "))
-      {
-        depositing.value = false
-        if(addingAdditionalLendingAccount.value)
-        {
-          cancelAddingAdditionalLendingAccount()
-          addingAdditionalLendingAccount.value = false
-        }
-      }
+        repaying.value = false
     }
   }
 
-  function openDepositModal(tokenMintAddress: string, fdr3SubMarkets: any[])
+  function openRepayModal(tokenMintAddress: string, fdr3SubMarkets: any[])
   {
     addCloseListner()
 
@@ -304,57 +233,32 @@
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
-
+    
     subMarketList.value = fdr3SubMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-    
+
     if(lendingUserAccountsHashMap.map)
     {
       const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
       if(userAccountList)
-      {
-        accountName.value = null
         accountList.value = userAccountList
-        hasAtleast1Account.value = true
-      }
-      else
-      {
-        accountName.value = "Account 1"
-        hasAtleast1Account.value = false
-      }
-    }
-    else
-    {
-      accountName.value = "Account 1"
-      hasAtleast1Account.value = false
     }
 
-    setTimeout(() =>
-    {
-      const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
-      if(inputElement)
-        inputElement.focus()
-    }, 10) 
-
-    const balance = connectedWallet.tokenBalanceMap.get(tokenMintAddress)
-    if(balance)
-      userBalance.value = Number(balance)
-    else
-      userBalance.value = 0
-
-    depositAmount.value = 0
-    depositIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
+    repayAmount.value = 0
+    repayIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
     tokenDecimalAmount.value = decimalAmount
-    depositSVG.value = tokenSVG
+    repaySVG.value = tokenSVG
     subMarketTokenName.value = tokenName
-    depositing.value = true
+    repaying.value = true
+
+    setDebtBalance()
   }
 
-  function closeDepositModal()
+  function closeRepayModal()
   {
-    depositing.value = false
+    repaying.value = false
     removeCloseListner()
   }
 
@@ -375,108 +279,94 @@
     copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
 
-  const customFormatter = (inputLength: number, maxLength: number) => 
-  {
-    const blob = new Blob([accountName.value])
-    const sizeInBytes = blob.size
-
-    inputLength = sizeInBytes
-
-    if(inputLength > maxLength)
-    {
-      overCommentByteSizeLimit.value = true
-    }
-    else
-      overCommentByteSizeLimit.value = false
-
-    return `${inputLength}/${maxLength} `
-  }
-
-  function insertEmoji(emoji: String)
-  {
-    const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
-    if(inputElement) 
-    {
-      const start = inputElement.selectionStart
-      const end = inputElement.selectionEnd
-      const newValue =
-      accountName.value.substring(0, start) + 
-      emoji + 
-      accountName.value.substring(end)
-
-      accountName.value = newValue
-
-      savedEmojiCursorPosition = inputElement.selectionStart + emoji.length
-    }
-  }
-
-  function setNewAccountDefaultName()
-  {
-    const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
-
-    accountName.value = `Account ${userAccountList.length + 1}`
-    previousAccountSelect = accountSelect.value
-    accountSelect.value = userAccountList.length
-    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
-
-    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-    addingAdditionalLendingAccount.value = true
-  }
-
-  function cancelAddingAdditionalLendingAccount()
-  {
-    accountSelect.value = previousAccountSelect
-    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
-
-    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-    addingAdditionalLendingAccount.value = false
-  }
-
   function updateStoredSelectedAccount()
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
   }
 
-  async function depositTokens()
+  function setDebtBalance()
+  {
+    if(!lendingUserTabAccountsHashMap.map || subMarketSelect.value == undefined)
+      return
+
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+    adminAccounts.lendingCEOAddressString +
+    subMarketSelect.value.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    if(lendingUserTabAccount)
+    {
+      const decimalAmount = tokenDecimalHashMap.get(selectedTokenMintAddress.toString())
+
+      if(lendingUserTabAccount)
+        userDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+      else
+        userDebt.value = 0
+    }
+    else
+      userDebt.value = 0
+  }
+
+  async function repayTokens()
   {
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens
+      const tx = await anchorPrograms.lending.lendingProgram.methods.repayTokens
       (
         selectedTokenMintAddress,
         adminAccounts.lendingCEOAddressKey,
         subMarketSelect.value,
         accountSelect.value,
-        new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
+        new anchor.BN(repayAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
         accountName.value
       ).accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey }).rpc()
 
-      await confirmLendingTransaction(tx, toast, "deposit_tokens")
+      await confirmLendingTransaction(tx, toast, "repay_tokens")
 
-      depositing.value = false
-      addingAdditionalLendingAccount.value = false
+      repaying.value = false
     }
     catch(error)
     {
-      toastPreTransactionError(error, toast, "deposit_tokens")
+      toastPreTransactionError(error, toast, "repay_tokens")
     }
   }
 
   function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
   {
-    localStorage.setItem(tokenMintAddress + "selectedMainSubMarketIndex", mainSubMarketIndex)
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
+    adminAccounts.lendingCEOAddressString +
+    mainSubMarketIndex +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    if(lendingUserTabAccount)
+    {
+      const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+
+      if(lendingUserTabAccount)
+        userDebt.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+      else
+        userDebt.value = 0
+    }
+    else
+      userDebt.value = 0
+
+    repayAmount.value = 0
+
+    localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(
   {
-    openDepositModal,
-    closeDepositModal
+    openRepayModal,
+    closeRepayModal
   })
 </script>
 
 <style scoped>
-  #depositModal
+  #repayModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
     top: 50%;
@@ -485,12 +375,6 @@
     z-index: 4000; /* Makes sure the modal is on top */
     padding: 20px;
     background-color: var(--ion-background-color)
-  }
-
-  #accountNameEditInput
-  {
-    min-height: 25px;
-    --highlight-color: v-bind(colorHexValue) !important
   }
 
   #accountSelect

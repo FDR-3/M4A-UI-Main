@@ -5,9 +5,8 @@
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
   import WETHSVG from '/src/assets/cryptoIcons/weth-svg.vue'
   import WBTCSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
-  import { tokenAddressStringsMainNet,
-    tokenAddressStringsDevNet,
-    tokenReserveAssociatedTokenAddressKeysDevNet,
+  import { tokenAddressStrings,
+    tokenReserveATAKeys,
     pythPriceUpdateKeys,
     pythIds } from '/src/assets/constants/Addresses.ts'
   import { sourceDAI,
@@ -33,26 +32,14 @@
     data: undefined
   })
 
-  //Mainnet Net
-  export const tokenReserveMainnetMap: Map<string, tokenMapObject> = new Map(
-  [
-    //Key: Token Mint Address, Value: Token SVG
-    [tokenAddressStringsMainNet.daiTokenMintAddress, { name: "DAI", decimalAmount: 8, svg: markRaw(DAISVG), source: () => {sourceDAI()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.daiATA, pythKey: pythPriceUpdateKeys.daiPythId, pythId: pythIds.daiPythId }],
-    [tokenAddressStringsMainNet.usdcTokenMintAddress, { name: "USDC", decimalAmount: 6, svg: markRaw(USDCSVG), source: () => {sourceUSDC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.usdcATA, pythKey: pythPriceUpdateKeys.usdcPythId, pythId: pythIds.usdcPythId }],
-    [tokenAddressStringsMainNet.solTokenMintAddress, { name: "SOL", decimalAmount: 9, svg: markRaw(SOLSVG), source: () => {sourceSOL()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.solATA, pythKey: pythPriceUpdateKeys.solPythId, pythId: pythIds.solPythId }],
-    [tokenAddressStringsMainNet.wethTokenMintAddress, { name: "WETH", decimalAmount: 8, svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wethATA, pythKey: pythPriceUpdateKeys.wethPythId, pythId: pythIds.wethPythId }],
-    [tokenAddressStringsMainNet.wbtcTokenMintAddress, { name: "WBTC", decimalAmount: 8, svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wbtcATA, pythKey: pythPriceUpdateKeys.wbtcPythId, pythId: pythIds.wbtcPythId }]
-  ])
-
-  //Dev Net
-  export const tokenReserveDevNetMap: Map<string, tokenMapObject> = new Map(
+  export const tokenReserveHashMap: Map<string, tokenMapObject> = new Map(
   [ 
     //Key: Token Mint Address, Value: Token SVG
-    [tokenAddressStringsDevNet.daiTokenMintAddress, { name: "DAI-Dev", decimalAmount: 8, svg: markRaw(DAISVG), source: () => {sourceDAI()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.daiATA, pythKey: pythPriceUpdateKeys.daiPythId, pythId: pythIds.daiPythId }],
-    [tokenAddressStringsDevNet.usdcTokenMintAddress, { name: "USDC-Dev", decimalAmount: 6, svg: markRaw(USDCSVG), source: () => {sourceUSDC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.usdcATA, pythKey: pythPriceUpdateKeys.usdcPythId, pythId: pythIds.usdcPythId }],
-    [tokenAddressStringsDevNet.solTokenMintAddress, { name: "SOL-Dev", decimalAmount: 9, svg: markRaw(SOLSVG), source: () => {sourceSOL()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.solATA, pythKey: pythPriceUpdateKeys.solPythId, pythId: pythIds.solPythId }],
-    [tokenAddressStringsDevNet.wethTokenMintAddress, { name: "WETH-Dev", decimalAmount: 8, svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wethATA, pythKey: pythPriceUpdateKeys.wethPythId, pythId: pythIds.wethPythId }],
-    [tokenAddressStringsDevNet.wbtcTokenMintAddress, { name: "WBTC-Dev", decimalAmount: 8, svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveAssociatedTokenAddressKeysDevNet.wbtcATA, pythKey: pythPriceUpdateKeys.wbtcPythId, pythId: pythIds.wbtcPythId }]
+    [tokenAddressStrings.daiTokenMintAddress, { name: "DAI-Dev", decimalAmount: 8, svg: markRaw(DAISVG), source: () => {sourceDAI()}, ata: tokenReserveATAKeys.daiATA, pythKey: pythPriceUpdateKeys.daiPythId, pythId: pythIds.daiPythId }],
+    [tokenAddressStrings.usdcTokenMintAddress, { name: "USDC-Dev", decimalAmount: 6, svg: markRaw(USDCSVG), source: () => {sourceUSDC()}, ata: tokenReserveATAKeys.usdcATA, pythKey: pythPriceUpdateKeys.usdcPythId, pythId: pythIds.usdcPythId }],
+    [tokenAddressStrings.solTokenMintAddress, { name: "SOL-Dev", decimalAmount: 9, svg: markRaw(SOLSVG), source: () => {sourceSOL()}, ata: tokenReserveATAKeys.solATA, pythKey: pythPriceUpdateKeys.solPythId, pythId: pythIds.solPythId }],
+    [tokenAddressStrings.wethTokenMintAddress, { name: "WETH-Dev", decimalAmount: 8, svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveATAKeys.wethATA, pythKey: pythPriceUpdateKeys.wethPythId, pythId: pythIds.wethPythId }],
+    [tokenAddressStrings.wbtcTokenMintAddress, { name: "WBTC-Dev", decimalAmount: 8, svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveATAKeys.wbtcATA, pythKey: pythPriceUpdateKeys.wbtcPythId, pythId: pythIds.wbtcPythId }]
   ])
 
   type tokenMapObject =

@@ -3,12 +3,13 @@
     <ion-icon :src="informationCircle" color="dark"></ion-icon>
   </ion-button>
   <ion-popover
+  class="infoButtonPopover"
   :is-open="infoPopoverOpen" 
   :event="event" 
   @didDismiss="infoPopoverOpen=false"
   side="top"
   alignment="center">
-    <ion-text align="center" class="preserveWhiteSpace">{{ infoMessage }}</ion-text>
+    <ion-text align="center" class="preserveWhiteSpace infoButtonText">{{ infoMessage }}</ion-text>
   </ion-popover>
 </template>
 

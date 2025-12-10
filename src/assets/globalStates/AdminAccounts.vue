@@ -1,11 +1,6 @@
 <script lang="ts">
   import { reactive } from 'vue'
-  import { tokenAddressStringsMainNet,
-    tokenAddressStringsDevNet,
-    hodlAssociatedTokenAddressKeysMainNet,
-    singlePayerAssociatedTokenAddressKeysMainNet,
-    hodlAssociatedTokenAddressKeysDevNet,
-    singlePayerAssociatedTokenAddressKeysDevNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings, hodlWalletATAKeys, hodlDepositsATAStrings, singlePayerDepositsATAStrings } from '/src/assets/constants/Addresses.ts'
   import { PublicKey } from "@solana/web3.js"
 
   export const adminAccounts = reactive(
@@ -13,13 +8,17 @@
     initialCEOAddress: "Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg",
     initialCEOPublicKey: new PublicKey("Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg"),
     hodlTreasuryAddress: new PublicKey("9BRgCdmwyP5wGVTvKAUDjSwucpqGncurVa35DjaWqSsC"),
+    hodlTreasuryLendingAccountIndex: 0,
     singlePayerTreasuryAddress: new PublicKey("B9UiZdNg7j7qH1FhimSwkG5CY7D4K8WRpP1Zw4BgHBtb"),
+    singlePayerTreasuryLendingAccountIndex: 0,
     m4aCEOAddress: undefined,
     m4aTreasurerAddress: undefined,
     chatCEOAddress: undefined,
     chatTreasurerAddress: undefined,
     lendingCEOAddressKey: undefined,
     lendingCEOAddressString: undefined,
+    lendingMain3PercentSubMarketIndex: 0,
+    lendingMain100PercentSubMarketIndex: 1,
     alertCEOAddress: undefined,
     isM4ACEOAccountReady: false,
     isChatCEOAccountReady: false,
@@ -28,60 +27,37 @@
     ceoIsDead: false
   })
 
-  //Mainnet Net
-  export const hodlTreasuryBalancesMainNetHashMap = reactive(
+  export const hodlTreasuryWalletBalancesHashMap = reactive(
   {
     map: new Map<string, string>()
   })
-  export const singlePayerTreasuryBalancesMainNetHashMap = reactive(
-  {
-    map: new Map<string, string>()
-  })
-  export const hodlTreasuryATAMainNetHashMap: Map<string, PublicKey> = new Map(
+
+  //These are for the Chat and M4A fees
+  export const hodlTreasuryWalletATAHashMap: Map<string, PublicKey> = new Map(
   [
     //Key: Token Mint Address, Value: Assocated Token Address
-    [tokenAddressStringsMainNet.daiTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.daiATA],
-    [tokenAddressStringsMainNet.usdcTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.usdcATA],
-    [tokenAddressStringsMainNet.solTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.solATA],
-    [tokenAddressStringsMainNet.wethTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.wethATA],
-    [tokenAddressStringsMainNet.wbtcTokenMintAddress, hodlAssociatedTokenAddressKeysMainNet.wbtcATA]
-  ])
-  export const singlePayerTreasuryATAMainNetHashMap: Map<string, PublicKey> = new Map(
-  [
-    //Key: Token Mint Address, Value: Assocated Token Address
-    [tokenAddressStringsMainNet.daiTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.daiATA],
-    [tokenAddressStringsMainNet.usdcTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.usdcATA],
-    [tokenAddressStringsMainNet.solTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.solATA],
-    [tokenAddressStringsMainNet.wethTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.wethATA],
-    [tokenAddressStringsMainNet.wbtcTokenMintAddress, singlePayerAssociatedTokenAddressKeysMainNet.wbtcATA]
+    [tokenAddressStrings.daiTokenMintAddress, hodlWalletATAKeys.daiATA],
+    [tokenAddressStrings.usdcTokenMintAddress, hodlWalletATAKeys.usdcATA]
   ])
 
-  //Dev Net
-  export const hodlTreasuryBalancesDevNetHashMap = reactive(
-  {
-    map: new Map<string, string>()
-  })
-  export const singlePayerTreasuryBalancesDevNetHashMap = reactive(
-  {
-    map: new Map<string, string>()
-  })
-  export const hodlTreasuryATADevNetHashMap: Map<string, PublicKey> = new Map(
+  export const hodlTreasuryDepositsATAHashMap: Map<string, string> = new Map(
   [
     //Key: Token Mint Address, Value: Assocated Token Address
-    [tokenAddressStringsDevNet.daiTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.daiATA],
-    [tokenAddressStringsDevNet.usdcTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.usdcATA],
-    [tokenAddressStringsDevNet.solTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.solATA],
-    [tokenAddressStringsDevNet.wethTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.wethATA],
-    [tokenAddressStringsDevNet.wbtcTokenMintAddress, hodlAssociatedTokenAddressKeysDevNet.wbtcATA]
+    [tokenAddressStrings.daiTokenMintAddress, hodlDepositsATAStrings.daiATA],
+    [tokenAddressStrings.usdcTokenMintAddress, hodlDepositsATAStrings.usdcATA],
+    [tokenAddressStrings.solTokenMintAddress, hodlDepositsATAStrings.solATA],
+    [tokenAddressStrings.wethTokenMintAddress, hodlDepositsATAStrings.wethATA],
+    [tokenAddressStrings.wbtcTokenMintAddress, hodlDepositsATAStrings.wbtcATA]
   ])
-  export const singlePayerTreasuryATADevNetHashMap: Map<string, PublicKey> = new Map(
+  
+  export const singlePayerTreasuryDepositsATAHashMap: Map<string, string> = new Map(
   [
     //Key: Token Mint Address, Value: Assocated Token Address
-    [tokenAddressStringsDevNet.daiTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.daiATA],
-    [tokenAddressStringsDevNet.usdcTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.usdcATA],
-    [tokenAddressStringsDevNet.solTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.solATA],
-    [tokenAddressStringsDevNet.wethTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.wethATA],
-    [tokenAddressStringsDevNet.wbtcTokenMintAddress, singlePayerAssociatedTokenAddressKeysDevNet.wbtcATA]
+    [tokenAddressStrings.daiTokenMintAddress, singlePayerDepositsATAStrings.daiATA],
+    [tokenAddressStrings.usdcTokenMintAddress, singlePayerDepositsATAStrings.usdcATA],
+    [tokenAddressStrings.solTokenMintAddress, singlePayerDepositsATAStrings.solATA],
+    [tokenAddressStrings.wethTokenMintAddress, singlePayerDepositsATAStrings.wethATA],
+    [tokenAddressStrings.wbtcTokenMintAddress, singlePayerDepositsATAStrings.wbtcATA]
   ])
 
   export const tvl = reactive(

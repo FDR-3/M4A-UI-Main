@@ -117,7 +117,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button style="margin-left: -11px; margin-right: -11px" fill="clear" @click="openTokenPopover($event, slotProps.data)">
-              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStringsMainNet.solTokenMintAddress"  style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStrings.solTokenMintAddress"  style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
               <component v-else :is="slotProps.data.tokenSVG" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.tokenName }}</ion-label>
             </ion-button>
@@ -253,7 +253,7 @@
   import InputText from 'primevue/inputtext'
   import InputNumber from 'primevue/inputnumber'
   import { search } from 'ionicons/icons'
-  import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -269,7 +269,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { tokenAddressStringsMainNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
 
   const emits = defineEmits(['updateOwnerTableSizing'])
@@ -503,7 +503,7 @@
       //This has to be done here as opposed to in the LendingProtocol.vue file since it has to be after it's deep cloned
       for(var j=0; j<unprocessedData[i].ownerData.ownerSubMarketList.length; j++)
       {
-        const tokenReserveFrontEndProperties = tokenReserveDevNetMap.get(unprocessedData[i].ownerData.ownerSubMarketList[j].tokenMintAddress.toString())
+        const tokenReserveFrontEndProperties = tokenReserveHashMap.get(unprocessedData[i].ownerData.ownerSubMarketList[j].tokenMintAddress.toString())
         unprocessedData[i].ownerData.ownerSubMarketList[j].tokenSVG = tokenReserveFrontEndProperties.svg
       }
 

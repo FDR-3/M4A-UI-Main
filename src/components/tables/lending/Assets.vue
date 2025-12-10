@@ -10,18 +10,27 @@
     sourceSOL,
     sourceWETH,
     sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
-  import { hodlAssociatedTokenAddressKeysMainNet,
-    singlePayerAssociatedTokenAddressKeysMainNet,
-    hodlAssociatedTokenAddressKeysDevNet,
-    singlePayerAssociatedTokenAddressKeysDevNet } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings, hodlDepositsATAStrings, singlePayerDepositsATAStrings } from '/src/assets/constants/Addresses.ts'
+  import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
+
+  var usdcName = ""
+
+  if(DEV_MODE)
+  {
+    usdcName = "USDC-DEV"
+  }
+  else
+  {
+    usdcName = "USDC"
+  }
 
   export const StableCoins = reactive(
   [
     {
-      tokenMintAddressString: "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o",
+      tokenMintAddressString: tokenAddressStrings.daiTokenMintAddress,
       decimalAmount: 8,
-      hodlATA: hodlAssociatedTokenAddressKeysMainNet.daiATA,
-      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.daiATA,
+      hodlATA: hodlDepositsATAStrings.daiATA,
+      singlePayerATA: singlePayerDepositsATAStrings.daiATA,
       asset: 
       {
         name: "DAI",
@@ -40,35 +49,13 @@
       }
     },
     {
-      tokenMintAddressString: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",//Mainnet
+      tokenMintAddressString: tokenAddressStrings.usdcTokenMintAddress,
       decimalAmount: 6,
-      hodlATA: hodlAssociatedTokenAddressKeysMainNet.usdcATA,
-      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.usdcATA,
+      hodlATA: hodlDepositsATAStrings.usdcATA,
+      singlePayerATA: singlePayerDepositsATAStrings.usdcATA,
       asset: 
       {
-        name: "USDC",
-        svg: USDCSVG,
-        source: () => {sourceUSDC()}
-      },
-      price: '-',
-      percentChange24h: '-',
-      supplyAPY: "-",
-      borrowAPY: "-",
-      chain:
-      {
-        name: "Solana",
-        svg: SOLSVG,
-        source: () => {sourceSOL()}
-      }
-    },
-    {
-      tokenMintAddressString: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",//Devnet
-      decimalAmount: 6,
-      hodlATA: hodlAssociatedTokenAddressKeysDevNet.usdcATA,
-      singlePayerATA: singlePayerAssociatedTokenAddressKeysDevNet.usdcATA,
-      asset: 
-      {
-        name: "USDC-Dev",
+        name: usdcName,
         svg: USDCSVG,
         source: () => {sourceUSDC()}
       },
@@ -88,10 +75,10 @@
   export const CryptoCurrency = reactive(
   [
     {
-      tokenMintAddressString: "So11111111111111111111111111111111111111112",
+      tokenMintAddressString: tokenAddressStrings.solTokenMintAddress,
       decimalAmount: 9,
-      hodlATA: hodlAssociatedTokenAddressKeysMainNet.solATA,
-      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.solATA,
+      hodlATA: hodlDepositsATAStrings.solATA,
+      singlePayerATA: singlePayerDepositsATAStrings.solATA,
       asset: 
       {
         name: "Sol",
@@ -110,10 +97,10 @@
       }
     },
     {
-      tokenMintAddressString: "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+      tokenMintAddressString: tokenAddressStrings.wethTokenMintAddress,
       decimalAmount: 8,
-      hodlATA: hodlAssociatedTokenAddressKeysMainNet.wethATA,
-      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.wethATA,
+      hodlATA: hodlDepositsATAStrings.wethATA,
+      singlePayerATA: singlePayerDepositsATAStrings.wethATA,
       asset: 
       {
         name: "WETH",
@@ -132,10 +119,10 @@
       }
     },
     {
-      tokenMintAddressString: "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+      tokenMintAddressString: tokenAddressStrings.wbtcTokenMintAddress,
       decimalAmount: 8,
-      hodlATA: hodlAssociatedTokenAddressKeysMainNet.wbtcATA,
-      singlePayerATA: singlePayerAssociatedTokenAddressKeysMainNet.wbtcATA,
+      hodlATA: hodlDepositsATAStrings.wbtcATA,
+      singlePayerATA: singlePayerDepositsATAStrings.wbtcATA,
       asset: 
       {
         name: "WBTC",

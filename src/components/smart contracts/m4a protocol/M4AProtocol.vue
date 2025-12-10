@@ -7,6 +7,7 @@
   getProcessors,
   getAllSubmitters,
   getAllPatients,
+  setM4AProtocolLeaderBoard,
   getClaimQueue,
   getClaimStats,
   getQueueClaims,
@@ -98,6 +99,7 @@
 
     //M4A Patients
     await getAllPatients()
+    setM4AProtocolLeaderBoard()
     await listenForPatientStatChanges()
 
     //M4A Hospitals
@@ -338,6 +340,9 @@
         //Handle account change...
         claims.data = await getQueueClaims()
         claimStats.data = await getClaimStats()
+        await getAllSubmitters()
+        await getAllPatients()
+        setM4AProtocolLeaderBoard()
       })
     }
     catch(error)
@@ -408,6 +413,7 @@
       {
         //Handle account change...
         await getAllPatients()
+        setM4AProtocolLeaderBoard()
       })
     }
     catch(error)
@@ -522,6 +528,7 @@
         hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
         insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
         processors.data = await getProcessors()
+        setM4AProtocolLeaderBoard()
       })
     }
     catch(error)

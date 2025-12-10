@@ -1,11 +1,11 @@
 <script lang="ts">
   import * as anchor from "@coral-xyz/anchor"
-  import { PublicKey } from "@solana/web3.js"
+  import { Account, PublicKey } from "@solana/web3.js"
   import { countryNameArray, 
     countryStateNameArray,
     countryStateCoordinatesArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
   import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
-  import { chatAccountHashMap, customUserNameHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
+  import { chatAccounts, chatAccountHashMap, customUserNameHashMap, chatLeaderBoard } from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { commentSectionHashMap } from '/src/assets/globalStates/chat/CommentSections.vue'
   import { ideas, feds } from '/src/assets/globalStates/chat/QOL.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
@@ -375,17 +375,19 @@
     }
   }
 
+  //This function doesn't run initially, only runs on listening to changes to the M4A, PLI, or About Chat
   export async function setChatAccountHashMap()
   {
     console.log("Get Chat Account Hash Map")
 
     var userAccountHashMap = new Map<string, any>()
 
-    const chatAccounts = await getChatAccountsWrapper()
+    const tempChatAccounts = await getChatAccountsWrapper()
 
-    for(var i=0; i<chatAccounts.length; i++)
-      userAccountHashMap.set(chatAccounts[i].account.userAddress.toBase58(), chatAccounts[i].account)
+    for(var i=0; i<tempChatAccounts.length; i++)
+      userAccountHashMap.set(tempChatAccounts[i].account.userAddress.toBase58(), tempChatAccounts[i].account)
 
+    chatAccounts.data = tempChatAccounts
     chatAccountHashMap.map = userAccountHashMap
   }
 
@@ -397,6 +399,7 @@
       return undefined 
   }
 
+  //This function runs initially and on changes to the ChatStatsAccount
   export async function setChatAccountAndUserNameHashMap()
   {
     console.log("Get Chat Account And User Name Hash Map")
@@ -404,23 +407,63 @@
     var userAccountHashMap = new Map<string, any>()
     var userNameHashMap = new Map<string, any>()
 
-    const chatAccounts = await getChatAccountsWrapper()
+    const tempChatAccounts = await getChatAccountsWrapper()
 
-    for(var i=0; i<chatAccounts.length; i++)
+    for(var i=0; i<tempChatAccounts.length; i++)
     {
       var ChatAccountDisplayName: any =
       {
-        useCustomName: chatAccounts[i].account.useCustomName,
-        userName: chatAccounts[i].account.userName
+        useCustomName: tempChatAccounts[i].account.useCustomName,
+        userName: tempChatAccounts[i].account.userName
       }
 
-      userAccountHashMap.set(chatAccounts[i].account.userAddress.toBase58(), chatAccounts[i].account)
-      userNameHashMap.set(chatAccounts[i].account.userAddress.toBase58(), ChatAccountDisplayName)
+      userAccountHashMap.set(tempChatAccounts[i].account.userAddress.toBase58(), tempChatAccounts[i].account)
+      userNameHashMap.set(tempChatAccounts[i].account.userAddress.toBase58(), ChatAccountDisplayName)
     }
 
+    chatAccounts.data = tempChatAccounts
     chatAccountHashMap.map = userAccountHashMap
     customUserNameHashMap.map = userNameHashMap
   }
+
+  export function setChatProtocolLeaderBoard()
+  {
+    console.log("Set Chat Protocol Leader Board")
+
+    var tempLeaderBoardData: any[] = []
+
+    for(var i=0; i<chatAccounts.data.length; i++)
+    {
+      const voteMoneyEarned = Number(chatAccounts.data[i].account.receivedUpVoteScore) * .01
+      const tempData = 
+      {
+        displayName: getCustomOrTrimmedUserDisplayName(chatAccounts.data[i].account.userAddress.toBase58()),
+        userAddress: chatAccounts.data[i].account.userAddress.toBase58(),
+        voteMoneyEarned: voteMoneyEarned,
+        voteMoneyEarnedString: '$' + voteMoneyEarned.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }),
+        netReceivedVoteScore: Number(chatAccounts.data[i].account.receivedUpVoteScore.sub(chatAccounts.data[i].account.receivedDownVoteScore)),
+        netCastedVoteScore: Number(chatAccounts.data[i].account.castedUpVoteScore.sub(chatAccounts.data[i].account.castedDownVoteScore)),
+        votesReceivedCount: Number(chatAccounts.data[i].account.upVoteReceivedCount.add(chatAccounts.data[i].account.downVoteReceivedCount)),
+        upVoteReceivedCount: Number(chatAccounts.data[i].account.upVoteReceivedCount),
+        downVoteReceivedCount: Number(chatAccounts.data[i].account.downVoteReceivedCount),
+        votesCastedCount: Number(chatAccounts.data[i].account.upVoteCastedCount.add(chatAccounts.data[i].account.downVoteCastedCount)),
+        upVoteCastedCount: Number(chatAccounts.data[i].account.upVoteCastedCount),
+        downVoteCastedCount: Number(chatAccounts.data[i].account.downVoteCastedCount),
+        commentAndReplyCount: Number(chatAccounts.data[i].account.commentAndReplyCount),
+        editedCommentAndReplyCount: Number(chatAccounts.data[i].account.editedCommentAndReplyCount),
+        deletedCommentAndReplyCount: Number(chatAccounts.data[i].account.deletedCommentAndReplyCount),
+        ceoStarredCommentAndReplyCount: Number(chatAccounts.data[i].account.ceoStarredCommentAndReplyCount),
+        ceoMarkedFEDCommentAndReplyCount: Number(chatAccounts.data[i].account.ceoMarkedFedCommentAndReplyCount)
+      }
+
+      tempLeaderBoardData.push(tempData)
+    }
+
+    chatLeaderBoard.data = tempLeaderBoardData
+  }
+
 
   async function getChatAccountsWrapper()
   {

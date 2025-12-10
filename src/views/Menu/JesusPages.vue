@@ -41,7 +41,7 @@
   import { FAQsPages } from '/src/views/Jesus/FAQs/FAQsPages.vue'
   import { navigation, MenuIndex } from '/src/assets/globalStates/Navigation.vue'
   import MaintenancePage from '/src/components/pages/MaintenancePage.vue'
-  import { MAINTENANCE_MODE, APPROVED_TESTERS } from '/src/assets/globalStates/MaintenanceMode.ts'
+  import { MAINTENANCE_MODE, APPROVED_TESTERS } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 

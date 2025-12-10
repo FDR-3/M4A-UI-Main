@@ -6,13 +6,22 @@
       show-gridlines
       size="small" 
       :value="stableCoinTableData"
-      :globalFilterFields="['tokenMintAddress', 'singlePayerATA', 'asset.name', 'chain.name', 'priceString','percentChange24h', 'quantity', 'value']"  
+      :globalFilterFields="['tokenMintAddress', 'singlePayerATA', 'asset.name', 'chain.name', 'priceString','percentChange24h', 'unCollectedFees', 'deposits', 'value']"  
     >
       <template #header>
         <div>
           <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ tvl.singlePayerTVL.toLocaleString('en-US', {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}</span></h2>
+            maximumFractionDigits: 2 }) }}</span>
+          </h2>
+          <!--<h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ tvl.singlePayerTVL.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}</span>
+          </h2>-->
+          <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ (0).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}</span>
+          </h2>
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Single Payer Treasury Search     ">
               <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
@@ -61,7 +70,8 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="quantity" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="unCollectedFees" header="UnCollected Fees" style="width: 0%" sortable></Column>
+      <Column field="deposits" header="Deposits" style="width: 0%" sortable></Column>
       <Column field="value" header="Value" style="width: 0%" sortable></Column>
     </DataTable>
 
@@ -70,7 +80,7 @@
       v-model:filters="filters" 
       show-gridlines size="small" 
       :value="CryptoCurrencyTableData"
-      :globalFilterFields="['tokenMintAddress', 'singlePayerATA', 'asset.name', 'chain.name', 'priceString', 'percentChange24h', 'quantity', 'value']"
+      :globalFilterFields="['tokenMintAddress', 'singlePayerATA', 'asset.name', 'chain.name', 'priceString', 'percentChange24h', 'unCollectedFees', 'deposits', 'value']"
     >
       <template #header>
         <div>
@@ -120,7 +130,8 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="quantity" header="Quantity" style="width: 0%" sortable></Column>
+      <Column field="unCollectedFees" header="UnCollected Fees" style="width: 0%" sortable></Column>
+      <Column field="deposits" header="Deposits" style="width: 0%" sortable></Column>
       <Column field="value" header="Value" style="width: 0%" sortable></Column>
     </DataTable>
   </div>
@@ -131,28 +142,31 @@
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
-  import { singlePayerTreasuryBalancesDevNetHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
   import { copyTreasuryATA } from '/src/assets/contracts/WalletHelper.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const stableCoinTableData = ref()
-  const CryptoCurrencyTableData = ref()
-  const isLoading = ref(true)
+  var stableCoinTableData = ref()
+  var CryptoCurrencyTableData = ref()
+  var isLoading = ref(true)
   var stableValue = ref(0)
   var cryptoValue = ref(0)
 
-  const tokenPopoverOpen = ref(false)
-  const event = ref()
+  var tokenPopoverOpen = ref(false)
+  var event = ref()
   var copyTreasuryATAButtonText = ref("Copy Treasury ATA")
 
   onMounted(() =>
   {
-    if(singlePayerTreasuryBalancesDevNetHashMap.map)
+    if(lendingUserTabAccountsHashMap.map)
     {
       processSinglePayerStableCoinTableData()
       processSinglePayerCryptoCurrencyTableData()
@@ -164,7 +178,7 @@
       isLoading.value = true
   })
 
-  watch(singlePayerTreasuryBalancesDevNetHashMap, () => 
+  watch(lendingUserTabAccountsHashMap, () => 
   {
     processSinglePayerStableCoinTableData()
     processSinglePayerCryptoCurrencyTableData()
@@ -207,6 +221,9 @@
 
   function processSinglePayerStableCoinTableData()
   {
+    if(!lendingUserTabAccountsHashMap.map)
+      return
+
     var value = 0
     var unprocessedTableData = []
 
@@ -216,27 +233,45 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
-      if(tokenAmount)
-      {
-        var calculatedValue = 0
+      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
 
-        const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
-        if(priceData)
-          calculatedValue = (tokenAmount * priceData.usdPrice)
-
-        unprocessedTableData[i].quantity = tokenAmount
-        unprocessedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })
-
-        value += calculatedValue
-      }
+      //Set UnCollected Fee Amounts
+      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      adminAccounts.lendingCEOAddressString +
+      adminAccounts.lendingMain100PercentSubMarketIndex.toString())
+      if(subMarket)
+        unprocessedTableData[i].unCollectedFees = subMarket.uncollectedFeesAmount
       else
-      {
-        unprocessedTableData[i].quantity = 0.00
-        unprocessedTableData[i].value = '$0.00'
-      }
+        unprocessedTableData[i].unCollectedFees = (0).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+
+      //Set Deposit Amounts
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      adminAccounts.lendingCEOAddressString +
+      adminAccounts.lendingMain100PercentSubMarketIndex.toString() +
+      adminAccounts.hodlTreasuryAddress.toString() +
+      adminAccounts.hodlTreasuryLendingAccountIndex.toString())
+      if(lendingUserTabAccount)
+        unprocessedTableData[i].deposits = Number(lendingUserTabAccount.depositedAmount)
+      else
+        unprocessedTableData[i].deposits = (0).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+
+      const totalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+
+      var calculatedValue = 0
+
+      const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
+      if(priceData)
+        calculatedValue = (totalAmount * priceData.usdPrice)
+
+      value += calculatedValue
+
+      unprocessedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 })
     }
 
     stableValue.value = value
@@ -245,6 +280,9 @@
 
   function processSinglePayerCryptoCurrencyTableData()
   {
+    if(!lendingUserTabAccountsHashMap.map)
+      return
+
     var value = 0
     var unprocessedTableData = []
 
@@ -254,27 +292,45 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const tokenAmount = singlePayerTreasuryBalancesDevNetHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
-      if(tokenAmount)
-      {
-        var calculatedValue = 0
+      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
 
-        const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
-        if(priceData)
-          calculatedValue = (tokenAmount * priceData.usdPrice)
-
-        unprocessedTableData[i].quantity = tokenAmount
-        unprocessedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })
-
-        value += calculatedValue
-      }
+      //Set UnCollected Fee Amounts
+      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      adminAccounts.lendingCEOAddressString +
+      adminAccounts.lendingMain100PercentSubMarketIndex.toString())
+      if(subMarket)
+        unprocessedTableData[i].unCollectedFees = subMarket.uncollectedFeesAmount
       else
-      {
-        unprocessedTableData[i].quantity = 0.00
-        unprocessedTableData[i].value = '$0.00'
-      }
+        unprocessedTableData[i].unCollectedFees = (0).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+
+      //Set Deposit Amounts
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      adminAccounts.lendingCEOAddressString +
+      adminAccounts.lendingMain100PercentSubMarketIndex.toString() +
+      adminAccounts.hodlTreasuryAddress.toString() +
+      adminAccounts.hodlTreasuryLendingAccountIndex.toString())
+      if(lendingUserTabAccount)
+        unprocessedTableData[i].deposits = Number(lendingUserTabAccount.depositedAmount)
+      else
+        unprocessedTableData[i].deposits = (0).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+
+      const totalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+
+      var calculatedValue = 0
+
+      const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
+      if(priceData)
+        calculatedValue = (totalAmount * priceData.usdPrice)
+
+      value += calculatedValue
+
+      unprocessedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 })
     }
 
     cryptoValue.value = value
@@ -295,7 +351,7 @@
 
   .tableMinWidth
   {
-    min-width: 804px
+    min-width: 880px
   }
 
   ion-input

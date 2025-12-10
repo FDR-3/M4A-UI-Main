@@ -1,12 +1,12 @@
 <template>
-  <div v-if="withdrawing"
-    id="withdrawalModal"
+  <div v-if="borrowing"
+    id="borrowModal"
     class="thickBorder"
   >
     <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
       <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
         <img class="noClickEvent" v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component class="noClickEvent" v-else :is="withdrawSVG" style="width: 44px"></component>
+        <component class="noClickEvent" v-else :is="borrowSVG" style="width: 44px"></component>
         <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
@@ -50,28 +50,32 @@
       <HealthFactorSmall :assetValue="totalAssetValue" :debtValue="totalDebtValue"/>
     </div>
 
-    <ion-label class="alignSelfLeft noClickEvent">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
-    <ion-label class="alignSelfLeft noClickEvent">Available: {{ availableWithdrawalBalance.toFixed(tokenDecimalAmount) }}</ion-label>
+
+    <ion-label class="noClickEvent">Available</ion-label>
+    <div class="flexCenterRow noClickEvent">
+      <ion-label class="alignSelfLeft">Amount: {{ availableToBorrowAmount.toFixed(tokenDecimalAmount) }}</ion-label>
+      <ion-label class="alignSelfLeft">Value: {{ availableToBorrowValue }}</ion-label>
+    </div>
     <InputNumber
-      v-model="withdrawAmount"
+      v-model="borrowAmount"
       :inputStyle="{'text-align': 'center'}"
       :minFractionDigits="tokenDecimalAmount" :maxFractionDigits="tokenDecimalAmount"
-      :max="availableWithdrawalBalance"
+      :max="availableToBorrowAmount"
       :min="0"
-      :step="withdrawIncrementAmount"
+      :step="borrowIncrementAmount"
       showButtons
       fluid
       @input="updateValues"
       @update:model-value="calculateHealthFactorValues()"
     />
     <div id="maxButtonContainer" class="alignSelfLeft">
-      <button id="maxButton" style="background-color: transparent" @click="withdrawAmount=availableWithdrawalBalance; calculateHealthFactorValues()">
+      <button id="maxButton" style="background-color: transparent" @click="borrowAmount=availableToBorrowAmount; calculateHealthFactorValues()">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
 
     <div class="smallMarginTop noClickEvent">
-      <ion-text>Value: ${{ withdrawValue }}</ion-text>
+      <ion-text>Value: ${{ borrowValue }}</ion-text>
     </div>
 
     <div class="flexCenterRow mediumSmallMarginTop nMediumMarginBottom progressCircleWrapper">
@@ -84,30 +88,31 @@
         <div v-else class="inProgressCircle"></div>
       </div>
       <div title="Withdraw" class="progressBarStep flexCenterColumn progressCircleWrapper">
-        <div v-if="withdrawSuccessful" class="finishedCircle"></div>
+        <div v-if="borrowSuccessful" class="finishedCircle"></div>
         <div v-else class="inProgressCircle"></div>
       </div>
     </div>
 
     <ion-button
       v-if="snapShotValidCountDown==0"
-      id="withdrawModalButton"
+      id="borrowModalButton"
       color="dark"
       @click="updateUserSnapShots()"
       class="mediumSmallMarginTop nTinyMarginBottom"
+      :disabled="healthFactor<30"
     >
       Update SnapShots
     </ion-button>
 
     <ion-button
       v-else
-      id="withdrawModalButton"
+      id="borrowModalButton"
       color="dark"
-      @click="withdrawTokens()"
+      @click="borrowTokens()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="withdrawAmount==0 || snapShotValidCountDown==0"
+      :disabled="borrowAmount==0 || snapShotValidCountDown==0 || healthFactor<30"
     >
-      Withdraw
+      Borrow
     </ion-button>
   </div>
 </template>
@@ -117,8 +122,7 @@
   import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
-  import { anchorPrograms,
-    SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey, Transaction } from "@solana/web3.js"
@@ -138,17 +142,17 @@
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
-  var subMarketSelect = ref(0)
+  var subMarketSelect = ref()
   var subMarketList = ref()
-  var accountSelect = ref(0)
+  var accountSelect = ref()
   var accountList = ref()
-  var withdrawAmount = ref()
-  var withdrawIncrementAmount = ref()
-  var withdrawing = ref(false)
-  var withdrawSVG = ref()
+  var borrowAmount = ref()
+  var borrowIncrementAmount = ref()
+  var borrowing = ref(false)
+  var borrowSVG = ref()
   var subMarketTokenName = ref()
-  var userBalance = ref()
-  var availableWithdrawalBalance = ref()
+  var availableToBorrowAmount = ref(0)
+  var availableToBorrowValue = ref("$0.00")
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
 
@@ -157,7 +161,7 @@
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
   const withdrawOrBorrowInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
-  var withdrawSuccessful = ref(false)
+  var borrowSuccessful = ref(false)
 
   var snapShotValidCountDown = ref(0)
   var snapShotCountDownIntervalId: any
@@ -167,11 +171,11 @@
   var totalDebtValue = ref()
   var healthFactor = ref()
 
-  var withdrawValue = computed (() =>
+  var borrowValue = computed ( () =>
   {
     const price = priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice
     if(price)
-      return (withdrawAmount.value * Number(price)).toLocaleString('en-US', {
+      return (borrowAmount.value * Number(price)).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })        
     else
@@ -182,7 +186,7 @@
 
   watch(lendingUserTabAccountListHashMap, async() =>
   {
-    if(withdrawing.value)//Don't start another count down if on anothert modal since the withdrawal modal is still mounted even when not visible
+    if(borrowing.value)//Don't start another count down if on anothert modal since the withdrawal modal is still mounted even when not visible
     {
       clearSnapShotIntervalCountDown()
       await setSnapShotIntervalCountDown()
@@ -210,28 +214,9 @@
       return
 
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-    
-    if(lendingUserTabAccountsHashMap.map)
-    {
-      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
-      adminAccounts.lendingCEOAddressString +
-      subMarketSelect.value.toString() +
-      connectedWallet.addressString +
-      accountSelect.value.toString())
-
-      if(lendingUserTabAccount)
-      {
-        const decimalAmount = tokenDecimalHashMap.get(selectedTokenMintAddress.toString())
-        userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-      }
-      else
-        userBalance.value = 0
-    }
-    else
-      userBalance.value = 0
-
-    withdrawAmount.value = 0
     calculateHealthFactorValues()
+
+    borrowAmount.value = 0
   })
 
   function addCloseListner()
@@ -247,21 +232,21 @@
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = function(event: any) 
   {
-    if(withdrawing.value)
+    if(borrowing.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
-
+      
       if((event?.target?.id != "tokenButtonContainer") &&
       (event?.target?.id != "openCopyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressButton") &&
       (event?.target?.id != "copyTokenMintAddressPopover") &&
-      (event?.target?.id != "withdrawalModal") &&
-      (event?.target?.id != "openWithdrawalModal") &&
+      (event?.target?.id != "borrowModal") &&
+      (event?.target?.id != "openBorrowModal") &&
       (event?.target?.id != "maxButtonContainer") &&
       (event?.target?.id != "maxButton") &&
-      (event?.target?.id != "withdrawModalButton") &&
+      (event?.target?.id != "borrowButton") &&
       (event?.target?.id != "themeButton") &&
-      !event?.target?.classList.contains("tableWithdrawButton") &&
+      !event?.target?.classList.contains("tableBorrowButton") &&
       !event?.target?.classList.contains("native-wrapper") &&
       !event?.target?.classList.contains("native-input") &&
       !event?.target?.classList.contains("input-outline-container") &&
@@ -287,7 +272,7 @@
       !event?.target?.classList.contains("infoButtonPopover") &&
       !event?.target?.classList.contains("infoButtonText") &&
       !event?.target?.classList.contains("progressCircleWrapper") &&
-      !event?.target?.classList.contains("finishedCircle") &&
+      !event?.target?.classList.contains("progressBarStep") &&
       !event?.target?.classList.contains("inProgressCircle") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
@@ -296,23 +281,23 @@
       {
         clearSnapShotIntervalCountDown()
         clearPythAccountIntervalCountDown()
-        withdrawing.value = false
+        borrowing.value = false
       }  
-      
+
       //Close modal when clicking into input search's behind Modal
       if((event?.target?.placeholder == "Market Search     "))
       {
         clearSnapShotIntervalCountDown()
         clearPythAccountIntervalCountDown()
-        withdrawing.value = false
+        borrowing.value = false
       }  
     }
   }
 
-  async function openWithdrawalModal(tokenMintAddress: string, fdr3SubMarkets: any[])
+  async function openBorrowModal(tokenMintAddress: string, fdr3SubMarkets: any[])
   {
     addCloseListner()
-
+    borrowSuccessful.value = false
     const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
@@ -329,38 +314,27 @@
         accountList.value = userAccountList
     }
 
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
-    adminAccounts.lendingCEOAddressString +
-    subMarketSelect.value.toString() +
-    connectedWallet.addressString +
-    accountSelect.value.toString())
-
-    if(lendingUserTabAccount)
-      userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-    else
-      userBalance.value = 0
-
-    withdrawAmount.value = 0
-    withdrawIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
+    borrowAmount.value = 0
+    borrowIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
     tokenDecimalAmount.value = decimalAmount
-    withdrawSVG.value = tokenSVG
+    borrowSVG.value = tokenSVG
     subMarketTokenName.value = tokenName
-    withdrawing.value = true
+    borrowing.value = true
 
     calculateHealthFactorValues()
     await setSnapShotIntervalCountDown()
   }
 
-  function closeWithdrawalModal()
+  function closeBorrowModal()
   {
-    withdrawing.value = false
+    borrowing.value = false
     removeCloseListner()
 
     clearSnapShotIntervalCountDown()
     clearPythAccountIntervalCountDown()
   }
-  
+
   async function setSnapShotIntervalCountDown()
   {
     const allUserTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
@@ -433,12 +407,12 @@
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
     clearSnapShotIntervalCountDown()
-    await setSnapShotIntervalCountDown()
+    await setSnapShotIntervalCountDown()  
   }
 
   function updateValues(event: { value: number | null })
   {
-    withdrawAmount.value = event.value
+    borrowAmount.value = event.value
     calculateHealthFactorValues()
   }
 
@@ -447,7 +421,8 @@
     if(!lendingUserTabAccountListHashMap.map || selectedTokenMintAddress.toString()==SYSTEM_PROGRAM_ADDRESS_STRING)
       return
 
-    const userTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value)
+    //var selectedTokenMintAddressTabAccountExists = false //When borrowing, you might be borrowing from a token you've never enteracted with before
+    const userTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
 
     var calculatedAssetValue = 0
     var calculatedDebtValue = 0
@@ -462,27 +437,20 @@
         calculatedDebtValue += Number(userTabAccounts[i].borrowedAmount / Math.pow(10, decimalAmount)) * Number(price)
       }
     
+    const availableValueBeforeBorrow = calculatedAssetValue * 0.7 - calculatedDebtValue
+    availableToBorrowValue.value = '$' + availableValueBeforeBorrow.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 })
+
     const priceOfSelectedToken = Number(priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice)
-
-    if(calculatedDebtValue == 0)
-      availableWithdrawalBalance.value = userBalance.value
-    else
-    {
-      const availableValueBeforeWithdraw = calculatedAssetValue - calculatedDebtValue / 0.7
-      const availableToWithdrawAmount = availableValueBeforeWithdraw / priceOfSelectedToken
-
-      if(availableToWithdrawAmount >= userBalance.value)
-        availableWithdrawalBalance.value = userBalance.value
-      else
-        availableWithdrawalBalance.value = availableToWithdrawAmount
-    }
-
-    //Account for value that is about to be withdrawn
-    calculatedAssetValue -= withdrawAmount.value * Number(priceOfSelectedToken)
+    availableToBorrowAmount.value = availableValueBeforeBorrow / priceOfSelectedToken
+    
+    //Account for value that is about to be borrowed
+    calculatedDebtValue += borrowAmount.value * Number(priceOfSelectedToken)
 
     totalAssetValue.value = calculatedAssetValue
     totalDebtValue.value = calculatedDebtValue
-    healthFactor.value = ((calculatedAssetValue - calculatedDebtValue) / calculatedAssetValue) * 100
+    healthFactor.value = ((calculatedAssetValue - calculatedDebtValue)/calculatedAssetValue) * 100
   }
 
   async function updateUserSnapShots()
@@ -514,57 +482,8 @@
     }
   }
 
-  async function withdrawTokens()
+  async function borrowTokens()
   {
-
-    /*
-    await transactionBuilder.addPriceConsumerInstructions(
-      async (
-        // This function returns the temporary key for the freshly posted price update
-        getPriceUpdateAccount: (priceFeedId: string) => PublicKey
-      ): Promise<InstructionWithEphemeralSigners[]> => {
-        
-        // **A. Create a new array to hold the updated accounts**
-        let updatedRemainingAccounts = [];
-
-        for (let i = 0; i < remainingAccounts.length; i += 2) {
-          const tabAccountMeta = remainingAccounts[i];
-          const pythAccountMeta = remainingAccounts[i + 1];
-
-          // 1. Keep the Tab Account Meta as is (It holds the permanent key data)
-          updatedRemainingAccounts.push(tabAccountMeta);
-
-          // 2. Look up the Price Feed ID needed for this tab account
-          const tokenInfo = tokenReserveHashMap.get(tabAccountMeta.tokenMintAddress);
-          
-          // 3. Get the Ephemeral Pyth Key using the SDK's helper function
-          const ephemeralPythKey = getPriceUpdateAccount(tokenInfo.pythId);
-          
-          // 4. Push the new Ephemeral Pyth Account Meta
-          // We overwrite the pubkey with the fresh, temporary account's key
-          updatedRemainingAccounts.push({
-            isSigner: pythAccountMeta.isSigner,
-            isWritable: pythAccountMeta.isWritable,
-            pubkey: ephemeralPythKey, // <--- **THIS IS THE KEY CHANGE**
-          });
-        }
-
-        return [
-          {
-            instruction: await anchorPrograms.lending.lendingProgram.methods.borrowTokens
-              // ... (instruction parameters) ...
-              .remainingAccounts(updatedRemainingAccounts) // **Pass the corrected array**
-              .instruction(),
-            signers: []
-          },
-        ]
-      }
-    );*/
-
-
-
-
-
     const remainingAccounts = generateTabAndPythRemainingAccounts(connectedWallet.addressString, accountSelect.value)
     var pythIdArray = []
 
@@ -594,13 +513,13 @@
       ): Promise<InstructionWithEphemeralSigners[]> => {
         return [
           {
-            instruction: await anchorPrograms.lending.lendingProgram.methods.withdrawTokens
+            instruction: await anchorPrograms.lending.lendingProgram.methods.borrowTokens
               (
                 selectedTokenMintAddress,
                 adminAccounts.lendingCEOAddressKey,
                 subMarketSelect.value,
                 accountSelect.value,
-                new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
+                new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
               )
               .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
               .remainingAccounts(remainingAccounts)
@@ -615,64 +534,45 @@
     {
       const tx = await pythSolanaReceiver.provider.sendAll
       (
-        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 }), { skipPreflight: true }
+        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 200000 }), { skipPreflight: true }
       )
     
       if(tx.length)
         for(var i=0; i<tx.length; i++)
-          await confirmLendingTransaction(tx[i], toast, "withdraw_tokens")
+          await confirmLendingTransaction(tx[i], toast, "borrow_tokens")
       else
-        await confirmLendingTransaction(tx, toast, "withdraw_tokens")
+        await confirmLendingTransaction(tx, toast, "borrow_tokens")
 
-      withdrawSuccessful.value = true
+      borrowSuccessful.value = true
       clearSnapShotIntervalCountDown()
-      withdrawing.value = false
+      borrowing.value = false
     }
     catch(error: any)
     {
       if(error.message.includes("\"Custom\":6000"))//These error code numbers don't match the idl exactly for some reason, but I've confirmed these are the proper error messages
-        toastPreTransactionError("StalePriceData: The price data was stale", toast, "withdraw_tokens")
+        toastPreTransactionError("StalePriceData: The price data was stale", toast, "borrow_tokens")
       else if(error.message.includes("\"Custom\":6001"))//These error code numbers don't match the idl exactly for some reason, but I've confirmed these are the proper error messages
-        toastPreTransactionError("StaleSnapShot: The Lending User snap shot data was stale", toast, "withdraw_tokens")
+        toastPreTransactionError("StaleSnapShot: The Lending User snap shot data was stale", toast, "borrow_tokens")
       else
-        toastPreTransactionError(error, toast, "withdraw_tokens")  
+        toastPreTransactionError(error, toast, "borrow_tokens")  
     }
   }
 
   function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
   {
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
-    adminAccounts.lendingCEOAddressString +
-    mainSubMarketIndex +
-    connectedWallet.addressString +
-    accountSelect.value.toString())
-
-    if(lendingUserTabAccount)
-    {
-      const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-
-      if(lendingUserTabAccount)
-        userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-      else
-        userBalance.value = 0
-    }
-    else
-      userBalance.value = 0
-
-    withdrawAmount.value = 0
-    calculateHealthFactorValues()
+    borrowAmount.value = 0
     localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(
   {
-    openWithdrawalModal,
-    closeWithdrawalModal
+    openBorrowModal,
+    closeBorrowModal
   })
 </script>
 
 <style scoped>
-  #withdrawalModal
+  #borrowModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
     top: 50%;

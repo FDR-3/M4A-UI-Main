@@ -39,12 +39,12 @@
     <div class="smallMarginTop">
       <h2>Add Lending Token Reserve Account</h2>
       <div class="nMediumMarginTop smallMarginBottom">
-        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStringsDevNet.usdcTokenMintAddress)">
-          <component :is="tokenReserveDevNetMap.get(tokenAddressStringsDevNet.usdcTokenMintAddress).svg"> </component>
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.usdcTokenMintAddress)">
+          <component :is="tokenReserveHashMap.get(tokenAddressStrings.usdcTokenMintAddress).svg"> </component>
           <ion-label> </ion-label>Init USDC Token Reserve
         </ion-button>
-        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStringsDevNet.solTokenMintAddress)">
-          <component :is="tokenReserveDevNetMap.get(tokenAddressStringsDevNet.solTokenMintAddress).svg" style="width: 48px; margin-left: -20px; margin-right: -8px"> </component>
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.solTokenMintAddress)">
+          <component :is="tokenReserveHashMap.get(tokenAddressStrings.solTokenMintAddress).svg" style="width: 48px; margin-left: -20px; margin-right: -8px"> </component>
           <ion-label> </ion-label>Init SOL Token Reserve
         </ion-button>
       </div>
@@ -92,8 +92,8 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { tokenAddressStringsDevNet } from '/src/assets/constants/Addresses.ts'
-  import { tokenReserveDevNetMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenReserveHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
   import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
@@ -139,7 +139,7 @@
 
   async function addTokenReserveQuick(tokenAddress: String)
   {
-    const tokenInfo = tokenReserveDevNetMap.get(tokenAddress)
+    const tokenInfo = tokenReserveHashMap.get(tokenAddress)
     
     tokenMintAddressInput.value = tokenAddress
     pythUpdateKeyInput.value = tokenInfo.pythKey.toBase58()

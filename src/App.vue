@@ -92,7 +92,7 @@
   import Shield from '/src/assets/svg/shield-svg.vue'
   import HelpCircle from '/src/assets/svg/help-circle-sharp-svg.vue'
   import { useWindowResize } from './assets/globalStates/WindowWidth.ts'
-  import { MAINTENANCE_MODE } from './assets/globalStates/MaintenanceMode.ts'
+  import { MAINTENANCE_MODE } from './assets/globalStates/EnvironmentSettings.ts'
   import ContractSwitcher from '/src/components/smart contracts/ContractSwitcher.vue'
   import AlertProtocol from '/src/components/smart contracts/alert protocol/AlertProtocol.vue'
   import LendingProtocol from '/src/components/smart contracts/lending protocol/LendingProtocol.vue'

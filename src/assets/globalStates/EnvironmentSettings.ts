@@ -1,5 +1,5 @@
+export const DEV_MODE = true
 export const MAINTENANCE_MODE = false
-
 export const APPROVED_TESTERS = 
 [
   "Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg",

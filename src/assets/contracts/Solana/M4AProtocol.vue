@@ -1,7 +1,12 @@
 <script lang="ts">
   import {  PublicKey } from "@solana/web3.js"
   import { countryNameArray, countryStateNameArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
-  import { submitterHashMap, submitterPatientListHashMap, submitterActivePatientListHashMap, patientHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
+  import { submitterAccounts,
+    submitterHashMap,
+    submitterPatientListHashMap,
+    submitterActivePatientListHashMap,
+    patientHashMap,
+    m4aLeaderBoard } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
   import { claimHashMap, processedClaimHashMap } from '/src/assets/globalStates/m4a/Claims.vue'
   import { processorHashMap } from '/src/assets/globalStates/m4a/Processors.vue'
   import { stateAccountReadyHashMap, stateHospitalListHashMap } from '/src/assets/globalStates/m4a/States.vue'
@@ -187,6 +192,7 @@
       tempHashMap.set(submitter.address.toString(), submitter)
     }
 
+    submitterAccounts.data = submitters
     submitterHashMap.map = tempHashMap
   }
 
@@ -262,7 +268,7 @@
         }
       }
     }
-
+    
     patientHashMap.map = tempPatientMap
     submitterPatientListHashMap.map = tempSubmitterPatientListMap
     submitterActivePatientListHashMap.map = tempSubmitterActivePatientListMap
@@ -378,6 +384,55 @@
       return submitterPatientList.length
     else
       return 0
+  }
+
+  export function setM4AProtocolLeaderBoard()
+  {
+    console.log("Set M4A Protocol Leader Board")
+
+    var tempLeaderBoardData: any[] = []
+
+    for(var i=0; i<submitterAccounts.data.length; i++)
+    { 
+      const patientList = getSubmitterPatientList(submitterAccounts.data[i].account.address.toBase58())
+      
+      for(var j=0; j<patientList.length; j++)
+      {
+        const patientApprovedClaimAmount = Number(patientList[j].approvedClaimAmount) / 100
+
+        patientList[j].approvedClaimAmount = patientApprovedClaimAmount
+        patientList[j].approvedClaimAmountString = '$' + patientApprovedClaimAmount.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+      }
+
+      const submitterApprovedClaimAmount = Number(submitterAccounts.data[i].account.approvedClaimAmount) / 100
+
+      const tempData = 
+      {
+        id: i+1,
+        displayName: getCustomOrTrimmedUserDisplayName(submitterAccounts.data[i].account.address.toBase58()),
+        submitterAddress: submitterAccounts.data[i].account.address.toBase58(),
+        approvedClaimAmount: submitterApprovedClaimAmount,
+        approvedClaimAmountString: '$' + submitterApprovedClaimAmount.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }),
+        approvedClaimCount: submitterAccounts.data[i].account.approvedClaimCount,
+        patientCount: patientList.length,
+        submittedClaimCount: submitterAccounts.data[i].account.submittedClaimCount,
+        submittedAppealCount: submitterAccounts.data[i].account.submittedAppealCount,
+        deniedClaimCount: submitterAccounts.data[i].account.deniedClaimCount,
+        deniedAppealCount: submitterAccounts.data[i].account.deniedAppealCount,
+        maxDeniedClaimCount: submitterAccounts.data[i].account.maxDeniedClaimCount,
+        undeniedClaimCount: submitterAccounts.data[i].account.undeniedClaimCount,
+        revokedApprovalCount: submitterAccounts.data[i].account.revokedApprovalCount,
+        patientList: patientList
+      }
+
+      tempLeaderBoardData.push(tempData)
+    }
+
+    m4aLeaderBoard.data = tempLeaderBoardData
   }
 
   export async function getHospitalStats()

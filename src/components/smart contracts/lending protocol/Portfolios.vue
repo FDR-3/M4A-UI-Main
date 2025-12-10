@@ -3,9 +3,9 @@
     <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false); emitPortfolioRelatedTableHeight()">
       <ion-label color="green">Return</ion-label>
     </ion-button>
-    <LeaderBoardTable
+    <LendingLeaderBoardTable
     @viewPortfolio="viewPortfolio"
-    @totalLendingUsers="emitTotalLendingUsers"
+    @totalLeaderBoardLendingUsers="emitTotalLeaderBoardLendingUsers"
     @adjustLeaderBoardHeight="emitLeaderBoardHeightAdjust"
     @setLeaderBoardHeight="emitLeaderBoardHeightSet"
     @isDoneLoading="isLeaderBoardDoneLoading=true"/>
@@ -41,31 +41,36 @@
   </div>
  
   <div v-if="(userTabStableCoinSubMarketList?.length > 0 || userTabCryptoCurrencySubMarketList?.length > 0) && !isBrowsingAllUsers" class="thickBorder smallMarginTop">
-    <div class="hHeaderDisplay thinBorderBottom" style="justify-content:space-around !important">
-      <div>
-        <h2 class="underLine">7 Day Projection Rate</h2>
-        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">0.30</span> A Week</h3>
+    <div class="topHHeaderDisplay thinBorderBottom">
+  
+      <div class="flexCenterRow" style="justify-content:space-around !important">
+        <div>
+          <h2 class="underLine">7 Day Projection Rate</h2>
+          <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue }}</span> A Week</h3>
+        </div>
+
+        <Select
+        v-if="!editingAccountName"
+        class="accountSelect"
+        v-model="accountSelect" 
+        :options="accountList" 
+        optionLabel="accountName" 
+        optionValue="userAccountIndex" 
+        placeholder="Select Account"
+        appendTo="self"
+        @change="updateStoredSelectedAccount()">
+        </Select>
+
+        <div>
+          <h2 class="underLine">Life Time Interest Earned</h2>
+          <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue }}</span></h3>
+        </div>
       </div>
 
-      <Select
-      v-if="!editingAccountName"
-      class="accountSelect"
-      v-model="accountSelect" 
-      :options="accountList" 
-      optionLabel="accountName" 
-      optionValue="userAccountIndex" 
-      placeholder="Select Account"
-      appendTo="self"
-      @change="updateStoredSelectedAccount()">
-      </Select>
-
-      <div>
-        <h2 class="underLine">Life Time Interest Earned</h2>
-        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">30.00</span></h3>
-      </div>   
+      <HealthFactorBig :accountOwnerAddress="addressToCheck" :accountIndex="accountSelect"/>
     </div>
 
-    <div class="vHeaderDisplay thinBorderBottom" style="justify-content:space-around !important">
+    <div class="topVHeaderDisplay thinBorderBottom" style="justify-content:space-around !important">
       <Select
       v-if="!editingAccountName"
       class="accountSelect mediumMarginTop"
@@ -80,12 +85,16 @@
 
       <div>
         <h2 class="underLine">Life Time Interest Earned</h2>
-        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">30.00</span></h3>
+        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue }}</span></h3>
       </div>   
 
       <div>
         <h2 class="underLine nSmallMarginTop">7 Day Projection Rate</h2>
-        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">0.30</span> A Week</h3>
+        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue }}</span> A Week</h3>
+      </div>
+
+      <div class="nTinyMarginTop">
+        <HealthFactorBig :accountOwnerAddress="addressToCheck" :accountIndex="accountSelect"/>
       </div>
     </div>
 
@@ -93,28 +102,28 @@
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
       <div>
         <h4 class="underLine" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.15</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue }}</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div>
         <h4 class="underLine" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">15.00</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue }}</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
       </div>  
     </div>
 
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay">
       <div>
         <h4 class="underLine" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">15.00</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue }}</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
 
       <div style="margin-top: -47px">
         <h4 class="underLine" style="line-height: 27px">7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.15</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue }}</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
     </div>
 
@@ -123,6 +132,7 @@
         <PortfolioChart
         :key="chartReRenderKey"
         :isStableCoin="true"
+        :depositedAssetAmount="depositedAssetAmount"
         :tokenMintAddress="subMarketTab.tokenMintAddress"
         :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
         :subMarketOwnerAddressTrimmed="subMarketTab.subMarketOwnerAddressTrimmed"
@@ -132,9 +142,13 @@
         :subMarketFee="subMarketTab.subMarketFee"
         :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :initialBlockChainTimeStamp="initialBlockChainTimeStamp"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
-        @openDepositModal="(tokenMintAddress: string) => $emit('openDepositModal', tokenMintAddress)"
-        @openWithdrawalModal="(tokenMintAddress: string) => $emit('openWithdrawalModal', tokenMintAddress)"/>
+        @openDepositModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenMintAddress, subMarketOption)"
+        @openWithdrawalModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenMintAddress, subMarketOption)"
+        @openBorrowModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenMintAddress, subMarketOption)"
+        @openRepayModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenMintAddress, subMarketOption)"
+        @interestEarned="updateStableCoinRealTimeValues"/>
       </div>
     </div>
 
@@ -143,14 +157,14 @@
       :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '14px' : '0px'}">
       <div>
         <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.15</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue }}</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div>
         <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">15.00</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue }}</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
     </div>
 
@@ -158,22 +172,23 @@
       :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '4px' : '0px'}">
       <div>
         <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">15.00</span></h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">15.00</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue }}</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
 
       <div style="margin-top: -47px">
         <h4 class="underLine" style="line-height: 27px">7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">0.15</span> A Week</h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">0.15</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue }}</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
     </div>
 
     <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
-      <div v-for="subMarketTab in userTabCryptoCurrencySubMarketList">
+      <div v-for="(subMarketTab, userTabIndex) in userTabCryptoCurrencySubMarketList">
         <PortfolioChart
         :key="chartReRenderKey"
         :isStableCoin="false"
+        :depositedAssetAmount="depositedAssetAmount"
         :tokenMintAddress="subMarketTab.tokenMintAddress"
         :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
         :subMarketOwnerAddressTrimmed="subMarketTab.subMarketOwnerAddressTrimmed"
@@ -181,11 +196,16 @@
         :ownerAddress="searchAddress"
         :accountIndex="accountSelect"
         :subMarketFee="subMarketTab.subMarketFee"
+        :userTabIndex="userTabIndex"
         :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :initialBlockChainTimeStamp="initialBlockChainTimeStamp"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
-        @openDepositModal="(tokenMintAddress: string) => $emit('openDepositModal', tokenMintAddress)"
-        @openWithdrawalModal="(tokenMintAddress: string) => $emit('openWithdrawalModal', tokenMintAddress)"/>
+        @openDepositModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenMintAddress, subMarketOption)"
+        @openWithdrawalModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenMintAddress, subMarketOption)"
+        @openBorrowModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenMintAddress, subMarketOption)"
+        @openRepayModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenMintAddress, subMarketOption)"
+        @interestEarned="updateCryptoRealTimeValues"/>
       </div>
     </div>
   </div>
@@ -204,14 +224,17 @@
     lendingUserAvailableStableCoinYearsBySubMarketHashMap,
     lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap,
     lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap,
-    lendingUserMonthlyStatementsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+    lendingUserMonthlyStatementsHashMap,
+    lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { trimAddress, isValidSolanaPublicKey } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import LeaderBoardTable from '/src/components/tables/lending/LeaderBoardTable.vue'
+  import LendingLeaderBoardTable from '/src/components/tables/lending/LendingLeaderBoardTable.vue'
   import PortfolioChart from '/src/components/charts/lending/PortfolioChart.vue'
   import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
+  import HealthFactorBig from '/src/components/smart contracts/lending protocol/HealthFactorBig.vue'
+  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(['portfolioChartReRenderHelper'])
@@ -219,8 +242,10 @@
   [
     'openDepositModal',
     'openWithdrawalModal',
+    'openBorrowModal',
+    'openRepayModal',
     'portfolioHeightChange',
-    'totalLendingUsers',
+    'totalLeaderBoardLendingUsers',
     'leaderBoardHeightAdjust',
     'leaderBoardHeightSet'
   ])
@@ -248,6 +273,21 @@
 
   var selectedYearHashMap = new Map<string, any>()
   var selectedUserChartDataHashMap = ref()
+  var initialStableCoinSelectedYearSet = false
+  var initialCryptoCurrencySelectedYearSet = false
+  var depositedAssetAmount = ref()
+
+  var initialBlockChainTimeStamp = ref(0)
+
+  var stableCoin7DayProjectionRateAmount = ref("0")
+  var stableCoin7DayProjectionRateValue = ref(0)
+  var stableCoinLifeTimeInterestEarnedAmount = ref("0")
+  var stableCoinLifeTimeInterestEarnedValue = ref(0)
+
+  var crypto7DayProjectionRateAmount = ref("0")
+  var crypto7DayProjectionRateValue = ref(0)
+  var cryptoLifeTimeInterestEarnedAmount = ref("0")
+  var cryptoLifeTimeInterestEarnedValue = ref(0)
 
   const baseChartData =
   {
@@ -344,7 +384,7 @@
   {
     Balances = 0,
     InterestEarned = 1,
-    Debt = 2,
+    Debts = 2,
     InterestAccrued = 3,
     Deposits = 4,
     Withdrawals = 5,
@@ -353,7 +393,7 @@
     Liquidations = 8,
   }
 
-  onMounted(() =>
+  onMounted(async() =>
   {
     isBrowsingAllUsers.value = localStorage.getItem("isBrowsingAllLendingUsers") == "true" || false
 
@@ -364,6 +404,7 @@
     selectedUserChartDataHashMap.value = new Map<string, any>()
 
     setLendingUserAccountList()
+    checkForLendingUserAssets()
 
     if(connectedWallet.isChatAccountReady)
     {
@@ -381,18 +422,29 @@
       userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
       if(userTabStableCoinSubMarketList.value)
         if(userTabStableCoinSubMarketList.value.length)
+        {
           resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
+          initialStableCoinSelectedYearSet = true
+        }
 
       userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
       if(userTabCryptoCurrencySubMarketList.value)
         if(userTabCryptoCurrencySubMarketList.value.length)
+        {
           resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
+          initialCryptoCurrencySelectedYearSet = true
+        }
 
       setChartData()
+      emitPortfolioRelatedTableHeight()
+      startGradientAnimation()//This has to be called here and inside of the PortfolioChart.vue file for some reason
+      
+      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
+      initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
     }
+    console.log("onMounted")
 
-    emitPortfolioRelatedTableHeight()
-    startGradientAnimation()//This has to be called here and inside of the PortfolioChart.vue file for some reason
+    
   })
 
   onUnmounted(() =>
@@ -416,22 +468,11 @@
     if((newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex) || isBrowsingAllUsers.value)
       return
 
-    if(newWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
+    if(connectedWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
     {
       searchAddress.value = connectedWallet.addressString
       accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
-    }
 
-    addressToCheck.value = searchAddress.value
-    isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
-
-    displayName.value = getUserDisplayName(searchAddress.value)
-    possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
-
-    setLendingUserAccountList()
-
-    if(connectedWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
-    {
       if(lendingUserMonthlyStatementsHashMap.map)
       {
         userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
@@ -444,10 +485,19 @@
           if(userTabCryptoCurrencySubMarketList.value.length)
             resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
 
-        emitPortfolioRelatedTableHeight()
         setChartData()
       }
     }
+
+    addressToCheck.value = searchAddress.value
+    isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
+
+    displayName.value = getUserDisplayName(searchAddress.value)
+    possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
+
+    setLendingUserAccountList()
+    checkForLendingUserAssets()
+    emitPortfolioRelatedTableHeight()
   })
 
   watch(lendingUserAccountsHashMap, () =>
@@ -455,18 +505,35 @@
     setLendingUserAccountList()
   })
 
-  watch(lendingUserMonthlyStatementsHashMap, () =>
+  watch(lendingUserTabAccountListHashMap,() =>
+  {
+    checkForLendingUserAssets()
+  })
+
+  watch(lendingUserMonthlyStatementsHashMap, async() =>
   {
     userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    if(selectedYearHashMap.size == 0 && userTabStableCoinSubMarketList.value?.length)
+    if(!initialStableCoinSelectedYearSet && userTabStableCoinSubMarketList.value?.length)
+    {
       resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
+      initialStableCoinSelectedYearSet = true
+    }
 
     userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    if(selectedYearHashMap.size == 0 && userTabCryptoCurrencySubMarketList.value?.length)
+    if(!initialCryptoCurrencySelectedYearSet && userTabCryptoCurrencySubMarketList.value?.length)
+    {
       resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
+      initialCryptoCurrencySelectedYearSet = true
+    }
 
     emitPortfolioRelatedTableHeight()
     setChartData()
+
+    if(initialBlockChainTimeStamp.value == 0)
+    {
+      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
+      initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
+    }
   })
 
   watch(customUserNameHashMap,() =>
@@ -584,6 +651,7 @@
         var lastKnownActionAmount = 0
         var lastKnownActionTimeStamp = 0
         var previousBalance = 0
+        var previousDebt = 0
 
         const userAvailableYearsByTokenMintAddressList = lendingUserAvailableStableCoinYearsBySubMarketHashMap.map.get(tokenMintAddress +
         subMarketOwnerAddress +
@@ -595,8 +663,14 @@
         {
           var labels = []
           var balances = []
+          var earnedInterests = []
+          var debts = []
+          var accruedInterests = []
           var deposits = []
           var withdrawals = []
+          var borrows = []
+          var repays = []
+          var liquidations = []
           var tempChartData = cloneDeep(baseChartData)
         
           //If current year, go up until the current month, otherwise cover the whole year
@@ -621,29 +695,50 @@
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
                 previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / Math.pow(10, decimalAmount)
 
                 tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
                 tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+
                 balances.push(previousBalance)
+                debts.push(previousDebt)
+                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / Math.pow(10, decimalAmount))
+                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / Math.pow(10, decimalAmount))
                 deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
                 withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
+                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
+                liquidations.push(Number(userMonthlyStatement.monthlyUserWasLiquidatedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
                 tempChartData.lastActionType = lastKnownActionType
                 tempChartData.lastActionAmount = lastKnownActionAmount
                 tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+
                 balances.push(previousBalance)
+                debts.push(previousDebt)
+                earnedInterests.push(0)
+                accruedInterests.push(0)
                 deposits.push(0)
                 withdrawals.push(0)
+                borrows.push(0)
+                repays.push(0)
+                liquidations.push(0)
               }
             }
 
             tempChartData.labels = labels
             tempChartData.datasets[ChartIndex.Balances].data = balances
+            tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
+            tempChartData.datasets[ChartIndex.Debts].data = debts
+            tempChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
             tempChartData.datasets[ChartIndex.Deposits].data = deposits
             tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
+            tempChartData.datasets[ChartIndex.Borrows].data = borrows
+            tempChartData.datasets[ChartIndex.Repays].data = repays
+            tempChartData.datasets[ChartIndex.Liquidations].data = liquidations
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -668,29 +763,50 @@
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
                 previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / Math.pow(10, decimalAmount)
 
                 tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
                 tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+
                 balances.push(previousBalance)
+                debts.push(previousDebt)
+                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / Math.pow(10, decimalAmount))
+                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / Math.pow(10, decimalAmount))
                 deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
                 withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
+                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
+                liquidations.push(Number(userMonthlyStatement.monthlyUserWasLiquidatedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
                 tempChartData.lastActionType = lastKnownActionType
                 tempChartData.lastActionAmount = lastKnownActionAmount
                 tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+
                 balances.push(previousBalance)
+                debts.push(previousDebt)
+                earnedInterests.push(0)
+                accruedInterests.push(0)
                 deposits.push(0)
                 withdrawals.push(0)
+                borrows.push(0)
+                repays.push(0)
+                liquidations.push(0)
               }
             }
 
             tempChartData.labels = labels
             tempChartData.datasets[ChartIndex.Balances].data = balances
+            tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
+            tempChartData.datasets[ChartIndex.Debts].data = debts
+            tempChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
             tempChartData.datasets[ChartIndex.Deposits].data = deposits
             tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
+            tempChartData.datasets[ChartIndex.Borrows].data = borrows
+            tempChartData.datasets[ChartIndex.Repays].data = repays
+            tempChartData.datasets[ChartIndex.Liquidations].data = liquidations
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -709,6 +825,7 @@
         var lastKnownActionAmount = 0
         var lastKnownActionTimeStamp = 0
         var previousBalance = 0
+        var previousDebt = 0
 
         const userAvailableYearsByTokenMintAddressList = lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map.get(tokenMintAddress +
         subMarketOwnerAddress +
@@ -720,8 +837,14 @@
         {
           var labels = []
           var balances = []
+          var earnedInterests = []
+          var debts = []
+          var accruedInterests = []
           var deposits = []
           var withdrawals = []
+          var borrows = []
+          var repays = []
+          var liquidations = []
           var tempChartData = cloneDeep(baseChartData)
         
           //If current year, go up until the current month, otherwise cover the whole year
@@ -746,29 +869,50 @@
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
                 previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / Math.pow(10, decimalAmount)
 
                 tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
                 tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+
                 balances.push(previousBalance)
+                debts.push(previousDebt)
+                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / Math.pow(10, decimalAmount))
+                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / Math.pow(10, decimalAmount))
                 deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
                 withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
+                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
+                liquidations.push(Number(userMonthlyStatement.monthlyUserWasLiquidatedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
                 tempChartData.lastActionType = lastKnownActionType
                 tempChartData.lastActionAmount = lastKnownActionAmount
                 tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+
                 balances.push(previousBalance)
+                debts.push(previousDebt)
+                earnedInterests.push(0)
+                accruedInterests.push(0)
                 deposits.push(0)
                 withdrawals.push(0)
+                borrows.push(0)
+                repays.push(0)
+                liquidations.push(0)
               }
             }
 
             tempChartData.labels = labels
             tempChartData.datasets[ChartIndex.Balances].data = balances
+            tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
+            tempChartData.datasets[ChartIndex.Debts].data = debts
+            tempChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
             tempChartData.datasets[ChartIndex.Deposits].data = deposits
             tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
+            tempChartData.datasets[ChartIndex.Borrows].data = borrows
+            tempChartData.datasets[ChartIndex.Repays].data = repays
+            tempChartData.datasets[ChartIndex.Liquidations].data = liquidations
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -793,30 +937,51 @@
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
                 previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
+                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / Math.pow(10, decimalAmount)
 
                 tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
                 tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+
                 balances.push(previousBalance)
+                debts.push(previousDebt)
+                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / Math.pow(10, decimalAmount))
+                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / Math.pow(10, decimalAmount))
                 deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
                 withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
+                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
+                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
+                liquidations.push(Number(userMonthlyStatement.monthlyUserWasLiquidatedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
                 tempChartData.lastActionType = lastKnownActionType
                 tempChartData.lastActionAmount = lastKnownActionAmount
                 tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+
                 balances.push(previousBalance)
+                debts.push(previousDebt)
+                earnedInterests.push(0)
+                accruedInterests.push(0)
                 deposits.push(0)
                 withdrawals.push(0)
+                borrows.push(0)
+                repays.push(0)
+                liquidations.push(0)
               }
             }
 
             tempChartData.labels = labels
             tempChartData.datasets[ChartIndex.Balances].data = balances
+            tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
+            tempChartData.datasets[ChartIndex.Debts].data = debts
+            tempChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
             tempChartData.datasets[ChartIndex.Deposits].data = deposits
             tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-
+            tempChartData.datasets[ChartIndex.Borrows].data = borrows
+            tempChartData.datasets[ChartIndex.Repays].data = repays
+            tempChartData.datasets[ChartIndex.Liquidations].data = liquidations
+            
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
         }
@@ -878,6 +1043,7 @@
       resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
       resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
       setLendingUserAccountList()
+      checkForLendingUserAssets()
       setChartData()
     }
 
@@ -898,6 +1064,7 @@
     resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
     resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
     emitPortfolioRelatedTableHeight()
+    checkForLendingUserAssets()
     setChartData()
   }
 
@@ -936,8 +1103,9 @@
   {
     addressToCheck.value = owner
     searchAddress.value = undefined
-    setLendingUserAccountList()
     accountSelect.value = accountIndex
+    setLendingUserAccountList()
+    checkForLendingUserAssets()
     setIsBrowsingAllLendingUsers(false)
     checkNewAddress(accountIndex)
     isValidPublicKey.value = isValidSolanaPublicKey(owner)
@@ -945,9 +1113,9 @@
     document.getElementById("protfolioHeader")?.scrollIntoView() 
   }
 
-  function emitTotalLendingUsers(userCount: number)
+  function emitTotalLeaderBoardLendingUsers(userCount: number)
   {
-    emits('totalLendingUsers', userCount)
+    emits('totalLeaderBoardLendingUsers', userCount)
   }
 
   function emitLeaderBoardHeightAdjust(rowCount: number)
@@ -976,6 +1144,107 @@
       if(inputElement)
         inputElement.focus()
     }, 10) 
+  }
+
+  function checkForLendingUserAssets()
+  {
+    if(!lendingUserTabAccountListHashMap.map)
+      return
+
+    //Check for any assets to allow borrowing
+    var assetAmount = 0
+    const userTabAccounts = lendingUserTabAccountListHashMap.map.get(addressToCheck.value + accountSelect.value)
+    
+    if(userTabAccounts)
+      for(var i=0; i<userTabAccounts.length; i++)
+      {
+        const depositedAmount = Number(userTabAccounts[i].depositedAmount)
+        if(depositedAmount != 0)
+        {
+          assetAmount = depositedAmount
+          break
+        }
+      }
+
+    depositedAssetAmount.value = assetAmount
+  }
+
+  function updateStableCoinRealTimeValues(userTabIndex: number,
+  sevenDayCalculatedUserInterestEarned: number,
+  sevenDayInterestEarnedValue: number,
+  calculatedUserInterestEarned: number,
+  interestEarnedValue: number)
+  {
+    userTabStableCoinSubMarketList.value[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
+    userTabStableCoinSubMarketList.value[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
+    userTabStableCoinSubMarketList.value[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned
+    userTabStableCoinSubMarketList.value[userTabIndex].interestEarnedValue = interestEarnedValue
+
+    var highestTokenDecimalAmount = 0
+    var sevenDayCalculatedUserInterestEarned = 0
+    var sevenDayInterestEarnedValue = 0
+    var calculatedUserInterestEarned = 0
+    var interestEarnedValue = 0
+
+    for(var i=0; i<userTabStableCoinSubMarketList.value.length; i++)
+    {
+      const decimalAmount = tokenDecimalHashMap.get(userTabStableCoinSubMarketList.value[i].tokenMintAddress)
+      if(decimalAmount>highestTokenDecimalAmount)
+        highestTokenDecimalAmount = decimalAmount
+
+      sevenDayCalculatedUserInterestEarned += userTabStableCoinSubMarketList.value[i].sevenDayCalculatedUserInterestEarned
+      sevenDayInterestEarnedValue += userTabStableCoinSubMarketList.value[i].sevenDayInterestEarnedValue
+      calculatedUserInterestEarned += userTabStableCoinSubMarketList.value[i].calculatedUserInterestEarned
+      interestEarnedValue += userTabStableCoinSubMarketList.value[i].interestEarnedValue
+    }
+
+    stableCoin7DayProjectionRateAmount.value = sevenDayCalculatedUserInterestEarned.toLocaleString('en-US', {
+          minimumFractionDigits: highestTokenDecimalAmount,
+          maximumFractionDigits: highestTokenDecimalAmount })
+    stableCoin7DayProjectionRateValue.value = sevenDayInterestEarnedValue
+    stableCoinLifeTimeInterestEarnedAmount.value = calculatedUserInterestEarned.toLocaleString('en-US', {
+          minimumFractionDigits: highestTokenDecimalAmount,
+          maximumFractionDigits: highestTokenDecimalAmount })
+    stableCoinLifeTimeInterestEarnedValue.value = interestEarnedValue
+  }
+
+  function updateCryptoRealTimeValues(userTabIndex: number,
+  sevenDayCalculatedUserInterestEarned: number,
+  sevenDayInterestEarnedValue: number,
+  calculatedUserInterestEarned: number,
+  interestEarnedValue: number)
+  {
+    userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
+    userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
+    userTabCryptoCurrencySubMarketList.value[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned
+    userTabCryptoCurrencySubMarketList.value[userTabIndex].interestEarnedValue = interestEarnedValue
+
+    var highestTokenDecimalAmount = 0
+    var sevenDayCalculatedUserInterestEarned = 0
+    var sevenDayInterestEarnedValue = 0
+    var calculatedUserInterestEarned = 0
+    var interestEarnedValue = 0
+
+    for(var i=0; i<userTabCryptoCurrencySubMarketList.value.length; i++)
+    {
+      const decimalAmount = tokenDecimalHashMap.get(userTabCryptoCurrencySubMarketList.value[i].tokenMintAddress)
+      if(decimalAmount>highestTokenDecimalAmount)
+        highestTokenDecimalAmount = decimalAmount
+
+      sevenDayCalculatedUserInterestEarned += userTabCryptoCurrencySubMarketList.value[i].sevenDayCalculatedUserInterestEarned
+      sevenDayInterestEarnedValue += userTabCryptoCurrencySubMarketList.value[i].sevenDayInterestEarnedValue
+      calculatedUserInterestEarned += userTabCryptoCurrencySubMarketList.value[i].calculatedUserInterestEarned
+      interestEarnedValue += userTabCryptoCurrencySubMarketList.value[i].interestEarnedValue
+    }
+
+    crypto7DayProjectionRateAmount.value = sevenDayCalculatedUserInterestEarned.toLocaleString('en-US', {
+          minimumFractionDigits: highestTokenDecimalAmount,
+          maximumFractionDigits: highestTokenDecimalAmount })
+    crypto7DayProjectionRateValue.value = sevenDayInterestEarnedValue
+    cryptoLifeTimeInterestEarnedAmount.value = calculatedUserInterestEarned.toLocaleString('en-US', {
+          minimumFractionDigits: highestTokenDecimalAmount,
+          maximumFractionDigits: highestTokenDecimalAmount })
+    cryptoLifeTimeInterestEarnedValue.value = interestEarnedValue
   }
 
   /*async function editLendingUserAccountName()
@@ -1109,10 +1378,20 @@
 
   @media screen and (min-width: 1285.1px)
   { 
+    .topHHeaderDisplay
+    {
+      display: flex;
+      flex-direction: column;
+    }
     .hHeaderDisplay
     {
       display: flex;
       justify-content: space-around;
+    }
+
+    .topVHeaderDisplay
+    {
+      display: none
     }
     .vHeaderDisplay
     {
@@ -1121,9 +1400,18 @@
   }
   @media screen and (max-width: 1285px)
   { 
+    .topHHeaderDisplay
+    {
+      display: none
+    }
     .hHeaderDisplay
     {
       display: none
+    }
+
+    .topVHeaderDisplay
+    {
+
     }
     .vHeaderDisplay
     {
