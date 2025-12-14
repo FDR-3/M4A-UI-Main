@@ -15,7 +15,11 @@
 
       <div class="backTable" :style="{display: display2ndTable}">
         <h2>Under Construction On Devnet<br>Monopoly Money</h2>
-        <h1 id="protfolioHeader">Portfolios</h1>
+
+        <div class="flexCenterRow nTinyMarginTop">
+          <InfoButton :infoMessage="portfolioChartInfoMSG"/>
+          <h1 id="protfolioHeader">Portfolios</h1>
+        </div>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Markets</ion-button>
         <Portfolios :portfolioChartReRenderHelper="portfolioChartReRenderHelper"
@@ -60,6 +64,7 @@
   import KingobamaMobileM2NoRecords from '/src/components/fancy/poly/KingobamaMobileM2NoRecords.vue'
   import KingobamaMobileM3Portfolio from '/src/components/fancy/poly/KingobamaMobileM3Portfolio.vue'
   import KingobamaMobileM4LeaderBoard from '/src/components/fancy/poly/KingobamaMobileM4LeaderBoard.vue'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   defineProps(['colorName', 'colorHexValue'])//This just keeps a warning from going off since all pages get feed these props
 
@@ -83,6 +88,8 @@
   var lendingLeaderBoardTopRowCount = ref(0)
   var lendingLeaderBoardSubRowCount = ref(0)
   var numberOfRowsOpen = 0
+
+  const portfolioChartInfoMSG = "\nInterest earned and\naccrued is updated in the\ncharts after a user updates\ntheir snap shots or does\nany lending activity, IE:\ndepositing, repaying, etc."
   
   onMounted(() => 
   {

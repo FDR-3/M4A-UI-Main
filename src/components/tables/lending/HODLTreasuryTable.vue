@@ -6,7 +6,19 @@
       show-gridlines
       size="small" 
       :value="stableCoinTableData"
-      :globalFilterFields="['tokenMintAddress', 'hodlATA', 'asset.name', 'chain.name', 'priceString', 'percentChange24h', 'wallet', 'unCollectedFees', 'deposits', 'value']"  
+      :globalFilterFields="
+      [
+        'tokenMintAddress',
+        'hodlATA',
+        'asset.name',
+        'chain.name',
+        'priceString',
+        'percentChange24h',
+        'walletString',
+        'unCollectedFeeString',
+        'depositString',
+        'valueString'
+      ]"  
     >
       <template #header>
         <div>
@@ -70,10 +82,26 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="wallet" header="Wallet" style="width: 0%" sortable></Column>
-      <Column field="unCollectedFees" header="UnCollected Fees" style="width: 0%" sortable></Column>
-      <Column field="deposits" header="Deposits" style="width: 0%" sortable></Column>
-      <Column field="value" header="Value" style="width: 0%" sortable></Column>
+      <Column field="wallet" header="Wallet" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.walletString }}
+        </template>
+      </Column>
+      <Column field="unCollectedFees" header="UnCollected Fees" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.unCollectedFeeString }}
+        </template>
+      </Column>
+      <Column field="deposits" header="Deposits" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.depositString }}
+        </template>
+      </Column>
+      <Column field="value" header="Value" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.valueString }}
+        </template>
+      </Column>
     </DataTable>
 
     <DataTable 
@@ -81,7 +109,18 @@
       v-model:filters="filters" 
       show-gridlines size="small" 
       :value="CryptoCurrencyTableData"
-      :globalFilterFields="['tokenMintAddress', 'hodlATA', 'asset.name', 'chain.name', 'priceString', 'percentChange24h', 'unCollectedFees', 'deposits', 'value']"
+      :globalFilterFields="
+      [
+        'tokenMintAddress',
+        'hodlATA',
+        'asset.name',
+        'chain.name',
+        'priceString',
+        'percentChange24h',
+        'unCollectedFeeString',
+        'depositString',
+        'valueString'
+      ]"
     >
       <template #header>
         <div>
@@ -131,9 +170,21 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="unCollectedFees" header="UnCollected Fees" style="width: 0%" sortable></Column>
-      <Column field="deposits" header="Deposits" style="width: 0%" sortable></Column>
-      <Column field="value" header="Value" style="width: 0%" sortable></Column>
+      <Column field="unCollectedFees" header="UnCollected Fees" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.unCollectedFeeString }}
+        </template>
+      </Column>
+      <Column field="deposits" header="Deposits" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.depositString }}
+        </template>
+      </Column>
+      <Column field="value" header="Value" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.valueString }}
+        </template>
+      </Column>
     </DataTable>
   </div>
 </template>
@@ -250,22 +301,34 @@
       //Set Wallet Amounts
       const tokenAmount = hodlTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
       if(tokenAmount)
-        unprocessedTableData[i].wallet = tokenAmount
+      {
+        unprocessedTableData[i].wallet = Number(tokenAmount)
+        unprocessedTableData[i].walletString = tokenAmount
+      }
       else
-        unprocessedTableData[i].wallet = (0).toLocaleString('en-US', {
+      {
+        unprocessedTableData[i].wallet = 0
+        unprocessedTableData[i].walletString = (0).toLocaleString('en-US', {
         minimumFractionDigits: decimalAmount,
         maximumFractionDigits: decimalAmount })
+      }
 
       //Set UnCollected Fee Amounts
       const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
       adminAccounts.lendingCEOAddressString +
       adminAccounts.lendingMain3PercentSubMarketIndex.toString())
       if(subMarket)
-        unprocessedTableData[i].unCollectedFees = subMarket.uncollectedFeesAmount
+      {
+        unprocessedTableData[i].unCollectedFees = Number(subMarket.uncollectedFeesAmount)
+        unprocessedTableData[i].unCollectedFeeString = subMarket.uncollectedFeesAmount
+      }
       else
-        unprocessedTableData[i].unCollectedFees = (0).toLocaleString('en-US', {
+      {
+        unprocessedTableData[i].unCollectedFees = 0
+        unprocessedTableData[i].unCollectedFeeString = (0).toLocaleString('en-US', {
         minimumFractionDigits: decimalAmount,
         maximumFractionDigits: decimalAmount })
+      }
 
       //Set Deposit Amounts
       const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
@@ -274,11 +337,19 @@
       adminAccounts.hodlTreasuryAddress.toString() +
       adminAccounts.hodlTreasuryLendingAccountIndex.toString())
       if(lendingUserTabAccount)
-        unprocessedTableData[i].deposits = Number(lendingUserTabAccount.depositedAmount)
-      else
-        unprocessedTableData[i].deposits = (0).toLocaleString('en-US', {
+      {
+        unprocessedTableData[i].deposits = Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount)
+        unprocessedTableData[i].depositString = unprocessedTableData[i].deposits.toLocaleString('en-US', {
         minimumFractionDigits: decimalAmount,
         maximumFractionDigits: decimalAmount })
+      }
+      else
+      {
+        unprocessedTableData[i].deposits = 0
+        unprocessedTableData[i].depositString = (0).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+      }
 
       const totalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
 
@@ -290,7 +361,8 @@
 
       value += calculatedValue
 
-      unprocessedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
+      unprocessedTableData[i].value = calculatedValue
+      unprocessedTableData[i].valueString = '$' + calculatedValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }
@@ -320,11 +392,17 @@
       adminAccounts.lendingCEOAddressString +
       adminAccounts.lendingMain3PercentSubMarketIndex.toString())
       if(subMarket)
-        unprocessedTableData[i].unCollectedFees = subMarket.uncollectedFeesAmount
+      {
+        unprocessedTableData[i].unCollectedFees = Number(subMarket.uncollectedFeesAmount)
+        unprocessedTableData[i].unCollectedFeeString = subMarket.uncollectedFeesAmount
+      }
       else
-        unprocessedTableData[i].unCollectedFees = (0).toLocaleString('en-US', {
+      {
+        unprocessedTableData[i].unCollectedFees = 0
+        unprocessedTableData[i].unCollectedFeeString = (0).toLocaleString('en-US', {
         minimumFractionDigits: decimalAmount,
         maximumFractionDigits: decimalAmount })
+      }
 
       //Set Deposit Amounts
       const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
@@ -333,11 +411,19 @@
       adminAccounts.hodlTreasuryAddress.toString() +
       adminAccounts.hodlTreasuryLendingAccountIndex.toString())
       if(lendingUserTabAccount)
-        unprocessedTableData[i].deposits = Number(lendingUserTabAccount.depositedAmount)
-      else
-        unprocessedTableData[i].deposits = (0).toLocaleString('en-US', {
+      {
+        unprocessedTableData[i].deposits = Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount)
+        unprocessedTableData[i].depositString = unprocessedTableData[i].deposits.toLocaleString('en-US', {
         minimumFractionDigits: decimalAmount,
         maximumFractionDigits: decimalAmount })
+      }
+      else
+      {
+        unprocessedTableData[i].deposits = 0
+        unprocessedTableData[i].depositString = (0).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+      }
 
       const totalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
 
@@ -349,7 +435,8 @@
 
       value += calculatedValue
 
-      unprocessedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
+      unprocessedTableData[i].value = calculatedValue
+      unprocessedTableData[i].valueString = '$' + calculatedValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }

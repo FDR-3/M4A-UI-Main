@@ -128,7 +128,7 @@
     </div>
 
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
-      <div v-for="subMarketTab in userTabStableCoinSubMarketList">
+      <div v-for="(subMarketTab, userTabIndex) in userTabStableCoinSubMarketList">
         <PortfolioChart
         :key="chartReRenderKey"
         :isStableCoin="true"
@@ -140,6 +140,7 @@
         :ownerAddress="searchAddress"
         :accountIndex="accountSelect"
         :subMarketFee="subMarketTab.subMarketFee"
+        :userTabIndex="userTabIndex"
         :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         :initialBlockChainTimeStamp="initialBlockChainTimeStamp"
@@ -442,9 +443,6 @@
       const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
       initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
     }
-    console.log("onMounted")
-
-    
   })
 
   onUnmounted(() =>

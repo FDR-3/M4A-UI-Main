@@ -328,7 +328,7 @@
     'initialBlockChainTimeStamp'
   ])
 
-  const emits = defineEmits(['interestEarned'])
+  const emits = defineEmits(['interestEarned', 'changeYear', 'openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal' ])
 
   var chartOptions = ref()
   var chartRef = ref<any>(null)

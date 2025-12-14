@@ -59,9 +59,10 @@
       showButtons
       fluid
       @input="(event: { value: any }) => repayAmount = event.value"
+      @update:model-value="repayMax=false"
     />
     <div id="maxButtonContainer" class="alignSelfLeft">
-      <button id="maxButton" style="background-color: transparent" @click="repayAmount=userDebt">
+      <button id="maxButton" style="background-color: transparent" @click="repayAmount=userDebt; repayMax=true">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
@@ -111,6 +112,7 @@
   var repayIncrementAmount = ref()
   var repaying = ref(false)
   var repaySVG = ref()
+  var repayMax = ref(false)
   var subMarketTokenName = ref()
   var userDebt = ref(0)
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
@@ -320,12 +322,13 @@
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(repayAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
-        accountName.value
+        repayMax.value
       ).accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey }).rpc()
 
       await confirmLendingTransaction(tx, toast, "repay_tokens")
 
       repaying.value = false
+      repayMax.value = false
     }
     catch(error)
     {

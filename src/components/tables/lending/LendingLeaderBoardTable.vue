@@ -36,7 +36,7 @@
         <div>
           <div class="flexCenterRow">
             <div style="margin-bottom: 4px">
-              <InfoButton :infoMessage="lendingLeaderBoardInfoMSG" />
+              <InfoButton :infoMessage="lendingLeaderBoardInfoMSG"/>
             </div>
             <h2>Lending Leader Board</h2>
           </div>
@@ -275,7 +275,7 @@
   var totalNumberOfTopRows = 0
   var totalNumberOfSubRows = 0
 
-  const lendingLeaderBoardInfoMSG = "You can copy a User's\naddress by clicking on\nthem.\nYou can view an Account by\nclicking on them."
+  const lendingLeaderBoardInfoMSG = "You can copy a User's\naddress by clicking on\nthem.\nYou can view an Account by\nclicking on them.\n\nInterest earned and\naccrued is updated in the\ntable after a user updates\ntheir snap shots or does\nany lending activity, IE:\ndepositing, repaying, etc."
 
   var event = ref()
   var viewPortfolioPopoverOpen = ref(false)
@@ -298,7 +298,6 @@
 
       sortTable()
       emits('totalLeaderBoardLendingUsers', totalNumberOfTopRows)
-      console.log(totalNumberOfTopRows)
     }
   })
 

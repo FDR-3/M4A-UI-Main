@@ -1,5 +1,5 @@
 {
-  "address": "5cAHP93tbTEwTBs6Xr3AGu6fCrkrwP9BRy7YCNXKsaqP",
+  "address": "ETxhQkfMtfaP5PJP8mdi2h89WdWAFPfxePVXoaeZxJ2t",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -3770,6 +3770,10 @@
         {
           "name": "amount",
           "type": "u64"
+        },
+        {
+          "name": "withdraw_max",
+          "type": "bool"
         }
       ]
     }

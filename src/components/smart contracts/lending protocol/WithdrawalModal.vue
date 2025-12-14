@@ -62,10 +62,10 @@
       showButtons
       fluid
       @input="updateValues"
-      @update:model-value="calculateHealthFactorValues()"
+      @update:model-value="calculateHealthFactorValues(); withdrawMax=false"
     />
     <div id="maxButtonContainer" class="alignSelfLeft">
-      <button id="maxButton" style="background-color: transparent" @click="withdrawAmount=availableWithdrawalBalance; calculateHealthFactorValues()">
+      <button id="maxButton" style="background-color: transparent" @click="withdrawAmount=availableWithdrawalBalance; calculateHealthFactorValues(); withdrawMax=true">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
@@ -146,6 +146,7 @@
   var withdrawIncrementAmount = ref()
   var withdrawing = ref(false)
   var withdrawSVG = ref()
+  var withdrawMax = ref(false)
   var subMarketTokenName = ref()
   var userBalance = ref()
   var availableWithdrawalBalance = ref()
@@ -516,7 +517,6 @@
 
   async function withdrawTokens()
   {
-
     /*
     await transactionBuilder.addPriceConsumerInstructions(
       async (
@@ -600,7 +600,8 @@
                 adminAccounts.lendingCEOAddressKey,
                 subMarketSelect.value,
                 accountSelect.value,
-                new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
+                new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value)), //convert to fixedpoint notation
+                withdrawMax.value
               )
               .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
               .remainingAccounts(remainingAccounts)
@@ -615,7 +616,7 @@
     {
       const tx = await pythSolanaReceiver.provider.sendAll
       (
-        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 }), { skipPreflight: true }
+        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 }), { skipPreflight: false }
       )
     
       if(tx.length)
@@ -627,6 +628,7 @@
       withdrawSuccessful.value = true
       clearSnapShotIntervalCountDown()
       withdrawing.value = false
+      withdrawMax.value = false
     }
     catch(error: any)
     {
