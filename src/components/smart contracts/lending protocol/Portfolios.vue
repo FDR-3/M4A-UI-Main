@@ -6,9 +6,8 @@
     <LendingLeaderBoardTable
     @viewPortfolio="viewPortfolio"
     @totalLeaderBoardLendingUsers="emitTotalLeaderBoardLendingUsers"
-    @adjustLeaderBoardHeight="emitLeaderBoardHeightAdjust"
-    @setLeaderBoardHeight="emitLeaderBoardHeightSet"
-    @isDoneLoading="isLeaderBoardDoneLoading=true"/>
+    @adjustLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowAdjustment"
+    @setLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowSet"/>
   </div>
 
   <div v-if="!isBrowsingAllUsers" class="tableContainer">
@@ -247,8 +246,8 @@
     'openRepayModal',
     'portfolioHeightChange',
     'totalLeaderBoardLendingUsers',
-    'leaderBoardHeightAdjust',
-    'leaderBoardHeightSet'
+    'leaderBoardSubTableAndSubRowAdjust',
+    'leaderBoardSubTableAndSubRowSet'
   ])
 
   var displayName = ref()
@@ -270,7 +269,6 @@
   var accountSelect = ref(0)
   var accountList = ref()
   var isBrowsingAllUsers = ref()
-  var isLeaderBoardDoneLoading = ref(false)
 
   var selectedYearHashMap = new Map<string, any>()
   var selectedUserChartDataHashMap = ref()
@@ -437,12 +435,14 @@
         }
 
       setChartData()
-      emitPortfolioRelatedTableHeight()
+      
       startGradientAnimation()//This has to be called here and inside of the PortfolioChart.vue file for some reason
       
       const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
       initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
     }
+
+    emitPortfolioRelatedTableHeight()
   })
 
   onUnmounted(() =>
@@ -524,9 +524,9 @@
       initialCryptoCurrencySelectedYearSet = true
     }
 
-    emitPortfolioRelatedTableHeight()
     setChartData()
-
+    emitPortfolioRelatedTableHeight()
+    
     if(initialBlockChainTimeStamp.value == 0)
     {
       const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
@@ -1094,7 +1094,7 @@
     if(userTabCryptoCurrencySubMarketList.value)
       cryptoCurrencyChartCount = userTabCryptoCurrencySubMarketList.value.length
 
-    emits("portfolioHeightChange", searchAddress.value, stableCoinChartCount, cryptoCurrencyChartCount, isBrowsingAllUsers.value, isLeaderBoardDoneLoading.value)
+    emits("portfolioHeightChange", searchAddress.value, stableCoinChartCount, cryptoCurrencyChartCount, isBrowsingAllUsers.value)
   }
 
   function viewPortfolio(owner: string, accountIndex: number)
@@ -1116,14 +1116,14 @@
     emits('totalLeaderBoardLendingUsers', userCount)
   }
 
-  function emitLeaderBoardHeightAdjust(rowCount: number)
+  function emitLeaderBoardSubTableAndSubRowAdjustment(subTableCountAdjustment: number, subTableRowCountAdjustment: number)
   {
-    emits('leaderBoardHeightAdjust', rowCount)
+    emits('leaderBoardSubTableAndSubRowAdjust', subTableCountAdjustment, subTableRowCountAdjustment)
   }
 
-  function emitLeaderBoardHeightSet(rowCount: number)
+  function emitLeaderBoardSubTableAndSubRowSet(subTableCountSet: number, subTableRowCountSet: number)
   {
-    emits('leaderBoardHeightSet', rowCount)
+    emits('leaderBoardSubTableAndSubRowSet', subTableCountSet, subTableRowCountSet)
   }
 
   function setIsBrowsingAllLendingUsers(flag: boolean)

@@ -81,7 +81,7 @@
 
     if(calculatedAssetValue != 0)
     {
-      healthFactor.value = ((calculatedAssetValue - calculatedDebtValue)/calculatedAssetValue) * 100//Convert to percent
+      healthFactor.value = (((calculatedAssetValue - calculatedDebtValue)/calculatedAssetValue) * 100).toFixed(2)//Convert to percent
       if(healthFactor.value < 0)
         healthFactor.value = 0
     }

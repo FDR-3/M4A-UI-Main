@@ -45,7 +45,7 @@
             <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
 
-          <ion-button fill="clear" @click="expandSubTables(); $emit('setLeaderBoardHeight', totalNumberOfSubRows)">
+          <ion-button fill="clear" @click="expandSubTables(); $emit('setLeaderBoardSubTableAndSubRowCount', totalNumberOfTopRows, totalNumberOfSubRows)">
             <ion-label  color="dark">Expand Users</ion-label>
           </ion-button>
 
@@ -53,7 +53,7 @@
             <ion-label color="dark">Export</ion-label><ion-icon :src="download" color="dark"></ion-icon>
           </ion-button>
 
-          <ion-button fill="clear" @click="subTableData={}; $emit('setLeaderBoardHeight', 0)">
+          <ion-button fill="clear" @click="subTableData={}; $emit('setLeaderBoardSubTableAndSubRowCount', 0, 0)">
             <ion-label  color="dark">Collapse Users</ion-label>
           </ion-button>
         </div>
@@ -261,7 +261,7 @@
   import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const emits = defineEmits(['viewPortfolio', 'totalLeaderBoardLendingUsers', 'adjustLeaderBoardHeight', 'setLeaderBoardHeight', 'isDoneLoading'])
+  const emits = defineEmits(['viewPortfolio', 'totalLeaderBoardLendingUsers', 'setLeaderBoardSubTableAndSubRowCount', 'adjustLeaderBoardSubTableAndSubRowCount', 'isDoneLoading'])
 
   const colorHexValue = inject('colorHexValue') as string
   
@@ -299,6 +299,8 @@
       sortTable()
       emits('totalLeaderBoardLendingUsers', totalNumberOfTopRows)
     }
+    else
+      emits('totalLeaderBoardLendingUsers', 0)
   })
 
   watch(lendingLeaderBoardTable,() =>
@@ -639,12 +641,12 @@
 
   function handleRowExpand(event: any)
   {
-    emits("adjustLeaderBoardHeight", event.data.accountListWithLastestMonthlyStatement.length)
+    emits("adjustLeaderBoardSubTableAndSubRowCount", 1, event.data.accountListWithLastestMonthlyStatement.length)
   }
 
   function handleRowCollapse(event: any)
   {
-    emits("adjustLeaderBoardHeight", -event.data.accountListWithLastestMonthlyStatement.length)
+    emits("adjustLeaderBoardSubTableAndSubRowCount", -1, -event.data.accountListWithLastestMonthlyStatement.length)
   }
 
   const filters = ref(

@@ -10,7 +10,7 @@
         @openWithdrawalModal="openWithdrawAndCloseOthers"
         @openBorrowModal="openBorrowAndCloseOthers"
         @openRepayModal="openRepayAndCloseOthers"
-        @marketTableHeightChange="updateUserNameRelatedTableHeight"/>
+        @marketTableHeightChange="updateUserNameRelatedMarketTableHeight"/>
       </div>
 
       <div class="backTable" :style="{display: display2ndTable}">
@@ -28,9 +28,9 @@
         @openBorrowModal="openBorrowAndCloseOthers"
         @openRepayModal="openRepayAndCloseOthers"
         @portfolioHeightChange="updatePortfolioRelatedHeight"
-        @totalLeaderBoardLendingUsers="setTotalLeaderBoardLendingUsersHeight"
-        @leaderBoardHeightAdjust="adjustLeaderBoardHeight"
-        @leaderBoardHeightSet="setLeaderBoardHeight"/>
+        @totalLeaderBoardLendingUsers="setTotalLeaderBoardLendingUsers"
+        @leaderBoardSubTableAndSubRowAdjust="adjustLeaderBoardSubTableAndRowCount"
+        @leaderBoardSubTableAndSubRowSet="setLeaderBoardSubTableAndRowCount"/>
       </div>
     </div>
   </div>
@@ -87,7 +87,7 @@
   var portfolioChartReRenderHelper = ref(0)
   var lendingLeaderBoardTopRowCount = ref(0)
   var lendingLeaderBoardSubRowCount = ref(0)
-  var numberOfRowsOpen = 0
+  var lendingLeaderBoardSubTableCount = ref(0)
 
   const portfolioChartInfoMSG = "\nInterest earned and\naccrued is updated in the\ncharts after a user updates\ntheir snap shots or does\nany lending activity, IE:\ndepositing, repaying, etc."
   
@@ -201,7 +201,7 @@
     tokenRelatedDynamicTableHeight.value = baseTableHeight + tokenRelatedHeight
   }
 
-  function updateUserNameRelatedTableHeight(hasAtleast1Account: boolean, editingAccountName: boolean)
+  function updateUserNameRelatedMarketTableHeight(hasAtleast1Account: boolean, editingAccountName: boolean)
   {
     var accountStateRelatedHeight
 
@@ -215,9 +215,35 @@
     userNameRelatedDynamicTableHeight.value = accountStateRelatedHeight
   }
 
-  function updatePortfolioRelatedHeight(searchAddress: string, userStableCoinTabCount: number, userCryptoCurrencyTabCount: number, isBrowsingAllUsers: boolean, isLeaderBoardDoneLoading: boolean )
+  function setTotalLeaderBoardLendingUsers(userRowCount: number)
+  {
+    if(userRowCount == 0)
+      lendingLeaderBoardTopRowCount.value = 1
+    else
+      lendingLeaderBoardTopRowCount.value = userRowCount
+
+    updatePortfolioRelatedHeight("", 0, 0, true)
+  }
+
+  function adjustLeaderBoardSubTableAndRowCount(subTableCountAdjustment: number, subRowCountAdjustment: number)
+  {
+    lendingLeaderBoardSubTableCount.value += subTableCountAdjustment
+    lendingLeaderBoardSubRowCount.value += subRowCountAdjustment
+
+    updatePortfolioRelatedHeight("", 0, 0, true)
+  }
+  
+  function setLeaderBoardSubTableAndRowCount(subTableCount: number, subRowCount: number)
+  {
+    lendingLeaderBoardSubTableCount.value = subTableCount
+    lendingLeaderBoardSubRowCount.value = subRowCount
+
+    updatePortfolioRelatedHeight("", 0, 0, true)
+  }
+
+  function updatePortfolioRelatedHeight(searchAddress: string, userStableCoinTabCount: number, userCryptoCurrencyTabCount: number, isBrowsingAllUsers: boolean)
   { 
-    var portfolioStateRelatedHeight = 0
+    var dynamicHeight = 0
 
     if(isBrowsingAllUsers)
       onLeaderBoard.value = "onLeaderBoard"
@@ -229,124 +255,32 @@
 
     if(!isBrowsingAllUsers)
     {
-      numberOfRowsOpen = 0
-
       if(!isValidSolanaPublicKey(searchAddress))
         if(!isBrowserFireFox())
-          portfolioStateRelatedHeight += 500//Base height
+          dynamicHeight += 500//Base height
         else
-          portfolioStateRelatedHeight += 505//Base height
+          dynamicHeight += 505//Base height
       else if(userStableCoinTabCount == 0 && userCryptoCurrencyTabCount == 0)
-        portfolioStateRelatedHeight += 455//Base height
+        dynamicHeight += 455//Base height
       else
-        portfolioStateRelatedHeight += 425//Base height
+        dynamicHeight += 425//Base height
     }
     else
     {
-      var dynamicHeight
-
-      if(lendingLeaderBoardTopRowCount.value == 0)
-        if(!isBrowserFireFox())
-          if(isLeaderBoardDoneLoading)
-            dynamicHeight = 691
-          else
-            dynamicHeight = 675
-        else
-          if(isLeaderBoardDoneLoading)
-            dynamicHeight = 678
-          else
-            dynamicHeight = 664
-      else if(!isBrowserFireFox())
-          dynamicHeight = 600
+      if(!isBrowserFireFox())
+      {
+        dynamicHeight = 600
+        dynamicHeight += 56 * lendingLeaderBoardSubTableCount.value //SubTable Header Row
+      }
       else
-          dynamicHeight = 580
+      {
+        dynamicHeight = 588
+        dynamicHeight += 64.4 * lendingLeaderBoardSubTableCount.value //SubTable Header Row
+      }
 
-      portfolioStateRelatedHeight = dynamicHeight
-      stableCoinRowCount.value = 0
-      cryptoCurrencyRowCount.value = 0
-      lendingLeaderBoardSubRowCount.value = 0
-    }
-
-    portfolioRelatedDynamicTableHeight.value = portfolioStateRelatedHeight
-  }
-
-  function setTotalLeaderBoardLendingUsersHeight(userRowCount: number)
-  {
-    if(userRowCount == 0)
-      lendingLeaderBoardTopRowCount.value = 1
-    else
-      lendingLeaderBoardTopRowCount.value = userRowCount
-
-    var dynamicHeight
-    if(!isBrowserFireFox())
-      dynamicHeight = 600
-    else
-      dynamicHeight = 588
-
-    dynamicHeight += lendingLeaderBoardTopRowCount.value * 75
-    dynamicHeight += lendingLeaderBoardSubRowCount.value * 64
-    portfolioRelatedDynamicTableHeight.value = dynamicHeight
-  }
-
-  function adjustLeaderBoardHeight(rowCountAdjustment: number)
-  {
-    lendingLeaderBoardSubRowCount.value += rowCountAdjustment
-
-    var dynamicHeight
-    if(!isBrowserFireFox())
-      dynamicHeight = 600
-    else
-      dynamicHeight = 588
-    
-    if(rowCountAdjustment > 0)
-      numberOfRowsOpen += 1
-    else
-      numberOfRowsOpen -= 1
-
-    dynamicHeight += lendingLeaderBoardTopRowCount.value * 75 //Top Rows
-    dynamicHeight += lendingLeaderBoardSubRowCount.value * 64 //Sub Rows
-
-    if(!isBrowserFireFox())
-    {
-      dynamicHeight += 56 * numberOfRowsOpen //Header Row
-      dynamicHeight += 26 * numberOfRowsOpen //Space above and below subtable
-    }
-    else
-    {
-      dynamicHeight += 64.4 * numberOfRowsOpen //Header Row
-      dynamicHeight += 27 * numberOfRowsOpen //Space above and below subtable
-    }
-
-    portfolioRelatedDynamicTableHeight.value = dynamicHeight
-  }
-  
-  function setLeaderBoardHeight(rowCount: number)
-  {
-    if(rowCount > 0)
-      numberOfRowsOpen = lendingLeaderBoardTopRowCount.value
-    else
-      numberOfRowsOpen = 0
-
-    lendingLeaderBoardSubRowCount.value = rowCount
-
-    var dynamicHeight
-    if(!isBrowserFireFox())
-      dynamicHeight = 600 //Basetable height
-    else
-      dynamicHeight = 588 //Basetable height
-
-    dynamicHeight += lendingLeaderBoardTopRowCount.value * 75 //Top Rows
-    dynamicHeight += lendingLeaderBoardSubRowCount.value * 64 //Sub Rows
-    
-    if(!isBrowserFireFox())
-    {
-      dynamicHeight += 56 * numberOfRowsOpen //Header Row
-      dynamicHeight += 26 * numberOfRowsOpen //Space above and below subtable
-    }
-    else
-    {
-      dynamicHeight += 64.4 * numberOfRowsOpen //Header Row
-      dynamicHeight += 27 * numberOfRowsOpen //Space above and below subtable
+      dynamicHeight += 75 * lendingLeaderBoardTopRowCount.value //User Row
+      dynamicHeight += 64 * lendingLeaderBoardSubRowCount.value //User SubAccount Row
+      dynamicHeight += 26 * lendingLeaderBoardSubTableCount.value //Space above and below subtable
     }
 
     portfolioRelatedDynamicTableHeight.value = dynamicHeight
