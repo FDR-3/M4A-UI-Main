@@ -35,7 +35,9 @@
         Check New Address
       </ion-button>
 
-      <ion-button color="green" @click="setIsBrowsingAllLendingUsers(true); emitPortfolioRelatedTableHeight()">Browse All Users</ion-button>
+      <ion-button color="green" @click="setIsBrowsingAllLendingUsers(true); emitLeaderBoardSubTableAndSubRowSet(0,0)">
+        Browse All Users
+      </ion-button>
     </div>
   </div>
  

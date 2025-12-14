@@ -261,7 +261,7 @@
   import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const emits = defineEmits(['viewPortfolio', 'totalLeaderBoardLendingUsers', 'setLeaderBoardSubTableAndSubRowCount', 'adjustLeaderBoardSubTableAndSubRowCount', 'isDoneLoading'])
+  const emits = defineEmits(['viewPortfolio', 'totalLeaderBoardLendingUsers', 'setLeaderBoardSubTableAndSubRowCount', 'adjustLeaderBoardSubTableAndSubRowCount'])
 
   const colorHexValue = inject('colorHexValue') as string
   
@@ -464,10 +464,7 @@
       tableData.value = tempData
 
       if(isLoading.value)
-      {
         isLoading.value = false
-        emits("isDoneLoading")
-      }
     }
   }
 
