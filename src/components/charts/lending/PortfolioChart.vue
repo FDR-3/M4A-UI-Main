@@ -3,7 +3,7 @@
     <div class="flexCenterRow hChartLayout" style="justify-content:space-around !important">
       <div>
         <h4 class="underLine">7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ sevenDayInterestEarnedValue }}</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ sevenDayInterestEarnedValueString }}</span> A Week</h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ sevenDayCalculatedUserInterestEarned }}</span> A Week</h5>
       </div>
 
@@ -35,8 +35,9 @@
           <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text>
         </div>
 
-        <ion-label class="smallMarginBottom">Balance: <span class="rainbowText">{{ userCalculatedBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValue }} </span></ion-label>
- 
+        <ion-text>Balance: <span class="rainbowText">{{ userCalculatedBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text>
+        <ion-text class="smallMarginBottom">Debt: <span class="poopText">{{ userCalculatedDebt }}</span> Value: $<span class="poopText"> {{ debtValueString }} </span></ion-text>
+
         <ion-label >Last Action: {{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount + ' ' + tokenName}}
           <br>{{ convertUnixTimeToLocalDate(chartData?.lastActionTimeStamp) + ' ' + convertUnixTimeToLocalTime(chartData?.lastActionTimeStamp)}}
         </ion-label>
@@ -55,24 +56,24 @@
 
           <div v-if="ownerAddress==connectedWallet.addressString">
             <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption)"><ion-label color="dark">Deposit</ion-label></ion-button>
-            <ion-button v-else fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
+            <ion-button v-else fill="clear" @click="openHActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
             <ion-popover
-            :is-open="actionsPopoverOpen" 
+            :is-open="hActionsPopoverOpen" 
             :event="event" 
-            @didDismiss="actionsPopoverOpen=false"
+            @didDismiss="hActionsPopoverOpen=false"
             side="top" 
             alignment="center"
             >
-              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); actionsPopoverOpen=false">
+              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label color="dark">Deposit</ion-label>
               </ion-button>
-              <ion-button v-if="userCalculatedBalance" class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); actionsPopoverOpen=false">
+              <ion-button v-if="userCalculatedBalance" class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label color="dark">Withdraw</ion-label>
               </ion-button>
-              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); actionsPopoverOpen=false">
+              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label color="dark">Borrow</ion-label>
               </ion-button>
-              <ion-button v-if="userDebt" class="copyAddressButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); actionsPopoverOpen=false">
+              <ion-button v-if="userCalculatedDebt" class="copyAddressButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label color="dark">Repay</ion-label>
               </ion-button>
             </ion-popover>
@@ -82,7 +83,7 @@
 
       <div>
         <h4 class="underLine">Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ interestEarnedValue }}</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ interestEarnedValueString }}</span></h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ calculatedUserInterestEarned }}</span></h5>
       </div>   
     </div>
@@ -109,7 +110,17 @@
       <ion-text>SubMarket Index: {{ subMarketIndex }}</ion-text><br>
       <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text><br>
 
-      <br><ion-label>Balance: <span class="rainbowText">{{ userCalculatedBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValue }} </span></ion-label>
+      <div class="unStackedBalanceDebt">
+        <br><ion-text>Balance: <span class="rainbowText">{{ userCalculatedBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br>
+        <ion-text class="smallMarginBottom">Debt: <span class="poopText">{{ userCalculatedDebt}}</span> Value: $<span class="poopText"> {{ debtValueString }} </span></ion-text>
+      </div>
+
+      <div class="stackedBalanceDebt">
+        <br><ion-text>Balance: <span class="rainbowText">{{ userCalculatedBalance }}</span>
+        <br>Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br><br>
+        <ion-text class="smallMarginBottom">Debt: <span class="poopText">{{ userCalculatedDebt}}</span>
+        <br>Value: $<span class="poopText"> {{ debtValueString }} </span></ion-text>
+      </div>
 
       <div class="mediumSmallMarginTop">
         <ion-label>Last Action: <br>{{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount + ' ' + tokenName}}
@@ -117,17 +128,17 @@
         </ion-label>
       </div>
       
-      <div class="nSmallMarginTop">
-        <h4 class="underLine">Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ interestEarnedValue }}</span></h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ calculatedUserInterestEarned }}</span></h5>
-      </div>  
-
-      <div class="nMediumMarginTop" style="margin-bottom: -2px">
+      <div class="nSmallMarginTop" style="margin-bottom: -2px">
         <h4 class="underLine">7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ sevenDayInterestEarnedValue }}</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ sevenDayInterestEarnedValueString }}</span> A Week</h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ sevenDayCalculatedUserInterestEarned }}</span> A Week</h5>
       </div>
+
+      <div class="nMediumMarginTop">
+        <h4 class="underLine">Life Time Interest Earned</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ interestEarnedValueString }}</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ calculatedUserInterestEarned }}</span></h5>
+      </div>  
 
       <div class="nMediumMarginTop vYearAndActionContainer">
         <Select
@@ -141,24 +152,24 @@
         </Select>
         <div v-if="ownerAddress==connectedWallet.addressString" class="nSmallMarginTop">
           <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption)"><ion-label color="dark">Deposit</ion-label></ion-button>
-          <ion-button v-else fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
+          <ion-button v-else fill="clear" @click="openVActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
           <ion-popover
-          :is-open="actionsPopoverOpen" 
+          :is-open="vActionsPopoverOpen" 
           :event="event" 
-          @didDismiss="actionsPopoverOpen=false"
+          @didDismiss="vActionsPopoverOpen=false"
           side="top" 
           alignment="center"
           >
-            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); actionsPopoverOpen=false">
+            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
               <ion-label color="dark">Deposit</ion-label>
             </ion-button>
-            <ion-button v-if="userCalculatedBalance" class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); actionsPopoverOpen=false">
+            <ion-button v-if="userCalculatedBalance" class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
               <ion-label color="dark">Withdraw</ion-label>
             </ion-button>
-            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); actionsPopoverOpen=false">
+            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
               <ion-label color="dark">Borrow</ion-label>
             </ion-button>
-            <ion-button v-if="userDebt" class="copyAddressButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); actionsPopoverOpen=false">
+            <ion-button v-if="userOriginalDebt" class="copyAddressButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
               <ion-label color="dark">Repay</ion-label>
             </ion-button>
           </ion-popover>
@@ -308,6 +319,7 @@
   import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
   import { tokenReservesHashMap, tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
 
@@ -328,7 +340,7 @@
     'initialBlockChainTimeStamp'
   ])
 
-  const emits = defineEmits(['interestEarned', 'changeYear', 'openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal' ])
+  const emits = defineEmits(['interestEarned', 'changeYear', 'openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal'])
 
   var chartOptions = ref()
   var chartRef = ref<any>(null)
@@ -338,7 +350,8 @@
   var interestEarnedIntervalId: any
 
   var tokenPopoverOpen = ref(false)
-  var actionsPopoverOpen = ref(false)
+  var hActionsPopoverOpen = ref(false)
+  var vActionsPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
@@ -350,21 +363,21 @@
 
   var subMarketSelectOption: any[] = []
 
-  const SECONDS_IN_A_YEAR = 31_556_952//1 year = (365.2425 days) × (24 hours/day) × (3600 seconds/hour) = 31,556,952 seconds
-  const SECONDS_IN_A_WEEK = 604_800
   var tokenReserve: any
   var decimalAmount: number
   var lendingUserTabAccount: any
   var userOriginalBalance = ref()
   var userCalculatedBalance = ref()
-  var balanceValue = ref()
-  var userDebt = ref()
+  var balanceValueString = ref()
   var userOriginalInterestEarned = ref()
   var calculatedUserInterestEarned = ref()
-  var interestEarnedValue = ref()
+  var interestEarnedValueString = ref()
   var sevenDayCalculatedUserInterestEarned = ref()
-  var sevenDayInterestEarnedValue = ref()
-
+  var sevenDayInterestEarnedValueString = ref()
+  var userOriginalDebt = ref()
+  var userCalculatedDebt = ref()
+  var debtValueString = ref()
+ 
   var activityDescriptions =
   [
     "Deposited",
@@ -390,8 +403,8 @@
       props.accountIndex.toString())
 
       userOriginalBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
-      userDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
       userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
+      userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
 
       yearList.value = getYearList()
 
@@ -429,8 +442,8 @@
     props.accountIndex.toString())
 
     userOriginalBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-    userDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+    userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
 
     yearList.value = getYearList()
     yearSelect.value = props.selectedYear
@@ -455,8 +468,8 @@
     props.accountIndex.toString())
 
     userOriginalBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-    userDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+    userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
 
     yearList.value = getYearList()
     yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
@@ -464,6 +477,7 @@
 
   watch(() => [props.initialBlockChainTimeStamp], (() => 
   {
+    stopInterestCalculation()
     startInterestCalculation(props.initialBlockChainTimeStamp)
   }))
 
@@ -648,10 +662,16 @@
     tokenPopoverOpen.value = false
   }
 
-  function openActionsPopover(e: Event) 
+  function openHActionsPopover(e: Event) 
   {
     event.value = e
-    actionsPopoverOpen.value = true
+    hActionsPopoverOpen.value = true
+  }
+
+  function openVActionsPopover(e: Event) 
+  {
+    event.value = e
+    vActionsPopoverOpen.value = true
   }
 
   function passByRefWrapperCopyAddress()
@@ -659,27 +679,30 @@
     copyTokenMintAddress(copyTokenMintAddressButtonText, props.tokenMintAddress)
   }
 
-  function calculateTokenReserveSupplyInterestChangeIndex(timeStamp: number)
+  function calculateTokenReserveInterestChangeIndex(timeStamp: number)
   {
     //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
     tokenReserve = tokenReservesHashMap.map.get(props.tokenMintAddress)
 
     const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
     const changeInTime = timeStamp - oldTime
-    const supplyApy = tokenReserve.supplyApy/10000 //convert from fixed point to decimal
+    const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
+    const borrowApy = tokenReserve.borrowApy / 10000 //convert from fixed point to decimal
 
     tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * changeInTime / SECONDS_IN_A_YEAR)
+    tokenReserve.newBorrowInterestChangeIndex = Number(tokenReserve.borrowInterestChangeIndex) * (1 + borrowApy * changeInTime / SECONDS_IN_A_YEAR)
 
     const sevenDayChangeInTime = SECONDS_IN_A_WEEK + timeStamp - oldTime
     tokenReserve.sevenDaySupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * sevenDayChangeInTime / SECONDS_IN_A_YEAR)
   }
 
-  function calculateUserInterestEarned()
+  function calculateUserInterest()
   {
     //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
     //Interest Earned Before Fee = New Balance Before Fee - Old Balance
     //Interest Earned After Fee = Interest Earned Before Fee - (Interest Earned Before Fee * SubMarket Fee Rate)
     //User New Balance After Fee = Old Balance + Interest Earned After Fee
+    //Calculate interest earned
     const newBalanceBeforeFee = (userOriginalBalance.value * tokenReserve.newSupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
     const interestEarnedBeforeFee = newBalanceBeforeFee - userOriginalBalance.value
     const interestEarnedAfterFee = interestEarnedBeforeFee - (interestEarnedBeforeFee * props.subMarketFee / 100)
@@ -687,6 +710,12 @@
     userCalculatedBalance.value = (userOriginalBalance.value + interestEarnedAfterFee).toFixed(decimalAmount)
     calculatedUserInterestEarned.value = (interestEarnedAfterFee + userOriginalInterestEarned.value).toFixed(decimalAmount)
 
+    //User New Debt = Old Debt * Token Reserve Accrued Interest Index / User Accrued Interest Index
+    //Calculate interest accrued
+    const newDebt = (userOriginalDebt.value * tokenReserve.newBorrowInterestChangeIndex / Number(lendingUserTabAccount.borrowInterestChangeIndex))
+    userCalculatedDebt.value = newDebt.toFixed(decimalAmount)
+
+    //Calculate 7 day interest earned
     const sevenDayUserCalculatedBalanceBeforeFee = (userOriginalBalance.value * tokenReserve.sevenDaySupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
     const sevenDayInterestEarnedBeforeFee = sevenDayUserCalculatedBalanceBeforeFee - userOriginalBalance.value
 
@@ -695,35 +724,40 @@
     const price = priceObjectMap.data[props.tokenMintAddress].usdPrice
     if(price)
     {
-      balanceValue.value = (userCalculatedBalance.value * Number(price)).toLocaleString('en-US', {
+      balanceValueString.value = (userCalculatedBalance.value * Number(price)).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      interestEarnedValue.value = (calculatedUserInterestEarned.value * Number(price)).toLocaleString('en-US', {
+      debtValueString.value = (userCalculatedDebt.value * Number(price)).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      sevenDayInterestEarnedValue.value = (sevenDayCalculatedUserInterestEarned.value * Number(price)).toLocaleString('en-US', {
+      interestEarnedValueString.value = (calculatedUserInterestEarned.value * Number(price)).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
+
+      sevenDayInterestEarnedValueString.value = (sevenDayCalculatedUserInterestEarned.value * Number(price)).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
     }
     else
     {
-      const zeroValue = (0).toLocaleString('en-US', {
+      const zeroValueString = (0).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      balanceValue.value = zeroValue
-      interestEarnedValue.value = zeroValue
-      sevenDayInterestEarnedValue.value = zeroValue
+      balanceValueString.value = zeroValueString
+      debtValueString.value = zeroValueString
+      interestEarnedValueString.value = zeroValueString
+      sevenDayInterestEarnedValueString.value = zeroValueString
     }
 
     emits('interestEarned',
     props.userTabIndex,
     Number(sevenDayCalculatedUserInterestEarned.value),
-    Number(sevenDayInterestEarnedValue.value),
+    Number(sevenDayInterestEarnedValueString.value),
     Number(calculatedUserInterestEarned.value),
-    Number(interestEarnedValue.value))
+    Number(interestEarnedValueString.value))
   }
 
   function startInterestCalculation(initialTimeStamp: number)
@@ -731,8 +765,8 @@
     var timeStamp = initialTimeStamp
     interestEarnedIntervalId = setInterval(() =>
     {
-      calculateTokenReserveSupplyInterestChangeIndex(timeStamp)
-      calculateUserInterestEarned()
+      calculateTokenReserveInterestChangeIndex(timeStamp)
+      calculateUserInterest()
       timeStamp += 55/1000//convert milliseconds into seconds
     }, 55)
   }
@@ -857,7 +891,7 @@
     }
   }
 
-  @media screen and (min-width: 1285.1px)
+  @media screen and (min-width: 1420.1px)
   { 
     .hChartLayout
     {
@@ -868,7 +902,7 @@
       display: none
     } 
   }
-  @media screen and (max-width: 1285px)
+  @media screen and (max-width: 1420px)
   { 
     .hChartLayout
     {
@@ -955,4 +989,27 @@
       align-items: left;
     }
   }
+
+  @media screen and (min-width: 500.1px)
+  { 
+    .unStackedBalanceDebt
+    {
+      display: block
+    }
+    .stackedBalanceDebt
+    {
+      display: none
+    }
+  }
+  @media screen and (max-width: 500px)
+  { 
+    .unStackedBalanceDebt
+    {
+      display: none
+    }
+    .stackedBalanceDebt
+    {
+      display: block
+    }
+  } 
 </style>

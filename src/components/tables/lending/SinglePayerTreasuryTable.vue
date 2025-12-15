@@ -25,14 +25,8 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span>
           </h2>
-          <!--<h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ tvl.singlePayerTVL.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}</span>
-          </h2>-->
-          <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ (0).toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}</span>
-          </h2>
+          <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
+
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Single Payer Treasury Search     ">
               <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
@@ -184,20 +178,22 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, watch, markRaw } from 'vue'
+  import { ref, onMounted, onUnmounted, watch, markRaw } from 'vue'
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
   import { copyTreasuryATA } from '/src/assets/contracts/WalletHelper.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   var stableCoinTableData = ref()
@@ -210,7 +206,13 @@
   var event = ref()
   var copyTreasuryATAButtonText = ref("Copy Treasury ATA")
 
-  onMounted(() =>
+  var sevenDayProjectionRate = ref()
+  sevenDayProjectionRate.value = (0).toFixed(2)
+  var stableCoinFeeArray = cloneDeep(StableCoins)
+  var cryptoCurrencyFeeArray = cloneDeep(CryptoCurrency)
+  var subMarketFeesAccruedIntervalId: any
+
+  onMounted(async() =>
   {
     if(lendingUserTabAccountsHashMap.map)
     {
@@ -222,6 +224,13 @@
     }
     else
       isLoading.value = true
+
+    await startFeeCalculation()
+  })
+
+  onUnmounted(() =>
+  {
+    stopFeeCalculation()
   })
 
   watch(lendingUserTabAccountsHashMap, () => 
@@ -244,6 +253,12 @@
   {
     processSinglePayerCryptoCurrencyTableData()
     tvl.singlePayerTVL = stableValue.value + cryptoValue.value
+  })
+
+  watch([tokenReservesHashMap, subMarketsHashMap], async() => 
+  {
+    stopFeeCalculation()
+    await startFeeCalculation()
   })
 
   function openTokenPopover(e: Event, rowData: any) 
@@ -411,6 +426,91 @@
 
     cryptoValue.value = value
     CryptoCurrencyTableData.value = unprocessedTableData
+  }
+
+  function calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp: number, tokenMintAddress: string)
+  {
+    const tokenReserve = tokenReservesHashMap.map.get(tokenMintAddress)
+
+    if(!tokenReserve)
+      return
+
+    //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
+    const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
+    const sevenDayChangeInTime = SECONDS_IN_A_WEEK + timeStamp - oldTime
+    const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
+
+    return Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * sevenDayChangeInTime / SECONDS_IN_A_YEAR)
+  }
+
+  function calculateSubMarketSevenDayFeeAccrued(tokenMintAddress: string, tokenReserveSevenDaySupplyInterestChangeIndex: number)
+  {
+    const tokenReserve = tokenReservesHashMap.map.get(tokenMintAddress)
+    const subMarket = subMarketsHashMap.map.get(tokenMintAddress +
+    adminAccounts.lendingCEOAddressString +
+    adminAccounts.lendingMain100PercentSubMarketIndex.toString())
+
+    if(!tokenReserve || !subMarket)
+      return 0
+
+    if(subMarket.supplyInterestChangeIndex == 0)
+      return 0
+
+    //SubMarket New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / SubMarket Earned Interest Index
+    //Interest Earned Before Fee = New Balance Before Fee - Old Balance
+    //Fee Generated = Interest Earned Before Fee * SubMarket Fee Rate
+    const sevenDaySubMarketBalanceBeforeFee = (subMarket.depositedAmount * tokenReserveSevenDaySupplyInterestChangeIndex / Number(subMarket.supplyInterestChangeIndex))
+    const sevenDayInterestEarnedBeforeFee = sevenDaySubMarketBalanceBeforeFee - subMarket.depositedAmount
+    const sevenDaySubMarketFeeGenerated = (sevenDayInterestEarnedBeforeFee * subMarket.feeOnInterestEarnedRate / 100)
+
+    const price = priceObjectMap.data[tokenMintAddress].usdPrice
+    if(price)
+      return sevenDaySubMarketFeeGenerated * Number(price)
+    else
+      return 0
+  }
+
+  async function startFeeCalculation()
+  {
+    if(!tokenReservesHashMap.map || !subMarketsHashMap.map)
+      return
+
+    const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
+    var timeStamp = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
+
+    subMarketFeesAccruedIntervalId = setInterval(() =>
+    {
+      var sevenDayStableCoinProjectionValue = 0
+      for(var i=0; i<stableCoinFeeArray.length; i++)
+      {
+        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp, stableCoinFeeArray[i].tokenMintAddressString)
+        if(stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+          sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenMintAddressString, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+      }
+
+      var sevenDayCryptoCurrencyProjectionValue = 0
+      for(var i=0; i<cryptoCurrencyFeeArray.length; i++)
+      {
+        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp, cryptoCurrencyFeeArray[i].tokenMintAddressString)
+        if(cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenMintAddressString, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+      }
+
+      sevenDayProjectionRate.value = (sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 })
+
+      timeStamp += 55/1000//convert milliseconds into seconds
+    }, 55)
+  }
+
+  function stopFeeCalculation()
+  {
+    if(subMarketFeesAccruedIntervalId != undefined)
+    {
+      clearInterval(subMarketFeesAccruedIntervalId)
+      subMarketFeesAccruedIntervalId = undefined
+    }
   }
 
   const filters = ref(

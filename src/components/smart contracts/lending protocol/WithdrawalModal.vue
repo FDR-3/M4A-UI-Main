@@ -84,8 +84,7 @@
         <div v-else class="inProgressCircle"></div>
       </div>
       <div title="Withdraw" class="progressBarStep flexCenterColumn progressCircleWrapper">
-        <div v-if="withdrawSuccessful" class="finishedCircle"></div>
-        <div v-else class="inProgressCircle"></div>
+        <div class="inProgressCircle"></div>
       </div>
     </div>
 
@@ -158,7 +157,6 @@
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
   const withdrawOrBorrowInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
-  var withdrawSuccessful = ref(false)
 
   var snapShotValidCountDown = ref(0)
   var snapShotCountDownIntervalId: any
@@ -625,7 +623,6 @@
       else
         await confirmLendingTransaction(tx, toast, "withdraw_tokens")
 
-      withdrawSuccessful.value = true
       clearSnapShotIntervalCountDown()
       withdrawing.value = false
       withdrawMax.value = false

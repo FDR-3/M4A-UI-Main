@@ -27,7 +27,7 @@
         >
           <LinuxSVG class="pathSelectionIcon" slot="icon-only"/>
         </ion-button>
-        <ion-text style="margin-top: -15px">Linux</ion-text>
+        <ion-text class="nSmallMarginTop">Linux</ion-text>
       </div>
       <ion-text>Apple and Linux walkthroughs currently unavailable</ion-text>
       <a href="https://www.youtube.com/watch?v=AT5nb-TDm28" target="_blank">SFX</a>

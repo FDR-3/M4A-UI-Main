@@ -88,8 +88,7 @@
         <div v-else class="inProgressCircle"></div>
       </div>
       <div title="Withdraw" class="progressBarStep flexCenterColumn progressCircleWrapper">
-        <div v-if="borrowSuccessful" class="finishedCircle"></div>
-        <div v-else class="inProgressCircle"></div>
+        <div class="inProgressCircle"></div>
       </div>
     </div>
 
@@ -161,7 +160,6 @@
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
 
   const withdrawOrBorrowInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
-  var borrowSuccessful = ref(false)
 
   var snapShotValidCountDown = ref(0)
   var snapShotCountDownIntervalId: any
@@ -297,7 +295,6 @@
   async function openBorrowModal(tokenMintAddress: string, fdr3SubMarkets: any[])
   {
     addCloseListner()
-    borrowSuccessful.value = false
     const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
@@ -543,7 +540,6 @@
       else
         await confirmLendingTransaction(tx, toast, "borrow_tokens")
 
-      borrowSuccessful.value = true
       clearSnapShotIntervalCountDown()
       borrowing.value = false
     }

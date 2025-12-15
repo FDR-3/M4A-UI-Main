@@ -1,14 +1,18 @@
 <template>
   <div class="horizontalValues">
     <h3 class="nTinyMarginBottom" style="margin-top: 0">Health Factor</h3>
-    <ion-text>Asset Value: {{ assetValue }}</ion-text>
-    <ion-text> Debt Value: {{ debtValue }}</ion-text>
+    <div>
+      <ion-text>Asset Value: {{ assetValue }}</ion-text>
+      <ion-text> Debt Value: {{ debtValue }}</ion-text>
+    </div>
+    <ion-text>Overall Value: {{ overallValue }}</ion-text>
   </div>
 
   <div class="verticalValues">
     <h3 class="nTinyMarginBottom" style="margin-top: 0">Health Factor</h3>
     <ion-text>Asset Value: {{ assetValue }}</ion-text><br>
-    <ion-text> Debt Value: {{ debtValue }}</ion-text>
+    <ion-text>Debt Value: {{ debtValue }}</ion-text><br>
+    <ion-text>Overall Value: {{ overallValue }}</ion-text>
   </div>
 
   <div class="flexCenterRow nTinyMarginTop">
@@ -35,6 +39,7 @@
 
   var assetValue = ref()
   var debtValue = ref()
+  var overallValue = ref()
   var healthFactor = ref()
   var barColor = ref()
 
@@ -78,6 +83,9 @@
     debtValue.value = '$' + calculatedDebtValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
+    overallValue.value = '$' + (calculatedAssetValue - calculatedDebtValue).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) 
 
     if(calculatedAssetValue != 0)
     {
@@ -117,7 +125,7 @@
     transition: width 1s linear /* Smooth transition */
   }
 
-  @media screen and (min-width: 450.1px)
+  @media screen and (min-width: 520.1px)
   { 
     .horizontalValues
     {
@@ -128,7 +136,7 @@
       display: none
     }
   }
-  @media screen and (max-width: 450px)
+  @media screen and (max-width: 520px)
   { 
     .horizontalValues
     {

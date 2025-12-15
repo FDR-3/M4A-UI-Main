@@ -47,7 +47,7 @@
       <div class="flexCenterRow" style="justify-content:space-around !important">
         <div>
           <h2 class="underLine">7 Day Projection Rate</h2>
-          <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue }}</span> A Week</h3>
+          <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toFixed(2) }}</span> A Week</h3>
         </div>
 
         <Select
@@ -64,7 +64,7 @@
 
         <div>
           <h2 class="underLine">Life Time Interest Earned</h2>
-          <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue }}</span></h3>
+          <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toFixed(2) }}</span></h3>
         </div>
       </div>
 
@@ -85,14 +85,14 @@
       </Select>
 
       <div>
-        <h2 class="underLine">Life Time Interest Earned</h2>
-        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue }}</span></h3>
-      </div>   
+        <h2 class="underLine">7 Day Projection Rate</h2>
+        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toFixed(2) }}</span> A Week</h3>
+      </div>
 
       <div>
-        <h2 class="underLine nSmallMarginTop">7 Day Projection Rate</h2>
-        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue }}</span> A Week</h3>
-      </div>
+        <h2 class="underLine nSmallMarginTop">Life Time Interest Earned</h2>
+        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toFixed(2) }}</span></h3>
+      </div>   
 
       <div class="nTinyMarginTop">
         <HealthFactorBig :accountOwnerAddress="addressToCheck" :accountIndex="accountSelect"/>
@@ -103,28 +103,28 @@
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
       <div>
         <h4 class="underLine" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue }}</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div>
         <h4 class="underLine" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue }}</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
       </div>  
     </div>
 
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay">
       <div>
-        <h4 class="underLine" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue }}</span></h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
+        <h4 class="underLine" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
-      <div style="margin-top: -47px">
-        <h4 class="underLine" style="line-height: 27px">7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue }}</span> A Week</h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
+      <div class="nMediumMarginTop">
+        <h4 class="underLine" style="line-height: 27px">Life Time Interest Earned</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
     </div>
 
@@ -159,30 +159,32 @@
       :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '14px' : '0px'}">
       <div>
         <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue }}</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div>
         <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue }}</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
     </div>
 
     <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay" :class="userTabStableCoinSubMarketList?.length > 0 ? 'thinBorderTop' : ''"
       :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '4px' : '0px'}">
+      
       <div>
-        <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue }}</span></h5>
+        <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
+        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
+      </div>
+
+      <div class="nMediumMarginTop">
+        <h4 class="underLine" style="line-height: 27px">Life Time Interest Earned</h4>
+        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
 
-      <div style="margin-top: -47px">
-        <h4 class="underLine" style="line-height: 27px">7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue }}</span> A Week</h5>
-        <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
-      </div>
     </div>
 
     <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
@@ -437,11 +439,10 @@
         }
 
       setChartData()
-      
       startGradientAnimation()//This has to be called here and inside of the PortfolioChart.vue file for some reason
-      
-      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
-      initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
+
+      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
+      initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
     }
 
     emitPortfolioRelatedTableHeight()
@@ -529,11 +530,8 @@
     setChartData()
     emitPortfolioRelatedTableHeight()
     
-    if(initialBlockChainTimeStamp.value == 0)
-    {
-      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
-      initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
-    }
+    const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
+    initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
   })
 
   watch(customUserNameHashMap,() =>
@@ -1299,6 +1297,7 @@
   {
     height: 38px; 
     width: min(250px, 80vw);
+    max-width: 250px;
     padding-left: 30px;
     align-self: center
   }
@@ -1376,7 +1375,7 @@
     }
   }
 
-  @media screen and (min-width: 1285.1px)
+  @media screen and (min-width: 1111.1px)
   { 
     .topHHeaderDisplay
     {
@@ -1398,7 +1397,7 @@
       display: none
     }
   }
-  @media screen and (max-width: 1285px)
+  @media screen and (max-width: 1111px)
   { 
     .topHHeaderDisplay
     {

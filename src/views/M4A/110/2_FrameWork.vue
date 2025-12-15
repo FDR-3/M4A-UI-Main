@@ -19,7 +19,7 @@
         <div>
           <SvelteSVG class="pathSelectionIcon" slot="icon-only" @click="giveSVGRepoSvelteCredit()"/>
         </div>
-        <ion-text style="margin-top: 7px">Svelte</ion-text>
+        <ion-text class="tinyMarginTop">Svelte</ion-text>
         <ion-text>(Basically its own language)</ion-text>
       </div>
       <ion-text>Svelte walkthrough currently unavailable</ion-text>
