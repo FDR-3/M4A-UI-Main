@@ -275,7 +275,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -366,7 +366,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -888,7 +888,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -979,7 +979,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1501,7 +1501,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1592,7 +1592,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2111,7 +2111,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2202,7 +2202,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2547,85 +2547,6 @@
       ]
     },
     {
-      "name": "clock_in_dead_mans_break",
-      "discriminator": [
-        192,
-        228,
-        188,
-        5,
-        16,
-        199,
-        9,
-        120
-      ],
-      "accounts": [
-        {
-          "name": "ceo",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  99,
-                  104,
-                  97,
-                  116,
-                  80,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  67,
-                  69,
-                  79
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "dead_mans_break",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  100,
-                  101,
-                  97,
-                  100,
-                  77,
-                  97,
-                  110,
-                  115,
-                  66,
-                  114,
-                  101,
-                  97,
-                  107
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "comment_section_vote",
       "discriminator": [
         67,
@@ -2831,7 +2752,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2922,7 +2843,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3724,7 +3645,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3815,7 +3736,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -4170,7 +4091,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -4261,7 +4182,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -4616,7 +4537,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -4707,7 +4628,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -5059,7 +4980,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -5150,7 +5071,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -5498,7 +5419,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -5589,7 +5510,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -5938,7 +5859,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -6029,7 +5950,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -6378,7 +6299,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -6469,7 +6390,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -6815,7 +6736,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -6906,7 +6827,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -7256,7 +7177,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -7347,7 +7268,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -7698,7 +7619,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -7789,7 +7710,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -8140,7 +8061,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -8231,7 +8152,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -8579,7 +8500,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -8670,7 +8591,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9020,7 +8941,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9111,7 +9032,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9462,7 +9383,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9553,7 +9474,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9904,7 +9825,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -9995,7 +9916,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -10343,7 +10264,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -10434,7 +10355,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -10788,7 +10709,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -10879,7 +10800,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -11238,7 +11159,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -11329,7 +11250,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -11688,7 +11609,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -11779,7 +11700,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -12135,7 +12056,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -12226,7 +12147,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -12578,7 +12499,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -12669,7 +12590,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -13022,7 +12943,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -13113,7 +13034,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -13466,7 +13387,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -13557,7 +13478,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -13907,7 +13828,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -13998,7 +13919,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -14352,7 +14273,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -14443,7 +14364,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -14798,7 +14719,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -14889,7 +14810,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -15244,7 +15165,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -15335,7 +15256,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -15687,7 +15608,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -15778,7 +15699,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -16132,7 +16053,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -16223,7 +16144,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -16578,7 +16499,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -16669,7 +16590,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -17024,7 +16945,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -17115,7 +17036,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -17467,7 +17388,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -17558,7 +17479,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -22530,32 +22451,6 @@
           }
         },
         {
-          "name": "dead_mans_break_counter",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  100,
-                  101,
-                  97,
-                  100,
-                  77,
-                  97,
-                  110,
-                  115,
-                  66,
-                  114,
-                  101,
-                  97,
-                  107
-                ]
-              }
-            ]
-          }
-        },
-        {
           "name": "signer",
           "writable": true,
           "signer": true
@@ -22829,7 +22724,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -22920,7 +22815,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -23436,7 +23331,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -23527,7 +23422,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -24043,7 +23938,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -24134,7 +24029,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -24647,7 +24542,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -24738,7 +24633,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -25255,7 +25150,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -25346,7 +25241,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -25864,7 +25759,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -25955,7 +25850,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -26473,7 +26368,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -26564,7 +26459,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -27079,7 +26974,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -27170,7 +27065,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -27809,7 +27704,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -27900,7 +27795,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -28418,7 +28313,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -28509,7 +28404,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -29027,7 +28922,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -29118,7 +29013,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -29633,7 +29528,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -29724,7 +29619,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -30204,7 +30099,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -30295,7 +30190,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -30669,7 +30564,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -30760,7 +30655,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -31136,7 +31031,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -31227,7 +31122,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -31603,7 +31498,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -31694,7 +31589,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -32200,7 +32095,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -32291,7 +32186,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -32722,7 +32617,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -32813,7 +32708,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -33244,7 +33139,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -33335,7 +33230,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -33763,7 +33658,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -33854,7 +33749,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -34272,7 +34167,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -34363,7 +34258,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -34785,7 +34680,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -34876,7 +34771,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -35298,7 +35193,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -35389,7 +35284,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -35808,7 +35703,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -35899,7 +35794,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -36320,7 +36215,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -36411,7 +36306,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -36836,7 +36731,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -36927,7 +36822,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -37352,7 +37247,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -37443,7 +37338,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -37865,7 +37760,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -37956,7 +37851,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -38377,7 +38272,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -38468,7 +38363,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -38893,7 +38788,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -38984,7 +38879,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -39409,7 +39304,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -39500,7 +39395,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -39922,7 +39817,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -40013,7 +39908,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -40781,7 +40676,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -40872,7 +40767,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -53145,7 +53040,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -53236,7 +53131,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -53600,7 +53495,7 @@
           }
         },
         {
-          "name": "user_fee_ata",
+          "name": "user_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -53691,7 +53586,7 @@
           }
         },
         {
-          "name": "treasurer_fee_ata",
+          "name": "treasurer_ata",
           "writable": true,
           "pda": {
             "seeds": [
@@ -54000,19 +53895,6 @@
         35,
         107,
         44
-      ]
-    },
-    {
-      "name": "DeadMansBreak",
-      "discriminator": [
-        181,
-        29,
-        102,
-        85,
-        173,
-        197,
-        211,
-        183
       ]
     },
     {
@@ -55197,18 +55079,6 @@
           {
             "name": "toggle_flag_count",
             "type": "u32"
-          }
-        ]
-      }
-    },
-    {
-      "name": "DeadMansBreak",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "unix_clock_in_time_stamp",
-            "type": "u64"
           }
         ]
       }

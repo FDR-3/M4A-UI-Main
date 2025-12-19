@@ -484,7 +484,7 @@
     const subMarket = subMarketsHashMap.map.get(tokenMintAddress +
     adminAccounts.lendingCEOAddressString +
     adminAccounts.lendingMain3PercentSubMarketIndex.toString())
-
+    
     if(!tokenReserve || !subMarket)
       return 0
 

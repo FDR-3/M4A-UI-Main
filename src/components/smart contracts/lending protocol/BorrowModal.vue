@@ -129,8 +129,9 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { generateTabAndPythRemainingAccounts } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { lendingUserAccountsHashMap,
+    lendingUserTabAccountListHashMap,
+    lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { PythSolanaReceiver, InstructionWithEphemeralSigners } from "@pythnetwork/pyth-solana-receiver"
   import { HermesClient } from "@pythnetwork/hermes-client"
@@ -481,17 +482,16 @@
 
   async function borrowTokens()
   {
-    const remainingAccounts = generateTabAndPythRemainingAccounts(connectedWallet.addressString, accountSelect.value)
-    var pythIdArray = []
+    const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    var pythIdArray: string[] = []
 
-    for(var i=0; i<remainingAccounts.length; i+=2)
+    for(var i=0; i<remainingTabAccounts.length; i++)
     {
-      const tokenInfo = tokenReserveHashMap.get(remainingAccounts[i].tokenMintAddress)
+      const tokenInfo = tokenReserveHashMap.get(remainingTabAccounts[i].tokenMintAddress)
       pythIdArray.push(tokenInfo.pythId)
     }
 
     const hermesClient = new HermesClient("https://hermes.pyth.network/")
-
     const pythSolanaReceiver = new PythSolanaReceiver(
     {
       connection: anchorPrograms.lending.connection,
@@ -499,15 +499,33 @@
     })
 
     const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
-
     const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
 
     await transactionBuilder.addPostPriceUpdates(priceUpdateData.binary.data)
-
-    await transactionBuilder.addPriceConsumerInstructions(
-      async (
+    await transactionBuilder.addPriceConsumerInstructions
+    (
+      async(
         getPriceUpdateAccount: (priceFeedId: string) => PublicKey
-      ): Promise<InstructionWithEphemeralSigners[]> => {
+      ): Promise<InstructionWithEphemeralSigners[]> =>
+      {
+        var remainingAccounts = []
+
+        for(var i=0; i<pythIdArray.length; i++)
+        {
+          remainingAccounts.push(remainingTabAccounts[i])
+
+          const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[i]);
+
+          const ephemeralPythPriceUpdateRemainingAccount = 
+          {
+            pubkey: ephemeralPythKey,
+            isSigner: false,
+            isWritable: true
+          }
+
+          remainingAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
+        }
+        
         return [
           {
             instruction: await anchorPrograms.lending.lendingProgram.methods.borrowTokens

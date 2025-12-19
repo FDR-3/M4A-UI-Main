@@ -1,5 +1,5 @@
 {
-  "address": "J84wCxvKTHun7eBK8SDLbCijVacAkvtDaG9WgXtqJ4VF",
+  "address": "Ak8KL3BDDfPQjVmYmaFXFoydohrL9uPETYsgfipZdT7C",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -230,12 +230,21 @@
           "type": "u8"
         },
         {
-          "name": "pyth_price_update_key",
-          "type": "pubkey"
+          "name": "pyth_feed_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
         },
         {
-          "name": "borrow_apy",
+          "name": "fixed_borrow_apy",
           "type": "u16"
+        },
+        {
+          "name": "use_fixed_borrow_apy",
+          "type": "bool"
         },
         {
           "name": "global_limit",
@@ -2929,8 +2938,12 @@
           "type": "pubkey"
         },
         {
-          "name": "borrow_apy",
+          "name": "fixed_borrow_apy",
           "type": "u16"
+        },
+        {
+          "name": "use_fixed_borrow_apy",
+          "type": "bool"
         },
         {
           "name": "global_limit",
@@ -4047,7 +4060,7 @@
           },
           {
             "name": "tab_account_count",
-            "type": "u32"
+            "type": "u16"
           }
         ]
       }
@@ -4210,12 +4223,17 @@
             "type": "u8"
           },
           {
-            "name": "pyth_price_update_key",
-            "type": "pubkey"
+            "name": "pyth_feed_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "user_tab_account_index",
-            "type": "u32"
+            "type": "u16"
           },
           {
             "name": "user_tab_account_added",
@@ -4386,8 +4404,13 @@
             "type": "u8"
           },
           {
-            "name": "pyth_price_update_key",
-            "type": "pubkey"
+            "name": "pyth_feed_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "supply_apy",
@@ -4396,6 +4419,14 @@
           {
             "name": "borrow_apy",
             "type": "u16"
+          },
+          {
+            "name": "fixed_borrow_apy",
+            "type": "u16"
+          },
+          {
+            "name": "use_fixed_borrow_apy",
+            "type": "bool"
           },
           {
             "name": "utilization_rate",

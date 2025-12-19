@@ -52,10 +52,21 @@
     <div class=" flexCenterRow">
       <div style="width: 90%">
         <ion-input v-model="tokenMintAddressInput" class="mediumMarginBottom" fill="outline" placeholder="Enter The Mint Address"></ion-input>
-        <ion-input v-model="pythUpdateKeyInput" class="mediumMarginBottom" fill="outline" placeholder="Enter The Pyth Price Update Key"></ion-input>
+        <ion-input v-model="pythPriceFeedID" class="mediumMarginBottom" fill="outline" placeholder="Enter The Pyth Price Update Key"></ion-input>
         <ion-input v-model="tokenDecmialCountInput" class="mediumMarginBottom" fill="outline" type="number" min="0" max="10" step="1" placeholder="Enter The Token Decimal"></ion-input>
         
-        <ion-label >Borrow APY:</ion-label>
+        <ion-label>Use Fixed Borrow APY</ion-label><br>
+        <Select
+        class="tinyMarginTop tinyMarginBottom"
+        v-model="trueFalseSelect" 
+        :options="trueFalseList" 
+        optionLabel="booleanName" 
+        optionValue="booleanValue" 
+        placeholder="Select Boolean"
+        appendTo="self">
+        </Select><br><br>
+
+        <ion-label>Fixed Borrow APY:</ion-label>
         <InputNumber
         id="borrowAPYInput"
         v-model="borrowAPY"
@@ -104,7 +115,7 @@
   const toast = inject('toast')
 
   var tokenMintAddressInput = ref()
-  var pythUpdateKeyInput = ref()
+  var pythPriceFeedID = ref()
   var tokenDecmialCountInput = ref()
   var createSubMarketModal = ref()
   var monthSelect = ref()
@@ -114,6 +125,19 @@
   var borrowAPY = ref(5)
   var borrowAPRef = ref()
   var globalLimitInput = ref(1_000_000)
+
+  var trueFalseSelect = ref(true)
+  var trueFalseList = 
+  [
+    {
+      booleanName: "True",
+      booleanValue: true
+    },
+    {
+      booleanName: "False",
+      booleanValue: false
+    }
+  ]
 
   onMounted(() =>
   {
@@ -142,7 +166,7 @@
     const tokenInfo = tokenReserveHashMap.get(tokenAddress)
     
     tokenMintAddressInput.value = tokenAddress
-    pythUpdateKeyInput.value = tokenInfo.pythKey.toBase58()
+    pythPriceFeedID.value = tokenInfo.pythId.slice(2)
     tokenDecmialCountInput.value = tokenInfo.decimalAmount
 
     await addTokenReserve()
@@ -157,14 +181,15 @@
       const tx = await anchorPrograms.lending.lendingProgram.methods.addTokenReserve(
         mintAddressKey,
         tokenDecmialCountInput.value,
-        new PublicKey(pythUpdateKeyInput.value),
+        Array.from(Buffer.from(pythPriceFeedID.value, "hex")),
         borrowAPY.value * 100,//convert to fixedpoint notation
+        trueFalseSelect.value,
         new anchor.BN(globalLimitInput.value * Math.pow(10, tokenDecmialCountInput.value)))//convert to fixedpoint notation
       .accounts({mint: mintAddressKey})
       .rpc()
 
       tokenMintAddressInput.value = ""
-      pythUpdateKeyInput.value = ""
+      pythPriceFeedID.value = []
       tokenDecmialCountInput.value = ""
       await confirmLendingTransaction(tx, toast, "add_token_reserve")
     }

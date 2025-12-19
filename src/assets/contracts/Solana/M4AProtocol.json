@@ -10488,53 +10488,73 @@
   "errors": [
     {
       "code": 6000,
-      "name": "PatientFirstNameTooLong",
-      "msg": "Patient First Name can't be longer than 52 characters"
+      "name": "NoRatFuckeryAllowed",
+      "msg": "You're doing something the UI never would have allowed"
     },
     {
       "code": 6001,
-      "name": "PatientLastNameTooLong",
-      "msg": "Patient Last Name can't be longer than 52 characters"
+      "name": "TooManyClaimsInQueue",
+      "msg": "The Claim Queue is full"
     },
     {
       "code": 6002,
-      "name": "HospitalNameTooLong",
-      "msg": "Hospital Name can't be longer than 100 characters"
+      "name": "ClaimQueueDisabled",
+      "msg": "Claim Queue is currently disabled"
     },
     {
       "code": 6003,
-      "name": "HospitalAddressTooLong",
-      "msg": "Hospital Address can't be longer than 100 characters"
+      "name": "FlagSameState",
+      "msg": "Can't set flag to the same state"
     },
     {
       "code": 6004,
-      "name": "HospitalCityTooLong",
-      "msg": "Hospital City can't be longer than 40 characters"
+      "name": "RecordAlreadyCreated",
+      "msg": "Record has already been created"
     },
     {
       "code": 6005,
-      "name": "HospitalPhoneNumberTooLong",
-      "msg": "Hospital Phone Number can't be longer than 20 characters"
+      "name": "RecordNotCreated",
+      "msg": "Record hasn't been created yet"
     },
     {
       "code": 6006,
-      "name": "HospitalBillInvoiceNumberTooLong",
-      "msg": "Hospital Bill Invoice Number can't be longer than 20 characters"
+      "name": "ClaimAlreadyAssigned",
+      "msg": "Claim must not be assigned to assign it"
     },
     {
       "code": 6007,
-      "name": "AilmentTooLong",
-      "msg": "Ailment can't be longer than 45 characters"
+      "name": "ClaimNotAssigned",
+      "msg": "Claim must be assigned to unassign or reassign it"
     },
     {
       "code": 6008,
-      "name": "NoteTooLong",
-      "msg": "Note can't be longer than 140 characters"
+      "name": "ClaimNotPending",
+      "msg": "Claim must be being in a pending state to use this Max Deny"
     },
     {
       "code": 6009,
-      "name": "InsuranceCompanyNameTooLong",
-      "msg": "Insurance company name can't be longer than 35 characters"
+      "name": "ClaimNotBeingProcessed",
+      "msg": "Claim must be being processed already to need be reassigned, denied, or Max inprogress denied"
+    },
+    {
+      "code": 6010,
+      "name": "ClaimNotDenied",
+      "msg": "Claim must be in a denied state to appeal it"
+    },
+    {
+      "code": 6011,
+      "name": "ClaimNotAppealed",
+      "msg": "Can't deny appeal of a claim that isn't in an appealed state"
+    },
+    {
+      "code": 6012,
+      "name": "ClaimNotDeniedOrAppealed",
+      "msg": "Claim must be in a denied or appealed state to undeny it"
+    },
+    {
+      "code": 6013,
+      "name": "ClaimNotApproved",
+      "msg": "Claim must be in a approved state to revoke approval"
     }
   ],
   "types": [

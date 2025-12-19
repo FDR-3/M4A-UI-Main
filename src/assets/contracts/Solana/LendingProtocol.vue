@@ -413,30 +413,6 @@
     }
   }
 
-  export function generateTabAndPythRemainingAccounts(lendingUserAddress: string, lendingUserAccountIndex: number)
-  {
-    var remainingAccounts = []
-    const lendingUserTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(lendingUserAddress + lendingUserAccountIndex.toString())
-
-    for(var i=0; i<lendingUserTabAccounts.length; i++)
-    {
-      const tabRemainingAccount = cloneDeep(lendingUserTabAccounts[i])
-
-      remainingAccounts.push(tabRemainingAccount)
-
-      const pythPriceUpdateRemainingAccount = 
-      {
-        pubkey: lendingUserTabAccounts[i].pythPriceUpdateKey,
-        isSigner: false,
-        isWritable: true
-      }
-
-      remainingAccounts.push(pythPriceUpdateRemainingAccount)  
-    }
-
-    return remainingAccounts
-  }
-
   export async function setLendingUserPortfolioHashMaps()
   {
     if(!lendingUserMonthlyStatements.data)

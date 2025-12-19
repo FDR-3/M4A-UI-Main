@@ -530,14 +530,6 @@
         const tokenReserve = tokenReservesHashMap.map.get(CryptoCurrency[i].tokenMintAddressString)
         if(tokenReserve)
         {
-          /*console.log(tokenReserve)
-          console.log(Number(tokenReserve.utilizationRate))
-          console.log(Number(tokenReserve.feesGeneratedAmount))
-          console.log(Number(tokenReserve.interestAccruedAmount))
-          console.log(Number(tokenReserve.supplyInterestChangeIndex))
-          console.log(Number(tokenReserve.borrowInterestChangeIndex))
-          console.log(Number(tokenReserve.interestEarnedAmount))*/
-
           CryptoCurrency[i].supplyAPY  = tokenReserve.supplyApy / 100 //Convert to decimal from fixed point notation
           CryptoCurrency[i].supplyAPYString = CryptoCurrency[i].supplyAPY.toLocaleString('en-US', {
           minimumFractionDigits: 2,

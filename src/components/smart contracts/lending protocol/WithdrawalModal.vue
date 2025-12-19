@@ -125,8 +125,10 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { generateTabAndPythRemainingAccounts } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { lendingUserAccountsHashMap,
+    lendingUserTabAccountsHashMap,
+    lendingUserTabAccountListHashMap,
+    lendingUserRemainingTabAccountListHashMap, } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { PythSolanaReceiver, InstructionWithEphemeralSigners } from "@pythnetwork/pyth-solana-receiver"
   import { HermesClient } from "@pythnetwork/hermes-client"
@@ -515,65 +517,16 @@
 
   async function withdrawTokens()
   {
-    /*
-    await transactionBuilder.addPriceConsumerInstructions(
-      async (
-        // This function returns the temporary key for the freshly posted price update
-        getPriceUpdateAccount: (priceFeedId: string) => PublicKey
-      ): Promise<InstructionWithEphemeralSigners[]> => {
-        
-        // **A. Create a new array to hold the updated accounts**
-        let updatedRemainingAccounts = [];
+    const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    var pythIdArray: string[] = []
 
-        for (let i = 0; i < remainingAccounts.length; i += 2) {
-          const tabAccountMeta = remainingAccounts[i];
-          const pythAccountMeta = remainingAccounts[i + 1];
-
-          // 1. Keep the Tab Account Meta as is (It holds the permanent key data)
-          updatedRemainingAccounts.push(tabAccountMeta);
-
-          // 2. Look up the Price Feed ID needed for this tab account
-          const tokenInfo = tokenReserveHashMap.get(tabAccountMeta.tokenMintAddress);
-          
-          // 3. Get the Ephemeral Pyth Key using the SDK's helper function
-          const ephemeralPythKey = getPriceUpdateAccount(tokenInfo.pythId);
-          
-          // 4. Push the new Ephemeral Pyth Account Meta
-          // We overwrite the pubkey with the fresh, temporary account's key
-          updatedRemainingAccounts.push({
-            isSigner: pythAccountMeta.isSigner,
-            isWritable: pythAccountMeta.isWritable,
-            pubkey: ephemeralPythKey, // <--- **THIS IS THE KEY CHANGE**
-          });
-        }
-
-        return [
-          {
-            instruction: await anchorPrograms.lending.lendingProgram.methods.borrowTokens
-              // ... (instruction parameters) ...
-              .remainingAccounts(updatedRemainingAccounts) // **Pass the corrected array**
-              .instruction(),
-            signers: []
-          },
-        ]
-      }
-    );*/
-
-
-
-
-
-    const remainingAccounts = generateTabAndPythRemainingAccounts(connectedWallet.addressString, accountSelect.value)
-    var pythIdArray = []
-
-    for(var i=0; i<remainingAccounts.length; i+=2)
+    for(var i=0; i<remainingTabAccounts.length; i++)
     {
-      const tokenInfo = tokenReserveHashMap.get(remainingAccounts[i].tokenMintAddress)
+      const tokenInfo = tokenReserveHashMap.get(remainingTabAccounts[i].tokenMintAddress)
       pythIdArray.push(tokenInfo.pythId)
     }
 
     const hermesClient = new HermesClient("https://hermes.pyth.network/")
-
     const pythSolanaReceiver = new PythSolanaReceiver(
     {
       connection: anchorPrograms.lending.connection,
@@ -581,29 +534,47 @@
     })
 
     const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
-
     const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
 
     await transactionBuilder.addPostPriceUpdates(priceUpdateData.binary.data)
-
-    await transactionBuilder.addPriceConsumerInstructions(
-      async (
+    await transactionBuilder.addPriceConsumerInstructions
+    (
+      async(
         getPriceUpdateAccount: (priceFeedId: string) => PublicKey
-      ): Promise<InstructionWithEphemeralSigners[]> => {
-        return [
+      ): Promise<InstructionWithEphemeralSigners[]> =>
+      {
+        var remainingAccounts = []
+
+        for(var i=0; i<pythIdArray.length; i++)
+        {
+          remainingAccounts.push(remainingTabAccounts[i])
+
+          const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[i]);
+
+          const ephemeralPythPriceUpdateRemainingAccount = 
+          {
+            pubkey: ephemeralPythKey,
+            isSigner: false,
+            isWritable: true
+          }
+
+          remainingAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
+        }
+
+        return[
           {
             instruction: await anchorPrograms.lending.lendingProgram.methods.withdrawTokens
-              (
-                selectedTokenMintAddress,
-                adminAccounts.lendingCEOAddressKey,
-                subMarketSelect.value,
-                accountSelect.value,
-                new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value)), //convert to fixedpoint notation
-                withdrawMax.value
-              )
-              .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
-              .remainingAccounts(remainingAccounts)
-              .instruction(),
+            (
+              selectedTokenMintAddress,
+              adminAccounts.lendingCEOAddressKey,
+              subMarketSelect.value,
+              accountSelect.value,
+              new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value)), //convert to fixedpoint notation
+              withdrawMax.value
+            )
+            .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
+            .remainingAccounts(remainingAccounts)
+            .instruction(),
             signers: []
           },
         ]

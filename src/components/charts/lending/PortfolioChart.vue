@@ -322,7 +322,8 @@
   import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
   import { tokenReservesHashMap, tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
-
+  import cloneDeep from 'lodash/cloneDeep'
+  
   const props = defineProps(
   [
     'isStableCoin',
@@ -523,8 +524,10 @@
   function startGradientAnimation()
   {
     animationIntervalId = setInterval(() =>
-    {
-      chartRef.value.chart.update("none")
+    { 
+      if(chartRef.value)
+        if(chartRef.value.chart)
+          chartRef.value.chart.update("none")
     }, 55)
   }
 
@@ -682,7 +685,7 @@
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)
   {
     //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
-    tokenReserve = tokenReservesHashMap.map.get(props.tokenMintAddress)
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenMintAddress))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers 
 
     const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
     const changeInTime = timeStamp - oldTime
