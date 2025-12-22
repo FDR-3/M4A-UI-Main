@@ -93,7 +93,17 @@
 
   <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
   createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"/>
+  <AdminTokenReservesTable @editTokenReserveModal="(tokenMintAddress: PublicKey,
+  tokenSVG: Component,
+  tokenName:string,
+  fixedBorrowAPY: number,
+  useFixedBorrowApy: boolean,
+  globalLimit: number) =>
+  editTokenReserveModal.openEditTokenReserveModal(tokenMintAddress, tokenSVG, tokenName, fixedBorrowAPY, useFixedBorrowApy, globalLimit)"/>
+
   <CreateSubMarketModal ref="createSubMarketModal"/>
+  <EditTokenReserveModal ref="editTokenReserveModal"/>
+  
 </template>
 
 <script setup lang="ts">
@@ -108,8 +118,10 @@
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
   import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
+  import AdminTokenReservesTable from '/src/components/tables/lending/admin/AdminTokenReservesTable.vue'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
-  import {  PublicKey } from "@solana/web3.js"
+  import EditTokenReserveModal from '/src/components/smart contracts/lending protocol/EditTokenReserveModal.vue'
+  import { PublicKey } from "@solana/web3.js"
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -118,6 +130,7 @@
   var pythPriceFeedID = ref()
   var tokenDecmialCountInput = ref()
   var createSubMarketModal = ref()
+  var editTokenReserveModal = ref()
   var monthSelect = ref()
 
   var statementYearInput = ref("")

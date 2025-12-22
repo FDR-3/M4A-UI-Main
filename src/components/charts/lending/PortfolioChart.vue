@@ -21,7 +21,7 @@
           side="top" 
           alignment="center"
           >
-            <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+            <ion-button color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
               <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
             </ion-button>
           </ion-popover>
@@ -64,17 +64,17 @@
             side="top" 
             alignment="center"
             >
-              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
-                <ion-label color="dark">Deposit</ion-label>
+              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
               </ion-button>
-              <ion-button v-if="userCalculatedBalance" class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
-                <ion-label color="dark">Withdraw</ion-label>
+              <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
               </ion-button>
-              <ion-button class="copyAddressButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
-                <ion-label color="dark">Borrow</ion-label>
+              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
               </ion-button>
-              <ion-button v-if="userCalculatedDebt" class="copyAddressButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
-                <ion-label color="dark">Repay</ion-label>
+              <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                <ion-label class="noClickEvent" color="dark">Repay</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -101,7 +101,7 @@
       side="top" 
       alignment="center"
       >
-        <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover><br>
@@ -160,17 +160,17 @@
           side="top" 
           alignment="center"
           >
-            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
-              <ion-label color="dark">Deposit</ion-label>
+            <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+              <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
             </ion-button>
-            <ion-button v-if="userCalculatedBalance" class="copyAddressButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
-              <ion-label color="dark">Withdraw</ion-label>
+            <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+              <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
             </ion-button>
-            <ion-button class="copyAddressButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
-              <ion-label color="dark">Borrow</ion-label>
+            <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+              <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
             </ion-button>
-            <ion-button v-if="userOriginalDebt" class="copyAddressButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
-              <ion-label color="dark">Repay</ion-label>
+            <ion-button v-if="userOriginalDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+              <ion-label class="noClickEvent" color="dark">Repay</ion-label>
             </ion-button>
           </ion-popover>
         </div>

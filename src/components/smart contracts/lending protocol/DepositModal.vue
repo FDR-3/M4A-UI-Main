@@ -2,22 +2,22 @@
   <div v-if="depositing"
     id="depositModal"
     class="thickBorder"
+    ref="modalRef"
   >
-    <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
-      <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
-        <img class="noClickEvent" v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component class="noClickEvent" v-else :is="depositSVG" style="width: 44px"></component>
-        <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
+    <div class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
+      <ion-button fill="clear" @click="openTokenPopover($event)">
+        <img v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <component v-else :is="depositSVG" style="width: 44px"></component>
+        <ion-text color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
-      id="copyTokenMintAddressPopover"
       :is-open="tokenPopoverOpen" 
       :event="event" 
       @didDismiss="tokenPopoverOpen=false"
       side="top" 
       alignment="center"
       >
-        <ion-button id="copyTokenMintAddressButton" class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
@@ -34,7 +34,7 @@
     @change="updateStoredSelectedSubMarketIndex(selectedTokenMintAddress.toString(), subMarketSelect.toString())">
     </Select>
 
-    <div class="flexCenterRow accountNameActionContainer">
+    <div class="flexCenterRow">
       <ion-button v-if="addingAdditionalLendingAccount" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
         <ion-icon :src="close" color="dark"></ion-icon>
       </ion-button>
@@ -51,7 +51,7 @@
       appendTo="self"
       @change="updateStoredSelectedAccount()">
         <template #footer>
-          <div class="flexCenterRow accountNameActionContainer">
+          <div class="flexCenterRow">
             <ion-button @click="setNewAccountDefaultName()" color="dark">
               <ion-label color="light">New</ion-label>
             </ion-button>
@@ -78,7 +78,7 @@
       </ion-input>
     </div>
 
-    <ion-label class="alignSelfLeft noClickEvent">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
+    <ion-label class="alignSelfLeft">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <InputNumber
       v-model="depositAmount"
       :inputStyle="{'text-align': 'center'}"
@@ -90,24 +90,23 @@
       fluid
       @input="(event: { value: any }) => depositAmount = event.value"
     />
-    <div id="maxButtonContainer" class="alignSelfLeft">
+    <div class="alignSelfLeft">
       <!--If it's the SOL Token, leave some SOL when hitting the Max button for transactions-->
-      <button id="maxButton" style="background-color: transparent" @click="selectedTokenMintAddress?.toString()!=tokenAddressStrings.solTokenMintAddress ? depositAmount=userBalance : depositAmount=userBalance-0.1">
+      <button style="background-color: transparent" @click="selectedTokenMintAddress?.toString()!=tokenAddressStrings.solTokenMintAddress ? depositAmount=userBalance : depositAmount=userBalance-0.1">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
 
-    <div class="smallMarginTop noClickEvent">
+    <div class="smallMarginTop">
       <ion-text>Value: ${{ depositValue }}</ion-text>
     </div>
 
-    <ion-text v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom noClickEvent" style="font-size: 11px"
+    <ion-text v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom" style="font-size: 11px"
     >
       Connect wallet to deposit
     </ion-text>
     <ion-button
       v-else
-      id="depositButton"
       color="dark"
       @click="depositTokens()"
       class="mediumSmallMarginTop nTinyMarginBottom"
@@ -166,6 +165,7 @@
 
   var savedEmojiCursorPosition: any
   var overCommentByteSizeLimit = ref()
+  var modalRef = ref()
 
   var depositValue = computed(() =>
   {
@@ -230,46 +230,14 @@
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = function(event: any) 
-  {
+  {console.log(event?.target)
     if(depositing.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
       
-      if((event?.target?.id != "tokenButtonContainer") &&
-      (event?.target?.id != "openCopyTokenMintAddressButton") &&
-      (event?.target?.id != "copyTokenMintAddressButton") &&
-      (event?.target?.id != "copyTokenMintAddressPopover") &&
-      (event?.target?.id != "accountNameEditInput") &&
-      (event?.target?.id != "depositModal") &&
-      (event?.target?.id != "openDepositModal") &&
-      (event?.target?.id != "maxButtonContainer") &&
-      (event?.target?.id != "maxButton") &&
-      (event?.target?.id != "depositButton") &&
-      (event?.target?.id != "themeButton") &&
-      !event?.target?.classList.contains("tableDepositButton") &&
-      !event?.target?.classList.contains("native-wrapper") &&
-      !event?.target?.classList.contains("native-input") &&
-      !event?.target?.classList.contains("input-outline-container") &&
-      !event?.target?.classList.contains("input-wrapper") &&
-      !event?.target?.classList.contains("input-bottom") &&
-      !event?.target?.classList.contains("emoteButton") &&
-      !event?.target?.classList.contains("emojiButton") &&
-      !event?.target?.classList.contains("sc-ion-label-md-h") &&
-      !event?.target?.classList.contains("button") &&
-      !event?.target?.classList.contains("accountNameActionContainer") &&
-      !event?.target?.classList.contains("p-select") &&
-      !event?.target?.classList.contains("p-select-list") &&
-      !event?.target?.classList.contains("p-select-label") &&
-      !event?.target?.classList.contains("p-select-dropdown") &&
-      !event?.target?.classList.contains("p-select-empty-message") &&
-      !event?.target?.classList.contains("p-select-option") &&
-      !event?.target?.classList.contains("p-select-option-label") &&
-      !event?.target?.classList.contains("p-select-list-container") &&
-      !event?.target?.classList.contains("p-inputtext") &&
-      !event?.target?.classList.contains("p-icon") &&
-      !event?.target?.classList.contains("p-inputnumber") &&
-      !event?.target?.classList.contains("p-inputnumber-button") &&
-      !event?.target?.classList.contains("p-inputnumber-button-group") &&
+      if(!modalRef.value.contains(event?.target) &&
+      !event?.target?.classList.contains("lendingActionButton") &&
+      !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal

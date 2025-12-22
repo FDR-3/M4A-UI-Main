@@ -1,14 +1,14 @@
 <template>
-  <div v-if="creatingSubMarket"
-    id="createSubMarketModal"
+  <div v-if="editingTokenReserve"
+    id="editTokenReserveModal"
     class="thickBorder"
     ref="modalRef"
   >
     <div class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
       <ion-button fill="clear" @click="openTokenPopover($event)">
         <img v-if="selectedTokenMintAddressString==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component v-else :is="createSubMarketSVG" style="width: 44px"></component>
-        <ion-text color="dark">{{ subMarketTokenName }}</ion-text><br>
+        <component v-else :is="editTokenReserveSVG" style="width: 44px"></component>
+        <ion-text color="dark">{{ tokenReserveTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
       :is-open="tokenPopoverOpen" 
@@ -23,27 +23,10 @@
       </ion-popover>
     </div>
 
-    <p class="nTinyMarginTop">Owner: {{ trimAddress(connectedWallet.addressString) }}</p>
-    <div v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom">
-      <ion-text  style="font-size: 11px"
-      >
-        Connect wallet to create a submarket
-      </ion-text>
-    </div>
-
-    <ion-input
-      class="feeCollectorInput"
-      v-model="feeCollectorAddress"
-      fill="outline"
-      @ion-input="isValidPublicKey = isValidSolanaPublicKey(feeCollectorAddress)"
-      :class="{ 'invalid': !isValidPublicKey }"
-    >
-    </ion-input>
-    <ion-text style="font-size: 11px">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
     <InputNumber
-      v-model="feePercentage"
+      id="editTokenReserveInput"
+      v-model="fixedBorrowAPYPercentage"
       ref="feePercentageRef"
-      class="feeCollectorInput mediumMarginTop"
       :inputStyle="{'text-align': 'center'}"
       suffix="%"
       inputId="percent"
@@ -54,15 +37,35 @@
       fluid
       @keydown.enter="checkIfCursorBehindPercentSign()"
     />
-    <ion-text style="font-size: 11px">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text><br>
+    <ion-text style="font-size: 11px">Enter fixed Borrow APY%</ion-text><br><br>
+
+    <Select
+    v-model="useFixedBorrowAPYSelect" 
+    :options="trueFalseList" 
+    optionLabel="booleanName" 
+    optionValue="booleanValue" 
+    placeholder="Select Boolean"
+    appendTo="self">
+    </Select><br>
+    <ion-text style="font-size: 11px" class="nTinyMarginTop">Use Fixed Borrow APY</ion-text><br><br>
+
+    <InputNumber
+      id="editTokenReserveInput"
+      v-model="globalLimitInput"
+      :inputStyle="{'text-align': 'center'}"
+      :min="0"
+      :step="1"
+      showButtons
+      fluid
+    />
+    <ion-text style="font-size: 11px">Enter Global Limit</ion-text><br>
 
     <ion-button
       color="dark"
-      @click="createSubMarket()"
+      @click="editTokenReserve()"
       class="mediumMarginTop"
-      :disabled="!isValidPublicKey || !connectedWallet.isConnected"
     >
-      Create SubMarket
+      Edit TokenReserve
     </ion-button>
   </div>
 </template>
@@ -70,29 +73,41 @@
 <script setup lang="ts">
   import { ref, inject, onMounted, onUnmounted } from 'vue'
   import type { Component } from 'vue'
-  import { IonInput, IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
+  import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
+  import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
-  import { trimAddress,
-    copyTokenMintAddress,
-    isValidSolanaPublicKey,
+  import { copyTokenMintAddress,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
-  import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
 
-  var feePercentage = ref(3)
+  var fixedBorrowAPYPercentage = ref(3)
   var feePercentageRef = ref()
-  var isValidPublicKey = ref(false)
-  var creatingSubMarket = ref(false)
-  var createSubMarketSVG = ref()
-  var subMarketTokenName = ref()
-  var feeCollectorAddress = ref()
+  var editingTokenReserve = ref(false)
+  var editTokenReserveSVG = ref()
+  var tokenReserveTokenName = ref()
+
+  var globalLimitInput = ref()
+
+  var useFixedBorrowAPYSelect = ref()
+  var trueFalseList = 
+  [
+    {
+      booleanName: "True",
+      booleanValue: true
+    },
+    {
+      booleanName: "False",
+      booleanValue: false
+    }
+  ]
+
   var selectedTokenMintAddress: PublicKey
   var selectedTokenMintAddressString: string
 
@@ -111,44 +126,49 @@
     window.removeEventListener('click', handleClickOutside);
   })
 
-  // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
+  //When the user clicks anywhere outside of the edit token reserve modal, close it, not when closing toast alert though
   const handleClickOutside = (event: any) =>
   {
-    if(creatingSubMarket.value)
+    if(editingTokenReserve.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
 
       if(!modalRef.value.contains(event?.target) &&
-      (event?.target?.id != "openCreateSubMarketModalButton") &&
+      (event?.target?.id != "openEditTokenReserveModalButton") &&
       !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
-      !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
+      !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
-        creatingSubMarket.value = false
+        editingTokenReserve.value = false
 
       //Close modal when clicking into input search's behind Modal
       if((event?.target?.placeholder == "Reserves Search     ") ||
       (event?.target?.placeholder == "Owners Search     "))
-        creatingSubMarket.value = false
+        editingTokenReserve.value = false
     }
   }
 
-  function openCreateSubMarketModal(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName: string, )
+  function openEditTokenReserveModal(tokenMintAddress: PublicKey,
+  tokenSVG: Component,
+  tokenName:string,
+  fixedBorrowAPY: number,
+  useFixedBorrowApy: boolean,
+  globalLimit: number)
   {
-    feeCollectorAddress.value = connectedWallet.addressString
-    isValidPublicKey.value = isValidSolanaPublicKey(feeCollectorAddress.value)
     selectedTokenMintAddress = tokenMintAddress
     selectedTokenMintAddressString = tokenMintAddress.toString()
-    createSubMarketSVG.value = tokenSVG
-    subMarketTokenName.value = tokenName
-    creatingSubMarket.value = true
+    editTokenReserveSVG.value = tokenSVG
+    tokenReserveTokenName.value = tokenName
+    fixedBorrowAPYPercentage.value = fixedBorrowAPY
+    useFixedBorrowAPYSelect.value = useFixedBorrowApy
+    globalLimitInput.value = globalLimit
+    editingTokenReserve.value = true
   }
 
   function openTokenPopover(e: Event) 
   {
     event.value = e
-
     tokenPopoverOpen.value = true
   }
 
@@ -177,36 +197,35 @@
     }
   }
 
-  async function createSubMarket()
+  async function editTokenReserve()
   {
+    const decimalAmount = tokenDecimalHashMap.get(selectedTokenMintAddressString);console.log(decimalAmount)
     try
     {
-      const userNextSubMarketIndex = getUserNextSubMarketIndex(selectedTokenMintAddress.toString(), connectedWallet.addressString)
-
-      const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
+      const tx = await anchorPrograms.lending.lendingProgram.methods.updateTokenReserve
       (
         selectedTokenMintAddress,
-        userNextSubMarketIndex,
-        new PublicKey(feeCollectorAddress.value),
-        feePercentage.value * 100//convert to fixedpoint notation
+        fixedBorrowAPYPercentage.value * 100,//convert to fixedpoint notation
+        useFixedBorrowAPYSelect.value,
+        new anchor.BN(globalLimitInput.value * Math.pow(10, decimalAmount))//convert to fixedpoint notation
       ).rpc()
-      await confirmLendingTransaction(tx, toast, "create_sub_market")
-      creatingSubMarket.value = false
+      await confirmLendingTransaction(tx, toast, "update_token_reserve")
+      editingTokenReserve.value = false
     }
     catch(error)
     {
-      toastPreTransactionError(error, toast, "create_sub_market")
+      toastPreTransactionError(error, toast, "update_token_reserve")
     }
   }
 
   defineExpose(
   {
-    openCreateSubMarketModal
+    openEditTokenReserveModal
   })
 </script>
 
 <style scoped>
-  #createSubMarketModal
+  #editTokenReserveModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
     top: 50%;
@@ -217,7 +236,7 @@
     background-color: var(--ion-background-color)
   }
 
-  .feeCollectorInput
+  #editTokenReserveInput
   {
     --highlight-color: v-bind(colorHexValue) !important
   }

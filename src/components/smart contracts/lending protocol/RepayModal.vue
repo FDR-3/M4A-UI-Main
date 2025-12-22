@@ -2,22 +2,22 @@
   <div v-if="repaying"
     id="repayModal"
     class="thickBorder"
+    ref="modalRef"
   >
-    <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
-      <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
-        <img class="noClickEvent" v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component class="noClickEvent" v-else :is="repaySVG" style="width: 44px"></component>
-        <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
+    <div class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
+      <ion-button fill="clear" @click="openTokenPopover($event)">
+        <img v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <component v-else :is="repaySVG" style="width: 44px"></component>
+        <ion-text color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
-      id="copyTokenMintAddressPopover"
       :is-open="tokenPopoverOpen" 
       :event="event" 
       @didDismiss="tokenPopoverOpen=false"
       side="top" 
       alignment="center"
       >
-        <ion-button id="copyTokenMintAddressButton" class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
@@ -48,7 +48,7 @@
       </Select>
     </div>
 
-    <ion-label class="alignSelfLeft noClickEvent">Debt: {{ userDebt.toFixed(tokenDecimalAmount) }}</ion-label>
+    <ion-label class="alignSelfLeft">Debt: {{ userDebt.toFixed(tokenDecimalAmount) }}</ion-label>
     <InputNumber
       v-model="repayAmount"
       :inputStyle="{'text-align': 'center'}"
@@ -61,13 +61,13 @@
       @input="(event: { value: any }) => repayAmount = event.value"
       @update:model-value="repayMax=false"
     />
-    <div id="maxButtonContainer" class="alignSelfLeft">
-      <button id="maxButton" style="background-color: transparent" @click="repayAmount=userDebt; repayMax=true">
+    <div class="alignSelfLeft">
+      <button style="background-color: transparent" @click="repayAmount=userDebt; repayMax=true">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
 
-    <div class="smallMarginTop noClickEvent">
+    <div class="smallMarginTop">
       <ion-text>Value: ${{ repayValue }}</ion-text>
     </div>
 
@@ -121,6 +121,7 @@
   var tokenPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var modalRef = ref()
 
   var repayValue = computed ( () =>
   {
@@ -182,39 +183,9 @@
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
       
-      if((event?.target?.id != "tokenButtonContainer") &&
-      (event?.target?.id != "openCopyTokenMintAddressButton") &&
-      (event?.target?.id != "copyTokenMintAddressButton") &&
-      (event?.target?.id != "copyTokenMintAddressPopover") &&
-      (event?.target?.id != "repayModal") &&
-      (event?.target?.id != "openRepayModal") &&
-      (event?.target?.id != "maxButtonContainer") &&
-      (event?.target?.id != "maxButton") &&
-      (event?.target?.id != "repayButton") &&
-      (event?.target?.id != "themeButton") &&
-      !event?.target?.classList.contains("tableRepayButton") &&
-      !event?.target?.classList.contains("native-wrapper") &&
-      !event?.target?.classList.contains("native-input") &&
-      !event?.target?.classList.contains("input-outline-container") &&
-      !event?.target?.classList.contains("input-wrapper") &&
-      !event?.target?.classList.contains("input-bottom") &&
-      !event?.target?.classList.contains("emoteButton") &&
-      !event?.target?.classList.contains("emojiButton") &&
-      !event?.target?.classList.contains("sc-ion-label-md-h") &&
-      !event?.target?.classList.contains("button") &&
-      !event?.target?.classList.contains("p-select") &&
-      !event?.target?.classList.contains("p-select-list") &&
-      !event?.target?.classList.contains("p-select-label") &&
-      !event?.target?.classList.contains("p-select-dropdown") &&
-      !event?.target?.classList.contains("p-select-empty-message") &&
-      !event?.target?.classList.contains("p-select-option") &&
-      !event?.target?.classList.contains("p-select-option-label") &&
-      !event?.target?.classList.contains("p-select-list-container") &&
-      !event?.target?.classList.contains("p-inputtext") &&
-      !event?.target?.classList.contains("p-icon") &&
-      !event?.target?.classList.contains("p-inputnumber") &&
-      !event?.target?.classList.contains("p-inputnumber-button") &&
-      !event?.target?.classList.contains("p-inputnumber-button-group") &&
+      if(!modalRef.value.contains(event?.target) &&
+      !event?.target?.classList.contains("lendingActionButton") &&
+      !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal

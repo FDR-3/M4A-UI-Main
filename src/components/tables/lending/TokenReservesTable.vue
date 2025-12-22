@@ -66,7 +66,7 @@
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRow">
-            <ion-button id="openCreateSubMarketModal"
+            <ion-button id="openCreateSubMarketModalButton"
             color="dark"
             @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
             $emit('createSubMarketModal', 

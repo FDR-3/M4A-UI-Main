@@ -2,22 +2,22 @@
   <div v-if="borrowing"
     id="borrowModal"
     class="thickBorder"
+    ref="modalRef"
   >
-    <div id="tokenButtonContainer" class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
-      <ion-button id="openCopyTokenMintAddressButton" fill="clear" @click="openTokenPopover($event)">
-        <img class="noClickEvent" v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component class="noClickEvent" v-else :is="borrowSVG" style="width: 44px"></component>
-        <ion-text class="noClickEvent" color="dark">{{ subMarketTokenName }}</ion-text><br>
+    <div class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
+      <ion-button fill="clear" @click="openTokenPopover($event)">
+        <img v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <component v-else :is="borrowSVG" style="width: 44px"></component>
+        <ion-text color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover
-      id="copyTokenMintAddressPopover"
       :is-open="tokenPopoverOpen" 
       :event="event" 
       @didDismiss="tokenPopoverOpen=false"
       side="top" 
       alignment="center"
       >
-        <ion-button id="copyTokenMintAddressButton" class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
@@ -51,8 +51,8 @@
     </div>
 
 
-    <ion-label class="noClickEvent">Available</ion-label>
-    <div class="flexCenterRow noClickEvent">
+    <ion-label>Available</ion-label>
+    <div class="flexCenterRow">
       <ion-label class="alignSelfLeft">Amount: {{ availableToBorrowAmount.toFixed(tokenDecimalAmount) }}</ion-label>
       <ion-label class="alignSelfLeft">Value: {{ availableToBorrowValue }}</ion-label>
     </div>
@@ -68,26 +68,26 @@
       @input="updateValues"
       @update:model-value="calculateHealthFactorValues()"
     />
-    <div id="maxButtonContainer" class="alignSelfLeft">
-      <button id="maxButton" style="background-color: transparent" @click="borrowAmount=availableToBorrowAmount; calculateHealthFactorValues()">
+    <div class="alignSelfLeft">
+      <button style="background-color: transparent" @click="borrowAmount=availableToBorrowAmount; calculateHealthFactorValues()">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
 
-    <div class="smallMarginTop noClickEvent">
+    <div class="smallMarginTop">
       <ion-text>Value: ${{ borrowValue }}</ion-text>
     </div>
 
-    <div class="flexCenterRow mediumSmallMarginTop nMediumMarginBottom progressCircleWrapper">
+    <div class="flexCenterRow mediumSmallMarginTop nMediumMarginBottom">
       <div style="margin-left: -15px; margin-right: -4px">
       <InfoButton :infoMessage="withdrawOrBorrowInfo"/>
       </div>
-      <div title="Interest Earned and Accrued Snapshot" class="progressBarStep flexCenterColumn progressCircleWrapper nMediumSmallMarginLeft">
-        <div class="noClickEvent nMediumSmallMarginTop"><ion-label>{{ snapShotValidCountDown }}</ion-label></div>
+      <div title="Interest Earned and Accrued Snapshot" class="progressBarStep flexCenterColumn nMediumSmallMarginLeft">
+        <div class="nMediumSmallMarginTop"><ion-label>{{ snapShotValidCountDown }}</ion-label></div>
         <div v-if="snapShotValidCountDown!=0" class="finishedCircle"></div>
         <div v-else class="inProgressCircle"></div>
       </div>
-      <div title="Withdraw" class="progressBarStep flexCenterColumn progressCircleWrapper">
+      <div title="Withdraw" class="progressBarStep flexCenterColumn">
         <div class="inProgressCircle"></div>
       </div>
     </div>
@@ -169,6 +169,7 @@
   var totalAssetValue = ref()
   var totalDebtValue = ref()
   var healthFactor = ref()
+  var modalRef = ref()
 
   var borrowValue = computed ( () =>
   {
@@ -235,44 +236,11 @@
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
       
-      if((event?.target?.id != "tokenButtonContainer") &&
-      (event?.target?.id != "openCopyTokenMintAddressButton") &&
-      (event?.target?.id != "copyTokenMintAddressButton") &&
-      (event?.target?.id != "copyTokenMintAddressPopover") &&
-      (event?.target?.id != "borrowModal") &&
-      (event?.target?.id != "openBorrowModal") &&
-      (event?.target?.id != "maxButtonContainer") &&
-      (event?.target?.id != "maxButton") &&
-      (event?.target?.id != "borrowButton") &&
-      (event?.target?.id != "themeButton") &&
-      !event?.target?.classList.contains("tableBorrowButton") &&
-      !event?.target?.classList.contains("native-wrapper") &&
-      !event?.target?.classList.contains("native-input") &&
-      !event?.target?.classList.contains("input-outline-container") &&
-      !event?.target?.classList.contains("input-wrapper") &&
-      !event?.target?.classList.contains("input-bottom") &&
-      !event?.target?.classList.contains("sc-ion-label-md-h") &&
-      !event?.target?.classList.contains("button") &&
-      !event?.target?.classList.contains("selectionContainer") &&
-      !event?.target?.classList.contains("p-select") &&
-      !event?.target?.classList.contains("p-select-list") &&
-      !event?.target?.classList.contains("p-select-label") &&
-      !event?.target?.classList.contains("p-select-dropdown") &&
-      !event?.target?.classList.contains("p-select-empty-message") &&
-      !event?.target?.classList.contains("p-select-option") &&
-      !event?.target?.classList.contains("p-select-option-label") &&
-      !event?.target?.classList.contains("p-select-list-container") &&
-      !event?.target?.classList.contains("p-inputtext") &&
-      !event?.target?.classList.contains("p-icon") &&
-      !event?.target?.classList.contains("p-inputnumber") &&
-      !event?.target?.classList.contains("p-inputnumber-button") &&
-      !event?.target?.classList.contains("p-inputnumber-button-group") &&
-      !event?.target?.classList.contains("healthFactorBarContainer") &&
+      if(!modalRef.value.contains(event?.target) &&
+      !event?.target?.classList.contains("lendingActionButton") &&
+      !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("infoButtonPopover") &&
       !event?.target?.classList.contains("infoButtonText") &&
-      !event?.target?.classList.contains("progressCircleWrapper") &&
-      !event?.target?.classList.contains("progressBarStep") &&
-      !event?.target?.classList.contains("inProgressCircle") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
