@@ -338,7 +338,7 @@
     'userTabIndex',
     'chartData',
     'selectedYear',
-    'initialBlockChainTimeStamp'
+    'blockChainTimeStamp'
   ])
 
   const emits = defineEmits(['interestEarned', 'changeYear', 'openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal'])
@@ -409,8 +409,8 @@
 
       yearList.value = getYearList()
 
-      if(props.initialBlockChainTimeStamp != 0)
-        startInterestCalculation(props.initialBlockChainTimeStamp)
+      if(props.blockChainTimeStamp != 0)
+        startInterestCalculation(props.blockChainTimeStamp)
     }
 
     const subMarket = subMarketsHashMap.map.get(props.tokenMintAddress + props.subMarketOwnerAddress + props.subMarketIndex)
@@ -476,10 +476,10 @@
     yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
   }))
 
-  watch(() => [props.initialBlockChainTimeStamp], (() => 
+  watch(() => [props.blockChainTimeStamp], (() => 
   {
     stopInterestCalculation()
-    startInterestCalculation(props.initialBlockChainTimeStamp)
+    startInterestCalculation(props.blockChainTimeStamp)
   }))
 
   function getYearList()

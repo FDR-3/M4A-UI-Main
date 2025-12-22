@@ -200,7 +200,8 @@
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import cloneDeep from 'lodash/cloneDeep'
 
   var stableCoinTableData = ref()
@@ -232,11 +233,13 @@
     else
       isLoading.value = true
 
+    await startBlockChainTimeStampRefresh()
     await startFeeCalculation()
   })
 
   onUnmounted(() =>
   {
+    stopBlockChainTimeStampRefresh()
     stopFeeCalculation()
   })
 
@@ -273,6 +276,15 @@
   })
 
   watch([tokenReservesHashMap, subMarketsHashMap], async() => 
+  {
+    stopBlockChainTimeStampRefresh()
+    stopFeeCalculation()
+
+    await startBlockChainTimeStampRefresh()
+    await startFeeCalculation()
+  })
+
+  watch(blockChainData, async() => 
   {
     stopFeeCalculation()
     await startFeeCalculation()
@@ -510,8 +522,7 @@
     if(!tokenReservesHashMap.map || !subMarketsHashMap.map)
       return
 
-    const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
-    var timeStamp = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
+    var timeStamp = blockChainData.timeStamp
 
     subMarketFeesAccruedIntervalId = setInterval(() =>
     {

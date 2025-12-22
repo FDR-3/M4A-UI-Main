@@ -84,7 +84,13 @@
     isM4AFeeTokenAccountReady: false,
     isChatFeeTokenAccountReady: false,
     currentStatementMonth: monthList[newData.getMonth()].monthName,
-    currentStatementYear: newData.getFullYear()
+    currentStatementYear: newData.getFullYear(),
+    blockChainTimeStamp: 0
+  })
+
+  export const blockChainData = reactive(
+  { 
+    timeStamp: 0
   })
 
   export const SYSTEM_PROGRAM_ADDRESS_STRING = "11111111111111111111111111111111"

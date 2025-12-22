@@ -1,3 +1,5 @@
+import { anchorPrograms, blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+
 export function getNewTime() 
 {
   const newDate = new Date()
@@ -46,4 +48,28 @@ export function convertUnixTimeToLocalDate(timeStamp: number)
   })
 
   return localDateString;
+}
+
+var blockChainTimeStampRefreshIntervalId: any
+
+export async function startBlockChainTimeStampRefresh()
+{
+  const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
+  blockChainData.timeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
+
+  blockChainTimeStampRefreshIntervalId = setInterval(async() =>
+  {
+    console.log("Refreshing Block Chain Time Stamp")
+    const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
+    blockChainData.timeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
+  }, 60000) 
+}
+
+export function stopBlockChainTimeStampRefresh()
+{
+  if(blockChainTimeStampRefreshIntervalId != undefined)
+  {
+    clearInterval(blockChainTimeStampRefreshIntervalId)
+    blockChainTimeStampRefreshIntervalId = undefined
+  }
 }

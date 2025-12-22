@@ -144,7 +144,7 @@
         :userTabIndex="userTabIndex"
         :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
-        :initialBlockChainTimeStamp="initialBlockChainTimeStamp"
+        :blockChainTimeStamp="blockChainData.timeStamp"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
         @openDepositModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenMintAddress, subMarketOption)"
         @openWithdrawalModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenMintAddress, subMarketOption)"
@@ -203,7 +203,7 @@
         :userTabIndex="userTabIndex"
         :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
-        :initialBlockChainTimeStamp="initialBlockChainTimeStamp"
+        :blockChainTimeStamp="blockChainData.timeStamp"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
         @openDepositModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenMintAddress, subMarketOption)"
         @openWithdrawalModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenMintAddress, subMarketOption)"
@@ -238,7 +238,8 @@
   import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import HealthFactorBig from '/src/components/smart contracts/lending protocol/HealthFactorBig.vue'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(['portfolioChartReRenderHelper'])
@@ -279,8 +280,6 @@
   var initialStableCoinSelectedYearSet = false
   var initialCryptoCurrencySelectedYearSet = false
   var depositedAssetAmount = ref()
-
-  var initialBlockChainTimeStamp = ref(0)
 
   var stableCoin7DayProjectionRateAmount = ref("0")
   var stableCoin7DayProjectionRateValue = ref(0)
@@ -439,10 +438,9 @@
         }
 
       setChartData()
-      startGradientAnimation()//This has to be called here and inside of the PortfolioChart.vue file for some reason
+      startGradientAnimation()
 
-      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
-      initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
+      await startBlockChainTimeStampRefresh()
     }
 
     emitPortfolioRelatedTableHeight()
@@ -451,6 +449,7 @@
   onUnmounted(() =>
   {
     stopGradientAnimation()
+    stopBlockChainTimeStampRefresh()
   })
 
   //Json string of wallet to detect object property changes
@@ -529,9 +528,12 @@
 
     setChartData()
     emitPortfolioRelatedTableHeight()
+
+    stopGradientAnimation()
+    startGradientAnimation()
     
-    const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
-    initialBlockChainTimeStamp.value = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
+    stopBlockChainTimeStampRefresh()
+    await startBlockChainTimeStampRefresh()
   })
 
   watch(customUserNameHashMap,() =>

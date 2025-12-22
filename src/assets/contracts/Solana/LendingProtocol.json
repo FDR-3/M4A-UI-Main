@@ -1,5 +1,5 @@
 {
-  "address": "Ak8KL3BDDfPQjVmYmaFXFoydohrL9uPETYsgfipZdT7C",
+  "address": "JDiqkUzLo6qKGy9A8iRtmgLrNGv7D1Gj3a1aFwd3FEAB",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -3939,33 +3939,53 @@
   "errors": [
     {
       "code": 6000,
-      "name": "StalePriceData",
-      "msg": "The price data was stale"
+      "name": "InvalidFeeRate",
+      "msg": "The fee on interest earned rate can't be greater than 100%"
     },
     {
       "code": 6001,
-      "name": "StaleSnapShotData",
-      "msg": "The Lending User Snap Shot data was stale"
+      "name": "IncorrectNumberOfTabAccounts",
+      "msg": "You must provide all of the sub user's tab accounts"
     },
     {
       "code": 6002,
-      "name": "LiquidationExposure",
-      "msg": "You can't withdraw or borrow an amount that would cause your borrow liabilities to exceed 70% of deposited collateral"
+      "name": "IncorrectNumberOfTabAndPythPriceUpdateAccounts",
+      "msg": "You must provide all of the sub user's tab accounts and Pyth price update accounts"
     },
     {
       "code": 6003,
-      "name": "InsufficientFunds",
-      "msg": "You can't withdraw more funds than you've deposited"
+      "name": "IncorrectOrderOfTabAccounts",
+      "msg": "You must provide the sub user's tab accounts ordered by user_tab_account_index"
     },
     {
       "code": 6004,
-      "name": "InsufficientLiquidity",
-      "msg": "Not enough liquidity in the Token Reserve for this withdraw or borrow"
+      "name": "UnexpectedTabAccount",
+      "msg": "Unexpected Tab Account PDA detected. Feed in only legitimate PDA's ordered by user_tab_account_index"
     },
     {
       "code": 6005,
-      "name": "TooManyFunds",
-      "msg": "You can't pay back more funds than you've borrowed"
+      "name": "UnexpectedPythPriceUpdateAccount",
+      "msg": "Unexpected Pyth Price Update Account detected. Feed in only legitimate accounts :)"
+    },
+    {
+      "code": 6006,
+      "name": "UnexpectedTokenReserveAccount",
+      "msg": "Unexpected Token Reserve Account PDA detected"
+    },
+    {
+      "code": 6007,
+      "name": "UnexpectedSubMarketAccount",
+      "msg": "Unexpected SubMarket Account PDA detected"
+    },
+    {
+      "code": 6008,
+      "name": "UnexpectedMonthlyStatementAccount",
+      "msg": "Unexpected Monthly Statement Account PDA detected"
+    },
+    {
+      "code": 6009,
+      "name": "LendingUserAccountNameTooLong",
+      "msg": "Lending User Account name can't be longer than 25 characters"
     }
   ],
   "types": [
