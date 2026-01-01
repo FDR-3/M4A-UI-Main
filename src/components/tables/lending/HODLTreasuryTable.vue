@@ -200,7 +200,7 @@
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { anchorPrograms, blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import cloneDeep from 'lodash/cloneDeep'
 

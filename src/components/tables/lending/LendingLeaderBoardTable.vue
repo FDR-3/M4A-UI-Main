@@ -713,7 +713,7 @@
   
   #lendingLeaderBoardTable :deep(th)
   {
-    font-size: min(4vw, 14px)
+    font-size: min(4vw, 13px)
   }
   
   #lendingLeaderBoardTable :deep(.p-datatable-tbody > tr)

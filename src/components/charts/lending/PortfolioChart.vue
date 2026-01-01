@@ -937,7 +937,7 @@
     }
   }
 
-  @media screen and (min-width: 1160.1px)
+  @media screen and (min-width: 1285.1px)
   {  
     .normalChartLegend
     {
@@ -956,7 +956,7 @@
       gap: 10px
     }
   }
-  @media screen and (min-width: 620.1px) and (max-width: 1160px)
+  @media screen and (min-width: 730.1px) and (max-width: 1285px)
   { 
     .normalChartLegend
     {
@@ -974,7 +974,7 @@
       align-items: left;
     }
   }
-  @media screen and (max-width: 620.1px)
+  @media screen and (max-width: 730.1px)
   { 
     .normalChartLegend
     {

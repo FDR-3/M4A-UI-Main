@@ -193,98 +193,98 @@
   {
     .mobileSpaceFiller
     {
-      margin-top: -1vw
+      margin-top: 4vw
     }
   }
   @media screen and (min-width: 483.1px) and (max-width: 525px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -8vw
+      margin-top: -3vw
     }
   }
   @media screen and (min-width: 454.1px) and (max-width: 483px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -18vw
+      margin-top: -13vw
     }
   }
   @media screen and (min-width: 414.1px) and (max-width: 454px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -21vw
+      margin-top: -16vw
     }
   }
   @media screen and (min-width: 379.1px) and (max-width: 414px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -26vw
+      margin-top: -21vw
     }
   }
   @media screen and (min-width: 360.1px) and (max-width: 379px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -32vw
+      margin-top: -27vw
     }
   }
   @media screen and (min-width: 344.1px) and (max-width: 360px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -38vw
+      margin-top: -33vw
     }
   }
   @media screen and (min-width: 325.1px) and (max-width: 344px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -42vw
+      margin-top: -37vw
     }
   }
   @media screen and (min-width: 301.1px) and (max-width: 325px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -49vw
+      margin-top: -44vw
     }
   }
   @media screen and (min-width: 292.1px) and (max-width: 301px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -56vw
+      margin-top: -51vw
     }
   }
   @media screen and (min-width: 260.1px) and (max-width: 292px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -64vw
+      margin-top: -59vw
     }
   }
   @media screen and (min-width: 235.1px) and (max-width: 260px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -80vw
+      margin-top: -75vw
     }
   }
   @media screen and (min-width: 207.1px) and (max-width: 235px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -102vw
+      margin-top: -97vw
     }
   }
   @media screen and (min-width: 100.1px) and (max-width: 207px)
   {
     .mobileSpaceFiller
     {
-      margin-top: -117vw
+      margin-top: -112vw
     }
   }
 </style>

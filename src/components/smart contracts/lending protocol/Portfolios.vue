@@ -4,7 +4,6 @@
       <ion-label color="green">Return</ion-label>
     </ion-button>
     <LendingLeaderBoardTable
-    :key="portfolioReRenderHelper"
     @viewPortfolio="viewPortfolio"
     @totalLeaderBoardLendingUsers="emitTotalLeaderBoardLendingUsers"
     @adjustLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowAdjustment"
@@ -376,7 +375,13 @@
       },
       {
         type: 'bar',
-        label: 'Liquidations',
+        label: 'Liquidator',
+        backgroundColor: "#8a2be2",
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: 'Liquidated',
         backgroundColor: "#ff0000",
         data: [] as any[]
       }
@@ -393,7 +398,8 @@
     Withdrawals = 5,
     Borrows = 6,
     Repays = 7,
-    Liquidations = 8,
+    Liquidator = 8,
+    Liquidated = 9,
   }
 
   onMounted(async() =>
@@ -546,7 +552,7 @@
   watch(() => props.portfolioReRenderHelper, (() => 
   {
     chartReRenderKey.value += 1
-    emitLeaderBoardSubTableAndSubRowSet(0,0)
+    //emitLeaderBoardSubTableAndSubRowSet(0,0)
   }))
 
   function setRainbowAnimatedGradient(ctx: any, chartArea:any)
@@ -672,7 +678,8 @@
           var withdrawals = []
           var borrows = []
           var repays = []
-          var liquidations = []
+          var liquidator = []
+          var liquidated = []
           var tempChartData = cloneDeep(baseChartData)
         
           //If current year, go up until the current month, otherwise cover the whole year
@@ -711,7 +718,8 @@
                 withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
                 borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
                 repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
-                liquidations.push(Number(userMonthlyStatement.monthlyUserWasLiquidatedAmount) / Math.pow(10, decimalAmount))
+                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
+                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
@@ -727,7 +735,8 @@
                 withdrawals.push(0)
                 borrows.push(0)
                 repays.push(0)
-                liquidations.push(0)
+                liquidator.push(0)
+                liquidated.push(0)
               }
             }
 
@@ -740,7 +749,8 @@
             tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
             tempChartData.datasets[ChartIndex.Borrows].data = borrows
             tempChartData.datasets[ChartIndex.Repays].data = repays
-            tempChartData.datasets[ChartIndex.Liquidations].data = liquidations
+            tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
+            tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -779,7 +789,8 @@
                 withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
                 borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
                 repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
-                liquidations.push(Number(userMonthlyStatement.monthlyUserWasLiquidatedAmount) / Math.pow(10, decimalAmount))
+                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
+                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
@@ -795,7 +806,8 @@
                 withdrawals.push(0)
                 borrows.push(0)
                 repays.push(0)
-                liquidations.push(0)
+                liquidator.push(0)
+                liquidated.push(0)
               }
             }
 
@@ -808,7 +820,8 @@
             tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
             tempChartData.datasets[ChartIndex.Borrows].data = borrows
             tempChartData.datasets[ChartIndex.Repays].data = repays
-            tempChartData.datasets[ChartIndex.Liquidations].data = liquidations
+            tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
+            tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -846,7 +859,8 @@
           var withdrawals = []
           var borrows = []
           var repays = []
-          var liquidations = []
+          var liquidator = []
+          var liquidated = []
           var tempChartData = cloneDeep(baseChartData)
         
           //If current year, go up until the current month, otherwise cover the whole year
@@ -885,7 +899,8 @@
                 withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
                 borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
                 repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
-                liquidations.push(Number(userMonthlyStatement.monthlyUserWasLiquidatedAmount) / Math.pow(10, decimalAmount))
+                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
+                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
@@ -901,7 +916,8 @@
                 withdrawals.push(0)
                 borrows.push(0)
                 repays.push(0)
-                liquidations.push(0)
+                liquidator.push(0)
+                liquidated.push(0)
               }
             }
 
@@ -914,7 +930,8 @@
             tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
             tempChartData.datasets[ChartIndex.Borrows].data = borrows
             tempChartData.datasets[ChartIndex.Repays].data = repays
-            tempChartData.datasets[ChartIndex.Liquidations].data = liquidations
+            tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
+            tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -953,7 +970,8 @@
                 withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
                 borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
                 repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
-                liquidations.push(Number(userMonthlyStatement.monthlyUserWasLiquidatedAmount) / Math.pow(10, decimalAmount))
+                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
+                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
@@ -969,7 +987,8 @@
                 withdrawals.push(0)
                 borrows.push(0)
                 repays.push(0)
-                liquidations.push(0)
+                liquidator.push(0)
+                liquidated.push(0)
               }
             }
 
@@ -982,7 +1001,8 @@
             tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
             tempChartData.datasets[ChartIndex.Borrows].data = borrows
             tempChartData.datasets[ChartIndex.Repays].data = repays
-            tempChartData.datasets[ChartIndex.Liquidations].data = liquidations
+            tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
+            tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
             
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
