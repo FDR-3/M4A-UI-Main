@@ -35,8 +35,8 @@
     </Select>
 
     <div class="flexCenterRow">
-      <ion-button v-if="addingAdditionalLendingAccount" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
-        <ion-icon :src="close" color="dark"></ion-icon>
+      <ion-button v-if="addingAdditionalLendingAccount" id="closeAccountNameEditButton" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
+        <ion-icon :src="close" color="dark" class="noClickEvent"></ion-icon>
       </ion-button>
 
       <Select
@@ -52,8 +52,8 @@
       @change="updateStoredSelectedAccount()">
         <template #footer>
           <div class="flexCenterRow">
-            <ion-button @click="setNewAccountDefaultName()" color="dark">
-              <ion-label color="light">New</ion-label>
+            <ion-button id="newAccountButton" @click="setNewAccountDefaultName()" color="dark">
+              <ion-label class="noClickEvent" color="light">New</ion-label>
             </ion-button>
           </div>
         </template>
@@ -158,6 +158,7 @@
   var userBalance = ref()
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
+  var tokenProgram: PublicKey
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -230,36 +231,39 @@
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = function(event: any) 
-  {console.log(event?.target)
+  {
     if(depositing.value)
     {
+      //const emojiButton = 
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
-      
+      console.log(event?.target)
       if(!modalRef.value.contains(event?.target) &&
+      (event?.target?.id != "newAccountButton") &&
+      (event?.target?.id != "closeAccountNameEditButton") &&
+      (event?.target?.id != "emojiBottomBar") &&
+      !event?.target?.classList.contains("native-input") &&
+      !event?.target?.classList.contains("emojiSearchContainer") &&
+      !event?.target?.classList.contains("emojiSearchOptions") &&
+      !event?.target?.classList.contains("magnifyingGlassEmoji") &&
+      !event?.target?.classList.contains("emojiColorSelectDivider") &&
+      !event?.target?.classList.contains("emojiPage") &&
+      !event?.target?.classList.contains("button") &&
       !event?.target?.classList.contains("lendingActionButton") &&
       !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
+      !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
-        depositing.value = false
-        if(addingAdditionalLendingAccount.value)
-        {
-          cancelAddingAdditionalLendingAccount()
-          addingAdditionalLendingAccount.value = false
-        }
-      }
 
-      //Close modal when clicking into input search's behind Modal
-      if((event?.target?.placeholder == "Market Search     "))
-      {
-        depositing.value = false
-        if(addingAdditionalLendingAccount.value)
-        {
-          cancelAddingAdditionalLendingAccount()
-          addingAdditionalLendingAccount.value = false
-        }
+          depositing.value = false
+          if(addingAdditionalLendingAccount.value)
+          {
+            cancelAddingAdditionalLendingAccount()
+            addingAdditionalLendingAccount.value = false
+          }
+        
       }
     }
   }
@@ -272,6 +276,7 @@
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
+    tokenProgram = tokenInfo.tokenProgram
 
     subMarketList.value = fdr3SubMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
@@ -418,7 +423,7 @@
         accountSelect.value,
         new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
         accountName.value
-      ).accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey }).rpc()
+      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram }).rpc()
 
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
 

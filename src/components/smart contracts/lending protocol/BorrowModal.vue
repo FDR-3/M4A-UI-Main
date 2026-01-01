@@ -72,6 +72,10 @@
       <button style="background-color: transparent" @click="borrowAmount=availableToBorrowAmount; calculateHealthFactorValues()">
         <ion-label color="dark">Max</ion-label>
       </button>
+
+      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="borrowAmount=availableToBorrowAmount*0.5; calculateHealthFactorValues()">
+        <ion-label color="dark">Half</ion-label>
+      </button>
     </div>
 
     <div class="smallMarginTop">
@@ -155,6 +159,7 @@
   var availableToBorrowValue = ref("$0.00")
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
+  var tokenProgram: PublicKey
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -235,24 +240,17 @@
     if(borrowing.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
-      
+
       if(!modalRef.value.contains(event?.target) &&
       !event?.target?.classList.contains("lendingActionButton") &&
       !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("infoButtonPopover") &&
       !event?.target?.classList.contains("infoButtonText") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
+      !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
-      {
-        clearSnapShotIntervalCountDown()
-        clearPythAccountIntervalCountDown()
-        borrowing.value = false
-      }  
-
-      //Close modal when clicking into input search's behind Modal
-      if((event?.target?.placeholder == "Market Search     "))
       {
         clearSnapShotIntervalCountDown()
         clearPythAccountIntervalCountDown()
@@ -268,6 +266,7 @@
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
+    tokenProgram = tokenInfo.tokenProgram
 
     subMarketList.value = fdr3SubMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
@@ -433,6 +432,7 @@
           lendingUserTabAccounts[i].tokenMintAddress,
           lendingUserTabAccounts[i].subMarketOwnerAddress,
           lendingUserTabAccounts[i].subMarketIndex,
+          lendingUserTabAccounts[i].owner,
           accountSelect.value
         ).instruction()
 
@@ -504,7 +504,7 @@
                 accountSelect.value,
                 new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
               )
-              .accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey })
+              .accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram })
               .remainingAccounts(remainingAccounts)
               .instruction(),
             signers: []

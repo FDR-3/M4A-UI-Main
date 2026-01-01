@@ -65,6 +65,10 @@
       <button style="background-color: transparent" @click="repayAmount=userDebt; repayMax=true">
         <ion-label color="dark">Max</ion-label>
       </button>
+
+      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="repayAmount=userDebt*0.5; repayMax=false">
+        <ion-label color="dark">Half</ion-label>
+      </button>
     </div>
 
     <div class="smallMarginTop">
@@ -105,7 +109,6 @@
 
   var subMarketSelect = ref()
   var subMarketList = ref()
-  var accountName = ref()
   var accountSelect = ref()
   var accountList = ref()
   var repayAmount = ref()
@@ -117,6 +120,7 @@
   var userDebt = ref(0)
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount = ref()
+  var tokenProgram: PublicKey
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -187,13 +191,10 @@
       !event?.target?.classList.contains("lendingActionButton") &&
       !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
+      !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
-        repaying.value = false
-
-      //Close modal when clicking into input search's behind Modal
-      if((event?.target?.placeholder == "Market Search     "))
         repaying.value = false
     }
   }
@@ -206,6 +207,7 @@
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
+    tokenProgram = tokenInfo.tokenProgram
     
     subMarketList.value = fdr3SubMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
@@ -294,7 +296,7 @@
         accountSelect.value,
         new anchor.BN(repayAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
         repayMax.value
-      ).accounts({ mint: selectedTokenMintAddress, signer: connectedWallet.publicKey }).rpc()
+      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram }).rpc()
 
       await confirmLendingTransaction(tx, toast, "repay_tokens")
 

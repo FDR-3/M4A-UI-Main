@@ -25,8 +25,7 @@
 
     <InputNumber
       id="editTokenReserveInput"
-      v-model="fixedBorrowAPYPercentage"
-      ref="feePercentageRef"
+      v-model="solvencyInsuranceFeeRatePercentage"
       :inputStyle="{'text-align': 'center'}"
       suffix="%"
       inputId="percent"
@@ -35,7 +34,20 @@
       :step="0.01"
       showButtons
       fluid
-      @keydown.enter="checkIfCursorBehindPercentSign()"
+    />
+    <ion-text style="font-size: 11px">Enter Solvency Insurance Rate%</ion-text><br><br>
+
+    <InputNumber
+      id="editTokenReserveInput"
+      v-model="fixedBorrowAPYPercentage"
+      :inputStyle="{'text-align': 'center'}"
+      suffix="%"
+      inputId="percent"
+      :minFractionDigits="2" :maxFractionDigits="2"
+      :min="0" :max="100"
+      :step="0.01"
+      showButtons
+      fluid
     />
     <ion-text style="font-size: 11px">Enter fixed Borrow APY%</ion-text><br><br>
 
@@ -87,8 +99,8 @@
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
 
-  var fixedBorrowAPYPercentage = ref(3)
-  var feePercentageRef = ref()
+  var solvencyInsuranceFeeRatePercentage = ref()
+  var fixedBorrowAPYPercentage = ref()
   var editingTokenReserve = ref(false)
   var editTokenReserveSVG = ref()
   var tokenReserveTokenName = ref()
@@ -137,14 +149,10 @@
       (event?.target?.id != "openEditTokenReserveModalButton") &&
       !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
+      !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
-        editingTokenReserve.value = false
-
-      //Close modal when clicking into input search's behind Modal
-      if((event?.target?.placeholder == "Reserves Search     ") ||
-      (event?.target?.placeholder == "Owners Search     "))
         editingTokenReserve.value = false
     }
   }
@@ -152,6 +160,7 @@
   function openEditTokenReserveModal(tokenMintAddress: PublicKey,
   tokenSVG: Component,
   tokenName:string,
+  solvencyInsuranceFeeRate: number,
   fixedBorrowAPY: number,
   useFixedBorrowApy: boolean,
   globalLimit: number)
@@ -160,6 +169,7 @@
     selectedTokenMintAddressString = tokenMintAddress.toString()
     editTokenReserveSVG.value = tokenSVG
     tokenReserveTokenName.value = tokenName
+    solvencyInsuranceFeeRatePercentage.value = solvencyInsuranceFeeRate
     fixedBorrowAPYPercentage.value = fixedBorrowAPY
     useFixedBorrowAPYSelect.value = useFixedBorrowApy
     globalLimitInput.value = globalLimit
@@ -183,23 +193,9 @@
     copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
 
-  function checkIfCursorBehindPercentSign()
-  {
-    var inputElement = feePercentageRef.value?.$el.querySelector(".p-inputtext")
-
-    if(inputElement)
-    {
-      if(inputElement.value.length == inputElement.selectionEnd)
-      {
-        const beforePercentSign = inputElement.selectionEnd - 1
-        inputElement.setSelectionRange(beforePercentSign, beforePercentSign)
-      }
-    }
-  }
-
   async function editTokenReserve()
   {
-    const decimalAmount = tokenDecimalHashMap.get(selectedTokenMintAddressString);console.log(decimalAmount)
+    const decimalAmount = tokenDecimalHashMap.get(selectedTokenMintAddressString)
     try
     {
       const tx = await anchorPrograms.lending.lendingProgram.methods.updateTokenReserve
@@ -207,7 +203,8 @@
         selectedTokenMintAddress,
         fixedBorrowAPYPercentage.value * 100,//convert to fixedpoint notation
         useFixedBorrowAPYSelect.value,
-        new anchor.BN(globalLimitInput.value * Math.pow(10, decimalAmount))//convert to fixedpoint notation
+        new anchor.BN(globalLimitInput.value * Math.pow(10, decimalAmount)),//convert to fixedpoint notation
+        solvencyInsuranceFeeRatePercentage.value * 100,//convert to fixedpoint notation
       ).rpc()
       await confirmLendingTransaction(tx, toast, "update_token_reserve")
       editingTokenReserve.value = false

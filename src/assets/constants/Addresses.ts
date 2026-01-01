@@ -1,4 +1,5 @@
 import { PublicKey } from "@solana/web3.js"
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token"
 import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
 import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
 
@@ -96,6 +97,9 @@ const PYTH_HEX_ID_USDC= "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d
 const PYTH_HEX_ID_SOL = "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d"
 const PYTH_HEX_ID_WETH = "0x9d4294bbcd1174d6f2003ec365831e64cc31d9f6f15a2b85399db8d5000960f6"
 const PYTH_HEX_ID_WBTC = "0xc9d8b075a5c69303365ae23633d4e085199bf5c520a3b90fed1322a0342ffc33"
+
+export const LegacyTokenProgramID = TOKEN_PROGRAM_ID
+export const TokenProgram2022ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb")
 
 export const tokenAddressStrings = 
 {

@@ -42,7 +42,6 @@
     <ion-text style="font-size: 11px">Enter solana publickey that will have the authority to collect fees from your sub market</ion-text>
     <InputNumber
       v-model="feePercentage"
-      ref="feePercentageRef"
       class="feeCollectorInput mediumMarginTop"
       :inputStyle="{'text-align': 'center'}"
       suffix="%"
@@ -52,7 +51,6 @@
       :step="0.01"
       showButtons
       fluid
-      @keydown.enter="checkIfCursorBehindPercentSign()"
     />
     <ion-text style="font-size: 11px">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text><br>
 
@@ -87,7 +85,6 @@
   const colorHexValue = inject('colorHexValue') as string
 
   var feePercentage = ref(3)
-  var feePercentageRef = ref()
   var isValidPublicKey = ref(false)
   var creatingSubMarket = ref(false)
   var createSubMarketSVG = ref()
@@ -122,14 +119,10 @@
       (event?.target?.id != "openCreateSubMarketModalButton") &&
       !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
+      !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
-        creatingSubMarket.value = false
-
-      //Close modal when clicking into input search's behind Modal
-      if((event?.target?.placeholder == "Reserves Search     ") ||
-      (event?.target?.placeholder == "Owners Search     "))
         creatingSubMarket.value = false
     }
   }
@@ -161,20 +154,6 @@
   function passByRefWrapperCopyAddress()
   {
     copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
-  }
-
-  function checkIfCursorBehindPercentSign()
-  {
-    var inputElement = feePercentageRef.value?.$el.querySelector(".p-inputtext")
-
-    if(inputElement)
-    {
-      if(inputElement.value.length == inputElement.selectionEnd)
-      {
-        const beforePercentSign = inputElement.selectionEnd - 1
-        inputElement.setSelectionRange(beforePercentSign, beforePercentSign)
-      }
-    }
   }
 
   async function createSubMarket()

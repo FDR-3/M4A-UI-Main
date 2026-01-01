@@ -7,7 +7,7 @@
       paginator 
       :rows="10" 
       :rowsPerPageOptions="[10, 20, 50, 100]" 
-      dataKey="id" 
+      dataKey="ranking" 
       v-model:filters="filters" 
       show-gridlines 
       size="small"
@@ -21,6 +21,7 @@
       @row-collapse="handleRowCollapse($event)"
       :globalFilterFields="
       [
+        'ranking',
         'id',
         'displayName',
         'owner',
@@ -28,6 +29,7 @@
         'interestEarnedValueString',
         'borrowedValueString',
         'repaidValueString',
+        'liquidatorValueString',
         'liquidatedValueString',
         'accountListWithLastestMonthlyStatement.accountName'
       ]"
@@ -131,7 +133,12 @@
           {{ slotProps.data.repaidValueString }}
         </template>
       </Column>
-      <Column field="liquidatedValue" header="Was Liquidated Value" style="width: 0%; color: red" sortable>
+      <Column field="liquidatorValue" header="Liquidator Value" style="width: 0%; color: #8a2be2" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.liquidatorValueString }}
+        </template>
+      </Column>
+      <Column field="liquidatedValue" header="Liquidated Value" style="width: 0%; color: red" sortable>
         <template #body="slotProps">
           {{ slotProps.data.liquidatedValueString }}
         </template>
@@ -141,7 +148,7 @@
           <Column field="accountName" header="Account" style="width: 0%" sortable>
             <template #body="slotProps">
               <ion-button fill="clear" @click="openViewPortfolioPopover($event, slotProps.data)">
-                <ion-label color="dark" class="noWrapText nMediumSmallMarginLeft">{{ slotProps.data.accountName }}</ion-label>
+                <ion-label color="dark" class="noWrapText nMediumSmallMarginLeft" style="font-size: 11px">{{ slotProps.data.accountName }}</ion-label>
               </ion-button>
               <ion-popover
               :is-open="viewPortfolioPopoverOpen" 
@@ -159,11 +166,11 @@
           </Column>
           <Column field="tokenName" header="Market" style="width: 0%" sortable>
             <template #body="slotProps">
-              <div class="flexCenterRowHeight">
+              <div class="">
                 <ion-button fill="clear" class="marginZero" @click="openTokenPopover($event, slotProps.data)">
-                  <img v-if="slotProps.data.tokenMintAddress==tokenAddressStrings.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -10px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+                  <img v-if="slotProps.data.tokenMintAddress==tokenAddressStrings.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -17px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
                   <Component v-else style="width: 32px; height: 28px; margin-left: -17px" :is="slotProps.data.tokenSVG"></Component>
-                  <ion-label class="noWrapText" color="dark" style="font-size: 11px">{{ slotProps.data.tokenName }}</ion-label>
+                  <ion-label class="noWrapText" color="dark" style="font-size: 10px">{{ slotProps.data.tokenName }}</ion-label>
                 </ion-button>
                 <ion-popover 
                 :is-open="tokenPopoverOpen" 
@@ -227,8 +234,14 @@
               {{ slotProps.data.repaidValueString }}
             </template>
           </Column>
-          <Column field="liquidatedAmount" header="Was Liquidated Amount" style="width: 0%; color: red" sortable></Column>
-          <Column field="liquidatedValue" header="Was Liquidated Value" style="width: 0%; color: red" sortable>
+          <Column field="liquidatorAmount" header="Liquidator Amount" style="width: 0%; color: #8a2be2" sortable></Column>
+          <Column field="liquidatorValue" header="Liquidator Value" style="width: 0%; color: #8a2be2" sortable>
+            <template #body="slotProps">
+              {{ slotProps.data.liquidatorValueString }}
+            </template>
+          </Column>
+          <Column field="liquidatedAmount" header="Liquidated Amount" style="width: 0%; color: red" sortable></Column>
+          <Column field="liquidatedValue" header="Liquidated Value" style="width: 0%; color: red" sortable>
             <template #body="slotProps">
               {{ slotProps.data.liquidatedValueString }}
             </template>
@@ -307,7 +320,11 @@
   {
     updateLeaderBoardValues()
     sortTable()
+
     emits('totalLeaderBoardLendingUsers', totalNumberOfTopRows)
+    const openedSubTables = Object.keys(subTableData.value).length
+    const visibleSubRowCount = getVisibleSubRowCount()
+    emits('setLeaderBoardSubTableAndSubRowCount', openedSubTables, visibleSubRowCount)
   })
 
   watch(priceObjectMap,() =>
@@ -358,6 +375,7 @@
         var userAccountDepositedTotalValue = 0
         var userAccountBorrowedTotalValue = 0
         var userAccountRepaidTotalValue = 0
+        var userAccountLiquidatorTotalValue = 0
         var userAccountLiquidatedTotalValue = 0
         topRowCount += 1
 
@@ -412,6 +430,14 @@
             maximumFractionDigits: 2 })
             userAccountRepaidTotalValue += calculatedValue
 
+            //Calculate Liquidator Value
+            calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].liquidatorAmount * priceData.usdPrice)
+            tempData[i].accountListWithLastestMonthlyStatement[j].liquidatorValue = calculatedValue
+            tempData[i].accountListWithLastestMonthlyStatement[j].liquidatorValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })
+            userAccountLiquidatorTotalValue += calculatedValue
+
             //Calculate Liquidated Value
             calculatedValue = (tempData[i].accountListWithLastestMonthlyStatement[j].liquidatedAmount * priceData.usdPrice)
             tempData[i].accountListWithLastestMonthlyStatement[j].liquidatedValue = calculatedValue
@@ -449,6 +475,12 @@
         //Set Total Repaid Value
         tempData[i].repaidValue = userAccountRepaidTotalValue
         tempData[i].repaidValueString = '$' + userAccountRepaidTotalValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
+
+        //Set Total Liquidator Value
+        tempData[i].liquidatorValue = userAccountLiquidatorTotalValue
+        tempData[i].liquidatorValueString = '$' + userAccountLiquidatorTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
@@ -658,16 +690,31 @@
 
   const expandSubTables = () => 
   {
-    subTableData.value = tableData.value.reduce((acc: { [x: string]: boolean }, p: { id: string | number }) => (acc[p.id] = true) && acc, {})
+    subTableData.value = tableData.value.reduce((acc: { [x: string]: boolean }, p: { ranking: string | number }) => (acc[p.ranking] = true) && acc, {})
+  }
+
+  function getVisibleSubRowCount()
+  {
+    return tableData.value.reduce((total: number, row: any) =>
+    {
+      if(subTableData.value[row.ranking])
+        return total + (row.accountListWithLastestMonthlyStatement?.length || 0)
+    
+      return total
+    }, 0)
   }
 </script>
 
 <style scoped>
-ion-input
+  ion-input
   {
     --highlight-color: var(--ion-color-green)
   }
   
+  #lendingLeaderBoardTable :deep(th)
+  {
+    font-size: min(4vw, 14px)
+  }
   
   #lendingLeaderBoardTable :deep(.p-datatable-tbody > tr)
   {
@@ -682,12 +729,12 @@ ion-input
 
   #lendingLeaderBoardInnerTable :deep(th)
   {
-    font-size: min(4vw, 14px)
+    font-size: min(4vw, 10px)
   }
 
   #lendingLeaderBoardInnerTable :deep(td)
   {
-    font-size: min(4vw, 14px)
+    font-size: min(4vw, 13px)
   }
 
   .tableMinWidth

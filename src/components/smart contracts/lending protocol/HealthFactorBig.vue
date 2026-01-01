@@ -33,9 +33,9 @@
   import { lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
+  import healthFactorInfo from './HealthFactorInfo.ts'
   
   const props = defineProps(['accountOwnerAddress', 'accountIndex'])
-  const healthFactorInfo = "\nHealth Factor equals\n\n(Assets - Debt)/Assets\n\nWhen Debt is equal or less \nthan Assets, IE: Health\nFactor is 0% or negative,\nthe Account is exposed to\nLiquidation.\n\nLiquidations occur 48 times\na day automatically\nevery 30 minutes on the\nhour."
 
   var assetValue = ref()
   var debtValue = ref()
@@ -89,7 +89,7 @@
 
     if(calculatedAssetValue != 0)
     {
-      healthFactor.value = (((calculatedAssetValue - calculatedDebtValue)/calculatedAssetValue) * 100).toFixed(2)//Convert to percent
+      healthFactor.value = (((calculatedAssetValue * 0.8 - calculatedDebtValue)/(calculatedAssetValue * 0.8)) * 100).toFixed(2)//Convert to percent
       if(healthFactor.value < 0)
         healthFactor.value = 0
     }

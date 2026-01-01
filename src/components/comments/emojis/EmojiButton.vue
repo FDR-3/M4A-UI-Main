@@ -19,17 +19,16 @@
   >
   <div class="emojiPopover">
     <!--emoji search bar-->
-    <div v-if="!isEmojiSearchActive" class="flexCenterColumn">
+    <div v-if="!isEmojiSearchActive" class="flexCenterColumn emojiSearchContainer">
       <ion-button @click="setisEmojiSearchActive(true); setSearchBarFocus()" fill="clear">
-        <ion-label class="magnifyingGlassEmoji">🔍</ion-label>
-        <ion-label color="white">{{ emojiPlaceHolderSearchValue }}</ion-label>
+        <ion-label class="magnifyingGlassEmoji noClickEvent">🔍</ion-label>
+        <ion-label class="noClickEvent" color="white">{{ emojiPlaceHolderSearchValue }}</ion-label>
       </ion-button>
     </div>
-    <div v-else class="flexCenterRow">
+    <div v-else class="flexCenterRow emojiSearchContainer">
       <ion-input
-        ref="emojiSearchTextAreaRef"
-        id="emojiSearchTextArea"
-        class="right-placeholder"
+        ref="emojiSearchInputRef"
+        class="emojiSearchInput"
         v-model="emojiSearchValue" 
         :placeholder="emojiPlaceHolderSearchValue"
         :spellcheck="true"
@@ -42,13 +41,13 @@
     </div>
 
     <!--topOption bar-->
-    <div class="spaceRowEvenly">
+    <div class="spaceRowEvenly emojiSearchOptions">
       <ion-button 
       :class="{ selected: emojiSelector.topMenuBarIndex==0 }"
       class="emojiButton" 
       fill="clear" 
       title="emojis" 
-      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(0); emojiSearchValue=''; emojiPlaceHolderSearchValue='emoji search'">
+      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(0); emojiSearchValue=''; emojiPlaceHolderSearchValue='          emoji search'">
         🙂
       </ion-button>
       <ion-button 
@@ -56,7 +55,7 @@
       class="kaomojiButton noWrapText"
       fill="clear" 
       title="kaomojis" 
-      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(1); emojiSearchValue=''; emojiPlaceHolderSearchValue='ascii art search'" 
+      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(1); emojiSearchValue=''; emojiPlaceHolderSearchValue='      ascii art search'" 
       color="white">
         ( ͡• ͜ʖ ͡•)
       </ion-button>
@@ -65,7 +64,7 @@
       class="emojiButton" 
       fill="clear" 
       title="symbols" 
-      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(2); emojiSearchValue=''; emojiPlaceHolderSearchValue='ascii symbol search'" 
+      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(2); emojiSearchValue=''; emojiPlaceHolderSearchValue='      ascii symbol search'" 
       color="white"
       >
         ©
@@ -149,7 +148,7 @@
   defineEmits(['emojiSelected'])
 
   var isEmojiSearchActive = ref()
-  var emojiSearchTextAreaRef = ref()
+  var emojiSearchInputRef = ref()
   var emojiPlaceHolderSearchValue = ref("emoji search")
   var emojiSearchValue = ref("")
   var popoverOpen = ref()
@@ -279,8 +278,8 @@
   {
     await nextTick()
 
-    if (emojiSearchTextAreaRef.value)
-      setTimeout(() => { emojiSearchTextAreaRef.value.$el.setFocus() }, 100) //Doesn't work without delay
+    if (emojiSearchInputRef.value)
+      setTimeout(() => { emojiSearchInputRef.value.$el.setFocus() }, 100) //Doesn't work without delay
   }
 
 </script>
@@ -335,10 +334,6 @@
     font-size: 34px
   }
 
-  .right-placeholder::placeholder{
-    text-align: center !important;
-}
-
   .searchCloseButton
   {
     width: 20px
@@ -356,7 +351,7 @@
     min-height: 170px !important;
   }
 
-  #emojiSearchTextArea
+  .emojiSearchInput
   {
     text-align: center
   }

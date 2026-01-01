@@ -5,7 +5,9 @@
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
   import WETHSVG from '/src/assets/cryptoIcons/weth-svg.vue'
   import WBTCSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
-  import { tokenAddressStrings,
+  import { LegacyTokenProgramID,
+    TokenProgram2022ID,
+    tokenAddressStrings,
     tokenReserveATAKeys,
     pythPriceUpdateKeys,
     pythIds } from '/src/assets/constants/Addresses.ts'
@@ -15,6 +17,10 @@
     sourceWETH,
     sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
   import { PublicKey } from "@solana/web3.js"
+
+  //Currently on @solana/spl-token version 1.8 as updating introduces npm vunlerabilities
+  //The official Token-2022 Program ID
+  const TOKEN_2022_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb")
 
   export const tokenReserves = reactive(
   {
@@ -35,11 +41,60 @@
   export const tokenReserveHashMap: Map<string, tokenMapObject> = new Map(
   [ 
     //Key: Token Mint Address, Value: Token SVG
-    [tokenAddressStrings.daiTokenMintAddress, { name: "DAI-Dev", decimalAmount: 8, svg: markRaw(DAISVG), source: () => {sourceDAI()}, ata: tokenReserveATAKeys.daiATA, pythKey: pythPriceUpdateKeys.daiPythId, pythId: pythIds.daiPythId }],
-    [tokenAddressStrings.usdcTokenMintAddress, { name: "USDC-Dev", decimalAmount: 6, svg: markRaw(USDCSVG), source: () => {sourceUSDC()}, ata: tokenReserveATAKeys.usdcATA, pythKey: pythPriceUpdateKeys.usdcPythId, pythId: pythIds.usdcPythId }],
-    [tokenAddressStrings.solTokenMintAddress, { name: "SOL-Dev", decimalAmount: 9, svg: markRaw(SOLSVG), source: () => {sourceSOL()}, ata: tokenReserveATAKeys.solATA, pythKey: pythPriceUpdateKeys.solPythId, pythId: pythIds.solPythId }],
-    [tokenAddressStrings.wethTokenMintAddress, { name: "WETH-Dev", decimalAmount: 8, svg: markRaw(WETHSVG), source: () => {sourceWETH()}, ata: tokenReserveATAKeys.wethATA, pythKey: pythPriceUpdateKeys.wethPythId, pythId: pythIds.wethPythId }],
-    [tokenAddressStrings.wbtcTokenMintAddress, { name: "WBTC-Dev", decimalAmount: 8, svg: markRaw(WBTCSVG), source: () => {sourceWBTC()}, ata: tokenReserveATAKeys.wbtcATA, pythKey: pythPriceUpdateKeys.wbtcPythId, pythId: pythIds.wbtcPythId }]
+    [tokenAddressStrings.daiTokenMintAddress,
+    {
+      name: "DAI-Dev",
+      decimalAmount: 8,
+      svg: markRaw(DAISVG),
+      source: () => {sourceDAI()},
+      ata: tokenReserveATAKeys.daiATA,
+      pythKey: pythPriceUpdateKeys.daiPythId,
+      pythId: pythIds.daiPythId,
+      tokenProgram: LegacyTokenProgramID
+    }],
+    [tokenAddressStrings.usdcTokenMintAddress,
+    {
+      name: "USDC-Dev",
+      decimalAmount: 6,
+      svg: markRaw(USDCSVG),
+      source: () => {sourceUSDC()},
+      ata: tokenReserveATAKeys.usdcATA,
+      pythKey: pythPriceUpdateKeys.usdcPythId,
+      pythId: pythIds.usdcPythId,
+      tokenProgram: LegacyTokenProgramID
+    }],
+    [tokenAddressStrings.solTokenMintAddress,
+    {
+      name: "SOL-Dev", decimalAmount: 9,
+      svg: markRaw(SOLSVG),
+      source: () => {sourceSOL()},
+      ata: tokenReserveATAKeys.solATA,
+      pythKey: pythPriceUpdateKeys.solPythId,
+      pythId: pythIds.solPythId,
+      tokenProgram: LegacyTokenProgramID
+    }],
+    [tokenAddressStrings.wethTokenMintAddress,
+    {
+      name: "WETH-Dev",
+      decimalAmount: 8,
+      svg: markRaw(WETHSVG),
+      source: () => {sourceWETH()},
+      ata: tokenReserveATAKeys.wethATA,
+      pythKey: pythPriceUpdateKeys.wethPythId,
+      pythId: pythIds.wethPythId,
+      tokenProgram: LegacyTokenProgramID
+    }],
+    [tokenAddressStrings.wbtcTokenMintAddress,
+    {
+      name: "WBTC-Dev",
+      decimalAmount: 8,
+      svg: markRaw(WBTCSVG),
+      source: () => {sourceWBTC()},
+      ata: tokenReserveATAKeys.wbtcATA,
+      pythKey: pythPriceUpdateKeys.wbtcPythId,
+      pythId: pythIds.wbtcPythId,
+      tokenProgram: LegacyTokenProgramID
+    }]
   ])
 
   type tokenMapObject =

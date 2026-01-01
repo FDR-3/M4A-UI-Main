@@ -54,7 +54,18 @@
         <ion-input v-model="tokenMintAddressInput" class="mediumMarginBottom" fill="outline" placeholder="Enter The Mint Address"></ion-input>
         <ion-input v-model="pythPriceFeedID" class="mediumMarginBottom" fill="outline" placeholder="Enter The Pyth Price Update Key"></ion-input>
         <ion-input v-model="tokenDecmialCountInput" class="mediumMarginBottom" fill="outline" type="number" min="0" max="10" step="1" placeholder="Enter The Token Decimal"></ion-input>
-        
+
+        <ion-label>Token Program</ion-label><br>
+        <Select
+        class="tinyMarginTop tinyMarginBottom"
+        v-model="tokenProgramSelect" 
+        :options="tokenProgramList" 
+        optionLabel="programName" 
+        optionValue="programPublicKey" 
+        placeholder="Select Program"
+        appendTo="self">
+        </Select><br><br>
+
         <ion-label>Use Fixed Borrow APY</ion-label><br>
         <Select
         class="tinyMarginTop tinyMarginBottom"
@@ -68,9 +79,7 @@
 
         <ion-label>Fixed Borrow APY:</ion-label>
         <InputNumber
-        id="borrowAPYInput"
         v-model="borrowAPY"
-        ref="borrowAPYRef"
         class="mediumMarginBottom"
         :inputStyle="{'text-align': 'center'}"
         suffix="%"
@@ -80,7 +89,20 @@
         :step="0.01"
         showButtons
         fluid
-        @keydown.enter="checkIfCursorBehindPercentSign()"
+        />
+
+        <ion-label>Solvency Insurance Rate:</ion-label>
+        <InputNumber
+        v-model="solvencyInsurance"
+        class="mediumMarginBottom"
+        :inputStyle="{'text-align': 'center'}"
+        suffix="%"
+        inputId="percent"
+        :minFractionDigits="2" :maxFractionDigits="2"
+        :min="0" :max="100"
+        :step="0.01"
+        showButtons
+        fluid
         />
 
         <ion-label >Global Limit:</ion-label>
@@ -96,10 +118,11 @@
   <AdminTokenReservesTable @editTokenReserveModal="(tokenMintAddress: PublicKey,
   tokenSVG: Component,
   tokenName:string,
+  solvencyInsuranceFeeRate: number,
   fixedBorrowAPY: number,
   useFixedBorrowApy: boolean,
   globalLimit: number) =>
-  editTokenReserveModal.openEditTokenReserveModal(tokenMintAddress, tokenSVG, tokenName, fixedBorrowAPY, useFixedBorrowApy, globalLimit)"/>
+  editTokenReserveModal.openEditTokenReserveModal(tokenMintAddress, tokenSVG, tokenName, solvencyInsuranceFeeRate, fixedBorrowAPY, useFixedBorrowApy, globalLimit)"/>
 
   <CreateSubMarketModal ref="createSubMarketModal"/>
   <EditTokenReserveModal ref="editTokenReserveModal"/>
@@ -113,7 +136,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings, LegacyTokenProgramID, TokenProgram2022ID } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
@@ -126,6 +149,7 @@
 
   const toast = inject('toast')
 
+  var tokenProgram: PublicKey
   var tokenMintAddressInput = ref()
   var pythPriceFeedID = ref()
   var tokenDecmialCountInput = ref()
@@ -136,8 +160,22 @@
   var statementYearInput = ref("")
 
   var borrowAPY = ref(5)
-  var borrowAPRef = ref()
+  var solvencyInsurance = ref(1)
   var globalLimitInput = ref(1_000_000)
+
+   
+  var tokenProgramSelect = ref(LegacyTokenProgramID)
+  var tokenProgramList = 
+  [
+    {
+      programName: "Legacy",
+      programPublicKey: LegacyTokenProgramID
+    },
+    {
+      programName: "2022",
+      programPublicKey: TokenProgram2022ID
+    }
+  ]
 
   var trueFalseSelect = ref(true)
   var trueFalseList = 
@@ -160,20 +198,6 @@
     monthSelect.value = currentDate.getMonth() + 1
   })
 
-  function checkIfCursorBehindPercentSign()
-  {
-    var inputElement = borrowAPRef.value?.$el.querySelector(".p-inputtext")
-
-    if(inputElement)
-    {
-      if(inputElement.value.length == inputElement.selectionEnd)
-      {
-        const beforePercentSign = inputElement.selectionEnd - 1
-        inputElement.setSelectionRange(beforePercentSign, beforePercentSign)
-      }
-    }
-  }
-
   async function addTokenReserveQuick(tokenAddress: String)
   {
     const tokenInfo = tokenReserveHashMap.get(tokenAddress)
@@ -181,6 +205,7 @@
     tokenMintAddressInput.value = tokenAddress
     pythPriceFeedID.value = tokenInfo.pythId.slice(2)
     tokenDecmialCountInput.value = tokenInfo.decimalAmount
+    tokenProgramSelect.value = tokenInfo.tokenProgram
 
     await addTokenReserve()
   }
@@ -197,8 +222,9 @@
         Array.from(Buffer.from(pythPriceFeedID.value, "hex")),
         borrowAPY.value * 100,//convert to fixedpoint notation
         trueFalseSelect.value,
-        new anchor.BN(globalLimitInput.value * Math.pow(10, tokenDecmialCountInput.value)))//convert to fixedpoint notation
-      .accounts({mint: mintAddressKey})
+        new anchor.BN(globalLimitInput.value * Math.pow(10, tokenDecmialCountInput.value)),//convert to fixedpoint notation
+        solvencyInsurance.value * 100)//convert to fixedpoint notation
+      .accounts({ mint: mintAddressKey, tokenProgram: tokenProgramSelect.value })
       .rpc()
 
       tokenMintAddressInput.value = ""

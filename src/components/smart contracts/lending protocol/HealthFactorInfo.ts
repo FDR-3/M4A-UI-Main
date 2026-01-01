@@ -1,0 +1,2 @@
+export const healthFactorInfo = "\nHealth Factor equals\n\n(Assets * 0.8 - Debt)\n-----------------\n(Assets * 0.8)\n\nWhen Debt is equal or more \nthan 80% of Assets, IE:\nHealth Factor is 0% or\nnegative, the Account is\nexposed to Liquidation.\n\nA User can borrow up to 70%\nof the value of their\nassets initially\n"
+export default  healthFactorInfo

@@ -20,7 +20,6 @@
   var hodlDAIWAlletATAWatcherId: any
   var hodlUSDCWAlletATAWatcherId: any
 
-
   var userDAIWAlletATAWatcherId: any
   var userUSDCWalletATAWatcherId: any
   var userSOLWAlletATAWatcherId: any

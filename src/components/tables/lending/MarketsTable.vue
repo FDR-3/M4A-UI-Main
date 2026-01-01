@@ -300,7 +300,7 @@
             <div v-else>
               <ion-button
               v-if="depositedAssetAmount==0"
-              class="tableDepositButton"
+              class="lendingActionButton"
               color="dark"
               @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
               Deposit

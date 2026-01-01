@@ -24,9 +24,9 @@
   import { ref, onMounted, watch } from 'vue'
   import { IonText, IonLabel } from '@ionic/vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
+  import healthFactorInfo from './HealthFactorInfo.ts'
   
   const props = defineProps(['assetValue', 'debtValue'])
-  const healthFactorInfo = "\nHealth Factor equals\n\n(Assets - Debt)/Assets\n\nWhen Debt is equal or less \nthan Assets, IE: Health\nFactor is 0% or negative,\nthe Account is exposed to\nLiquidation.\n\nLiquidations occur 48 times\na day automatically\nevery 30 minutes on the\nhour."
 
   var assetValue = ref()
   var debtValue = ref()
@@ -53,7 +53,7 @@
           maximumFractionDigits: 2 })
 
     if(props.assetValue != 0)
-      healthFactor.value = (((props.assetValue - props.debtValue)/props.assetValue) * 100).toFixed(2)
+      healthFactor.value = ((((props.assetValue * 0.8) - props.debtValue)/(props.assetValue * 0.8)) * 100).toFixed(2)
     else if(props.debtValue == 0)
       healthFactor.value = 100
     else

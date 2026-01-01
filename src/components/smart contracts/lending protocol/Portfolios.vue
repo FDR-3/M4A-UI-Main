@@ -4,6 +4,7 @@
       <ion-label color="green">Return</ion-label>
     </ion-button>
     <LendingLeaderBoardTable
+    :key="portfolioReRenderHelper"
     @viewPortfolio="viewPortfolio"
     @totalLeaderBoardLendingUsers="emitTotalLeaderBoardLendingUsers"
     @adjustLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowAdjustment"
@@ -242,7 +243,7 @@
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
   
-  const props = defineProps(['portfolioChartReRenderHelper'])
+  const props = defineProps(['portfolioReRenderHelper'])
   const emits = defineEmits(
   [
     'openDepositModal',
@@ -542,9 +543,10 @@
     possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
   })
 
-  watch(() => props.portfolioChartReRenderHelper, (() => 
+  watch(() => props.portfolioReRenderHelper, (() => 
   {
     chartReRenderKey.value += 1
+    emitLeaderBoardSubTableAndSubRowSet(0,0)
   }))
 
   function setRainbowAnimatedGradient(ctx: any, chartArea:any)
@@ -1058,6 +1060,16 @@
       localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
     }
 
+    stableCoin7DayProjectionRateAmount.value = "0"
+    stableCoin7DayProjectionRateValue.value = 0
+    stableCoinLifeTimeInterestEarnedAmount.value = "0"
+    stableCoinLifeTimeInterestEarnedValue.value = 0
+
+    crypto7DayProjectionRateAmount.value = "0"
+    crypto7DayProjectionRateValue.value = 0
+    cryptoLifeTimeInterestEarnedAmount.value = "0"
+    cryptoLifeTimeInterestEarnedValue.value = 0
+
     userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
     userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
 
@@ -1109,6 +1121,16 @@
     setIsBrowsingAllLendingUsers(false)
     checkNewAddress(accountIndex)
     isValidPublicKey.value = isValidSolanaPublicKey(owner)
+
+    stableCoin7DayProjectionRateAmount.value = "0"
+    stableCoin7DayProjectionRateValue.value = 0
+    stableCoinLifeTimeInterestEarnedAmount.value = "0"
+    stableCoinLifeTimeInterestEarnedValue.value = 0
+
+    crypto7DayProjectionRateAmount.value = "0"
+    crypto7DayProjectionRateValue.value = 0
+    cryptoLifeTimeInterestEarnedAmount.value = "0"
+    cryptoLifeTimeInterestEarnedValue.value = 0
 
     document.getElementById("protfolioHeader")?.scrollIntoView() 
   }
@@ -1214,6 +1236,13 @@
   calculatedUserInterestEarned: number,
   interestEarnedValue: number)
   {
+    //userTabCryptoCurrencySubMarketList.value = undefined
+
+    userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayCalculatedUserInterestEarned = 0
+    userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayInterestEarnedValue = 0
+    userTabCryptoCurrencySubMarketList.value[userTabIndex].calculatedUserInterestEarned = 0
+    userTabCryptoCurrencySubMarketList.value[userTabIndex].interestEarnedValue = 0
+
     userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
     userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
     userTabCryptoCurrencySubMarketList.value[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned

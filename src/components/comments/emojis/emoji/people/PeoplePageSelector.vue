@@ -2,6 +2,7 @@
   <!--skin tone selector-->
   <ion-item-divider 
     v-if="emojiSelector.peopleEmojiFilterCount!=0"
+    class="emojiColorSelectDivider"
     color="light"
     sticky
   >

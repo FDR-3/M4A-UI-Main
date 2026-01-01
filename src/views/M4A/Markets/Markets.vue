@@ -5,7 +5,7 @@
         <h2>Under Construction On Devnet<br>Monopoly Money</h2>
         <h1>Markets</h1>
     
-        <ion-button @click="flipTable(); portfolioChartReRenderHelper+=1" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
+        <ion-button @click="flipTable(); portfolioReRenderHelper+=1" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
         <MarketsTable @openDepositModal="openDepositAndCloseOthers"
         @openWithdrawalModal="openWithdrawAndCloseOthers"
         @openBorrowModal="openBorrowAndCloseOthers"
@@ -22,7 +22,7 @@
         </div>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Markets</ion-button>
-        <Portfolios :portfolioChartReRenderHelper="portfolioChartReRenderHelper"
+        <Portfolios :portfolioReRenderHelper="portfolioReRenderHelper"
         @openDepositModal="openDepositAndCloseOthers"
         @openWithdrawalModal="openWithdrawAndCloseOthers"
         @openBorrowModal="openBorrowAndCloseOthers"
@@ -84,7 +84,7 @@
   var stableCoinRowCount = ref(0)
   var cryptoCurrencyRowCount = ref(0)
 
-  var portfolioChartReRenderHelper = ref(0)
+  var portfolioReRenderHelper = ref(0)
   var lendingLeaderBoardTopRowCount = ref(0)
   var lendingLeaderBoardSubRowCount = ref(0)
   var lendingLeaderBoardSubTableCount = ref(0)
@@ -270,12 +270,12 @@
       if(!isBrowserFireFox())
       {
         dynamicHeight = 600
-        dynamicHeight += 56 * lendingLeaderBoardSubTableCount.value //SubTable Header Row
+        dynamicHeight += 44 * lendingLeaderBoardSubTableCount.value //SubTable Header Row
       }
       else
       {
         dynamicHeight = 588
-        dynamicHeight += 64.4 * lendingLeaderBoardSubTableCount.value //SubTable Header Row
+        dynamicHeight += 50 * lendingLeaderBoardSubTableCount.value //SubTable Header Row
       }
 
       dynamicHeight += 75 * lendingLeaderBoardTopRowCount.value //User Row

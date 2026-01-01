@@ -135,8 +135,8 @@
           </div>
         </template>
       </Column>
-      <Column field="feesGeneratedAmount" header="Fees Generated" style="width: 0%" sortable></Column>
-      <Column field="uncollectedFeesAmount" header="Uncollected Fees" style="width: 0%" sortable></Column>
+      <Column field="subMarketFeesGeneratedAmount" header="Fees Generated" style="width: 0%" sortable></Column>
+      <Column field="uncollectedSubMarketFeesAmount" header="Uncollected Fees" style="width: 0%" sortable></Column>
       <Column field="feeCollectorAddress" header="Fee Collector Address" style="width: 0%" sortable>
         <template #editor="{ index, data, field }">
           <InputText

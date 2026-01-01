@@ -314,8 +314,8 @@
       adminAccounts.lendingMain100PercentSubMarketIndex.toString())
       if(subMarket)
       {
-        unprocessedTableData[i].unCollectedFees = Number(subMarket.uncollectedFeesAmount)
-        unprocessedTableData[i].unCollectedFeeString = subMarket.uncollectedFeesAmount
+        unprocessedTableData[i].unCollectedFees = Number(subMarket.uncollectedSubMarketFeesAmount)
+        unprocessedTableData[i].unCollectedFeeString = subMarket.uncollectedSubMarketFeesAmount
       }
       else
       {
@@ -388,8 +388,8 @@
       adminAccounts.lendingMain100PercentSubMarketIndex.toString())
       if(subMarket)
       {
-        unprocessedTableData[i].unCollectedFees = Number(subMarket.uncollectedFeesAmount)
-        unprocessedTableData[i].unCollectedFeeString = subMarket.uncollectedFeesAmount
+        unprocessedTableData[i].unCollectedFees = Number(subMarket.uncollectedSubMarketFeesAmount)
+        unprocessedTableData[i].unCollectedFeeString = subMarket.uncollectedSubMarketFeesAmount
       }
       else
       {
@@ -465,7 +465,7 @@
     if(!tokenReserve || !subMarket)
       return 0
 
-    if(subMarket.supplyInterestChangeIndex == 0)
+    if(Number(subMarket.supplyInterestChangeIndex) == 0)
       return 0
 
     //SubMarket New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / SubMarket Earned Interest Index

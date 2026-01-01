@@ -162,8 +162,8 @@
       //Convert Deposit, Fees Generated, and Fees Uncollected Amounts To Decimal from Fixed Point
       const decimalAmount = tokenDecimalHashMap.get(subMarket.tokenMintAddress.toBase58())
       subMarket.depositedAmount = (Number(subMarket.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
-      subMarket.feesGeneratedAmount = (Number(subMarket.feesGeneratedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
-      subMarket.uncollectedFeesAmount = (Number(subMarket.uncollectedFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+      subMarket.subMarketFeesGeneratedAmount = (Number(subMarket.subMarketFeesGeneratedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+      subMarket.uncollectedSubMarketFeesAmount = (Number(subMarket.uncollectedSubMarketFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
 
       //Convert Fee Percentage To Decimal from Fixed Point
       subMarket.feeOnInterestEarnedRate = (subMarket.feeOnInterestEarnedRate / 100)
@@ -719,7 +719,10 @@
               repaidAmount: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               repaidValue: 0,
               repaidValueString: "$0.00",
-              liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+              liquidatorAmount: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+              liquidatorValue: 0,
+              liquidatorValueString: "$0.00",
+              liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
               liquidatedValue: 0,
               liquidatedValueString: "$0.00",
             }
@@ -762,7 +765,10 @@
             repaidAmount: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             repaidValue: 0,
             repaidValueString: "$0.00",
-            liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            liquidatorAmount: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            liquidatorValue: 0,
+            liquidatorValueString: "$0.00",
+            liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             liquidatedValue: 0,
             liquidatedValueString: "$0.00",
           }
@@ -806,7 +812,10 @@
           repaidAmount: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           repaidValue: 0,
           repaidValueString: "$0.00",
-          liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotUserWasLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+          liquidatorAmount: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+          liquidatorValue: 0,
+          liquidatorValueString: "$0.00",
+          liquidatedAmount: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
           liquidatedValue: 0,
           liquidatedValueString: "$0.00",
         }

@@ -20,6 +20,7 @@
         'fixedBorrowAPYString',
         'useFixedBorrowApy',
         'utilizationRateString',
+        'solvencyInsuranceFeeRateString',
         'globalLimitString'
       ]"  
     >
@@ -73,6 +74,11 @@
           {{slotProps.data.utilizationRateString }}
         </template>
       </Column>
+      <Column field="solvencyInsuranceFeeRate" header="Solvency Insurance Rate" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.solvencyInsuranceFeeRateString }}
+        </template>
+      </Column>
       <Column field="globalLimit" header="Global Limit" style="width: 0%" sortable>
         <template #body="slotProps">
           {{slotProps.data.globalLimitString }}
@@ -88,6 +94,7 @@
               slotProps.data.tokenMintAddress,
               slotProps.data.svg,
               slotProps.data.name,
+              slotProps.data.solvencyInsuranceFeeRate,
               slotProps.data.fixedBorrowAPY,
               slotProps.data.useFixedBorrowApy,
               slotProps.data.globalLimit)"
@@ -211,6 +218,10 @@
       maximumFractionDigits: 2 }) + '%'
       processedTableData[i].utilizationRate = processedTableData[i].utilizationRate / 100 //Convert to decimal from fixed point notation 
       processedTableData[i].utilizationRateString = processedTableData[i].utilizationRate.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 }) + '%'
+      processedTableData[i].solvencyInsuranceFeeRate = processedTableData[i].solvencyInsuranceFeeRate / 100 //Convert to decimal from fixed point notation 
+      processedTableData[i].solvencyInsuranceFeeRateString = processedTableData[i].solvencyInsuranceFeeRate.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) + '%'
       processedTableData[i].globalLimit = Number(processedTableData[i].globalLimit) / Math.pow(10, decimalAmount) //Convert to decimal from fixed point notation

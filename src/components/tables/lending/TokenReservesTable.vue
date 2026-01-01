@@ -162,8 +162,8 @@
       </Column>
       <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable></Column>
       <Column field="value" header="Value" style="width: 0%" sortable></Column>
-      <Column field="feesGeneratedAmount" header="Fees Generated" style="width: 0%" sortable></Column>
-      <Column field="uncollectedFeesAmount" header="Uncollected Fees" style="width: 0%" sortable></Column>
+      <Column field="subMarketFeesGeneratedAmount" header="Fees Generated" style="width: 0%" sortable></Column>
+      <Column field="uncollectedSubMarketFeesAmount" header="Uncollected Fees" style="width: 0%" sortable></Column>
       <Column field="feeCollectorAddress" header="Fee Collector Address" style="width: 0%" sortable>
         <template #editor="{ index, data, field }">
           <InputText
@@ -423,9 +423,9 @@
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].value.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
-      else if(unfilteredTableData[i].feesGeneratedAmount.toLowerCase().includes(filterString.toLowerCase()))
+      else if(unfilteredTableData[i].subMarketFeesGeneratedAmount.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
-      else if(unfilteredTableData[i].uncollectedFeesAmount.toLowerCase().includes(filterString.toLowerCase()))
+      else if(unfilteredTableData[i].uncollectedSubMarketFeesAmount.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].feeCollectorAddress.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
