@@ -241,7 +241,7 @@
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
-  import { trimAddress, copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { trimAddress, copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
 
   const colorHexValue = inject('colorHexValue') as string
@@ -255,7 +255,7 @@
 
   var event = ref()
 
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   onMounted(async() =>
   {
@@ -294,7 +294,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.address)
+    copyAddress(copyFullAddressButtonText, event.value.address)
   }
 
   function exportCSV(e: Event) 

@@ -269,7 +269,8 @@
   import { statusTypes } from '/src/types/statusTypes.ts'
   import { parseDollarAmountStringFromFixed2PointNotationNoDollarSign, 
     trimAddress,
-    copyFullAddress,
+    copyAddress,
+    copyFullAddressText,
     confirmM4ATransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
@@ -305,7 +306,7 @@
   var appealDenialPopoverOpen = ref(false)
   var appealReason = ref("")
   var event = ref()
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   onMounted(() =>
   {
@@ -415,7 +416,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.address)
+    copyAddress(copyFullAddressButtonText, event.value.address)
   }
 
   function exportCSV(e: Event) 

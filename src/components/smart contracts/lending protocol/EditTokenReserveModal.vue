@@ -90,7 +90,8 @@
   import InputNumber from 'primevue/inputnumber'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { PublicKey } from "@solana/web3.js"
-  import { copyTokenMintAddress,
+  import { copyAddress,
+    copyTokenMintAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
@@ -125,7 +126,7 @@
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
   var modalRef = ref()
 
   onMounted(() =>
@@ -190,7 +191,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
 
   async function editTokenReserve()

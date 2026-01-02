@@ -212,7 +212,7 @@
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
   import { download } from 'ionicons/icons'
-  import { trimAddress, copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { trimAddress, copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { statusTypes } from '/src/types/statusTypes.ts'
 
@@ -233,7 +233,7 @@
   var insuranceCompanyPopoverOpen = ref(false)
   var event = ref()
 
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   onMounted(async () => 
   {
@@ -249,7 +249,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.address)
+    copyAddress(copyFullAddressButtonText, event.value.address)
   }
 
   function exportCSV (e: Event) 

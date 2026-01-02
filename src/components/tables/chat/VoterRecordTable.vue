@@ -107,7 +107,7 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { download } from 'ionicons/icons'
   import { search } from 'ionicons/icons'
-  import { copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
 
   const props = defineProps([
@@ -127,13 +127,13 @@
   var popoverOpen = ref(false)
   var event = ref()
 
-  var copyFullAddressButtonText = ref("Copy Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   const tableDownload = ref()
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.voterAddress)
+    copyAddress(copyFullAddressButtonText, event.value.voterAddress)
   }
 
   function exportCSV (e: Event) 

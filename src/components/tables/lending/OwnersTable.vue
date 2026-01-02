@@ -262,8 +262,9 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
   import { isValidSolanaPublicKey,
-    copyFullAddress,
-    copyTokenMintAddress,
+    copyAddress,
+    copyFullAddressText,
+    copyTokenMintAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -299,10 +300,10 @@
   var savedEditedRow: any 
   var isEditing = false
   var isDataEdited = ref(false)
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   var tokenPopoverOpen = ref(false)
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
 
   var inputFeeRefs = ref(new Map())
 
@@ -459,7 +460,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.ownerAddress)
+    copyAddress(copyFullAddressButtonText, event.value.ownerAddress)
   }
 
   function openTokenPopover(e: Event, rowData: any) 
@@ -478,7 +479,7 @@
 
   function passByRefWrapperCopyTokenMintAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
   }
 
   function processOwnersTable()

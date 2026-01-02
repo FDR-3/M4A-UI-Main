@@ -118,7 +118,7 @@
   import { tokenReserves, tokenReserveHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { PublicKey } from "@solana/web3.js"
-  import { copyTokenReserveATA } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyTreasuryATAText } from '/src/assets/contracts/WalletHelper.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
@@ -136,7 +136,7 @@
   var publicKeyCheckColor = ref("#6fff7b")
 
   var tokenReserveATAPopoverOpen = ref(false)
-  var copyTokenReserveATAButtonText = ref("Copy Token Reserve ATA")
+  var copyTokenReserveATAButtonText = ref(copyTreasuryATAText)
 
   onMounted(() =>
   {
@@ -174,7 +174,7 @@
 
   function passByRefWrapperCopyTokenReserveATA()
   {
-    copyTokenReserveATA(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
+    copyAddress(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
   }
 
   const filters = ref(

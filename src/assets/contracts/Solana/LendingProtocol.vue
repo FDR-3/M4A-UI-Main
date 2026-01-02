@@ -134,7 +134,18 @@
     var hashmap = new Map<string, any>()
 
     for(var i=0; i<tokenReserves.data.length; i++)
-      hashmap.set(tokenReserves.data[i].tokenMintAddress.toBase58(), tokenReserves.data[i])
+    {
+      const tokenReserve = tokenReserves.data[i]
+      const decimalAmount = tokenDecimalHashMap.get(tokenReserve.tokenMintAddress.toBase58())
+
+      //Convert Uncollected Solvency Fee Amounts To Decimal from Fixed Point
+      tokenReserve.uncollectedSolvencyInsuranceFeesAmount = (Number(tokenReserve.uncollectedSolvencyInsuranceFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+
+      //Convert Fee Rate To Decimal from Fixed Point
+      tokenReserve.solvencyInsuranceFeeRate = (tokenReserve.solvencyInsuranceFeeRate / 100)
+
+      hashmap.set(tokenReserves.data[i].tokenMintAddress.toBase58(), tokenReserve)
+    }
 
     tokenReservesHashMap.map = hashmap
   }
@@ -159,13 +170,13 @@
       //Populate Token Reserve hash map
       var ownerTokenReserveList: any = []
 
-      //Convert Deposit, Fees Generated, and Fees Uncollected Amounts To Decimal from Fixed Point
+      //Convert Deposit, Fees Generated, and Uncollected Fee Amounts To Decimal from Fixed Point
       const decimalAmount = tokenDecimalHashMap.get(subMarket.tokenMintAddress.toBase58())
       subMarket.depositedAmount = (Number(subMarket.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
       subMarket.subMarketFeesGeneratedAmount = (Number(subMarket.subMarketFeesGeneratedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
       subMarket.uncollectedSubMarketFeesAmount = (Number(subMarket.uncollectedSubMarketFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
 
-      //Convert Fee Percentage To Decimal from Fixed Point
+      //Convert Fee Rate To Decimal from Fixed Point
       subMarket.feeOnInterestEarnedRate = (subMarket.feeOnInterestEarnedRate / 100)
 
       //Add ceo name for filtering

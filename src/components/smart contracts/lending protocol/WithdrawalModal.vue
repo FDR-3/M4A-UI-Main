@@ -125,7 +125,8 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey, Transaction } from "@solana/web3.js"
-  import { copyTokenMintAddress,
+  import { copyAddress,
+    copyTokenMintAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
@@ -161,7 +162,7 @@
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
 
   const withdrawOrBorrowInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
 
@@ -393,7 +394,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
 
   async function updateStoredSelectedAccount()

@@ -74,7 +74,8 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
   import { trimAddress,
-    copyTokenMintAddress,
+    copyAddress,
+    copyTokenMintAddressText,
     isValidSolanaPublicKey,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
@@ -95,7 +96,7 @@
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
   var modalRef = ref()
 
   onMounted(() =>
@@ -153,7 +154,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
 
   async function createSubMarket()

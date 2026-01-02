@@ -290,8 +290,9 @@
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
-  import { copyFullAddress,
-    copyTokenReserveATA,
+  import { copyAddress,
+    copyFullAddressText,
+    copyTreasuryATAText,
     isValidSolanaPublicKey,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
@@ -325,10 +326,10 @@
   var savedEditedRow: any 
   var isEditing = false
   var isDataEdited = ref(false)
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   var tokenReserveATAPopoverOpen = ref(false)
-  var copyTokenReserveATAButtonText = ref("Copy Token Reserve ATA")
+  var copyTokenReserveATAButtonText = ref(copyTreasuryATAText)
   const subMarketInfoMSG = "Developers can create\nSubMarkets to generate\ninterest for their\nusers while collecting fees\nto pay what ever bill they\nchoose. Developers will\nneed to build their own UIs\nfor their user deposits,\netc."
 
   var inputFeeRefs = ref(new Map())
@@ -452,7 +453,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.ownerAddress)
+    copyAddress(copyFullAddressButtonText, event.value.ownerAddress)
   }
 
   function openTokenReserveATAPopover(e: Event, rowData: any) 
@@ -471,7 +472,7 @@
 
   function passByRefWrapperCopyTokenReserveATA()
   {
-    copyTokenReserveATA(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
+    copyAddress(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
   }
 
   function openCollectFeesPopover(e: Event, rowData: any) 

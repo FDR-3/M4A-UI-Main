@@ -404,7 +404,8 @@
   import { statusTypes } from '/src/types/statusTypes.ts'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { trimAddress,
-    copyFullAddress,
+    copyAddress,
+    copyFullAddressText,
     parseDollarAmountStringFromDecimal,
     confirmM4ATransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
@@ -436,7 +437,7 @@
 
   var event = ref()
 
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   //Keeps editing from fucking up the table after it's sorted
   function onValueChange(value: any) 
@@ -608,7 +609,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.address)
+    copyAddress(copyFullAddressButtonText, event.value.address)
   }
 
   function exportCSV(e: Event) 

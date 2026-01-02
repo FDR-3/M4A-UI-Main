@@ -8,7 +8,7 @@
       :value="stableCoinTableData"
       :globalFilterFields="
       [
-        'tokenMintAddress',
+        'tokenMintAddressString',
         'hodlATA',
         'asset.name',
         'chain.name',
@@ -38,18 +38,18 @@
       <Column field="asset.name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-            <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)">
+            <ion-button fill="clear" @click="openTreasuryATAPopover($event, slotProps.data)">
               <component :is="slotProps.data.asset.svg" style="width: 24px; margin-left: -11px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
             <ion-popover 
-            :is-open="tokenPopoverOpen" 
+            :is-open="treasuryATAPopoverOpen" 
             :event="event" 
-            @didDismiss="tokenPopoverOpen=false"
+            @didDismiss="treasuryATAPopoverOpen=false"
             side="top" 
             alignment="center"
             >
-              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTreasuryATA()" @mouseleave="closeTreasuryATAPopover($event)">
                 <ion-label color="light">{{ copyTreasuryATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
@@ -105,8 +105,7 @@
       :value="CryptoCurrencyTableData"
       :globalFilterFields="
       [
-        'tokenMintAddress',
-        'hodlATA',
+        'tokenMintAddressString',
         'asset.name',
         'chain.name',
         'priceString',
@@ -125,20 +124,20 @@
       <Column field="asset.name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
-            <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)" style="margin-left: -8px">
+            <ion-button fill="clear" @click="openTokenMintAddressPopover($event, slotProps.data)" style="margin-left: -8px">
               <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; height: 32px; margin-left: -8px; margin-right: -4px"/>
               <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 32px; margin-right: 5px"/>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
             <ion-popover 
-            :is-open="tokenPopoverOpen" 
+            :is-open="tokenMintAddressPopoverOpen" 
             :event="event" 
-            @didDismiss="tokenPopoverOpen=false"
+            @didDismiss="tokenMintAddressPopoverOpen=false"
             side="top" 
             alignment="center"
             >
-              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="light">{{ copyTreasuryATAButtonText }}</ion-label>
+              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenMintAddressPopover($event)">
+                <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -194,7 +193,7 @@
   import { tokenReservesHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
-  import { copyTreasuryATA } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyTokenMintAddressText, copyTreasuryATAText } from '/src/assets/contracts/WalletHelper.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
@@ -210,9 +209,11 @@
   var stableValue = ref(0)
   var cryptoValue = ref(0)
 
-  var tokenPopoverOpen = ref(false)
+  var treasuryATAPopoverOpen = ref(false)
+  var tokenMintAddressPopoverOpen = ref(false)
   var event = ref()
-  var copyTreasuryATAButtonText = ref("Copy Treasury ATA")
+  var copyTreasuryATAButtonText = ref(copyTreasuryATAText)
+  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
 
   var sevenDayProjectionRate = ref()
   sevenDayProjectionRate.value = (0).toFixed(2)
@@ -290,23 +291,42 @@
     await startFeeCalculation()
   })
 
-  function openTokenPopover(e: Event, rowData: any) 
+  function openTreasuryATAPopover(e: Event, rowData: any) 
   {
     event.value = e
     event.value.hodlATA = rowData.hodlATA
 
-    tokenPopoverOpen.value = true
+    treasuryATAPopoverOpen.value = true
   }
 
-  function closeTokenPopover(e: Event) 
+  function closeTreasuryATAPopover(e: Event) 
   {
     event.value = e
-    tokenPopoverOpen.value = false
+    treasuryATAPopoverOpen.value = false
   }
 
-  function passByRefWrapperCopyAddress()
+  function openTokenMintAddressPopover(e: Event, rowData: any) 
   {
-    copyTreasuryATA(copyTreasuryATAButtonText, event.value.hodlATA)
+    event.value = e
+    event.value.tokenMintAddressString = rowData.tokenMintAddressString
+
+    tokenMintAddressPopoverOpen.value = true
+  }
+
+  function closeTokenMintAddressPopover(e: Event) 
+  {
+    event.value = e
+    tokenMintAddressPopoverOpen.value = false
+  }
+
+  function passByRefWrapperCopyTreasuryATA()
+  {
+    copyAddress(copyTreasuryATAButtonText, event.value.hodlATA)
+  }
+
+  function passByRefWrapperCopyTokenMintAddress()
+  {
+    copyAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddressString)
   }
 
   function processHODLStableCoinTableData()
@@ -392,9 +412,6 @@
       unprocessedTableData[i].valueString = '$' + calculatedValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
-
-      //Calculate 7 Day Projection Rate
-
     }
 
     stableValue.value = value

@@ -454,7 +454,7 @@
   import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
   import EditBar from '/src/components/comments/EditBar.vue'
   import { parseYoutubeLink } from './Functions.ts'
-  import { copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { MAX_COMMENT_LENGTH, REPLY_LIST_INDEX, REMAINING_REPLIES_INDEX } from '../constants.ts'
   import { navigation, MenuIndex } from '/src/assets/globalStates/Navigation.vue'
   import { confirmChatTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
@@ -487,7 +487,7 @@
 
   const toast = inject('toast')
 
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
   var replying = ref()
   var editMode = ref()
   var editedMessage = ref()
@@ -523,7 +523,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, props.postOwnerAddress)
+    copyAddress(copyFullAddressButtonText, props.postOwnerAddress)
   }
 
   const replyTuple = computed (() =>

@@ -9,31 +9,32 @@
       :globalFilterFields="
       [
         'tokenMintAddressString',
+        'solvencyATA',
         'asset.name',
         'chain.name',
         'priceString',
         'percentChange24h',
+        'walletString',
         'unCollectedFeeString',
-        'depositString',
         'valueString'
       ]"  
     >
       <template #header>
         <div>
-          <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ tvl.singlePayerTVL.toLocaleString('en-US', {
+          <h2>Solvency Insurance Treasury Value: $<span class="rainbowText">{{ tvl.solvencyTVL.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span>
           </h2>
           <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
-          <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Single Payer Treasury Search     ">
-              <ion-icon slot="start" :icon="search"></ion-icon>
+          <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Solvency Treasury Search     ">
+            <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
           <br><ion-label id="tableTitle">Stable Coins</ion-label>
         </div>
       </template>
       <template #loading> Loading records. Please wait. </template>
-      <Column field="asset" header="Asset" style="width: 0%" sortable>
+      <Column field="asset.name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)">
@@ -47,8 +48,8 @@
             side="top" 
             alignment="center"
             >
-              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
+              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+                <ion-label color="light">{{ copyTreasuryATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -74,14 +75,14 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
+      <Column field="wallet" header="Wallet" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.walletString }}
+        </template>
+      </Column>
       <Column field="unCollectedFees" header="UnCollected Fees" style="width: 0%" sortable>
         <template #body="slotProps">
           {{ slotProps.data.unCollectedFeeString }}
-        </template>
-      </Column>
-      <Column field="deposits" header="Deposits" style="width: 0%" sortable>
-        <template #body="slotProps">
-          {{ slotProps.data.depositString }}
         </template>
       </Column>
       <Column field="value" header="Value" style="width: 0%" sortable>
@@ -99,12 +100,13 @@
       :globalFilterFields="
       [
         'tokenMintAddressString',
+        'solvencyATA',
         'asset.name',
         'chain.name',
         'priceString',
         'percentChange24h',
+        'walletString',
         'unCollectedFeeString',
-        'depositString',
         'valueString'
       ]"
     >
@@ -114,7 +116,7 @@
         </div>
       </template>
       <template #loading> Loading records. Please wait. </template>
-      <Column field="asset" header="Asset" style="width: 0%" sortable>
+      <Column field="asset.name" header="Asset" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)" style="margin-left: -8px">
@@ -129,8 +131,8 @@
             side="top" 
             alignment="center"
             >
-              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
+              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+                <ion-label color="light">{{ copyTreasuryATAButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
           </div>
@@ -156,14 +158,14 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
+      <Column field="wallet" header="Wallet" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{ slotProps.data.walletString }}
+        </template>
+      </Column>
       <Column field="unCollectedFees" header="UnCollected Fees" style="width: 0%" sortable>
         <template #body="slotProps">
           {{ slotProps.data.unCollectedFeeString }}
-        </template>
-      </Column>
-      <Column field="deposits" header="Deposits" style="width: 0%" sortable>
-        <template #body="slotProps">
-          {{ slotProps.data.depositString }}
         </template>
       </Column>
       <Column field="value" header="Value" style="width: 0%" sortable>
@@ -180,12 +182,13 @@
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
-  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { solvencyInsuranceTreasuryWalletBalancesHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { subMarketsHashMap, tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenReservesHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
-  import { copyAddress, copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyTreasuryATAText } from '/src/assets/contracts/WalletHelper.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
@@ -203,7 +206,7 @@
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
-  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
+  var copyTreasuryATAButtonText = ref(copyTreasuryATAText)
 
   var sevenDayProjectionRate = ref()
   sevenDayProjectionRate.value = (0).toFixed(2)
@@ -213,11 +216,11 @@
 
   onMounted(async() =>
   {
-    if(lendingUserTabAccountsHashMap.map)
+    if(solvencyInsuranceTreasuryWalletBalancesHashMap.map && lendingUserTabAccountsHashMap.map)
     {
-      processSinglePayerStableCoinTableData()
-      processSinglePayerCryptoCurrencyTableData()
-      tvl.singlePayerTVL = stableValue.value + cryptoValue.value
+      processHODLStableCoinTableData()
+      processHODLCryptoCurrencyTableData()
+      tvl.solvencyTVL = stableValue.value + cryptoValue.value
 
       isLoading.value = false
     }
@@ -234,11 +237,21 @@
     stopFeeCalculation()
   })
 
+  watch(solvencyInsuranceTreasuryWalletBalancesHashMap, () => 
+  {
+    processHODLStableCoinTableData()
+    processHODLCryptoCurrencyTableData()
+    tvl.solvencyTVL = stableValue.value + cryptoValue.value
+
+    if(isLoading.value)
+      isLoading.value = false
+  })
+
   watch(lendingUserTabAccountsHashMap, () => 
   {
-    processSinglePayerStableCoinTableData()
-    processSinglePayerCryptoCurrencyTableData()
-    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
+    processHODLStableCoinTableData()
+    processHODLCryptoCurrencyTableData()
+    tvl.solvencyTVL = stableValue.value + cryptoValue.value
 
     if(isLoading.value)
       isLoading.value = false
@@ -246,14 +259,14 @@
 
   watch(StableCoins, () => 
   {
-    processSinglePayerStableCoinTableData()
-    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
+    processHODLStableCoinTableData()
+    tvl.solvencyTVL = stableValue.value + cryptoValue.value
   })
 
   watch(CryptoCurrency, () => 
   {
-    processSinglePayerCryptoCurrencyTableData()
-    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
+    processHODLCryptoCurrencyTableData()
+    tvl.solvencyTVL = stableValue.value + cryptoValue.value
   })
 
   watch([tokenReservesHashMap, subMarketsHashMap], async() => 
@@ -274,7 +287,7 @@
   function openTokenPopover(e: Event, rowData: any) 
   {
     event.value = e
-    event.value.tokenMintAddressString = rowData.tokenMintAddressString
+    event.value.solvencyATA = rowData.solvencyATA
 
     tokenPopoverOpen.value = true
   }
@@ -285,14 +298,14 @@
     tokenPopoverOpen.value = false
   }
 
-  function passByRefWrapperCopyTokenMintAddress()
+  function passByRefWrapperCopyAddress()
   {
-    copyAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddressString)
+    copyAddress(copyTreasuryATAButtonText, event.value.solvencyATA)
   }
 
-  function processSinglePayerStableCoinTableData()
+  function processHODLStableCoinTableData()
   {
-    if(!lendingUserTabAccountsHashMap.map)
+    if(!solvencyInsuranceTreasuryWalletBalancesHashMap.map || !lendingUserTabAccountsHashMap.map)
       return
 
     var value = 0
@@ -300,20 +313,33 @@
 
     for(var i=0; i<StableCoins.length; i++)
     {
-      unprocessedTableData.push(cloneDeep(StableCoins[i]))//Keeps SinglePayer and Single Payer tables from writing over each other
+      unprocessedTableData.push(cloneDeep(StableCoins[i]))//Keeps HODL and Single Payer tables from writing over each other
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
       const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
 
-      //Set UnCollected Fee Amounts
-      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
-      adminAccounts.lendingCEOAddressString +
-      adminAccounts.lendingMain100PercentSubMarketIndex.toString())
-      if(subMarket)
+      //Set Wallet Amounts
+      const tokenAmount = solvencyInsuranceTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      if(tokenAmount)
       {
-        unprocessedTableData[i].unCollectedFees = Number(subMarket.uncollectedSubMarketFeesAmount)
-        unprocessedTableData[i].unCollectedFeeString = subMarket.uncollectedSubMarketFeesAmount
+        unprocessedTableData[i].wallet = Number(tokenAmount)
+        unprocessedTableData[i].walletString = tokenAmount
+      }
+      else
+      {
+        unprocessedTableData[i].wallet = 0
+        unprocessedTableData[i].walletString = (0).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+      }
+
+      //Set UnCollected Fee Amounts
+      const tokenReserve = tokenReservesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      if(tokenReserve)
+      {
+        unprocessedTableData[i].unCollectedFees = Number(tokenReserve.uncollectedSolvencyInsuranceFeesAmount)
+        unprocessedTableData[i].unCollectedFeeString = tokenReserve.uncollectedSolvencyInsuranceFeesAmount
       }
       else
       {
@@ -323,28 +349,7 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      //Set Deposit Amounts
-      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
-      adminAccounts.lendingCEOAddressString +
-      adminAccounts.lendingMain100PercentSubMarketIndex.toString() +
-      adminAccounts.singlePayerTreasuryAddress.toString() +
-      adminAccounts.singlePayerTreasuryLendingAccountIndex.toString())
-      if(lendingUserTabAccount)
-      {
-        unprocessedTableData[i].deposits = Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount)
-        unprocessedTableData[i].depositString = unprocessedTableData[i].deposits.toLocaleString('en-US', {
-        minimumFractionDigits: decimalAmount,
-        maximumFractionDigits: decimalAmount })
-      }
-      else
-      {
-        unprocessedTableData[i].deposits = 0
-        unprocessedTableData[i].depositString = (0).toLocaleString('en-US', {
-        minimumFractionDigits: decimalAmount,
-        maximumFractionDigits: decimalAmount })
-      }
-
-      const totalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+      const totalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees)
 
       var calculatedValue = 0
 
@@ -364,7 +369,7 @@
     stableCoinTableData.value = unprocessedTableData
   }
 
-  function processSinglePayerCryptoCurrencyTableData()
+  function processHODLCryptoCurrencyTableData()
   {
     if(!lendingUserTabAccountsHashMap.map)
       return
@@ -374,20 +379,33 @@
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
-      unprocessedTableData.push(cloneDeep(CryptoCurrency[i]))//Keeps SinglePayer and Single Payer tables from writing over each other
+      unprocessedTableData.push(cloneDeep(CryptoCurrency[i]))//Keeps HODL and Single Payer tables from writing over each other
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
       const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
 
-      //Set UnCollected Fee Amounts
-      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
-      adminAccounts.lendingCEOAddressString +
-      adminAccounts.lendingMain100PercentSubMarketIndex.toString())
-      if(subMarket)
+      //Set Wallet Amounts
+      const tokenAmount = solvencyInsuranceTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      if(tokenAmount)
       {
-        unprocessedTableData[i].unCollectedFees = Number(subMarket.uncollectedSubMarketFeesAmount)
-        unprocessedTableData[i].unCollectedFeeString = subMarket.uncollectedSubMarketFeesAmount
+        unprocessedTableData[i].wallet = Number(tokenAmount)
+        unprocessedTableData[i].walletString = tokenAmount
+      }
+      else
+      {
+        unprocessedTableData[i].wallet = 0
+        unprocessedTableData[i].walletString = (0).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+      }
+
+      //Set UnCollected Fee Amounts
+      const tokenReserve = tokenReservesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      if(tokenReserve)
+      {
+        unprocessedTableData[i].unCollectedFees = Number(tokenReserve.uncollectedSolvencyInsuranceFeesAmount)
+        unprocessedTableData[i].unCollectedFeeString = tokenReserve.uncollectedSolvencyInsuranceFeesAmount
       }
       else
       {
@@ -397,28 +415,7 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      //Set Deposit Amounts
-      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
-      adminAccounts.lendingCEOAddressString +
-      adminAccounts.lendingMain100PercentSubMarketIndex.toString() +
-      adminAccounts.singlePayerTreasuryAddress.toString() +
-      adminAccounts.singlePayerTreasuryLendingAccountIndex.toString())
-      if(lendingUserTabAccount)
-      {
-        unprocessedTableData[i].deposits = Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount)
-        unprocessedTableData[i].depositString = unprocessedTableData[i].deposits.toLocaleString('en-US', {
-        minimumFractionDigits: decimalAmount,
-        maximumFractionDigits: decimalAmount })
-      }
-      else
-      {
-        unprocessedTableData[i].deposits = 0
-        unprocessedTableData[i].depositString = (0).toLocaleString('en-US', {
-        minimumFractionDigits: decimalAmount,
-        maximumFractionDigits: decimalAmount })
-      }
-
-      const totalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+      const totalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees)
 
       var calculatedValue = 0
 
@@ -456,26 +453,29 @@
   function calculateSubMarketSevenDayFeeAccrued(tokenMintAddress: string, tokenReserveSevenDaySupplyInterestChangeIndex: number)
   {
     const tokenReserve = tokenReservesHashMap.map.get(tokenMintAddress)
-    const subMarket = subMarketsHashMap.map.get(tokenMintAddress +
-    adminAccounts.lendingCEOAddressString +
-    adminAccounts.lendingMain100PercentSubMarketIndex.toString())
-
-    if(!tokenReserve || !subMarket)
+    const tokenReserveSubMarketList = tokenReserveSubMarketListHashMap.map.get(tokenMintAddress)
+    
+    if(!tokenReserve || !tokenReserveSubMarketList)
       return 0
 
-    if(Number(subMarket.supplyInterestChangeIndex) == 0)
-      return 0
+    var totalSolvencyInsuranceFeesGenerated = 0
 
-    //SubMarket New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / SubMarket Earned Interest Index
-    //Interest Earned Before Fee = New Balance Before Fee - Old Balance
-    //Fee Generated = Interest Earned Before Fee * SubMarket Fee Rate
-    const sevenDaySubMarketBalanceBeforeFee = (subMarket.depositedAmount * tokenReserveSevenDaySupplyInterestChangeIndex / Number(subMarket.supplyInterestChangeIndex))
-    const sevenDayInterestEarnedBeforeFee = sevenDaySubMarketBalanceBeforeFee - subMarket.depositedAmount
-    const sevenDaySubMarketFeeGenerated = (sevenDayInterestEarnedBeforeFee * subMarket.feeOnInterestEarnedRate / 100)
+    for(var i=0; i<tokenReserveSubMarketList.length; i++)
+    {
+      if(Number(tokenReserveSubMarketList[i].supplyInterestChangeIndex) == 0)
+        continue
 
+      //SubMarket New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / SubMarket Earned Interest Index
+      //Interest Earned Before Fee = New Balance Before Fee - Old Balance
+      //Fee Generated = Interest Earned Before Fee * Token Reserve Solvency Insurance Fee Rate
+      const sevenDaySubMarketBalanceBeforeFee = (Number(tokenReserveSubMarketList[i].depositedAmount) * tokenReserveSevenDaySupplyInterestChangeIndex / Number(tokenReserveSubMarketList[i].supplyInterestChangeIndex))
+      const sevenDayInterestEarnedBeforeFee = sevenDaySubMarketBalanceBeforeFee - Number(tokenReserveSubMarketList[i].depositedAmount)
+      totalSolvencyInsuranceFeesGenerated += (sevenDayInterestEarnedBeforeFee * tokenReserve.solvencyInsuranceFeeRate / 100)
+    }
+    
     const price = priceObjectMap.data[tokenMintAddress].usdPrice
     if(price)
-      return sevenDaySubMarketFeeGenerated * Number(price)
+      return totalSolvencyInsuranceFeesGenerated * Number(price)
     else
       return 0
   }
@@ -529,9 +529,14 @@
 </script>
 
 <style scoped>
+  .container
+  {
+    margin-bottom: 77px
+  }
+  
   #tableTitle
   {
-    margin: 90px
+    margin: 20px
   }
 
   .tableMinWidth

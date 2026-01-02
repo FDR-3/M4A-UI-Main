@@ -147,7 +147,7 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { chatLeaderBoard } from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
@@ -165,7 +165,7 @@
 
   var event = ref()
   var ownerPopoverOpen = ref(false)
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   onMounted(() =>
   {
@@ -325,7 +325,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.userAddress)
+    copyAddress(copyFullAddressButtonText, event.value.userAddress)
   }
 
   function viewSelectedUser()

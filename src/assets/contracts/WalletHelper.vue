@@ -158,51 +158,21 @@
     }
   }
 
-  export function copyFullAddress(buttonText: Ref, addressString: string)
+  export const copyFullAddressText = "Copy Full Address"
+  export const copyTokenMintAddressText = "Copy Token Mint Address"
+  export const copyTreasuryATAText = "Copy Treasury ATA"
+
+  export function copyAddress(buttonText: Ref, addressString: string)
   {
+    const originalText = buttonText.value
+
     //Copy address to clipboard
     navigator.clipboard.writeText(addressString)
     buttonText.value = "Copied!"
 
     setTimeout(() =>
     {
-      buttonText.value = "Copy Full Address" // Revert to the initial value
-    }, 2000) // 2000 milliseconds = 2 seconds
-  }
-
-  export function copyTokenMintAddress(buttonText: Ref, addressString: string)
-  {
-    //Copy address to clipboard
-    navigator.clipboard.writeText(addressString)
-    buttonText.value = "Copied!"
-
-    setTimeout(() =>
-    {
-      buttonText.value = "Copy Token Mint Address" // Revert to the initial value
-    }, 2000) // 2000 milliseconds = 2 seconds
-  }
-
-  export function copyTreasuryATA(buttonText: Ref, addressString: string)
-  {
-    //Copy address to clipboard
-    navigator.clipboard.writeText(addressString)
-    buttonText.value = "Copied!"
-
-    setTimeout(() =>
-    {
-      buttonText.value = "Copy Treasury ATA" // Revert to the initial value
-    }, 2000) // 2000 milliseconds = 2 seconds
-  }
-
-  export function copyTokenReserveATA(buttonText: Ref, addressString: string)
-  {
-    //Copy address to clipboard
-    navigator.clipboard.writeText(addressString)
-    buttonText.value = "Copied!"
-
-    setTimeout(() =>
-    {
-      buttonText.value = "Copy Token Reserve ATA" // Revert to the initial value
+      buttonText.value = originalText // Revert to the initial value
     }, 2000) // 2000 milliseconds = 2 seconds
   }
 

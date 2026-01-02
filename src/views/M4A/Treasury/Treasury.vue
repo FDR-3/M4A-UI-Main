@@ -6,7 +6,7 @@
   </div>
   <!--<M4AProtocolTVLLongHTMLText/>-->
   <!--<M4AProtocolTVLShortHTMLText/>-->
-  <h1 class="nMediumLargeMarginTop">$<span class="rainbowText">{{ (tvl.hodlTVL + tvl.singlePayerTVL + tvl.tokenReserveTVL).toLocaleString('en-US', {
+  <h1 class="nMediumLargeMarginTop">$<span class="rainbowText">{{ (tvl.singlePayerTVL + tvl.hodlTVL + tvl.solvencyTVL + tvl.tokenReserveTVL).toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) }}</span></h1>
       
@@ -15,8 +15,9 @@
       <div class="frontTable" :style="{display: display1stTable}">
         <h1>Treasuries</h1>
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Reserves</ion-button>
-        <HODLTreasuryTable/>
         <SinglePayerTreasuryTable/>
+        <HODLTreasuryTable/>
+        <SolvencyInsuranceTreasuryTable/>
       </div>
 
       <div class="backTable" :style="{display: display2ndTable}">
@@ -39,8 +40,9 @@
 <script setup lang="ts">
   import { ref, onMounted, Component, computed } from 'vue'
   import { IonButton } from '@ionic/vue'
-  import HODLTreasuryTable from '/src/components/tables/lending/HODLTreasuryTable.vue'
   import SinglePayerTreasuryTable from '/src/components/tables/lending/SinglePayerTreasuryTable.vue'
+  import HODLTreasuryTable from '/src/components/tables/lending/HODLTreasuryTable.vue'
+  import SolvencyInsuranceTreasuryTable from '/src/components/tables/lending/SolvencyInsuranceTreasuryTable.vue'
   import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
   import OwnersTable from '/src/components/tables/lending/OwnersTable.vue'
   import TVLLongSVG from '/src/assets/svg/tvl-long-svg.vue'
@@ -144,19 +146,19 @@
     var tokenRelatedHeight = 0
 
     if(!isBrowserFireFox())
-      baseTableHeight = 939
+      baseTableHeight = 1334
     else
-      baseTableHeight = 972
+      baseTableHeight = 1384
     
     if(StableCoins.length == 0)
-      tokenRelatedHeight += 14 * 2
+      tokenRelatedHeight += 14 * 3//3 Treasuries
     else
-      tokenRelatedHeight += StableCoins.length * 70 * 2
+      tokenRelatedHeight += StableCoins.length * 70 * 3//3 Treasuries
 
     if(CryptoCurrency.length == 0)
-      tokenRelatedHeight += 14 * 2
+      tokenRelatedHeight += 14 * 3//3 Treasuries
     else
-      tokenRelatedHeight += CryptoCurrency.length * 70 * 2
+      tokenRelatedHeight += CryptoCurrency.length * 70 * 3//3 Treasuries
 
     tokenRelatedDynamicTableHeight.value = baseTableHeight + tokenRelatedHeight
   }
@@ -374,21 +376,28 @@
   { 
     .tableFlipContainer
     {
-      height: v-bind('(41 + tokenRelatedDynamicTableHeight) + "px"')
+      height: v-bind('(56 + tokenRelatedDynamicTableHeight) + "px"')
     }
   }
-  @media screen and (min-width: 1010.1px) and (max-width: 1249px) 
+  @media screen and (min-width: 1240.1px) and (max-width: 1249px) 
   { 
     .tableFlipContainer
     {
-      height: v-bind('(55 + tokenRelatedDynamicTableHeight) + "px"')
+      height: v-bind('(70 + tokenRelatedDynamicTableHeight) + "px"')
+    }
+  }
+  @media screen and (min-width: 1010.1px) and (max-width: 1240px) 
+  { 
+    .tableFlipContainer
+    {
+      height: v-bind('(84 + tokenRelatedDynamicTableHeight) + "px"')
     }
   }
   @media screen and (max-width: 1010px) 
   { 
     .tableFlipContainer
     {
-      height: v-bind('(86 + tokenRelatedDynamicTableHeight) + "px"')
+      height: v-bind('(129 + tokenRelatedDynamicTableHeight) + "px"')
     }
   }
   /*Set table height for Fire Fox*/

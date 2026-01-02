@@ -316,7 +316,7 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { lendingUserAvailableStableCoinYearsBySubMarketHashMap, lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
@@ -354,7 +354,7 @@
   var hActionsPopoverOpen = ref(false)
   var vActionsPopoverOpen = ref(false)
   var event = ref()
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
 
   var tokenName = ref()
   var tokenSVG = ref()
@@ -679,7 +679,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, props.tokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, props.tokenMintAddress)
   }
 
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)

@@ -352,7 +352,8 @@
   import { anchorPrograms, MAX_ACCOUNT_NAME_LENGTH, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { search } from 'ionicons/icons'
-  import { copyTokenMintAddress,
+  import { copyAddress,
+    copyTokenMintAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
@@ -371,7 +372,7 @@
   var tokenPopoverOpen = ref(false)
   var actionsPopoverOpen = ref(false)
   var event = ref()
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
   const userLendingInfoMSG = "Create new accounts while\nmaking a deposit"
   var accountSelect = ref(0)
   var accountList = ref()
@@ -798,7 +799,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddressString)
+    copyAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddressString)
   }
 
   async function editLendingUserAccountName()

@@ -1,6 +1,9 @@
 <script lang="ts">
   import { reactive } from 'vue'
-  import { tokenAddressStrings, hodlWalletATAKeys, hodlDepositsATAStrings, singlePayerDepositsATAStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings,
+      hodlWalletATAKeys,
+      solvencyWalletATAKeys,
+      solvencyTreasuryWalletPublicKeyString  } from '/src/assets/constants/Addresses.ts'
   import { PublicKey } from "@solana/web3.js"
 
   export const adminAccounts = reactive(
@@ -11,6 +14,8 @@
     hodlTreasuryLendingAccountIndex: 0,
     singlePayerTreasuryAddress: new PublicKey("B9UiZdNg7j7qH1FhimSwkG5CY7D4K8WRpP1Zw4BgHBtb"),
     singlePayerTreasuryLendingAccountIndex: 0,
+    solvencyTreasuryAddress: new PublicKey(solvencyTreasuryWalletPublicKeyString),
+    solvencyTreasuryLendingAccountIndex: 0,
     m4aCEOAddress: undefined,
     m4aTreasurerAddress: undefined,
     chatCEOAddress: undefined,
@@ -27,12 +32,7 @@
     ceoIsDead: false
   })
 
-  export const hodlTreasuryWalletBalancesHashMap = reactive(
-  {
-    map: new Map<string, string>()
-  })
-
-  //These are for the Chat and M4A fees
+  //These are for the Chat and M4A fees that go directly to HODL Wallet
   export const hodlTreasuryWalletATAHashMap: Map<string, PublicKey> = new Map(
   [
     //Key: Token Mint Address, Value: Assocated Token Address
@@ -40,30 +40,32 @@
     [tokenAddressStrings.usdcTokenMintAddress, hodlWalletATAKeys.usdcATA]
   ])
 
-  export const hodlTreasuryDepositsATAHashMap: Map<string, string> = new Map(
+  //These are for the Chat and M4A fees that go directly to HODL Wallet
+  export const solvencyInsuranceTreasuryWalletATAHashMap: Map<string, PublicKey> = new Map(
   [
     //Key: Token Mint Address, Value: Assocated Token Address
-    [tokenAddressStrings.daiTokenMintAddress, hodlDepositsATAStrings.daiATA],
-    [tokenAddressStrings.usdcTokenMintAddress, hodlDepositsATAStrings.usdcATA],
-    [tokenAddressStrings.solTokenMintAddress, hodlDepositsATAStrings.solATA],
-    [tokenAddressStrings.wethTokenMintAddress, hodlDepositsATAStrings.wethATA],
-    [tokenAddressStrings.wbtcTokenMintAddress, hodlDepositsATAStrings.wbtcATA]
+    [tokenAddressStrings.daiTokenMintAddress, solvencyWalletATAKeys.daiATA],
+    [tokenAddressStrings.usdcTokenMintAddress, solvencyWalletATAKeys.usdcATA],
+    [tokenAddressStrings.solTokenMintAddress, solvencyWalletATAKeys.solATA],
+    [tokenAddressStrings.wethTokenMintAddress, solvencyWalletATAKeys.wethATA],
+    [tokenAddressStrings.wbtcTokenMintAddress, solvencyWalletATAKeys.wbtcATA]
   ])
   
-  export const singlePayerTreasuryDepositsATAHashMap: Map<string, string> = new Map(
-  [
-    //Key: Token Mint Address, Value: Assocated Token Address
-    [tokenAddressStrings.daiTokenMintAddress, singlePayerDepositsATAStrings.daiATA],
-    [tokenAddressStrings.usdcTokenMintAddress, singlePayerDepositsATAStrings.usdcATA],
-    [tokenAddressStrings.solTokenMintAddress, singlePayerDepositsATAStrings.solATA],
-    [tokenAddressStrings.wethTokenMintAddress, singlePayerDepositsATAStrings.wethATA],
-    [tokenAddressStrings.wbtcTokenMintAddress, singlePayerDepositsATAStrings.wbtcATA]
-  ])
+  export const hodlTreasuryWalletBalancesHashMap = reactive(
+  {
+    map: new Map<string, string>()
+  })
+
+  export const solvencyInsuranceTreasuryWalletBalancesHashMap = reactive(
+  {
+    map: new Map<string, string>()
+  })
 
   export const tvl = reactive(
   {
-    hodlTVL: 0,
     singlePayerTVL: 0,
+    hodlTVL: 0,
+    solvencyTVL: 0,
     tokenReserveTVL: 0
   })
 

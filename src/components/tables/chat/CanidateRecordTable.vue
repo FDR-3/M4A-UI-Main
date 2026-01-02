@@ -107,7 +107,7 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { download } from 'ionicons/icons'
   import { search } from 'ionicons/icons'
-  import { copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import * as anchor from "@coral-xyz/anchor"
 
@@ -129,11 +129,11 @@
   var popoverOpen = ref(false)
   var event = ref()
 
-  var copyFullAddressButtonText = ref("Copy Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.canidateAddress)
+    copyAddress(copyFullAddressButtonText, event.value.canidateAddress)
   }
 
   const tableDownload = ref()

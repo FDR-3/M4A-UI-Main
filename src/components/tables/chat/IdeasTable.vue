@@ -179,7 +179,7 @@
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
-  import { trimAddress, confirmChatTransaction, toastPreTransactionError, copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { trimAddress, confirmChatTransaction, toastPreTransactionError, copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   const toast = inject('toast')
@@ -198,7 +198,7 @@
 
   var event = ref()
 
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   onMounted(() =>
   {
@@ -219,7 +219,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.address)
+    copyAddress(copyFullAddressButtonText, event.value.address)
   }
 
   function exportCSV(e: Event) 

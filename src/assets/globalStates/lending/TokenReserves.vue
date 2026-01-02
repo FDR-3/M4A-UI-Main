@@ -18,10 +18,6 @@
     sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
   import { PublicKey } from "@solana/web3.js"
 
-  //Currently on @solana/spl-token version 1.8 as updating introduces npm vunlerabilities
-  //The official Token-2022 Program ID
-  const TOKEN_2022_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb")
-
   export const tokenReserves = reactive(
   {
     data: undefined

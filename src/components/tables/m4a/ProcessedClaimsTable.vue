@@ -289,7 +289,7 @@
   import { statusTypes } from '/src/types/statusTypes.ts'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { M4A_MAX_NOTE_LENGTH } from '/src/assets/contracts/Solana/M4AProtocol.vue'
-  import { trimAddress, copyFullAddress, confirmM4ATransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { trimAddress, copyAddress, copyFullAddressText, confirmM4ATransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
@@ -321,7 +321,7 @@
   var appealReason = ref("")
   var event = ref()
 
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   onMounted(() =>
   {
@@ -337,7 +337,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.address)
+    copyAddress(copyFullAddressButtonText, event.value.address)
   }
 
   function exportCSV (e: Event) 

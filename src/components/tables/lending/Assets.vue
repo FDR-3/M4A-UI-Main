@@ -10,7 +10,7 @@
     sourceSOL,
     sourceWETH,
     sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
-  import { tokenAddressStrings, hodlDepositsATAStrings, singlePayerDepositsATAStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings, hodlWalletATAStrings, solvencyWalletATAStrings } from '/src/assets/constants/Addresses.ts'
   import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
 
   var usdcName = ""
@@ -29,8 +29,8 @@
     {
       tokenMintAddressString: tokenAddressStrings.daiTokenMintAddress,
       decimalAmount: 8,
-      hodlATA: hodlDepositsATAStrings.daiATA,
-      singlePayerATA: singlePayerDepositsATAStrings.daiATA,
+      hodlATA: hodlWalletATAStrings.daiATA,
+      solvencyATA: solvencyWalletATAStrings.daiATA,
       asset: 
       {
         name: "DAI",
@@ -51,8 +51,8 @@
     {
       tokenMintAddressString: tokenAddressStrings.usdcTokenMintAddress,
       decimalAmount: 6,
-      hodlATA: hodlDepositsATAStrings.usdcATA,
-      singlePayerATA: singlePayerDepositsATAStrings.usdcATA,
+      hodlATA: hodlWalletATAStrings.usdcATA,
+      solvencyATA: solvencyWalletATAStrings.usdcATA,
       asset: 
       {
         name: usdcName,
@@ -77,8 +77,7 @@
     {
       tokenMintAddressString: tokenAddressStrings.solTokenMintAddress,
       decimalAmount: 9,
-      hodlATA: hodlDepositsATAStrings.solATA,
-      singlePayerATA: singlePayerDepositsATAStrings.solATA,
+      solvencyATA: solvencyWalletATAStrings.solATA,
       asset: 
       {
         name: "Sol",
@@ -99,8 +98,7 @@
     {
       tokenMintAddressString: tokenAddressStrings.wethTokenMintAddress,
       decimalAmount: 8,
-      hodlATA: hodlDepositsATAStrings.wethATA,
-      singlePayerATA: singlePayerDepositsATAStrings.wethATA,
+      solvencyATA: solvencyWalletATAStrings.wethATA,
       asset: 
       {
         name: "WETH",
@@ -121,8 +119,7 @@
     {
       tokenMintAddressString: tokenAddressStrings.wbtcTokenMintAddress,
       decimalAmount: 8,
-      hodlATA: hodlDepositsATAStrings.wbtcATA,
-      singlePayerATA: singlePayerDepositsATAStrings.wbtcATA,
+      solvencyATA: solvencyWalletATAStrings.wbtcATA,
       asset: 
       {
         name: "WBTC",

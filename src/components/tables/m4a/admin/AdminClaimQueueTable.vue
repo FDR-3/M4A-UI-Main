@@ -644,7 +644,8 @@
   import { hospitalTypeOptions, HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { statusTypes } from '/src/types/statusTypes.ts'
   import { trimAddress,
-    copyFullAddress,
+    copyAddress,
+    copyFullAddressText,
     parsePhoneNumberString,
     parseDollarAmountStringFromDecimal,
     convertFromFixed2PointNotationToDecimal,
@@ -699,7 +700,7 @@
   
   var event = ref()
 
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   //Keeps editing from fucking up the table after it's sorted
   function onValueChange(value: any) 
@@ -879,7 +880,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.address)
+    copyAddress(copyFullAddressButtonText, event.value.address)
   }
 
   function exportCSV(e: Event) 

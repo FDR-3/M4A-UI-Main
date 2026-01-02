@@ -266,7 +266,7 @@
   import { lendingLeaderBoardTable, lendingUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { copyFullAddress, copyTokenMintAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyFullAddressText, copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
@@ -293,9 +293,9 @@
   var event = ref()
   var viewPortfolioPopoverOpen = ref(false)
   var ownerPopoverOpen = ref(false)
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
   var tokenPopoverOpen = ref(false)
-  var copyTokenMintAddressButtonText = ref("Copy Token Mint Address")
+  var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
 
   onMounted(() =>
   {
@@ -599,7 +599,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.owner)
+    copyAddress(copyFullAddressButtonText, event.value.owner)
   }
 
   function openTokenPopover(e: Event, rowData: any) 
@@ -620,7 +620,7 @@
 
   function passByRefWrapperCopyTokenMintAddress()
   {
-    copyTokenMintAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
   }
 
   function openViewPortfolioPopover(e: Event, rowData: any) 

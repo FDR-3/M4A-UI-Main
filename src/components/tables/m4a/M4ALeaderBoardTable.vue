@@ -171,7 +171,7 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { m4aLeaderBoard } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { copyFullAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
@@ -191,7 +191,7 @@
 
   var event = ref()
   var submitterPopoverOpen = ref(false)
-  var copyFullAddressButtonText = ref("Copy Full Address")
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   onMounted(() =>
   {
@@ -334,7 +334,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyFullAddress(copyFullAddressButtonText, event.value.submitterAddress)
+    copyAddress(copyFullAddressButtonText, event.value.submitterAddress)
   }
 
   function viewSelectedSubmitter()
