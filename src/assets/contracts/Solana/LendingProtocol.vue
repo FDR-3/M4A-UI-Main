@@ -696,7 +696,8 @@
         if(existingAccountEntry)
         {
           //Replace Sub Account TokenMintAddres Monthly Statement with more recent one if found
-          if(lendingUserMonthlyStatementAccount.statementMonth > existingAccountEntry.statementMonth && lendingUserMonthlyStatementAccount.statementYear >= existingAccountEntry.statementYear)
+          if(lendingUserMonthlyStatementAccount.statementYear > existingAccountEntry.statementYear ||
+          (lendingUserMonthlyStatementAccount.statementYear == existingAccountEntry.statementYear && lendingUserMonthlyStatementAccount.statementMonth > existingAccountEntry.statementMonth))
           {
             const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
             const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
