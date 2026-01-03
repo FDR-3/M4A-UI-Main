@@ -707,11 +707,26 @@
     //User New Balance After Fee = Old Balance + Interest Earned After Fee
     //Calculate interest earned
     const newBalanceBeforeFee = (userOriginalBalance.value * tokenReserve.newSupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
-    const interestEarnedBeforeFee = newBalanceBeforeFee - userOriginalBalance.value
-    const interestEarnedAfterFee = interestEarnedBeforeFee - (interestEarnedBeforeFee * props.subMarketFee / 100)
+    const interestEarnedBeforeFees = newBalanceBeforeFee - userOriginalBalance.value
 
-    userCalculatedBalance.value = (userOriginalBalance.value + interestEarnedAfterFee).toFixed(decimalAmount)
-    calculatedUserInterestEarned.value = (interestEarnedAfterFee + userOriginalInterestEarned.value).toFixed(decimalAmount)
+    var subMarketFee
+    var solvencyInsuranceFee
+    if(props.subMarketFee + tokenReserve.solvencyInsuranceFeeRate <= 100)
+    {
+      subMarketFee = props.subMarketFee
+      solvencyInsuranceFee = tokenReserve.solvencyInsuranceFeeRate
+    }
+    else
+    {
+      solvencyInsuranceFee = tokenReserve.solvencyInsuranceFeeRate
+      subMarketFee = 100 - tokenReserve.solvencyInsuranceFeeRate
+    }
+
+    var interestEarnedAfterFees = interestEarnedBeforeFees - (interestEarnedBeforeFees * subMarketFee / 100) - (interestEarnedBeforeFees * solvencyInsuranceFee / 100)
+    interestEarnedAfterFees = Number(interestEarnedAfterFees.toFixed(decimalAmount))
+
+    userCalculatedBalance.value = (userOriginalBalance.value + interestEarnedAfterFees).toFixed(decimalAmount)
+    calculatedUserInterestEarned.value = (interestEarnedAfterFees + userOriginalInterestEarned.value).toFixed(decimalAmount)
 
     //User New Debt = Old Debt * Token Reserve Accrued Interest Index / User Accrued Interest Index
     //Calculate interest accrued

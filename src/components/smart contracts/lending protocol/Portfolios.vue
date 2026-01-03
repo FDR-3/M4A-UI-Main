@@ -1,6 +1,6 @@
 <template>
   <div v-if="isBrowsingAllUsers">
-    <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false); emitPortfolioRelatedTableHeight()">
+    <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false); emitPortfolioRelatedTableHeight(); updateBlockChainTimeStamp()">
       <ion-label color="green">Return</ion-label>
     </ion-button>
     <LendingLeaderBoardTable
@@ -238,7 +238,7 @@
   import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import HealthFactorBig from '/src/components/smart contracts/lending protocol/HealthFactorBig.vue'
-  import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
+  import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh, updateBlockChainTimeStamp } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
   
@@ -1151,6 +1151,8 @@
     crypto7DayProjectionRateValue.value = 0
     cryptoLifeTimeInterestEarnedAmount.value = "0"
     cryptoLifeTimeInterestEarnedValue.value = 0
+
+    updateBlockChainTimeStamp()
 
     document.getElementById("protfolioHeader")?.scrollIntoView() 
   }

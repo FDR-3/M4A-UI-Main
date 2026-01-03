@@ -52,6 +52,12 @@ export function convertUnixTimeToLocalDate(timeStamp: number)
 
 var blockChainTimeStampRefreshIntervalId: any
 
+export async function updateBlockChainTimeStamp()
+{
+  const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
+  blockChainData.timeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
+}
+
 export async function startBlockChainTimeStampRefresh()
 {
   const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
