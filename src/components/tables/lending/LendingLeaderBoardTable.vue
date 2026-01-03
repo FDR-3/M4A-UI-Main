@@ -454,7 +454,7 @@
             userAccountDepositedTotalValue += calculatedValue
 
             tempData[i].accountListWithLastestMonthlyStatement[j].newBorrowedAmount = Number((Number(tempData[i].accountListWithLastestMonthlyStatement[j].borrowedAmount) +
-            newInterestEarnedAmount).toFixed(decimalAmount))
+            newInterestAccruedAmount).toFixed(decimalAmount))
             //Calculate Borrowed Value
             calculatedValue = tempData[i].accountListWithLastestMonthlyStatement[j].newBorrowedAmount * priceData.usdPrice
             tempData[i].accountListWithLastestMonthlyStatement[j].borrowedValue = calculatedValue
