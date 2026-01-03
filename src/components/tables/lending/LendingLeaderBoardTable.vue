@@ -194,6 +194,9 @@
             <template #header>
               <span class="rainbowText">Interest Earned Amount</span>
             </template>
+            <template #body="slotProps">
+              {{ slotProps.data.newInterestEarnedAmountString }}
+            </template>
           </Column>
           <Column field="interestEarnedValue" style="width: 0%" class="rainbowText" sortable>
             <template #header>
@@ -207,6 +210,9 @@
             <template #header>
               <span class="poopText">Interest Accrued Amount</span>
             </template>
+            <template #body="slotProps">
+              {{ slotProps.data.newInterestAccruedAmountString }}
+            </template>
           </Column>
           <Column field="interestAccruedValue" style="width: 0%" class="poopText" sortable>
             <template #header>
@@ -216,31 +222,51 @@
               {{ slotProps.data.interestAccruedValueString }}
             </template>
           </Column>
-          <Column field="newDepositedAmount" header="Deposited Amount" style="width: 0%" :style="{color: colorHexValue}" sortable></Column>
+          <Column field="newDepositedAmount" header="Deposited Amount" style="width: 0%" :style="{color: colorHexValue}" sortable>
+            <template #body="slotProps">
+              {{ slotProps.data.newDepositedAmountString }}
+            </template>
+          </Column>
           <Column field="depositedValue" header="Deposited Value" style="width: 0%" :style="{color: colorHexValue}" sortable>
             <template #body="slotProps">
               {{ slotProps.data.depositedValueString }}
             </template>
           </Column>
-          <Column field="newBorrowedAmount" header="Borrowed Amount" style="width: 0%; color: #557fcc" sortable></Column>
+          <Column field="newBorrowedAmount" header="Borrowed Amount" style="width: 0%; color: #557fcc" sortable>
+          <template #body="slotProps">
+            {{ slotProps.data.newBorrowedAmountString }}
+          </template>
+          </Column>
           <Column field="borrowedValue" header="Borrowed Value" style="width: 0%; color: #557fcc" sortable>
             <template #body="slotProps">
               {{ slotProps.data.borrowedValueString }}
             </template>
           </Column>
-          <Column field="repaidAmount" header="Repaid Amount" style="width: 0%; color: #ffd700" sortable></Column>
+          <Column field="repaidAmount" header="Repaid Amount" style="width: 0%; color: #ffd700" sortable>
+            <template #body="slotProps">
+              {{ slotProps.data.repaidAmountString }}
+            </template>
+          </Column>
           <Column field="repaidValue" header="Repaid Value" style="width: 0%; color: #ffd700" sortable>
             <template #body="slotProps">
               {{ slotProps.data.repaidValueString }}
             </template>
           </Column>
-          <Column field="liquidatorAmount" header="Liquidator Amount" style="width: 0%; color: #8a2be2" sortable></Column>
+          <Column field="liquidatorAmount" header="Liquidator Amount" style="width: 0%; color: #8a2be2" sortable>
+            <template #body="slotProps">
+              {{ slotProps.data.liquidatorAmountString }}
+            </template>
+          </Column>
           <Column field="liquidatorValue" header="Liquidator Value" style="width: 0%; color: #8a2be2" sortable>
             <template #body="slotProps">
               {{ slotProps.data.liquidatorValueString }}
             </template>
           </Column>
-          <Column field="liquidatedAmount" header="Liquidated Amount" style="width: 0%; color: red" sortable></Column>
+          <Column field="liquidatedAmount" header="Liquidated Amount" style="width: 0%; color: red" sortable>
+            <template #body="slotProps">
+              {{ slotProps.data.liquidatedAmountString }}
+            </template>
+          </Column>
           <Column field="liquidatedValue" header="Liquidated Value" style="width: 0%; color: red" sortable>
             <template #body="slotProps">
               {{ slotProps.data.liquidatedValueString }}
@@ -422,8 +448,9 @@
             tempData[i].accountListWithLastestMonthlyStatement[j].tokenSVG = markRaw(tempData[i].accountListWithLastestMonthlyStatement[j].tokenSVG)
 
             const newInterestEarnedAmount = calculateUserNewInterestEarnedAmount(tempData[i].accountListWithLastestMonthlyStatement[j])
-            tempData[i].accountListWithLastestMonthlyStatement[j].newInterestEarnedAmount = Number((Number(tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedAmount) +
+            tempData[i].accountListWithLastestMonthlyStatement[j].newInterestEarnedAmount = Number((tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedAmount +
             newInterestEarnedAmount).toFixed(decimalAmount))
+            tempData[i].accountListWithLastestMonthlyStatement[j].newInterestEarnedAmountString = tempData[i].accountListWithLastestMonthlyStatement[j].newInterestEarnedAmount.toFixed(decimalAmount)
             //Calculate Interest Earned Value
             calculatedValue = tempData[i].accountListWithLastestMonthlyStatement[j].newInterestEarnedAmount * priceData.usdPrice
             tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedValue = calculatedValue
@@ -433,8 +460,9 @@
             userAccountInterestEarnedTotalValue += calculatedValue
 
             const newInterestAccruedAmount = calculateUserNewInterestAccruedAmount(tempData[i].accountListWithLastestMonthlyStatement[j])
-            tempData[i].accountListWithLastestMonthlyStatement[j].newInterestAccruedAmount = Number((Number(tempData[i].accountListWithLastestMonthlyStatement[j].interestAccruedAmount) +
+            tempData[i].accountListWithLastestMonthlyStatement[j].newInterestAccruedAmount = Number((tempData[i].accountListWithLastestMonthlyStatement[j].interestAccruedAmount +
             newInterestAccruedAmount).toFixed(decimalAmount))
+            tempData[i].accountListWithLastestMonthlyStatement[j].newInterestAccruedAmountString = tempData[i].accountListWithLastestMonthlyStatement[j].newInterestAccruedAmount.toFixed(decimalAmount)
             //Calculate Interest Accrued Value
             calculatedValue = tempData[i].accountListWithLastestMonthlyStatement[j].newInterestAccruedAmount * priceData.usdPrice
             tempData[i].accountListWithLastestMonthlyStatement[j].interestAccruedValue = calculatedValue
@@ -443,8 +471,9 @@
             maximumFractionDigits: 2 })
             userAccountInterestAccruedTotalValue += calculatedValue
 
-            tempData[i].accountListWithLastestMonthlyStatement[j].newDepositedAmount = Number((Number(tempData[i].accountListWithLastestMonthlyStatement[j].depositedAmount) +
+            tempData[i].accountListWithLastestMonthlyStatement[j].newDepositedAmount = Number((tempData[i].accountListWithLastestMonthlyStatement[j].depositedAmount +
             newInterestEarnedAmount).toFixed(decimalAmount))
+            tempData[i].accountListWithLastestMonthlyStatement[j].newDepositedAmountString = tempData[i].accountListWithLastestMonthlyStatement[j].newDepositedAmount.toFixed(decimalAmount)
             //Calculate Deposited Value
             calculatedValue = tempData[i].accountListWithLastestMonthlyStatement[j].newDepositedAmount * priceData.usdPrice
             tempData[i].accountListWithLastestMonthlyStatement[j].depositedValue = calculatedValue
@@ -453,8 +482,9 @@
             maximumFractionDigits: 2 })
             userAccountDepositedTotalValue += calculatedValue
 
-            tempData[i].accountListWithLastestMonthlyStatement[j].newBorrowedAmount = Number((Number(tempData[i].accountListWithLastestMonthlyStatement[j].borrowedAmount) +
+            tempData[i].accountListWithLastestMonthlyStatement[j].newBorrowedAmount = Number((tempData[i].accountListWithLastestMonthlyStatement[j].borrowedAmount +
             newInterestAccruedAmount).toFixed(decimalAmount))
+            tempData[i].accountListWithLastestMonthlyStatement[j].newBorrowedAmountString = tempData[i].accountListWithLastestMonthlyStatement[j].newBorrowedAmount.toFixed(decimalAmount)
             //Calculate Borrowed Value
             calculatedValue = tempData[i].accountListWithLastestMonthlyStatement[j].newBorrowedAmount * priceData.usdPrice
             tempData[i].accountListWithLastestMonthlyStatement[j].borrowedValue = calculatedValue
