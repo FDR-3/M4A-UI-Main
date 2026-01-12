@@ -17,7 +17,7 @@
       side="top" 
       alignment="center"
       >
-        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
@@ -159,7 +159,7 @@
   var availableToBorrowAmount = ref(0)
   var availableToBorrowValue = ref("$0.00")
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
-  var tokenDecimalAmount = ref()
+  var tokenDecimalAmount: number
   var tokenProgram: PublicKey
 
   var tokenPopoverOpen = ref(false)
@@ -225,16 +225,6 @@
     borrowAmount.value = 0
   })
 
-  function addCloseListner()
-  {
-    window.addEventListener('click', handleClickOutside);
-  }
-
-  function removeCloseListner()
-  {
-    window.removeEventListener('click', handleClickOutside);
-  }
-
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = function(event: any) 
   {
@@ -250,19 +240,21 @@
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
-      !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
+      !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
         clearSnapShotIntervalCountDown()
         clearPythAccountIntervalCountDown()
         borrowing.value = false
+        window.removeEventListener('click', handleClickOutside)
       }  
     }
   }
 
   async function openBorrowModal(tokenMintAddress: string, fdr3SubMarkets: any[])
   {
-    addCloseListner()
+    window.addEventListener('click', handleClickOutside)
+    
     const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
@@ -283,22 +275,13 @@
     borrowAmount.value = 0
     borrowIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
-    tokenDecimalAmount.value = decimalAmount
+    tokenDecimalAmount = decimalAmount
     borrowSVG.value = tokenSVG
     subMarketTokenName.value = tokenName
     borrowing.value = true
 
     calculateHealthFactorValues()
     await setSnapShotIntervalCountDown()
-  }
-
-  function closeBorrowModal()
-  {
-    borrowing.value = false
-    removeCloseListner()
-
-    clearSnapShotIntervalCountDown()
-    clearPythAccountIntervalCountDown()
   }
 
   async function setSnapShotIntervalCountDown()
@@ -363,7 +346,7 @@
     tokenPopoverOpen.value = false
   }
 
-  function passByRefWrapperCopyAddress()
+  function passByRefWrapperCopyTokenMintAddress()
   {
     copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
@@ -503,7 +486,7 @@
                 adminAccounts.lendingCEOAddressKey,
                 subMarketSelect.value,
                 accountSelect.value,
-                new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount.value))//convert to fixedpoint notation
+                new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount))//convert to fixedpoint notation
               )
               .accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram })
               .remainingAccounts(remainingAccounts)
@@ -549,8 +532,7 @@
 
   defineExpose(
   {
-    openBorrowModal,
-    closeBorrowModal
+    openBorrowModal
   })
 </script>
 

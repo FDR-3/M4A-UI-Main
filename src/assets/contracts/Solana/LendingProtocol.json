@@ -1,5 +1,5 @@
 {
-  "address": "G4bZxLRVVnYj3aUSgePfaNbSVmv1TftnBRgWSWgPWgb3",
+  "address": "SYcBiQtCfjAia7DkkXYubztiQ1e5AGjKPKsM9iJz8od",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -671,6 +671,364 @@
       ]
     },
     {
+      "name": "claim_liquidation_fees",
+      "discriminator": [
+        121,
+        4,
+        241,
+        20,
+        195,
+        85,
+        146,
+        219
+      ],
+      "accounts": [
+        {
+          "name": "lending_protocol",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "lending_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  83,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "liquidation_treasurer",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  105,
+                  113,
+                  117,
+                  105,
+                  100,
+                  97,
+                  116,
+                  105,
+                  111,
+                  110,
+                  84,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_reserve",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  82,
+                  101,
+                  115,
+                  101,
+                  114,
+                  118,
+                  101
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              }
+            ]
+          }
+        },
+        {
+          "name": "sub_market",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  77,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_owner_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lending_user_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "user_account_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lending_user_tab_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  84,
+                  97,
+                  98,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_owner_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_index"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "user_account_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "lending_user_monthly_statement_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
+                  108,
+                  121,
+                  83,
+                  116,
+                  97,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_month",
+                "account": "LendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
+                "account": "LendingProtocol"
+              },
+              {
+                "kind": "arg",
+                "path": "token_mint_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_owner_address"
+              },
+              {
+                "kind": "arg",
+                "path": "sub_market_index"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "user_account_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_mint_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "sub_market_owner_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "sub_market_index",
+          "type": "u16"
+        },
+        {
+          "name": "user_account_index",
+          "type": "u8"
+        },
+        {
+          "name": "account_name",
+          "type": {
+            "option": "string"
+          }
+        }
+      ]
+    },
+    {
       "name": "claim_solvency_insurance_fees",
       "discriminator": [
         160,
@@ -736,27 +1094,20 @@
           }
         },
         {
-          "name": "treasurer",
+          "name": "solvency_treasurer",
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
+                  115,
+                  111,
                   108,
+                  118,
                   101,
                   110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  80,
-                  114,
-                  111,
-                  116,
-                  111,
                   99,
-                  111,
-                  108,
+                  121,
                   84,
                   114,
                   101,
@@ -2803,7 +3154,37 @@
           }
         },
         {
-          "name": "treasurer",
+          "name": "solvency_treasurer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  111,
+                  108,
+                  118,
+                  101,
+                  110,
+                  99,
+                  121,
+                  84,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "liquidation_treasurer",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2811,20 +3192,16 @@
                 "kind": "const",
                 "value": [
                   108,
-                  101,
-                  110,
-                  100,
                   105,
-                  110,
-                  103,
-                  80,
-                  114,
-                  111,
+                  113,
+                  117,
+                  105,
+                  100,
+                  97,
                   116,
+                  105,
                   111,
-                  99,
-                  111,
-                  108,
+                  110,
                   84,
                   114,
                   101,
@@ -2967,7 +3344,7 @@
         },
         {
           "name": "statement_year",
-          "type": "u32"
+          "type": "u16"
         }
       ]
     },
@@ -3784,8 +4161,16 @@
           "type": "u8"
         },
         {
-          "name": "repayment_amount",
+          "name": "amount_to_repay",
           "type": "u64"
+        },
+        {
+          "name": "repay_max",
+          "type": "bool"
+        },
+        {
+          "name": "paying_off_insolvent_account",
+          "type": "bool"
         },
         {
           "name": "account_name",
@@ -3857,20 +4242,20 @@
       ]
     },
     {
-      "name": "pass_on_lending_protocol_treasurer",
+      "name": "pass_on_liquidation_treasurer",
       "discriminator": [
-        85,
-        237,
-        96,
-        105,
-        15,
-        69,
-        224,
-        72
+        209,
+        70,
+        3,
+        169,
+        246,
+        140,
+        135,
+        251
       ],
       "accounts": [
         {
-          "name": "treasurer",
+          "name": "liquidation_treasurer",
           "writable": true,
           "pda": {
             "seeds": [
@@ -3878,20 +4263,76 @@
                 "kind": "const",
                 "value": [
                   108,
-                  101,
-                  110,
-                  100,
                   105,
-                  110,
-                  103,
-                  80,
-                  114,
-                  111,
+                  113,
+                  117,
+                  105,
+                  100,
+                  97,
                   116,
+                  105,
                   111,
-                  99,
+                  110,
+                  84,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_treasurer_address",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "pass_on_solvency_treasurer",
+      "discriminator": [
+        15,
+        244,
+        70,
+        112,
+        78,
+        79,
+        171,
+        226
+      ],
+      "accounts": [
+        {
+          "name": "solvency_treasurer",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
                   111,
                   108,
+                  118,
+                  101,
+                  110,
+                  99,
+                  121,
                   84,
                   114,
                   101,
@@ -4424,7 +4865,7 @@
         },
         {
           "name": "statement_year",
-          "type": "u32"
+          "type": "u16"
         }
       ]
     },
@@ -5329,19 +5770,6 @@
       ]
     },
     {
-      "name": "LendingProtocolTreasurer",
-      "discriminator": [
-        218,
-        52,
-        1,
-        220,
-        178,
-        186,
-        55,
-        176
-      ]
-    },
-    {
       "name": "LendingStats",
       "discriminator": [
         250,
@@ -5404,6 +5832,32 @@
         233,
         55,
         195
+      ]
+    },
+    {
+      "name": "LiquidationTreasurer",
+      "discriminator": [
+        249,
+        79,
+        140,
+        59,
+        126,
+        135,
+        20,
+        160
+      ]
+    },
+    {
+      "name": "SolvencyTreasurer",
+      "discriminator": [
+        171,
+        84,
+        80,
+        96,
+        255,
+        2,
+        147,
+        36
       ]
     },
     {
@@ -5502,16 +5956,21 @@
     },
     {
       "code": 6008,
+      "name": "NotInsolvent",
+      "msg": "You can't zero out an account whose borrow liabilities aren't 100% or more of their deposited collateral"
+    },
+    {
+      "code": 6009,
       "name": "DuplicateSubMarket",
       "msg": "Duplicate SubMarket Detected"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "NegativePriceDetected",
       "msg": "Negative Price Detected"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "OraclePriceTooUnstable",
       "msg": "Oracle Price Too Unstable"
     }
@@ -5528,25 +5987,13 @@
           },
           {
             "name": "current_statement_year",
-            "type": "u32"
+            "type": "u16"
           }
         ]
       }
     },
     {
       "name": "LendingProtocolCEO",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "address",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "LendingProtocolTreasurer",
       "type": {
         "kind": "struct",
         "fields": [
@@ -5587,15 +6034,7 @@
             "type": "u128"
           },
           {
-            "name": "sub_market_fee_collections",
-            "type": "u128"
-          },
-          {
-            "name": "solvency_insurance_fee_collections",
-            "type": "u64"
-          },
-          {
-            "name": "collateral_swaps",
+            "name": "fee_collections",
             "type": "u128"
           }
         ]
@@ -5660,7 +6099,7 @@
           },
           {
             "name": "statement_year",
-            "type": "u32"
+            "type": "u16"
           },
           {
             "name": "monthly_statement_account_added",
@@ -5688,6 +6127,14 @@
           },
           {
             "name": "snap_shot_solvency_insurance_fees_collected_amount",
+            "type": "u64"
+          },
+          {
+            "name": "snap_shot_liquidation_fees_generated_amount",
+            "type": "u64"
+          },
+          {
+            "name": "snap_shot_liquidation_fees_collected_amount",
             "type": "u64"
           },
           {
@@ -5732,6 +6179,14 @@
           },
           {
             "name": "monthly_solvency_insurance_fees_collected_amount",
+            "type": "u64"
+          },
+          {
+            "name": "monthly_liquidation_fees_generated_amount",
+            "type": "u64"
+          },
+          {
+            "name": "monthly_liquidation_fees_collected_amount",
             "type": "u64"
           },
           {
@@ -5868,6 +6323,14 @@
             "type": "u64"
           },
           {
+            "name": "liquidation_fees_generated_amount",
+            "type": "u64"
+          },
+          {
+            "name": "liquidation_fees_collected_amount",
+            "type": "u64"
+          },
+          {
             "name": "borrowed_amount",
             "type": "u64"
           },
@@ -5890,6 +6353,30 @@
           {
             "name": "interest_change_last_updated_time_stamp",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LiquidationTreasurer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SolvencyTreasurer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
           }
         ]
       }
@@ -5949,6 +6436,10 @@
           },
           {
             "name": "solvency_insurance_fees_generated_amount",
+            "type": "u128"
+          },
+          {
+            "name": "liquidation_fees_generated_amount",
             "type": "u128"
           },
           {
@@ -6078,6 +6569,14 @@
           },
           {
             "name": "uncollected_solvency_insurance_fees_amount",
+            "type": "u128"
+          },
+          {
+            "name": "liquidation_fees_generated_amount",
+            "type": "u128"
+          },
+          {
+            "name": "uncollected_liquidation_fees_amount",
             "type": "u128"
           },
           {

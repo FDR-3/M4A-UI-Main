@@ -17,7 +17,7 @@
       side="top" 
       alignment="center"
       >
-        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
@@ -131,12 +131,12 @@
 
   onMounted(() =>
   {
-    window.addEventListener('click', handleClickOutside);
+    window.addEventListener('click', handleClickOutside)
   })
 
   onUnmounted(() =>
   {
-    window.removeEventListener('click', handleClickOutside);
+    window.removeEventListener('click', handleClickOutside)
   })
 
   //When the user clicks anywhere outside of the edit token reserve modal, close it, not when closing toast alert though
@@ -189,7 +189,7 @@
     tokenPopoverOpen.value = false
   }
 
-  function passByRefWrapperCopyAddress()
+  function passByRefWrapperCopyTokenMintAddress()
   {
     copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }

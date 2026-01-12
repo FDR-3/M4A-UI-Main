@@ -246,7 +246,7 @@
     subMarketsHashMap.map = cloneDeep(subMarketsMap)
     subMarketOwnerHashMap.map = cloneDeep(subMarketOwnerMap)
     subMarketByTokenMintAddressAndOwnerHashMap.map = cloneDeep(subMarketOwnerByTokenMintAddressMap) 
-
+    
     subMarkets.ownerCount = subMarketOwnerHashMap.map.size
 
     return subMarketsList

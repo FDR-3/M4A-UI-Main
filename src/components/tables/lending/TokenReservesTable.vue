@@ -141,8 +141,8 @@
               <ion-label v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddressString" color="green">
                 fdr-3
               </ion-label>
-              <ion-label v-else=" slotProps.data.owner==adminAccounts.lendingCEOAddressString" color="dark">
-                {{ slotProps.data.ownerData.displayName }}
+              <ion-label v-else color="dark">
+                {{ slotProps.data.displayName }}
               </ion-label>
               
             </ion-button>
@@ -209,56 +209,39 @@
                 Editing Another Row
               </ion-label>
               <ion-label v-else-if="!slotProps.data.isRowDataEdited">No Edits Detected</ion-label>
-              <ion-button
-              v-if="slotProps.data.isRowDataEdited"
-              color="dark"
-              @click="editSubMarket(slotProps.data, slotProps.index)"
-              :disabled="isInvalidPublicKey"
-              >
-                Edit Market
-              </ion-button>
             </div>
             <ion-text v-else align="center">Owner Not Detected</ion-text>
-            
+
             <ion-button
-            v-if="connectedWallet.addressString==slotProps.data.feeCollectorAddress && !isDataEdited"
+            v-if="slotProps.data.isRowDataEdited || connectedWallet.addressString==slotProps.data.feeCollectorAddress"
+            class="actionsPopoverButton"
             color="dark"
-            @click="openCollectFeesPopover($event, slotProps.data)"
+            @click="openActionsPopover($event, slotProps.data, slotProps.index)"
             >
-              Collect Fees
+              Actions
             </ion-button>
             <ion-popover 
-            :is-open="collectFeesPopoverOpen" 
+            :is-open="actionsPopoverOpen" 
             :event="event" 
-            @didDismiss="collectFeesPopoverOpen=false"
+            @didDismiss="actionsPopoverOpen=false"
             side="top" 
             alignment="center"
             >
-              <div style="margin: 5px" class="flexCenterColumn">
-                <div>
-                  <div>
-                    <ion-text v-if="accountList==undefined">Create Accounts While Depositing</ion-text>
-                  </div>
-                  <Select
-                  id="accountSelect"
-                  class="standardFontSize mediumMarginTop"
-                  style="margin-bottom: 40px"
-                  v-model="accountSelect" 
-                  :options="accountList" 
-                  optionLabel="accountName" 
-                  optionValue="userAccountIndex" 
-                  placeholder="No Accounts"
-                  appendTo="self">
-                  </Select>
-                </div>
-                <ion-button
-                class="copyAddressButton"
-                color="dark"
-                :disabled="accountSelect==undefined"
-                @click="claimSubMarketFees()">
-                  Collect Fees
-                </ion-button>
-              </div>
+              <ion-button
+              v-if="event.rowData.isRowDataEdited"
+              fill="clear"
+              @click="editSubMarket()"
+              :disabled="isInvalidPublicKey"
+              >
+                <ion-label color="dark">Edit Market</ion-label>
+              </ion-button>
+              <ion-button
+              v-if="connectedWallet.addressString==event.rowData.feeCollectorAddress && !event.rowData.isRowDataEdited"
+              fill="clear"
+              @click="$emit('collectSubMarketFeesModal', event.rowData); actionsPopoverOpen=false"
+              >
+                <ion-label color="dark" class="noClickEvent">Collect Fees</ion-label>
+              </ion-button>
             </ion-popover>
           </div>
         </template>
@@ -272,7 +255,6 @@
   import { IonLabel, IonIcon, IonInput, IonButton, IonText, IonPopover } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
-  import Select from 'primevue/select'
   import { FilterMatchMode } from '@primevue/core/api'
   import InputNumber from 'primevue/inputnumber'
   import InputText from 'primevue/inputtext'
@@ -297,12 +279,11 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
-  import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
   import InfoButton from '/src/components/help/InfoButton.vue'
 
-  var emits = defineEmits(['createSubMarketModal', 'updateReserveTableSizing'])
+  var emits = defineEmits(['createSubMarketModal', 'updateReserveTableSizing', 'collectSubMarketFeesModal'])
 
   var toast = inject('toast')
   var colorHexValue = inject('colorHexValue') as string
@@ -312,12 +293,9 @@
   var showTokenSubMarkets = ref(false)
   var isLoading = ref(true)
   var newTableData: any
-
-  var accountSelect = ref()
-  var accountList = ref()
   
   var ownerPopoverOpen = ref(false)
-  var collectFeesPopoverOpen = ref(false)
+  var actionsPopoverOpen = ref(false)
   var event = ref()
 
   var selectedTokenMintAddress: PublicKey
@@ -475,30 +453,12 @@
     copyAddress(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
   }
 
-  function openCollectFeesPopover(e: Event, rowData: any) 
+  function openActionsPopover(e: Event, rowData: any, rowIndex: number)
   {
-    if(lendingUserAccountsHashMap.map)
-    {
-      const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
-      console.log(userAccountList)
-      if(userAccountList)
-      {
-        accountList.value = userAccountList
-        accountSelect.value = 0
-      }
-      else
-      {
-        accountList.value = undefined
-        accountSelect.value = undefined
-      }
-    }
-
     event.value = e
-    event.value.tokenMintAddress = rowData.tokenMintAddress
-    event.value.owner = rowData.owner
-    event.value.subMarketIndex = rowData.subMarketIndex
-    
-    collectFeesPopoverOpen.value = true
+    event.value.rowData = rowData
+    event.value.rowIndex = rowIndex
+    actionsPopoverOpen.value = true
   }
 
   const filters = ref(
@@ -592,7 +552,7 @@
 
   function processNewSubMarketData()
   {
-    if(isEditing)//Save new table data until after Processor is done typing
+    if(isEditing)//Save new table data until after SubMarket Owner is done typing
       newTableData = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
     else if(unfilteredTableData != undefined) //Set new data into the unfiltered table if currently filtering table
     {
@@ -785,47 +745,28 @@
     }
   }
 
-  async function editSubMarket(subMarketTableRow: any, index: number)
+  async function editSubMarket()
   {
     try
     {
       const tx = await anchorPrograms.lending.lendingProgram.methods.editSubMarket
       (
-        new PublicKey(subMarketTableRow.tokenMintAddress),
-        subMarketTableRow.subMarketIndex,
-        new PublicKey(subMarketTableRow.feeCollectorAddress),
-        subMarketTableRow.feeOnInterestEarnedRate * 100//convert to fixedpoint notation
+        new PublicKey(event.value.rowData.tokenMintAddress),
+        event.value.rowData.subMarketIndex,
+        new PublicKey(event.value.rowData.feeCollectorAddress),
+        event.value.rowData.feeOnInterestEarnedRate * 100//convert to fixedpoint notation
       ).rpc()
       await confirmLendingTransaction(tx, toast, "edit_sub_market")
 
-      tokenMarketTableData.value[index].isRowDataEdited = false
+      tokenMarketTableData.value[event.value.rowIndex].isRowDataEdited = false
       savedEditedRow = undefined
       isDataEdited.value = false
+
+      actionsPopoverOpen.value = false
     }
     catch(error)
     {
       toastPreTransactionError(error, toast, "edit_sub_market")
-    }
-  }
-
-  async function claimSubMarketFees()
-  {
-    try
-    {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFees
-      (
-        event.value.tokenMintAddress,
-        event.value.owner,
-        event.value.subMarketIndex,
-        accountSelect.value
-      ).rpc()
-      await confirmLendingTransaction(tx, toast, "claim_sub_market_fees")
-
-      collectFeesPopoverOpen.value = false
-    }
-    catch(error)
-    {
-      toastPreTransactionError(error, toast, "claim_sub_market_fees")
     }
   }
 </script>

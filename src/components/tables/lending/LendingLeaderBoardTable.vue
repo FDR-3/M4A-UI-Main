@@ -170,7 +170,7 @@
                 <ion-button fill="clear" class="marginZero" @click="openTokenPopover($event, slotProps.data)">
                   <img v-if="slotProps.data.tokenMintAddress==tokenAddressStrings.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -17px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
                   <Component v-else style="width: 32px; height: 28px; margin-left: -17px" :is="slotProps.data.tokenSVG"></Component>
-                  <ion-label class="noWrapText" color="dark" style="font-size: 10px">{{ slotProps.data.tokenName }}</ion-label>
+                  <ion-label class="noWrapText" color="dark" style="font-size: 9px">{{ slotProps.data.tokenName }}</ion-label>
                 </ion-button>
                 <ion-popover 
                 :is-open="tokenPopoverOpen" 
@@ -675,11 +675,14 @@
     lendingUserMonthlyStatementAccount.subMarketOwnerAddress +
     lendingUserMonthlyStatementAccount.subMarketIndex)
     const userBalance = lendingUserMonthlyStatementAccount.depositedAmount
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(lendingUserMonthlyStatementAccount.tokenMintAddress +
+    const lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(lendingUserMonthlyStatementAccount.tokenMintAddress +
     lendingUserMonthlyStatementAccount.subMarketOwnerAddress +
     lendingUserMonthlyStatementAccount.subMarketIndex +
     lendingUserMonthlyStatementAccount.owner +
-    lendingUserMonthlyStatementAccount.accountIndex)
+    lendingUserMonthlyStatementAccount.accountIndex))
+
+    if(Number(lendingUserTabAccount.supplyInterestChangeIndex) == 0)
+      lendingUserTabAccount.supplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex
 
     //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
     //Interest Earned Before Fee = New Balance Before Fee - Old Balance
@@ -713,12 +716,14 @@
   {
     const tokenReserve = tokenReservesHashMapCopy.get(lendingUserMonthlyStatementAccount.tokenMintAddress)
     const userDebt = lendingUserMonthlyStatementAccount.borrowedAmount
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(lendingUserMonthlyStatementAccount.tokenMintAddress +
+    const lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(lendingUserMonthlyStatementAccount.tokenMintAddress +
     lendingUserMonthlyStatementAccount.subMarketOwnerAddress +
     lendingUserMonthlyStatementAccount.subMarketIndex +
     lendingUserMonthlyStatementAccount.owner +
-    lendingUserMonthlyStatementAccount.accountIndex)
+    lendingUserMonthlyStatementAccount.accountIndex))
 
+    if(Number(lendingUserTabAccount.borrowInterestChangeIndex) == 0)
+      lendingUserTabAccount.borrowInterestChangeIndex = tokenReserve.newBorrowInterestChangeIndex
     //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
     //Interest Earned Before Fee = New Balance Before Fee - Old Balance
     //Interest Earned After Fee = Interest Earned Before Fee - (Interest Earned Before Fee * SubMarket Fee Rate)
@@ -914,7 +919,7 @@
 
   #lendingLeaderBoardInnerTable :deep(td)
   {
-    font-size: min(4vw, 13px)
+    font-size: min(4vw, 11px)
   }
 
   .tableMinWidth

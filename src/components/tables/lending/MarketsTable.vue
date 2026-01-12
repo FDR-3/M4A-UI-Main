@@ -27,9 +27,9 @@
       <template #header>
         <div>
           <h2>Earn interest on deposits while helping to push the USA to universal health care like every other fucking first world country not named the United States of America</h2>
-          <p>A 3% fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
+          <p>A 3% SubMarket and 1% Solvency fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
           <p>IE: If you have $100 of USDC deposited for a year, and the supply APY remains at exactly 10% for the whole year (Not likely at all)</p>
-          <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) = $109.70</p>
+          <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) - $0.10(fee) = $109.60</p>
           <!--<a href="https://www.youtube.com/@fdr-3" target="_blank">Where does the money come from that users are earning on their deposits?</a>-->
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Market Search     ">
             <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
@@ -61,7 +61,7 @@
               ref="accountNameEditInputRef"
               id="accountNameEditInput"
               class="mediumMarginTop mediumMarginBottom"
-              :class="{ 'invalid': overCommentByteSizeLimit }"
+              :class="{ 'invalid': overByteSizeLimit }"
               fill="outline"
               :counter="true"
               :counter-formatter="customFormatter"
@@ -102,7 +102,7 @@
             side="top" 
             alignment="center"
             >
-              <ion-button class="copyTokenAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+              <ion-button class="copyTokenAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
                 <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
               </ion-button>
             </ion-popover>
@@ -154,7 +154,7 @@
           {{slotProps.data.borrowsString }}
         </template>
       </Column>
-      <Column field="globalLimit" header="Global Limit" style="width: 0%" sortable>
+      <Column field="globalLimit" header="Global Deposit Limit" style="width: 0%" sortable>
         <template #body="slotProps">
           {{slotProps.data.globalLimitString }}
         </template>
@@ -169,15 +169,15 @@
               class="lendingActionButton"
               color="dark"
               @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
-              Deposit
+                Deposit
               </ion-button>
               
               <ion-button
               v-else
-              class="tableWithdrawButton"
+              class="actionsPopoverButton"
               color="dark"
               @click="openActionsPopover($event, slotProps.data)">
-              Actions
+                Actions
               </ion-button>
               <ion-popover
               :is-open="actionsPopoverOpen" 
@@ -288,7 +288,7 @@
           {{slotProps.data.borrowsString }}
         </template>
       </Column>
-      <Column field="globalLimit" header="Global Limit" style="width: 0%" sortable>
+      <Column field="globalLimit" header="Global Deposit Limit" style="width: 0%" sortable>
         <template #body="slotProps">
           {{slotProps.data.globalLimitString }}
         </template>
@@ -303,14 +303,15 @@
               class="lendingActionButton"
               color="dark"
               @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
-              Deposit
+                Deposit
               </ion-button>
               
               <ion-button
               v-else
+              class="actionsPopoverButton"
               color="dark"
               @click="openActionsPopover($event, slotProps.data)">
-              Actions
+                Actions
               </ion-button>
               <ion-popover
               :is-open="actionsPopoverOpen" 
@@ -381,7 +382,7 @@
   var accountName = ref()
   var accountNameEditInputRef = ref()
   var savedEmojiCursorPosition: any
-  var overCommentByteSizeLimit = ref()
+  var overByteSizeLimit = ref()
   var depositedAssetAmount = ref()
 
   onMounted(() =>
@@ -729,10 +730,10 @@
 
     if(inputLength > maxLength)
     {
-      overCommentByteSizeLimit.value = true
+      overByteSizeLimit.value = true
     }
     else
-      overCommentByteSizeLimit.value = false
+      overByteSizeLimit.value = false
 
     return `${inputLength}/${maxLength} `
   }
@@ -797,7 +798,7 @@
     }, 10) 
   }
 
-  function passByRefWrapperCopyAddress()
+  function passByRefWrapperCopyTokenMintAddress()
   {
     copyAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddressString)
   }

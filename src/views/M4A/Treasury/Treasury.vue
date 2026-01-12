@@ -25,20 +25,25 @@
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Treasuries</ion-button>
         <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
         createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"
+        @collectSubMarketFeesModal="(rowData: any) => collectSubMarketFeesModal.openCollectSubMarketFeesModal(rowData)"
         @updateReserveTableSizing="(tokenReserveCount: number, tokenSubMarketCount: number, showTokenSubMarkets: boolean) =>
         updateTokenTableSizing(tokenReserveCount, tokenSubMarketCount, showTokenSubMarkets)"/>
-        <OwnersTable @updateOwnerTableSizing="(subMarketOwnerCount: number, ownerSubMarketCount: number, showOwnerSubMarkets: boolean) =>
+        <OwnersTable @collectSubMarketFeesModal="(rowData: any) => collectSubMarketFeesModal.openCollectSubMarketFeesModal(rowData)"
+        @updateOwnerTableSizing="(subMarketOwnerCount: number, ownerSubMarketCount: number, showOwnerSubMarkets: boolean) =>
         updateOwnerTableSizing(subMarketOwnerCount, ownerSubMarketCount, showOwnerSubMarkets)"/>
       </div>
     </div>
   </div>
+
   <CreateSubMarketModal ref="createSubMarketModal"/>
+  <CollectSubMarketFeesModal ref="collectSubMarketFeesModal"/>
+
   <KingobamaMobileT1 :style="{display: display1stTable}"/>
   <KingobamaMobileT2 :style="{display: display2ndTable}"/>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, Component, computed } from 'vue'
+  import { ref, onMounted, onUnmounted, watch, Component, computed } from 'vue'
   import { IonButton } from '@ionic/vue'
   import SinglePayerTreasuryTable from '/src/components/tables/lending/SinglePayerTreasuryTable.vue'
   import HODLTreasuryTable from '/src/components/tables/lending/HODLTreasuryTable.vue'
@@ -52,7 +57,11 @@
   import { PublicKey } from "@solana/web3.js"
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { isBrowserFireFox } from '/src/assets/helperFunctions/browserHelper.ts'
+  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
+  import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'
   import KingobamaMobileT1 from '/src/components/fancy/poly/KingobamaMobileT1.vue'
   import KingobamaMobileT2 from '/src/components/fancy/poly/KingobamaMobileT2.vue'
   import M4AProtocolTVLLongHTMLText from './M4AProtocolTVLLongHTMLText.vue'
@@ -76,6 +85,8 @@
   var display2ndTable = ref("none")
 
   var createSubMarketModal = ref()
+  var collectSubMarketFeesModal = ref()
+
   var tokenRelatedDynamicTableHeight = ref(0)
 
   var dynamicTableHeight = ref()
@@ -89,7 +100,7 @@
   const numberToSubTractForBothTables = 110
   const numberToSubTractForBothTablesFireFox = 93
 
-  onMounted(() => 
+  onMounted(async() => 
   {
     updateTokenRelatedTreasuryTableHeight()
     
@@ -104,6 +115,19 @@
       display1stTable.value = "none"
       display2ndTable.value = ""
     }
+
+    await startBlockChainTimeStampRefresh()
+  })
+
+  onUnmounted(() =>
+  {
+    stopBlockChainTimeStampRefresh()
+  })
+
+  watch([tokenReservesHashMap, subMarketsHashMap], async() => 
+  {
+    stopBlockChainTimeStampRefresh()
+    await startBlockChainTimeStampRefresh()
   })
 
   function flipTable()

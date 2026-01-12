@@ -412,7 +412,7 @@
           fill="outline"  
           class="replyButtons" 
           color="dark"
-          :disabled="overCommentByteSizeLimit || replyMessage==''"
+          :disabled="overByteSizeLimit || replyMessage==''"
         >
           <ion-label :color="colorName">Reply</ion-label>
         </ion-button>
@@ -511,7 +511,7 @@
   var fedPopoverOpen = ref()
   var event = ref()
 
-  var overCommentByteSizeLimit = ref()
+  var overByteSizeLimit = ref()
 
   onMounted(() => 
   {
@@ -551,10 +551,10 @@
 
     if(inputLength > maxLength)
     {
-      overCommentByteSizeLimit.value = true
+      overByteSizeLimit.value = true
     }
     else
-      overCommentByteSizeLimit.value = false
+      overByteSizeLimit.value = false
 
     return `${inputLength}/${maxLength} `
   }
@@ -568,10 +568,10 @@
 
     if(inputLength > maxLength)
     {
-      overCommentByteSizeLimit.value = true
+      overByteSizeLimit.value = true
     }
     else
-      overCommentByteSizeLimit.value = false
+      overByteSizeLimit.value = false
 
     return `${inputLength}/${maxLength} `
   }

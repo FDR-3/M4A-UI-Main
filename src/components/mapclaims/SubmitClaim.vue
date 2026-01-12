@@ -221,7 +221,7 @@
     <div class="flexCenterColumn">
       <ion-label v-if="invalidInputs" color="red" >Fill in required inputs</ion-label>
     </div>  
-      <ion-button id="claimSubmitButton" color="green" @click="submitClaimToQueue()" :disabled=overCommentByteSizeLimit>
+      <ion-button id="claimSubmitButton" color="green" @click="submitClaimToQueue()" :disabled=overByteSizeLimit>
         <span class="flexCenterRow">
           <ion-text color="dark" >Submit a Claim for just $0.04</ion-text>
           <USDCSVG class="svgSize tinyMarginLeft"/>
@@ -281,7 +281,7 @@
   var note = ref("")//Set as string initially for length to insert emoji
   var addClaimNoteTextArea = ref()
   var savedEmojiCursorPosition: any
-  var overCommentByteSizeLimit = ref()
+  var overByteSizeLimit = ref()
   var preFillInputs = ref()
   var newInsuranceToggle = ref()
 
@@ -434,10 +434,10 @@
 
     if(inputLength > maxLength)
     {
-      overCommentByteSizeLimit.value = true
+      overByteSizeLimit.value = true
     }
     else
-      overCommentByteSizeLimit.value = false
+      overByteSizeLimit.value = false
 
     return `${inputLength}/${maxLength}`
   }

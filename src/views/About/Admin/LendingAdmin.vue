@@ -149,7 +149,6 @@
 
   const toast = inject('toast')
 
-  var tokenProgram: PublicKey
   var tokenMintAddressInput = ref()
   var pythPriceFeedID = ref()
   var tokenDecmialCountInput = ref()
@@ -163,7 +162,6 @@
   var solvencyInsurance = ref(1)
   var globalLimitInput = ref(1_000_000)
 
-   
   var tokenProgramSelect = ref(LegacyTokenProgramID)
   var tokenProgramList = 
   [

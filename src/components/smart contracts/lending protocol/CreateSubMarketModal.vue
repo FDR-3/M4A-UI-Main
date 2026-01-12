@@ -17,7 +17,7 @@
       side="top" 
       alignment="center"
       >
-        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
@@ -66,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, onMounted, onUnmounted } from 'vue'
+  import { ref, inject } from 'vue'
   import type { Component } from 'vue'
   import { IonInput, IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import InputNumber from 'primevue/inputnumber'
@@ -99,16 +99,6 @@
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
   var modalRef = ref()
 
-  onMounted(() =>
-  {
-    window.addEventListener('click', handleClickOutside);
-  })
-
-  onUnmounted(() =>
-  {
-    window.removeEventListener('click', handleClickOutside);
-  })
-
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = (event: any) =>
   {
@@ -124,12 +114,17 @@
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
+      {
         creatingSubMarket.value = false
+        window.removeEventListener('click', handleClickOutside)
+      }
     }
   }
 
   function openCreateSubMarketModal(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName: string, )
   {
+    window.addEventListener('click', handleClickOutside)
+
     feeCollectorAddress.value = connectedWallet.addressString
     isValidPublicKey.value = isValidSolanaPublicKey(feeCollectorAddress.value)
     selectedTokenMintAddress = tokenMintAddress
@@ -142,7 +137,6 @@
   function openTokenPopover(e: Event) 
   {
     event.value = e
-
     tokenPopoverOpen.value = true
   }
 
@@ -152,7 +146,7 @@
     tokenPopoverOpen.value = false
   }
 
-  function passByRefWrapperCopyAddress()
+  function passByRefWrapperCopyTokenMintAddress()
   {
     copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }

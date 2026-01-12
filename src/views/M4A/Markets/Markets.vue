@@ -144,37 +144,21 @@
 
   function openDepositAndCloseOthers(tokenMintAddressString: String, fdr3SubMarkets: any[])
   {
-    withdrawalModal.value.closeWithdrawalModal()
-    borrowModal.value.closeBorrowModal()
-    repayModal.value.closeRepayModal()
-    
     depositModal.value.openDepositModal(tokenMintAddressString, fdr3SubMarkets)
   }
 
   function openWithdrawAndCloseOthers(tokenMintAddressString: String, fdr3SubMarkets: any[])
   {
-    depositModal.value.closeDepositModal()
-    borrowModal.value.closeBorrowModal()
-    repayModal.value.closeRepayModal()
-
     withdrawalModal.value.openWithdrawalModal(tokenMintAddressString, fdr3SubMarkets)
   }
 
   function openBorrowAndCloseOthers(tokenMintAddressString: String, fdr3SubMarkets: any[])
   {
-    depositModal.value.closeDepositModal()
-    withdrawalModal.value.closeWithdrawalModal()
-    repayModal.value.closeRepayModal()
-
     borrowModal.value.openBorrowModal(tokenMintAddressString, fdr3SubMarkets)
   }
 
   function openRepayAndCloseOthers(tokenMintAddressString: String, fdr3SubMarkets: any[])
   {
-    depositModal.value.closeDepositModal()
-    withdrawalModal.value.closeWithdrawalModal()
-    borrowModal.value.closeBorrowModal()
-
     repayModal.value.openRepayModal(tokenMintAddressString, fdr3SubMarkets)
   }
 
@@ -184,7 +168,7 @@
     var tokenRelatedHeight = 0
 
     if(!isBrowserFireFox())
-      baseTableHeight = 728
+      baseTableHeight = 758
     else
       baseTableHeight = 727
     
@@ -355,28 +339,28 @@
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 1769.1px)
+    @media screen and (min-width: 1840.1px)
     { 
       .tableFlipContainer
       {
         height: v-bind('(0 + tokenRelatedDynamicTableHeight + userNameRelatedDynamicTableHeight) + "px"')
       } 
     }
-    @media screen and (min-width: 1757.1px) and (max-width: 1769px)
+    @media screen and (min-width: 1831.1px) and (max-width: 1840px)
     { 
       .tableFlipContainer
       {
-        height: v-bind('(35 + tokenRelatedDynamicTableHeight + userNameRelatedDynamicTableHeight) + "px"')
+        height: v-bind('(18 + tokenRelatedDynamicTableHeight + userNameRelatedDynamicTableHeight) + "px"')
       } 
     }
-    @media screen and (min-width: 1737.1px) and (max-width: 1757px)
+    @media screen and (min-width: 1769.1px) and (max-width: 1831px)
     { 
       .tableFlipContainer
       {
-        height: v-bind('(53 + tokenRelatedDynamicTableHeight + userNameRelatedDynamicTableHeight) + "px"')
+        height: v-bind('(36 + tokenRelatedDynamicTableHeight + userNameRelatedDynamicTableHeight) + "px"')
       } 
     }
-    @media screen and (min-width: 1698.1px) and (max-width: 1737px)
+    @media screen and (min-width: 1698.1px) and (max-width: 1769px)
     { 
       .tableFlipContainer
       {
@@ -393,176 +377,175 @@
   }
 
   /*Set Portfolio Table Height flipped*/
-  @media screen and (min-width: 1420.1px)
+  @media screen and (min-width: 1800.1px)
   { 
     .tableFlipContainer.flipped
     {
       height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 215.78 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0)  + ((231 + 15 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*215.78(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 231(Specific Token Row) + 15(Legend) + 160(Chart)*/
     } 
   }
-  @media screen and (min-width: 1285.1px) and (max-width: 1420px)
+  @media screen and (min-width: 1544.1px) and (max-width: 1800px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 215.78 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((466.38 + 15 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*215.78(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 466.38(Specific Token Row) + 15(Legend) + 160(Chart)*/
-    }
+      height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 215.78 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0)  + ((231 + 55 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*215.78(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 231(Specific Token Row) + 55(Legend) + 160(Chart)*/
+    } 
   }
-
-  @media screen and (min-width: 1239.1px) and (max-width: 1285px)
+  @media screen and (min-width: 1239.1px) and (max-width: 1544px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 215.78 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((466.38 + 35 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*215.78(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 466.38(Specific Token Row) + 35(Legend) + 160(Chart)*/
+      height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 215.78 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((466.38 + 55 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*215.78(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 466.38(Specific Token Row) + 55(Legend) + 160(Chart)*/
     }
   }
   @media screen and (min-width: 1111.1px) and (max-width: 1239px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 251.78 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((466.38 + 35 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*251.78(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 466.38(Specific Token Row) + 35(Legend) + 160(Chart)*/
+      height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 251.78 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((466.38 + 55 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*251.78(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 466.38(Specific Token Row) + 55(Legend) + 160(Chart)*/
     }
   }
-  @media screen and (min-width: 730.1px) and (max-width: 1111px)
+  @media screen and (min-width: 795.1px) and (max-width: 1111px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(10 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 352.17 : 0) + (stableCoinRowCount > 0 ? 253 : 0) + (cryptoCurrencyRowCount > 0 ? 253 : 0) + ((466.38 + 35 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*352.17(PortfolioHeader) + 253(StableCoinHeader) + 253(CryptoCurrencyHeader) + 466.38(Specific Token Row) + 35(Legend) + 160(Chart)*/
+      height: v-bind('(10 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 352.17 : 0) + (stableCoinRowCount > 0 ? 253 : 0) + (cryptoCurrencyRowCount > 0 ? 253 : 0) + ((466.38 + 55 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*352.17(PortfolioHeader) + 253(StableCoinHeader) + 253(CryptoCurrencyHeader) + 466.38(Specific Token Row) + 55(Legend) + 160(Chart)*/
     }
   }
-  @media screen and (min-width: 527.1px) and (max-width: 730px)
+  @media screen and (min-width: 527.1px) and (max-width: 795px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(11 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 352.17 : 0) + (stableCoinRowCount > 0 ? 252 : 0) + (cryptoCurrencyRowCount > 0 ? 252 : 0) + ((465.38 + 150 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*352.17(PortfolioHeader) + 252(StableCoinHeader) + 252(CryptoCurrencyHeader) + 465.38(Specific Token Row) + 150(Legend) + 160(Chart)*/
+      height: v-bind('(11 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 352.17 : 0) + (stableCoinRowCount > 0 ? 252 : 0) + (cryptoCurrencyRowCount > 0 ? 252 : 0) + ((465.38 + 195 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*352.17(PortfolioHeader) + 252(StableCoinHeader) + 252(CryptoCurrencyHeader) + 465.38(Specific Token Row) + 195(Legend) + 160(Chart)*/
     }
   }
   @media screen and (min-width: 500.1px) and (max-width: 527px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(13 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 385.83 : 0) + (stableCoinRowCount > 0 ? 234.13 : 0) + (cryptoCurrencyRowCount > 0 ? 234.13 : 0) + ((442.03 + 150 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*385.83(PortfolioHeader) + 234.13(StableCoinHeader) + 234.13(CryptoCurrencyHeader) + 442.03(Specific Token Row) + 150(Legend) + 160(Chart)*/
+      height: v-bind('(13 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 385.83 : 0) + (stableCoinRowCount > 0 ? 234.13 : 0) + (cryptoCurrencyRowCount > 0 ? 234.13 : 0) + ((442.03 + 195 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*385.83(PortfolioHeader) + 234.13(StableCoinHeader) + 234.13(CryptoCurrencyHeader) + 442.03(Specific Token Row) + 195(Legend) + 160(Chart)*/
     }
   }
   @media screen and (min-width: 450.1px) and (max-width: 500px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(13 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 397 : 0) + (stableCoinRowCount > 0 ? 229 : 0) + (cryptoCurrencyRowCount > 0 ? 229 : 0) + ((482 + 150 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*397(PortfolioHeader) + 229(StableCoinHeader) + 229(CryptoCurrencyHeader) + 482(Specific Token Row) + 150(Legend) + 160(Chart)*/
+      height: v-bind('(13 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 397 : 0) + (stableCoinRowCount > 0 ? 229 : 0) + (cryptoCurrencyRowCount > 0 ? 229 : 0) + ((482 + 195 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*397(PortfolioHeader) + 229(StableCoinHeader) + 229(CryptoCurrencyHeader) + 482(Specific Token Row) + 195(Legend) + 160(Chart)*/
     }
   }
   @media screen and (min-width: 400.1px) and (max-width: 450px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(92 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 377.17 : 0) + (stableCoinRowCount > 0 ? 219.38 : 0) + (cryptoCurrencyRowCount > 0 ? 219.38 : 0) + ((466.97 + 150 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*377.17(PortfolioHeader) + 219.38(StableCoinHeader) + 219.38(CryptoCurrencyHeader) + 466.97(Specific Token Row) + 150(Legend) + 160(Chart)*/
+      height: v-bind('(92 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 377.17 : 0) + (stableCoinRowCount > 0 ? 219.38 : 0) + (cryptoCurrencyRowCount > 0 ? 219.38 : 0) + ((466.97 + 195 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*377.17(PortfolioHeader) + 219.38(StableCoinHeader) + 219.38(CryptoCurrencyHeader) + 466.97(Specific Token Row) + 195(Legend) + 160(Chart)*/
     }
   }
   @media screen and (min-width: 364.1px) and (max-width: 400px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(119 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 357.39 : 0) + (stableCoinRowCount > 0 ? 209.75 : 0) + (cryptoCurrencyRowCount > 0 ? 209.75 : 0) + ((451.94 + 150 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*357.39(PortfolioHeader) + 209.75(StableCoinHeader) + 209.75(CryptoCurrencyHeader) + 451.94(Specific Token Row) + 150(Legend) + 160(Chart)*/
+      height: v-bind('(119 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 357.39 : 0) + (stableCoinRowCount > 0 ? 209.75 : 0) + (cryptoCurrencyRowCount > 0 ? 209.75 : 0) + ((451.94 + 195 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*357.39(PortfolioHeader) + 209.75(StableCoinHeader) + 209.75(CryptoCurrencyHeader) + 451.94(Specific Token Row) + 195(Legend) + 160(Chart)*/
     }
   }
   @media screen and (min-width: 300.1px) and (max-width: 364px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(164 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 343.13 : 0) + (stableCoinRowCount > 0 ? 202.88 : 0) + (cryptoCurrencyRowCount > 0 ? 202.88 : 0) + ((441.16 + 140 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*343.13(PortfolioHeader) + 202.88(StableCoinHeader) + 202.88(CryptoCurrencyHeader) + 441.16(Specific Token Row) + 140(Legend) + 160(Chart)*/
+      height: v-bind('(164 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 343.13 : 0) + (stableCoinRowCount > 0 ? 202.88 : 0) + (cryptoCurrencyRowCount > 0 ? 202.88 : 0) + ((441.16 + 182 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*343.13(PortfolioHeader) + 202.88(StableCoinHeader) + 202.88(CryptoCurrencyHeader) + 441.16(Specific Token Row) + 182(Legend) + 160(Chart)*/
     }
   }
   @media screen and (max-width: 300px)
   { 
     .tableFlipContainer.flipped
     {
-      height: v-bind('(278 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 317.78 : 0) + (stableCoinRowCount > 0 ? 190.56 : 0) + (cryptoCurrencyRowCount > 0 ? 190.56 : 0) + ((421.94 + 140 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*317.78(PortfolioHeader) + 190.56(StableCoinHeader) + 190.56(CryptoCurrencyHeader) + 421.94(Specific Token Row) + 140(Legend) + 160(Chart)*/
+      height: v-bind('(278 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 317.78 : 0) + (stableCoinRowCount > 0 ? 190.56 : 0) + (cryptoCurrencyRowCount > 0 ? 190.56 : 0) + ((421.94 + 182 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*317.78(PortfolioHeader) + 190.56(StableCoinHeader) + 190.56(CryptoCurrencyHeader) + 421.94(Specific Token Row) + 182(Legend) + 160(Chart)*/
     }
   }
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 1420.1px)
+    @media screen and (min-width: 1800.1px)
     { 
       .tableFlipContainer.flipped
       {
         height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 222.2 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0)  + ((254.6 + 18 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*222.2(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 254.6(Specific Token Row) + 18(Legend) + 160(Chart)*/
       } 
     }
-    @media screen and (min-width: 1285.1px) and (max-width: 1420px)
+    @media screen and (min-width: 1544.1px) and (max-width: 1800px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 222.2 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((501.6 + 18 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*222.2(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 501.6(Specific Token Row) + 18(Legend) + 160(Chart)*/
-      }
+        height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 222.2 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0)  + ((254.6 + 64 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*222.2(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 254.6(Specific Token Row) + 64(Legend) + 160(Chart)*/
+      } 
     }
-    @media screen and (min-width: 1239.1px) and (max-width: 1285px)
+    @media screen and (min-width: 1239.1px) and (max-width: 1544px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 222.2 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((501.6 + 41 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*222.2(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 501.6(Specific Token Row) + 41(Legend) + 160(Chart)*/
+        height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 222.2 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((501.6 + 64 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*222.2(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 501.6(Specific Token Row) + 64(Legend) + 160(Chart)*/
       }
     }
     @media screen and (min-width: 1111.1px) and (max-width: 1239px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 258.2 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((501.6 + 41 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*258.2(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 501.6(Specific Token Row) + 41(Legend) + 160(Chart)*/
+        height: v-bind('(portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 258.2 : 0) + (stableCoinRowCount > 0 ? 150 : 0) + (cryptoCurrencyRowCount > 0 ? 150 : 0) + ((501.6 + 64 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*258.2(PortfolioHeader) + 150(StableCoinHeader) + 150(CryptoCurrencyHeader) + 501.6(Specific Token Row) + 64(Legend) + 160(Chart)*/
       }
     }
-    @media screen and (min-width: 730.1px) and (max-width: 1111px)
+    @media screen and (min-width: 795.1px) and (max-width: 1111px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(10 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 358.6 : 0) + (stableCoinRowCount > 0 ? 253 : 0) + (cryptoCurrencyRowCount > 0 ? 253 : 0) + ((501.6 + 41 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*358.6(PortfolioHeader) + 253(StableCoinHeader) + 253(CryptoCurrencyHeader) + 501.6(Specific Token Row) + 41(Legend) + 160(Chart)*/
+        height: v-bind('(10 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 358.6 : 0) + (stableCoinRowCount > 0 ? 253 : 0) + (cryptoCurrencyRowCount > 0 ? 253 : 0) + ((501.6 + 64 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*358.6(PortfolioHeader) + 253(StableCoinHeader) + 253(CryptoCurrencyHeader) + 501.6(Specific Token Row) + 64(Legend) + 160(Chart)*/
       }
     }
-    @media screen and (min-width: 527.1px) and (max-width: 730px)
+    @media screen and (min-width: 527.1px) and (max-width: 795px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(11 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 358.6 : 0) + (stableCoinRowCount > 0 ? 252.067 : 0) + (cryptoCurrencyRowCount > 0 ? 252.067 : 0) + ((500.667 + 180 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*358.6(PortfolioHeader) + 252.067(StableCoinHeader) + 252.067(CryptoCurrencyHeader) + 500.667(Specific Token Row) + 180(Legend) + 160(Chart)*/
+        height: v-bind('(11 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 358.6 : 0) + (stableCoinRowCount > 0 ? 253 : 0) + (cryptoCurrencyRowCount > 0 ? 253 : 0) + ((501.6 + 234 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*358.6(PortfolioHeader) + 253(StableCoinHeader) + 253(CryptoCurrencyHeader) + 501.6(Specific Token Row) + 234(Legend) + 160(Chart)*/
       }
     }
     @media screen and (min-width: 500.1px) and (max-width: 527px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(13 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 392.25 : 0) + (stableCoinRowCount > 0 ? 234.133 : 0) + (cryptoCurrencyRowCount > 0 ? 234.133 : 0) + ((477.2 + 180 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*392.25(PortfolioHeader) + 234.133(StableCoinHeader) + 234.133(CryptoCurrencyHeader) + 477.2(Specific Token Row) + 180(Legend) + 160(Chart)*/
+        height: v-bind('(13 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 392.25 : 0) + (stableCoinRowCount > 0 ? 234.133 : 0) + (cryptoCurrencyRowCount > 0 ? 234.133 : 0) + ((477.2 + 234 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*392.25(PortfolioHeader) + 234.133(StableCoinHeader) + 234.133(CryptoCurrencyHeader) + 477.2(Specific Token Row) + 234(Legend) + 160(Chart)*/
       }
     }
     @media screen and (min-width: 450.1px) and (max-width: 500px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(13 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 392.25 : 0) + (stableCoinRowCount > 0 ? 234.133 : 0) + (cryptoCurrencyRowCount > 0 ? 234.133 : 0) + ((526.8 + 180 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*392.25(PortfolioHeader) + 234.133(StableCoinHeader) + 234.133(CryptoCurrencyHeader) + 526.8(Specific Token Row) + 180(Legend) + 160(Chart)*/
+        height: v-bind('(13 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 392.25 : 0) + (stableCoinRowCount > 0 ? 234.133 : 0) + (cryptoCurrencyRowCount > 0 ? 234.133 : 0) + ((526.8 + 234 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*392.25(PortfolioHeader) + 234.133(StableCoinHeader) + 234.133(CryptoCurrencyHeader) + 526.8(Specific Token Row) + 234(Legend) + 160(Chart)*/
       }
     }
     @media screen and (min-width: 400.1px) and (max-width: 450px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(92 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 386.8 : 0) + (stableCoinRowCount > 0 ? 219.4 : 0) + (cryptoCurrencyRowCount > 0 ? 219.4 : 0) + ((511.8 + 180 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*386.8(PortfolioHeader) + 219.4(StableCoinHeader) + 219.4(CryptoCurrencyHeader) + 511.8(Specific Token Row) + 180(Legend) + 160(Chart)*/
+        height: v-bind('(92 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 386.8 : 0) + (stableCoinRowCount > 0 ? 219.4 : 0) + (cryptoCurrencyRowCount > 0 ? 219.4 : 0) + ((511.8 + 234 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*386.8(PortfolioHeader) + 219.4(StableCoinHeader) + 219.4(CryptoCurrencyHeader) + 511.8(Specific Token Row) + 234(Legend) + 160(Chart)*/
       }
     }
     @media screen and (min-width: 364.1px) and (max-width: 400px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(119 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 367 : 0) + (stableCoinRowCount > 0 ? 209.8  : 0) + (cryptoCurrencyRowCount > 0 ? 209.8 : 0) + ((496.8 + 180 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*367(PortfolioHeader) + 209.8(StableCoinHeader) + 209.8(CryptoCurrencyHeader) + 496.8(Specific Token Row) + 180(Legend) + 160(Chart)*/
+        height: v-bind('(119 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 367 : 0) + (stableCoinRowCount > 0 ? 209.8  : 0) + (cryptoCurrencyRowCount > 0 ? 209.8 : 0) + ((496.8 + 234 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*367(PortfolioHeader) + 209.8(StableCoinHeader) + 209.8(CryptoCurrencyHeader) + 496.8(Specific Token Row) + 234(Legend) + 160(Chart)*/
       }
     }
     @media screen and (min-width: 300.1px) and (max-width: 364px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(144 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 353.1 : 0) + (stableCoinRowCount > 0 ? 202.867 : 0) + (cryptoCurrencyRowCount > 0 ? 202.867 : 0) + ((487.4 + 174.667 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*353.1(PortfolioHeader) + 202.867(StableCoinHeader) + 202.867(CryptoCurrencyHeader) + 487.4(Specific Token Row) + 174.667(Legend) + 160(Chart)*/
+        height: v-bind('(144 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 353.1 : 0) + (stableCoinRowCount > 0 ? 202.867 : 0) + (cryptoCurrencyRowCount > 0 ? 202.867 : 0) + ((487.4 + 227.067 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*353.1(PortfolioHeader) + 202.867(StableCoinHeader) + 202.867(CryptoCurrencyHeader) + 487.4(Specific Token Row) + 227.067(Legend) + 160(Chart)*/
       }
     }
     @media screen and (max-width: 300px)
     { 
       .tableFlipContainer.flipped
       {
-        height: v-bind('(258 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 327.4 : 0) + (stableCoinRowCount > 0 ? 190.6 : 0) + (cryptoCurrencyRowCount > 0 ? 190.6 : 0) + ((466.8 + 168 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*327.4(PortfolioHeader) + 190.6(StableCoinHeader) + 190.6(CryptoCurrencyHeader) + 466.8(Specific Token Row) + 168(Legend) + 160(Chart)*/
+        height: v-bind('(258 + portfolioRelatedDynamicTableHeight + (stableCoinRowCount > 0 || cryptoCurrencyRowCount > 0 ? 327.4 : 0) + (stableCoinRowCount > 0 ? 190.6 : 0) + (cryptoCurrencyRowCount > 0 ? 190.6 : 0) + ((466.8 + 218.4 + 160) * (stableCoinRowCount + cryptoCurrencyRowCount))) + "px"') /*327.4(PortfolioHeader) + 190.6(StableCoinHeader) + 190.6(CryptoCurrencyHeader) + 466.8(Specific Token Row) + 218.4(Legend) + 160(Chart)*/
       }
     }
   }

@@ -21,7 +21,7 @@
 
     if(DEV_MODE)
     {
-      //const connection = new Connection('http://127.0.0.1:8899') //For testing with local validator
+      //connection = new Connection('http://127.0.0.1:8899') //For testing with local validator
       connection = new Connection(clusterApiUrl("devnet"), preflightCommitment)
     }
     else

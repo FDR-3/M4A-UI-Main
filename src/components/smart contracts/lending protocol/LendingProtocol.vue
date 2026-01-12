@@ -29,8 +29,6 @@
   import PriceUpdater from './PriceUpdater.vue'
   import WalletBalanceUpdater from './WalletBalanceUpdater.vue'
 
-  //
-
   var lendingProtocolWatcherId: any
   var lendingProtocolCEOAccountWatcherId: any
   var tokenReserveStatsWatcherId: any

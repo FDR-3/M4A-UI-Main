@@ -58,6 +58,8 @@
     connectedWallet.addressString==adminAccounts.chatCEOAddress ||
     connectedWallet.addressString==adminAccounts.chatTreasurerAddress ||
     connectedWallet.addressString==adminAccounts.lendingCEOAddressString ||
+    connectedWallet.addressString==adminAccounts.singlePayerTreasuryAddress.toString() ||
+    connectedWallet.addressString==adminAccounts.solvencyTreasuryAddress.toString() ||
     connectedWallet.isProcessorAccountActive"/>
     <LogoArt v-else/>
   </div>

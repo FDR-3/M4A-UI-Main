@@ -17,7 +17,7 @@
       side="top" 
       alignment="center"
       >
-        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
@@ -241,17 +241,7 @@
     withdrawAmount.value = 0
     calculateHealthFactorValues()
   })
-
-  function addCloseListner()
-  {
-    window.addEventListener('click', handleClickOutside);
-  }
-
-  function removeCloseListner()
-  {
-    window.removeEventListener('click', handleClickOutside);
-  }
-
+  
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = function(event: any) 
   {
@@ -267,19 +257,20 @@
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
-      !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
+      !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
         clearSnapShotIntervalCountDown()
         clearPythAccountIntervalCountDown()
         withdrawing.value = false
+        window.removeEventListener('click', handleClickOutside)
       }  
     }
   }
 
   async function openWithdrawalModal(tokenMintAddress: string, fdr3SubMarkets: any[])
   {
-    addCloseListner()
+    window.addEventListener('click', handleClickOutside)
 
     const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
@@ -319,15 +310,6 @@
 
     calculateHealthFactorValues()
     await setSnapShotIntervalCountDown()
-  }
-
-  function closeWithdrawalModal()
-  {
-    withdrawing.value = false
-    removeCloseListner()
-
-    clearSnapShotIntervalCountDown()
-    clearPythAccountIntervalCountDown()
   }
   
   async function setSnapShotIntervalCountDown()
@@ -392,7 +374,7 @@
     tokenPopoverOpen.value = false
   }
 
-  function passByRefWrapperCopyAddress()
+  function passByRefWrapperCopyTokenMintAddress()
   {
     copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
@@ -605,8 +587,7 @@
 
   defineExpose(
   {
-    openWithdrawalModal,
-    closeWithdrawalModal
+    openWithdrawalModal
   })
 </script>
 

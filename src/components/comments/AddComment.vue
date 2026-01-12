@@ -143,7 +143,7 @@
         <ion-button v-else-if="!commentSectionInfo.isCommentSectionReady" :color="colorName" @click="createCommentSection()">
           <ion-label color="dark">Initialize This Comment Section</ion-label>
         </ion-button>
-        <ion-button v-else @click="postComment()" :color="colorName" :disabled="overCommentByteSizeLimit || msg==''">
+        <ion-button v-else @click="postComment()" :color="colorName" :disabled="overByteSizeLimit || msg==''">
           <ion-label color="dark">Post Comment</ion-label>
         </ion-button>
       </div>
@@ -192,7 +192,7 @@
     'link'
   ])
 
-  var overCommentByteSizeLimit = ref()
+  var overByteSizeLimit = ref()
 
   const isChatReady = computed(() =>
   {
@@ -245,10 +245,10 @@
 
     if(inputLength > maxLength)
     {
-      overCommentByteSizeLimit.value = true
+      overByteSizeLimit.value = true
     }
     else
-      overCommentByteSizeLimit.value = false
+      overByteSizeLimit.value = false
 
     return `${inputLength}/${maxLength}`
   }

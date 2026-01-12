@@ -260,10 +260,10 @@
         </span>
         </div>
       </div>
-      <!--Render Remaining Legend Items, Skipping First 4-->
+      <!--Render Next 4 Legend Items, Skipping First 4-->
       <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
         <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(4)" 
+        v-for="(dataset, index) in chartData?.datasets.slice(4, 8)" 
         :key="index + 4" 
         class="legendItem"
         @click="toggleDataset(index+4, chartRef)"
@@ -297,7 +297,45 @@
           >
             <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
           </span>
-          <br v-if="index==2"> 
+        </div>
+      </div>
+      <!--Render Remaining Legend Items, Skipping First 8-->
+      <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
+        <div 
+        v-for="(dataset, index) in chartData?.datasets.slice(8)" 
+        :key="index + 8" 
+        class="legendItem"
+        @click="toggleDataset(index+8, chartRef)"
+        >
+          <div class="swatchWrapper">
+            <div 
+              v-if="dataset.label=='Balance'" 
+              class="swatch animatedRainbow">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Interest Earned'" 
+              class="swatch rainbowBackGround">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Debt'" 
+              class="swatch animatedPoop">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Interest Accrued'" 
+              class="swatch poopBackGround">
+            </div>
+            <div 
+              v-else 
+              class="swatch" 
+              :style="{ backgroundColor: dataset.backgroundColor }">
+            </div>
+          </div>
+          <span 
+            class="legendLabel" 
+            :class="{'hiddenLabel': legenHiddenArray[index+8] }"
+          >
+            <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+          </span>
         </div>
       </div>
     </div>
@@ -384,7 +422,11 @@
     "Deposited",
     "Withdrew",
     "Borrowed",
-    "Repaid"
+    "Repaid",
+    "Liquidated",
+    "Collected SubMarket Fees",
+    "Collected Solvency Fees",
+    "Collected Liquidation Fees"
   ]
 
   onMounted(() =>
@@ -426,6 +468,7 @@
     chartOptions.value = setChartOptions()
     startGradientAnimation()
     
+    legenHiddenArray.value = props.chartData.datasets.map((dataset: any) => dataset.hidden)
   })
 
   onUnmounted(() =>
@@ -462,11 +505,11 @@
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
   {
-    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
+    lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
     props.subMarketOwnerAddress +
     props.subMarketIndex.toString() +
     props.ownerAddress +
-    props.accountIndex.toString())
+    props.accountIndex.toString()))
 
     userOriginalBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
@@ -701,6 +744,13 @@
 
   function calculateUserInterest()
   {
+    //For tab accounts initialized with no deposits, keeps from dividing by zero
+    //For example, can happen to when claiming submarket fees in different destination submarket on new initial tab account
+    if(Number(lendingUserTabAccount.supplyInterestChangeIndex) == 0)
+      lendingUserTabAccount.supplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex
+    if(Number(lendingUserTabAccount.borrowInterestChangeIndex) == 0)
+      lendingUserTabAccount.borrowInterestChangeIndex = tokenReserve.newBorrowInterestChangeIndex
+
     //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
     //Interest Earned Before Fee = New Balance Before Fee - Old Balance
     //Interest Earned After Fee = Interest Earned Before Fee - (Interest Earned Before Fee * SubMarket Fee Rate)
@@ -909,7 +959,7 @@
     }
   }
 
-  @media screen and (min-width: 1420.1px)
+  @media screen and (min-width: 1544.1px)
   { 
     .hChartLayout
     {
@@ -920,7 +970,7 @@
       display: none
     } 
   }
-  @media screen and (max-width: 1420px)
+  @media screen and (max-width: 1544px)
   { 
     .hChartLayout
     {
@@ -952,7 +1002,7 @@
     }
   }
 
-  @media screen and (min-width: 1285.1px)
+  @media screen and (min-width: 1800.1px)
   {  
     .normalChartLegend
     {
@@ -971,7 +1021,7 @@
       gap: 10px
     }
   }
-  @media screen and (min-width: 730.1px) and (max-width: 1285px)
+  @media screen and (min-width: 795.1px) and (max-width: 1800px)
   { 
     .normalChartLegend
     {
@@ -989,7 +1039,7 @@
       align-items: left;
     }
   }
-  @media screen and (max-width: 730.1px)
+  @media screen and (max-width: 795.1px)
   { 
     .normalChartLegend
     {

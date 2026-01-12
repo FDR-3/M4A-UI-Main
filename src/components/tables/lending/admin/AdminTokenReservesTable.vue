@@ -220,7 +220,7 @@
       processedTableData[i].utilizationRateString = processedTableData[i].utilizationRate.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) + '%'
-      processedTableData[i].solvencyInsuranceFeeRate = processedTableData[i].solvencyInsuranceFeeRate / 100 //Convert to decimal from fixed point notation 
+      processedTableData[i].solvencyInsuranceFeeRate = processedTableData[i].solvencyInsuranceFeeRate // Already converted in .../assets/contracts/Solana/LendingProtocol.vue 
       processedTableData[i].solvencyInsuranceFeeRateString = processedTableData[i].solvencyInsuranceFeeRate.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) + '%'

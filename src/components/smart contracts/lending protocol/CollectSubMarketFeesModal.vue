@@ -1,7 +1,7 @@
 <template>
-  <div v-if="depositing"
-    id="depositModal"
-    class="thickBorder"
+  <div v-if="collecting"
+    id="collectSubMarketFeesModal"
+    class="thickBorder flexCenterColumn"
     ref="modalRef"
   >
     <div class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
@@ -23,20 +23,58 @@
       </ion-popover>
     </div>
 
-    <div class="flexCenterColumn">
-    <span v-if="subMarketSelect==1" class="mediumMarginTop"><ion-text color="red">Warning: </ion-text> Depositing into 100%<br>fee on interest earned SubMarket</span>
+    <div class="mediumMarginTop mediumSmallMarginBottom">
+      <ion-text>Destination SubMarket</ion-text>
+    </div>
+    <div class="nMediumMarginBottom">
+      <ion-text>SubMarket Owner:</ion-text>
+    </div>
+ 
     <Select
     class="standardFontSize mediumMarginTop nTinyMarginBottom"
+    style="width: min(290px, 70vw)"
+    v-model="ownerSelect" 
+    :options="ownerList" 
+    optionLabel="ownerDisplayName" 
+    optionValue="ownerAddress" 
+    placeholder="Select SubMarket Owner"
+    appendTo="self"
+    @change="setSelectedOwner()">
+    </Select>
+
+    <ion-button fill="clear" class="marginZero" @click="openOwnerPopover($event)">
+      <ion-label color="dark">{{ trimmedOwnerAddress }}</ion-label>
+    </ion-button>
+    <ion-popover 
+    :is-open="ownerPopoverOpen" 
+    :event="event" 
+    @didDismiss="ownerPopoverOpen=false"
+    side="top" 
+    alignment="center"
+    >
+      <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeOwnerPopover($event)">
+        <ion-label class="noClickEvent" color="dark">{{ copyFullAddressButtonText }}</ion-label>
+      </ion-button>
+    </ion-popover>
+
+    <div class="nMediumMarginBottom">
+      <ion-text>SubMarket Index:</ion-text>
+    </div>
+ 
+    <Select
+    class="standardFontSize mediumMarginTop nTinyMarginBottom"
+    style="width: min(290px, 70vw)"
     v-model="subMarketSelect" 
     :options="subMarketList" 
-    optionLabel="subMarketFeeName" 
+    optionLabel="subMarketDescription" 
     optionValue="subMarketIndex" 
-    placeholder="Select fdr-3 SubMarket"
-    appendTo="self"
-    @change="updateStoredSelectedSubMarketIndex(selectedTokenMintAddress.toString(), subMarketSelect.toString())">
+    placeholder="Select SubMarket Index"
+    appendTo="self">
     </Select>
+ 
+    <div class="mediumMarginTop nMediumMarginBottom">
+      <ion-text>Account:</ion-text>
     </div>
-
     <div class="flexCenterRow">
       <ion-button v-if="addingAdditionalLendingAccount" id="closeAccountNameEditButton" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
         <ion-icon :src="close" color="dark" class="noClickEvent"></ion-icon>
@@ -69,6 +107,7 @@
       id="accountNameEditInput"
       class="mediumMarginTop smallMarginBottom"
       :class="{ 'invalid': overByteSizeLimit }"
+      style="width: min(290px, 70vw)"
       fill="outline"
       :counter="true"
       :counter-formatter="customFormatter"
@@ -81,41 +120,18 @@
       </ion-input>
     </div>
 
-    <ion-label class="alignSelfLeft">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
-    <InputNumber
-      v-model="depositAmount"
-      :inputStyle="{'text-align': 'center'}"
-      :minFractionDigits="tokenDecimalAmount" :maxFractionDigits="tokenDecimalAmount"
-      :max="userBalance"
-      :min="0"
-      :step="depositIncrementAmount"
-      showButtons
-      fluid
-      @input="(event: { value: any }) => depositAmount = event.value"
-    />
-    <div class="alignSelfLeft">
-      <!--If it's the SOL Token, leave some SOL when hitting the Max button for transactions-->
-      <button style="background-color: transparent" @click="selectedTokenMintAddress?.toString()!=tokenAddressStrings.solTokenMintAddress ? depositAmount=userBalance : depositAmount=userBalance-0.1">
-        <ion-label color="dark">Max</ion-label>
-      </button>
-    </div>
-
+    <ion-label class="alignSelfLeft">Uncollected Fees: {{ uncollectedAmount }}</ion-label>
     <div class="smallMarginTop">
-      <ion-text>Value: ${{ depositValue }}</ion-text>
+      <ion-text>Value: ${{ uncollectedValue }}</ion-text>
     </div>
 
-    <ion-text v-if="!connectedWallet.isConnected" class="nMediumMarginTop mediumMarginBottom" style="font-size: 11px"
-    >
-      Connect wallet to deposit
-    </ion-text>
     <ion-button
-      v-else
       color="dark"
-      @click="depositTokens()"
+      @click="claimSubMarketFees()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="depositAmount == 0 || overByteSizeLimit"
+      :disabled="uncollectedAmount == 0 || overByteSizeLimit"
     >
-      Deposit
+      Deposit Fees
     </ion-button>
   </div>
 </template>
@@ -125,28 +141,34 @@
   import { IonButton, IonText, IonPopover, IonLabel, IonInput, IonIcon } from '@ionic/vue'
   import { close } from 'ionicons/icons'
   import Select from 'primevue/select'
-  import InputNumber from 'primevue/inputnumber'
   import EmojiButton from '/src/components/comments/emojis/EmojiButton.vue'
   import { anchorPrograms,
     SYSTEM_PROGRAM_ADDRESS_STRING,
     MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { PublicKey } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
+    copyFullAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { subMarketOwnerHashMap, subMarketByTokenMintAddressAndOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
+  import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
-  import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
+  var ownerSelect = ref()
+  var ownerList = ref()
   var subMarketSelect = ref()
   var subMarketList = ref()
+  var initialSubMarketOwnerAddress: PublicKey
+  var initialSubMarketIndex: number
+  var trimmedOwnerAddress = ref()
   var accountName = ref()
   var accountSelect = ref()
   var previousAccountSelect: number
@@ -154,59 +176,36 @@
   var hasAtleast1Account = ref()
   var accountNameEditInputRef = ref()
   var addingAdditionalLendingAccount = ref(false)
-  var depositAmount = ref()
-  var depositIncrementAmount = ref()
-  var depositing = ref(false)
+  var uncollectedAmount = ref()
+  var collecting = ref(false)
   var depositSVG = ref()
   var subMarketTokenName = ref()
-  var userBalance = ref()
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
+  var subMarketOwnerAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
 
   var tokenPopoverOpen = ref(false)
+  var ownerPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
+  var copyFullAddressButtonText = ref(copyFullAddressText)
 
   var savedEmojiCursorPosition: any
   var overByteSizeLimit = ref()
   var modalRef = ref()
 
-  var depositValue = computed(() =>
+  var uncollectedValue = computed(() =>
   {
     const price = priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice
     if(price)
-      return (depositAmount.value * Number(price)).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })        
+      return (uncollectedAmount.value * Number(price)).toLocaleString('en-US', {
+        minimumFractionDigits: tokenDecimalAmount,
+        maximumFractionDigits: tokenDecimalAmount })        
     else
       return (0).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })   
-  })
-
-  //Json string of wallet to detect object property changes
-  const walletWatch = computed(() =>
-  {
-    return JSON.stringify(connectedWallet)
-  })
-
-  watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
-  {
-    let newWallet = JSON.parse(newJSONObjectString)
-    let oldWallet= JSON.parse(oldJSONObjectString)
-
-    //Only want this running if the connected Wallet Address String is changing
-    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
-      return
-
-    const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
-    if(balance)
-      userBalance.value = Number(balance)
-    else
-      userBalance.value = 0
-
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+        minimumFractionDigits: tokenDecimalAmount,
+        maximumFractionDigits: tokenDecimalAmount })   
   })
 
   //Move cursor back after emoji insert
@@ -223,10 +222,16 @@
       }
   })
 
+  watch(subMarketByTokenMintAddressAndOwnerHashMap,() =>
+  {
+    generateOwnersSelectList()
+    generateSubMarketList()
+  })
+
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = function(event: any) 
   {
-    if(depositing.value)
+    if(collecting.value)
     {
       //const emojiButton = 
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
@@ -248,32 +253,44 @@
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
-      !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
+      !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path'))) //Keep transaction toast close button from sometimes closing modal
       {
-        depositing.value = false
-        if(addingAdditionalLendingAccount.value)
-        {
-          cancelAddingAdditionalLendingAccount()
-          addingAdditionalLendingAccount.value = false
-        }
-        window.removeEventListener('click', handleClickOutside)
+          collecting.value = false
+          if(addingAdditionalLendingAccount.value)
+          {
+            cancelAddingAdditionalLendingAccount()
+            addingAdditionalLendingAccount.value = false
+          }
+          window.removeEventListener('click', handleClickOutside)
       }
     }
   }
 
-  function openDepositModal(tokenMintAddress: string, fdr3SubMarkets: any[])
+  function openCollectSubMarketFeesModal(rowData: any)
   {
     window.addEventListener('click', handleClickOutside)
 
-    const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
+    const tokenInfo = tokenReserveHashMap.get(rowData.tokenMintAddress.toString())
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
+    
     tokenProgram = tokenInfo.tokenProgram
+    uncollectedAmount.value = rowData.uncollectedSubMarketFeesAmount
+    selectedTokenMintAddress = new PublicKey(rowData.tokenMintAddress.toString())
+    subMarketOwnerAddress = new PublicKey(rowData.owner.toString())
+    trimmedOwnerAddress.value = trimAddress(rowData.owner.toString())
+    tokenDecimalAmount = decimalAmount
+    depositSVG.value = tokenSVG
+    subMarketTokenName.value = tokenName
 
-    subMarketList.value = fdr3SubMarkets
-    subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
+    generateOwnersSelectList()
+    generateSubMarketList()
+    ownerSelect.value = rowData.owner.toString()
+    subMarketSelect.value = rowData.subMarketIndex
+    initialSubMarketOwnerAddress = rowData.owner
+    initialSubMarketIndex = rowData.subMarketIndex
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     
     if(lendingUserAccountsHashMap.map)
@@ -287,13 +304,13 @@
       }
       else
       {
-        accountName.value = "Account 1"
+        accountName.value = "Generic Sub Fee Claimer 1"
         hasAtleast1Account.value = false
       }
     }
     else
     {
-      accountName.value = "Account 1"
+      accountName.value = "Generic Sub Fee Claimer 1"
       hasAtleast1Account.value = false
     }
 
@@ -304,19 +321,7 @@
         inputElement.focus()
     }, 10) 
 
-    const balance = connectedWallet.tokenBalanceMap.get(tokenMintAddress)
-    if(balance)
-      userBalance.value = Number(balance)
-    else
-      userBalance.value = 0
-
-    depositAmount.value = 0
-    depositIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
-    selectedTokenMintAddress = new PublicKey(tokenMintAddress)
-    tokenDecimalAmount = decimalAmount
-    depositSVG.value = tokenSVG
-    subMarketTokenName.value = tokenName
-    depositing.value = true
+    collecting.value = true
   }
 
   function openTokenPopover(e: Event) 
@@ -334,6 +339,23 @@
   function passByRefWrapperCopyTokenMintAddress()
   {
     copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
+  }
+
+  function openOwnerPopover(e: Event) 
+  {
+    event.value = e
+    ownerPopoverOpen.value = true
+  }
+
+  function closeOwnerPopover(e: Event) 
+  {
+    event.value = e
+    ownerPopoverOpen.value = false
+  }
+
+  function passByRefWrapperCopyAddress()
+  {
+    copyAddress(copyFullAddressButtonText, subMarketOwnerAddress)
   }
 
   const customFormatter = (inputLength: number, maxLength: number) => 
@@ -375,7 +397,7 @@
   {
     const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
 
-    accountName.value = `Account ${userAccountList.length + 1}`
+    accountName.value = `Generic Sub Fee Claimer ${userAccountList.length + 1}`
     previousAccountSelect = accountSelect.value
     accountSelect.value = userAccountList.length
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
@@ -399,44 +421,111 @@
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
   }
 
-  async function depositTokens()
+  function setSelectedOwner()
   {
-    try
-    {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens
-      (
-        selectedTokenMintAddress,
-        adminAccounts.lendingCEOAddressKey,
-        subMarketSelect.value,
-        accountSelect.value,
-        new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
-        accountName.value
-      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram }).rpc()
-
-      await confirmLendingTransaction(tx, toast, "deposit_tokens")
-
-      depositing.value = false
-      addingAdditionalLendingAccount.value = false
-    }
-    catch(error)
-    {
-      toastPreTransactionError(error, toast, "deposit_tokens")
-    }
+    subMarketOwnerAddress = new PublicKey(ownerSelect.value)
+    trimmedOwnerAddress.value = trimAddress(ownerSelect.value)
+    generateSubMarketList()
+    subMarketSelect.value = 0
   }
 
-  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
+  function generateOwnersSelectList()
   {
-    localStorage.setItem(tokenMintAddress + "selectedMainSubMarketIndex", mainSubMarketIndex)
+    if(!subMarketOwnerHashMap.map)
+      return
+    
+    const subMarketOwnerArray = Array.from(subMarketOwnerHashMap.map, ([owner, ownerData]) => ({ owner, ownerData }))
+    var tempOwnerList = []
+
+    if(!subMarketOwnerArray || subMarketOwnerArray.length == 0)
+      return
+
+    for(var i=0; i<subMarketOwnerArray.length; i++)
+    {
+      const displayName = getCustomOrTrimmedUserDisplayName(subMarketOwnerArray[i].owner) 
+      tempOwnerList.push({ ownerDisplayName: displayName, ownerAddress: subMarketOwnerArray[i].owner })
+    }
+
+    ownerList.value = tempOwnerList
+  }
+
+  function generateSubMarketList()
+  {
+    if(!subMarketByTokenMintAddressAndOwnerHashMap.map)
+      return
+
+    const ownerSubMarketListArray = subMarketByTokenMintAddressAndOwnerHashMap.map.get(selectedTokenMintAddress.toString() + subMarketOwnerAddress.toString())
+    var tempSubMarketList = []
+
+    if(!ownerSubMarketListArray || ownerSubMarketListArray.length == 0)
+      return
+
+    for(var i=0; i<ownerSubMarketListArray.length; i++)
+    {
+
+      tempSubMarketList.push({ subMarketDescription: `Index: ${ownerSubMarketListArray[i].subMarketIndex}, ${ownerSubMarketListArray[i].feeOnInterestEarnedRate}% Fee`,
+      subMarketIndex: ownerSubMarketListArray[i].subMarketIndex })
+    }
+
+    subMarketList.value = tempSubMarketList
+  }
+
+  async function claimSubMarketFees()
+  {
+    if(initialSubMarketOwnerAddress.toString() == subMarketOwnerAddress.toString() && initialSubMarketIndex == subMarketSelect.value)
+    {
+      try
+      {
+        const tx = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFees
+        (
+          selectedTokenMintAddress,
+          initialSubMarketOwnerAddress,
+          initialSubMarketIndex,
+          accountSelect.value,
+          accountName.value
+        ).rpc()
+        await confirmLendingTransaction(tx, toast, "claim_sub_market_fees")
+
+        collecting.value = false
+      }
+      catch(error)
+      {
+        toastPreTransactionError(error, toast, "claim_sub_market_fees")
+      }
+    }
+    else
+    {
+      try
+      {
+        const tx = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFeesAndDepositInDifferentSubMarket
+        (
+          selectedTokenMintAddress,
+          initialSubMarketOwnerAddress,
+          initialSubMarketIndex,
+          subMarketOwnerAddress,
+          subMarketSelect.value,
+          accountSelect.value,
+          accountName.value
+        ).rpc()
+        await confirmLendingTransaction(tx, toast, "claim_sub_market_fees_and_deposit_in_different_sub_market")
+
+        collecting.value = false
+      }
+      catch(error)
+      {
+        toastPreTransactionError(error, toast, "claim_sub_market_fees_and_deposit_in_different_sub_market")
+      }
+    }
   }
 
   defineExpose(
   {
-    openDepositModal
+    openCollectSubMarketFeesModal
   })
 </script>
 
 <style scoped>
-  #depositModal
+  #collectSubMarketFeesModal
   {
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
     top: 50%;

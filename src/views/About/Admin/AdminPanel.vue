@@ -67,7 +67,10 @@
   />
 
   <LendingAdmin v-if="adminPanelSelect==2 &&
-    (connectedWallet.addressString==adminAccounts.lendingCEOAddressString)"
+    (connectedWallet.addressString==adminAccounts.lendingCEOAddressString ||
+     connectedWallet.addressString==adminAccounts.singlePayerTreasuryAddress.toString() ||
+     connectedWallet.addressString==adminAccounts.hodlTreasuryAddress.toString() ||
+     connectedWallet.addressString==adminAccounts.solvencyTreasuryAddress.toString())"
   />
 
   <AlertAdmin v-if="adminPanelSelect==3 &&

@@ -240,6 +240,7 @@
   import HealthFactorBig from '/src/components/smart contracts/lending protocol/HealthFactorBig.vue'
   import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh, updateBlockChainTimeStamp } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(['portfolioReRenderHelper'])
@@ -384,6 +385,24 @@
         label: 'Liquidated',
         backgroundColor: "#ff0000",
         data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: 'Collect Liq Fee',
+        backgroundColor: "#ff00ff",
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: 'Collect SB Fee',
+        backgroundColor: "#ff8800",
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: 'Collect Sol Fee',
+        backgroundColor: "#006400",
+        data: [] as any[]
       }
     ]
   }
@@ -400,6 +419,9 @@
     Repays = 7,
     Liquidator = 8,
     Liquidated = 9,
+    CollectedLiquidationFees = 10,
+    CollectedSubMarketFees = 11,
+    CollectedSolvencyFees = 12
   }
 
   onMounted(async() =>
@@ -680,6 +702,10 @@
           var repays = []
           var liquidator = []
           var liquidated = []
+          var collectedLiquidationFees = []
+          var collectedSubMarketFees = []
+          var collectedSolvencyFees = []
+
           var tempChartData = cloneDeep(baseChartData)
         
           //If current year, go up until the current month, otherwise cover the whole year
@@ -720,6 +746,9 @@
                 repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
                 liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
                 liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
+                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
@@ -737,6 +766,9 @@
                 repays.push(0)
                 liquidator.push(0)
                 liquidated.push(0)
+                collectedLiquidationFees.push(0)
+                collectedSubMarketFees.push(0)
+                collectedSolvencyFees.push(0)
               }
             }
 
@@ -751,6 +783,15 @@
             tempChartData.datasets[ChartIndex.Repays].data = repays
             tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
             tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
+            tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees 
+            tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
+            tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
+            if(searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() && searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
+            {
+              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+            }
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -791,6 +832,9 @@
                 repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
                 liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
                 liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
+                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
@@ -808,6 +852,9 @@
                 repays.push(0)
                 liquidator.push(0)
                 liquidated.push(0)
+                collectedLiquidationFees.push(0)
+                collectedSubMarketFees.push(0)
+                collectedSolvencyFees.push(0)
               }
             }
 
@@ -822,6 +869,15 @@
             tempChartData.datasets[ChartIndex.Repays].data = repays
             tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
             tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
+            tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
+            tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
+            tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
+            if(searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() && searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
+            {
+              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+            }
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -861,6 +917,9 @@
           var repays = []
           var liquidator = []
           var liquidated = []
+          var collectedLiquidationFees = []
+          var collectedSubMarketFees = []
+          var collectedSolvencyFees = []
           var tempChartData = cloneDeep(baseChartData)
         
           //If current year, go up until the current month, otherwise cover the whole year
@@ -901,6 +960,9 @@
                 repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
                 liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
                 liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
+                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
@@ -918,6 +980,9 @@
                 repays.push(0)
                 liquidator.push(0)
                 liquidated.push(0)
+                collectedLiquidationFees.push(0)
+                collectedSubMarketFees.push(0)
+                collectedSolvencyFees.push(0)
               }
             }
 
@@ -932,6 +997,15 @@
             tempChartData.datasets[ChartIndex.Repays].data = repays
             tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
             tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
+            tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
+            tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
+            tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
+            if(searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() && searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
+            {
+              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+            }
 
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
@@ -972,6 +1046,9 @@
                 repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
                 liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
                 liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
+                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / Math.pow(10, decimalAmount))
               }
               else
               {
@@ -989,6 +1066,9 @@
                 repays.push(0)
                 liquidator.push(0)
                 liquidated.push(0)
+                collectedLiquidationFees.push(0)
+                collectedSubMarketFees.push(0)
+                collectedSolvencyFees.push(0)
               }
             }
 
@@ -1003,6 +1083,15 @@
             tempChartData.datasets[ChartIndex.Repays].data = repays
             tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
             tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
+            tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
+            tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
+            tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
+            if(searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() && searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
+            {
+              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+            }
             
             tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }

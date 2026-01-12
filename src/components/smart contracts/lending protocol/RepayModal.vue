@@ -17,7 +17,7 @@
       side="top" 
       alignment="center"
       >
-        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-button class="copyTokenMintAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
           <ion-label class="noClickEvent" color="dark">{{ copyTokenMintAddressButtonText }}</ion-label>
         </ion-button>
       </ion-popover>
@@ -120,7 +120,7 @@
   var subMarketTokenName = ref()
   var userDebt = ref(0)
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
-  var tokenDecimalAmount = ref()
+  var tokenDecimalAmount: number
   var tokenProgram: PublicKey
 
   var tokenPopoverOpen = ref(false)
@@ -171,16 +171,6 @@
     setDebtBalance()
   })
 
-  function addCloseListner()
-  {
-    window.addEventListener('click', handleClickOutside);
-  }
-
-  function removeCloseListner()
-  {
-    window.removeEventListener('click', handleClickOutside);
-  }
-
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = function(event: any) 
   {
@@ -194,15 +184,18 @@
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal
       !event?.target?.classList.contains("p-toast-close-button") && //Keep transaction toast close button from closing modal
-      !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
+      !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
+      {
         repaying.value = false
+        window.removeEventListener('click', handleClickOutside)
+      }
     }
   }
 
   function openRepayModal(tokenMintAddress: string, fdr3SubMarkets: any[])
   {
-    addCloseListner()
+    window.addEventListener('click', handleClickOutside)
 
     const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
@@ -224,18 +217,12 @@
     repayAmount.value = 0
     repayIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
-    tokenDecimalAmount.value = decimalAmount
+    tokenDecimalAmount = decimalAmount
     repaySVG.value = tokenSVG
     subMarketTokenName.value = tokenName
     repaying.value = true
 
     setDebtBalance()
-  }
-
-  function closeRepayModal()
-  {
-    repaying.value = false
-    removeCloseListner()
   }
 
   function openTokenPopover(e: Event) 
@@ -250,7 +237,7 @@
     tokenPopoverOpen.value = false
   }
 
-  function passByRefWrapperCopyAddress()
+  function passByRefWrapperCopyTokenMintAddress()
   {
     copyAddress(copyTokenMintAddressButtonText, selectedTokenMintAddress)
   }
@@ -295,7 +282,7 @@
         adminAccounts.lendingCEOAddressKey,
         subMarketSelect.value,
         accountSelect.value,
-        new anchor.BN(repayAmount.value * Math.pow(10, tokenDecimalAmount.value)),//convert to fixedpoint notation
+        new anchor.BN(repayAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
         repayMax.value
       ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram }).rpc()
 
@@ -337,8 +324,7 @@
 
   defineExpose(
   {
-    openRepayModal,
-    closeRepayModal
+    openRepayModal
   })
 </script>
 
