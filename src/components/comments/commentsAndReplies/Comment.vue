@@ -14,12 +14,12 @@
             <StarWolf v-else id="userIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
           
             <div class="flexCenterColumn">
-              <ion-label color="dark">
+              <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
                 {{ displayName }}
               </ion-label>
 
-              <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
-                fdr-3
+              <ion-label v-else color="dark">
+                {{ displayName }}
               </ion-label>
             </div>
           </ion-button>
@@ -220,12 +220,12 @@
             <StarWolf v-else id="userIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
           
             <div class="flexCenterColumn">
-              <ion-label color="dark">
+              <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
                 {{ displayName }}
               </ion-label>
 
-              <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
-                fdr-3
+              <ion-label v-else color="dark">
+                {{ displayName }}
               </ion-label>
             </div>
           </ion-button>
@@ -412,7 +412,7 @@
           fill="outline"  
           class="replyButtons" 
           color="dark"
-          :disabled="overByteSizeLimit || replyMessage==''"
+          :disabled="overCommentByteSizeLimit || replyMessage==''"
         >
           <ion-label :color="colorName">Reply</ion-label>
         </ion-button>
@@ -511,7 +511,7 @@
   var fedPopoverOpen = ref()
   var event = ref()
 
-  var overByteSizeLimit = ref()
+  var overCommentByteSizeLimit = ref()
 
   onMounted(() => 
   {
@@ -551,10 +551,10 @@
 
     if(inputLength > maxLength)
     {
-      overByteSizeLimit.value = true
+      overCommentByteSizeLimit.value = true
     }
     else
-      overByteSizeLimit.value = false
+      overCommentByteSizeLimit.value = false
 
     return `${inputLength}/${maxLength} `
   }
@@ -568,10 +568,10 @@
 
     if(inputLength > maxLength)
     {
-      overByteSizeLimit.value = true
+      overCommentByteSizeLimit.value = true
     }
     else
-      overByteSizeLimit.value = false
+      overCommentByteSizeLimit.value = false
 
     return `${inputLength}/${maxLength} `
   }

@@ -14,12 +14,12 @@
             <StarWolf v-else id="userIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
             
             <div class="flexCenterColumn">
-              <ion-label color="dark">
+              <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
                 {{ displayName }}
               </ion-label>
 
-              <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
-                fdr-3
+              <ion-label v-else color="dark">
+                {{ displayName }}
               </ion-label>
             </div>
           </ion-button>
@@ -218,13 +218,14 @@
             </div>
 
             <StarWolf v-else id="userIcon" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+            
             <div class="flexCenterColumn">
-              <ion-label color="dark">
+              <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
                 {{ displayName }}
               </ion-label>
 
-              <ion-label v-if="postOwnerAddress.toBase58()==adminAccounts.chatCEOAddress" :color="colorName">
-                fdr-3
+              <ion-label v-else color="dark">
+                {{ displayName }}
               </ion-label>
             </div>
           </ion-button>

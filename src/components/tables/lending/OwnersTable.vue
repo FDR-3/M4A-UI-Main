@@ -13,7 +13,7 @@
       size="small" 
       :value="ownerTableData"
       :loading="isLoading"
-      :globalFilterFields="['owner', 'ownerData.displayName', 'ownerData.ceoName', 'ownerData.subMarketCount']"  
+      :globalFilterFields="['owner', 'ownerData.displayName', 'ownerData.subMarketCount']"  
     >
       <template #header>
         <div>
@@ -37,7 +37,7 @@
               <StarWolf v-else class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
 
               <ion-label v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddressString" color="green">
-                fdr-3
+                {{ slotProps.data.ownerData.displayName }}
               </ion-label>
               <ion-label v-else color="dark">
                 {{ slotProps.data.ownerData.displayName }}
@@ -455,11 +455,6 @@
     for(var i=0; i<unprocessedData.length; i++)
     {
       unprocessedData[i].ownerData.displayName = getCustomOrTrimmedUserDisplayName(unprocessedData[i].owner)
-
-      if(unprocessedData[i].owner.toString() == adminAccounts.lendingCEOAddressString)
-        unprocessedData[i].ownerData.ceoName = "fdr-3"
-      else
-        unprocessedData[i].ownerData.ceoName = ""
 
       //This has to be done here as opposed to in the LendingProtocol.vue file since it has to be after it's deep cloned
       for(var j=0; j<unprocessedData[i].ownerData.ownerSubMarketList.length; j++)

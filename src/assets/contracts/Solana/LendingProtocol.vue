@@ -141,6 +141,9 @@
       //Convert Uncollected Solvency Fee Amounts To Decimal from Fixed Point
       tokenReserve.uncollectedSolvencyInsuranceFeesAmount = (Number(tokenReserve.uncollectedSolvencyInsuranceFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
 
+      //Convert Uncollected Solvency Fee Amounts To Decimal from Fixed Point
+      tokenReserve.uncollectedLiquidationFeesAmount = (Number(tokenReserve.uncollectedLiquidationFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+
       //Convert Fee Rate To Decimal from Fixed Point
       tokenReserve.solvencyInsuranceFeeRate = (tokenReserve.solvencyInsuranceFeeRate / 100)
 
@@ -178,10 +181,6 @@
 
       //Convert Fee Rate To Decimal from Fixed Point
       subMarket.feeOnInterestEarnedRate = (subMarket.feeOnInterestEarnedRate / 100)
-
-      //Add ceo name for filtering
-      if(subMarket.owner.toBase58() == adminAccounts.lendingCEOAddressString)
-        subMarket.ceoName = "fdr-3"
 
       const previousTokenReserveList = tokenReserveMap.get(subMarket.tokenMintAddress.toBase58())
       if(previousTokenReserveList)

@@ -16,6 +16,8 @@
     singlePayerTreasuryLendingAccountIndex: 0,
     solvencyTreasuryAddress: new PublicKey(solvencyTreasuryWalletPublicKeyString),
     solvencyTreasuryLendingAccountIndex: 0,
+    liquidationTreasuryAddress: new PublicKey("9BRgCdmwyP5wGVTvKAUDjSwucpqGncurVa35DjaWqSsC"),
+    liquidationTreasuryLendingAccountIndex: 0,
     m4aCEOAddress: undefined,
     m4aTreasurerAddress: undefined,
     chatCEOAddress: undefined,

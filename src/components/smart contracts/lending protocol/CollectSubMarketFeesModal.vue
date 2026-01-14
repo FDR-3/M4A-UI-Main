@@ -183,7 +183,6 @@
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var subMarketOwnerAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
-  var tokenProgram: PublicKey
 
   var tokenPopoverOpen = ref(false)
   var ownerPopoverOpen = ref(false)
@@ -276,7 +275,6 @@
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     
-    tokenProgram = tokenInfo.tokenProgram
     uncollectedAmount.value = rowData.uncollectedSubMarketFeesAmount
     selectedTokenMintAddress = new PublicKey(rowData.tokenMintAddress.toString())
     subMarketOwnerAddress = new PublicKey(rowData.owner.toString())

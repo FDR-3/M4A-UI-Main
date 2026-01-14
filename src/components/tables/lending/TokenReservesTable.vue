@@ -139,7 +139,7 @@
               <StarWolf v-else class="starWolfButton" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
 
               <ion-label v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddressString" color="green">
-                fdr-3
+                {{ slotProps.data.displayName }}
               </ion-label>
               <ion-label v-else color="dark">
                 {{ slotProps.data.displayName }}
@@ -395,8 +395,6 @@
       else if(unfilteredTableData[i].owner.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].displayName.toLowerCase().includes(filterString.toLowerCase()))
-        filteredTable.push(unfilteredTableData[i])
-      else if(unfilteredTableData[i].ceoName.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].depositedAmount.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])

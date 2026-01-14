@@ -80,7 +80,7 @@
               </div>
 
               <ion-label v-if="slotProps.data.userAddress!=adminAccounts.chatCEOAddress" color="dark" class="noWrapText">{{ slotProps.data.displayName }}</ion-label>
-              <ion-label v-else color="green" class="noWrapText">fdr-3</ion-label>
+              <ion-label v-else color="green" class="noWrapText">{{ slotProps.data.displayName }}</ion-label>
             </div>
           </ion-button>
           <ion-popover 

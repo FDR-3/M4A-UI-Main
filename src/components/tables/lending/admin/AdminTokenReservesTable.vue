@@ -21,7 +21,9 @@
         'useFixedBorrowApy',
         'utilizationRateString',
         'solvencyInsuranceFeeRateString',
-        'globalLimitString'
+        'globalLimitString',
+        'uncollectedSolvencyInsuranceFeesAmountString',
+        'uncollectedLiquidationFeesAmountString'
       ]"  
     >
       <template #header>
@@ -84,23 +86,73 @@
           {{slotProps.data.globalLimitString }}
         </template>
       </Column>
+      <Column field="uncollectedSolvencyInsuranceFeesAmount" header="Uncollected Solvency Fees" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.uncollectedSolvencyInsuranceFeesAmountString }}
+        </template>
+      </Column>
+      <Column field="uncollectedLiquidationFeesAmount" header="Uncollected Liquidation Fees" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.uncollectedLiquidationFeesAmountString }}
+        </template>
+      </Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRow">
-            <ion-button id="openEditTokenReserveModalButton"
+            <ion-text v-if="connectedWallet.addressString!=adminAccounts.lendingCEOAddressString &&
+            connectedWallet.addressString!=solvencyTreasuryWalletPublicKeyString &&
+            connectedWallet.addressString!=adminAccounts.liquidationTreasuryAddress.toString()">
+              Lending CEO/Treasuer Not Detected
+            </ion-text>
+
+            <ion-button
+            v-else
+            class="actionsPopoverButton"
             color="dark"
-            @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
-            $emit('editTokenReserveModal', 
-              slotProps.data.tokenMintAddress,
-              slotProps.data.svg,
-              slotProps.data.name,
-              slotProps.data.solvencyInsuranceFeeRate,
-              slotProps.data.fixedBorrowAPY,
-              slotProps.data.useFixedBorrowApy,
-              slotProps.data.globalLimit)"
+            @click="openActionsPopover($event, slotProps.data.tokenMintAddress)"
             >
-              Edit TokenReserve
+              Actions
             </ion-button>
+            <ion-popover 
+            :is-open="actionsPopoverOpen" 
+            :event="event" 
+            @didDismiss="actionsPopoverOpen=false"
+            side="top" 
+            alignment="center"
+            >
+              <ion-button
+              v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString"
+              id="openEditTokenReserveModalButton"
+              fill="clear"
+              @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
+              $emit('editTokenReserveModal', 
+                slotProps.data.tokenMintAddress,
+                slotProps.data.svg,
+                slotProps.data.name,
+                slotProps.data.solvencyInsuranceFeeRate,
+                slotProps.data.fixedBorrowAPY,
+                slotProps.data.useFixedBorrowApy,
+                slotProps.data.globalLimit)"
+              >
+                <ion-label color="dark">Edit TokenReserve</ion-label>
+              </ion-button>
+              <ion-button
+              v-if="connectedWallet.addressString==solvencyTreasuryWalletPublicKeyString"
+              id="openEditTokenReserveModalButton"
+              fill="clear"
+              @click="collectSolvencyFees()"
+              >
+                <ion-label color="dark">Collect Solvency Fees</ion-label>
+              </ion-button>
+              <ion-button
+              v-if="connectedWallet.addressString==adminAccounts.liquidationTreasuryAddress.toString()"
+              id="openEditTokenReserveModalButton"
+              fill="clear"
+              @click="collectLiquidationFees()"
+              >
+                <ion-label color="dark">Collect Liquidation Fees</ion-label>
+              </ion-button>
+            </ion-popover>
           </div>
         </template>
       </Column>
@@ -110,7 +162,7 @@
 
 <script setup lang="ts">
   import { ref, onMounted, watch, inject } from 'vue'
-  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover } from '@ionic/vue'
+  import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
@@ -118,18 +170,24 @@
   import { tokenReserves, tokenReserveHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { PublicKey } from "@solana/web3.js"
-  import { copyAddress, copyTreasuryATAText } from '/src/assets/contracts/WalletHelper.vue'
-  import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { copyAddress, copyTreasuryATAText, confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { adminAccounts, tvl } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { solvencyTreasuryWalletPublicKeyString } from '/src/assets/constants/Addresses.ts'
+  import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
+  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   var emits = defineEmits(['editTokenReserveModal'])
 
+  var toast = inject('toast')
   var colorHexValue = inject('colorHexValue') as string
 
   var tokenReserveTableData = ref()
   var showTokenSubMarkets = ref(false)
   var isLoading = ref(true)
+  var tokenProgram: PublicKey
 
+  var actionsPopoverOpen = ref(false)
   var event = ref()
 
   var selectedTokenMintAddress: PublicKey
@@ -177,6 +235,15 @@
     copyAddress(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
   }
 
+  function openActionsPopover(e: Event, tokenMintAddress: PublicKey)
+  {
+    event.value = e
+    event.value.tokenMintAddress = tokenMintAddress
+    console.log(tokenMintAddress)
+    console.log(tokenMintAddress.toString())
+    actionsPopoverOpen.value = true
+  }
+
   const filters = ref(
   {
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
@@ -187,7 +254,7 @@
     var value = 0
     var processedTableData = []
     var newTableData = cloneDeep(tokenReserves)
-
+    console.log(tokenReserves)
     if(!newTableData.data)
       return
 
@@ -226,10 +293,70 @@
       maximumFractionDigits: 2 }) + '%'
       processedTableData[i].globalLimit = Number(processedTableData[i].globalLimit) / Math.pow(10, decimalAmount) //Convert to decimal from fixed point notation
       processedTableData[i].globalLimitString = processedTableData[i].globalLimit.toLocaleString()
+      processedTableData[i].uncollectedSolvencyInsuranceFeesAmount = Number(processedTableData[i].uncollectedSolvencyInsuranceFeesAmount)
+      processedTableData[i].uncollectedSolvencyInsuranceFeesAmountString = processedTableData[i].uncollectedSolvencyInsuranceFeesAmount.toLocaleString('en-US', {
+      minimumFractionDigits: decimalAmount,
+      maximumFractionDigits: decimalAmount })
+      processedTableData[i].uncollectedLiquidationFeesAmount = Number(processedTableData[i].uncollectedLiquidationFeesAmount)
+      processedTableData[i].uncollectedLiquidationFeesAmountString = processedTableData[i].uncollectedLiquidationFeesAmount.toLocaleString('en-US', {
+      minimumFractionDigits: decimalAmount,
+      maximumFractionDigits: decimalAmount })
     }
 
     tvl.tokenReserveTVL = value
     tokenReserveTableData.value = processedTableData
+  }
+
+  async function collectSolvencyFees()
+  {
+    const tokenInfo = tokenReserveHashMap.get(event.value.tokenMintAddress.toString())
+    tokenProgram = tokenInfo.tokenProgram
+
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.claimSolvencyInsuranceFees
+      (
+        event.value.tokenMintAddress,
+        adminAccounts.lendingCEOAddressKey,
+        0, //Use Submarket Index 0, needed for monthly statement
+        adminAccounts.solvencyTreasuryLendingAccountIndex, //Use Solvency account index 0
+        null
+      ).accounts({ mint: event.value.tokenMintAddress, tokenProgram: tokenProgram })
+      .rpc()
+      await confirmLendingTransaction(tx, toast, "claim_solvency_insurance_fees")
+
+      actionsPopoverOpen.value = false
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "claim_solvency_insurance_fees")
+    }
+  }
+
+  async function collectLiquidationFees()
+  {
+    const tokenInfo = tokenReserveHashMap.get(event.value.tokenMintAddress.toString())
+    tokenProgram = tokenInfo.tokenProgram
+
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.claimLiquidationFees
+      (
+        event.value.tokenMintAddress,
+        adminAccounts.lendingCEOAddressKey,
+        1, //Use Submarket Index 1, HODL Treasury uses the 100% fee submarket
+        adminAccounts.hodlTreasuryLendingAccountIndex, //Use HODL account index 0
+        null
+      ).accounts({ mint: event.value.tokenMintAddress, tokenProgram: tokenProgram })
+      .rpc()
+      await confirmLendingTransaction(tx, toast, "claim_liquidation_fees")
+
+      actionsPopoverOpen.value = false
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "claim_liquidation_fees")
+    }
   }
 </script>
 
