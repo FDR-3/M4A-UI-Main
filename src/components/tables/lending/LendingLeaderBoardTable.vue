@@ -299,7 +299,6 @@
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { updateBlockChainTimeStamp } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
@@ -339,8 +338,6 @@
       if(tokenReservesHashMap.map)
         tokenReservesHashMapCopy = cloneDeep(tokenReservesHashMap.map)
 
-      updateBlockChainTimeStamp()
-      startTimeStampInterval(blockChainData.timeStamp)
       updateLeaderBoardValues(true)
       updateLeaderBoardDisplayNames()
 
@@ -381,12 +378,6 @@
     sortTable()//Sort again incase price changes cause a change in the rankings
   })
 
-  watch(blockChainData,() =>
-  {
-    stopTimeStampInterval()
-    startTimeStampInterval(blockChainData.timeStamp)
-  })
-
   watch(customUserNameHashMap,() =>
   {
     updateLeaderBoardDisplayNames()
@@ -422,7 +413,7 @@
       var topRowCount = 0
       var subRowCount = 0
 
-      calculateTokenReserveInterestChangeIndex(blockChainTimeStamp)
+      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
 
       for(var i=0; i<tempData.length; i++)
       {
@@ -733,18 +724,6 @@
     const interestAccrued = newDebt - userDebt
 
     return interestAccrued
-  }
-
-  function startTimeStampInterval(initialTimeStamp: number)
-  {
-    if(initialTimeStamp == 0)
-      return
-
-    blockChainTimeStamp = initialTimeStamp
-    timeStampIntervalId = setInterval(() =>
-    {
-      blockChainTimeStamp += 2000/1000//convert milliseconds into seconds
-    }, 2000)
   }
 
   function stopTimeStampInterval()

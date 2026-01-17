@@ -2,8 +2,8 @@
   <div class="nSmallMarginTop noClickEvent">
     <h3 class="" style="margin: 0">Health Factor</h3>
     <div class="flexCenterRow" style="gap: 10px">
-      <ion-label>Asset Value: {{ assetValue }}</ion-label>
-      <ion-label>Debt Value: {{ debtValue }}</ion-label>
+      <ion-label>Asset Value: {{ assetValueString }}</ion-label>
+      <ion-label>Debt Value: {{ debtValueString }}</ion-label>
     </div>
   </div>
 
@@ -28,8 +28,8 @@
   
   const props = defineProps(['assetValue', 'debtValue'])
 
-  var assetValue = ref()
-  var debtValue = ref()
+  var assetValueString = ref()
+  var debtValueString = ref()
   var healthFactor = ref()
   var barColor = ref()
 
@@ -45,19 +45,19 @@
 
   function setValues()
   {
-    assetValue.value = '$' + props.assetValue.toLocaleString('en-US', {
+    assetValueString.value = '$' + props.assetValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
-    debtValue.value = '$' + props.debtValue.toLocaleString('en-US', {
+    debtValueString.value = '$' + props.debtValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
-
+    
     if(props.assetValue != 0)
       healthFactor.value = ((((props.assetValue * 0.8) - props.debtValue)/(props.assetValue * 0.8)) * 100).toFixed(2)
     else if(props.debtValue == 0)
-      healthFactor.value = 100
+      healthFactor.value = (100).toFixed(2)
     else
-      healthFactor.value = 0
+      healthFactor.value = (0).toFixed(2)
 
     if(healthFactor.value >= 70)
       barColor.value = "#39bd39"

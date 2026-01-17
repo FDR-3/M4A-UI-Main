@@ -51,6 +51,7 @@ export function convertUnixTimeToLocalDate(timeStamp: number)
 }
 
 var blockChainTimeStampRefreshIntervalId: any
+var blockChainTimeStampEstimationIntervalId: any
 
 export async function updateBlockChainTimeStamp()
 {
@@ -71,11 +72,24 @@ export async function startBlockChainTimeStampRefresh()
   }, 60000) 
 }
 
+export function startBlockChainTimeStampEstimation()
+{
+  blockChainTimeStampEstimationIntervalId = setInterval(async() =>
+  {
+    blockChainData.timeStamp += 55/1000//convert milliseconds into seconds
+  }, 55) 
+}
+
 export function stopBlockChainTimeStampRefresh()
 {
   if(blockChainTimeStampRefreshIntervalId != undefined)
   {
     clearInterval(blockChainTimeStampRefreshIntervalId)
     blockChainTimeStampRefreshIntervalId = undefined
+  }
+  if(blockChainTimeStampEstimationIntervalId != undefined)
+  {
+    clearInterval(blockChainTimeStampEstimationIntervalId)
+    blockChainTimeStampEstimationIntervalId = undefined
   }
 }

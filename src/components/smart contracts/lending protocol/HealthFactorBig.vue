@@ -27,13 +27,15 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, watch } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
   import { IonText } from '@ionic/vue'
-  import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
-  import healthFactorInfo from './HealthFactorInfo.ts'
+  import { calculateNewBalance, calculateNewDebtBalance, healthFactorInfo } from './HealthFactorInfo.ts'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   
   const props = defineProps(['accountOwnerAddress', 'accountIndex'])
 
@@ -42,23 +44,19 @@
   var overallValue = ref()
   var healthFactor = ref()
   var barColor = ref()
+  var healthFactorIntervalId: any
 
   onMounted(() =>
   {
-    calculateValues()
+    startHealthFactorCalculation()
   })
 
-  watch([lendingUserTabAccountListHashMap, priceObjectMap], () =>
+  onUnmounted(() =>
   {
-    calculateValues()
+    stopHealthFactorCalculation()
   })
 
-  watch(() => [props.accountOwnerAddress, props.accountIndex], (() => 
-  {
-    calculateValues()
-  }))
-
-  function calculateValues()
+  function calculateHealthFactorValues(timeStamp: number)
   {
     if(!lendingUserTabAccountListHashMap.map)
       return
@@ -72,9 +70,26 @@
     {
       const price = priceObjectMap.data[userTabAccounts[i].tokenMintAddress.toString()].usdPrice
       const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenMintAddress.toString())
+      const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString())
+      const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString() +
+      userTabAccounts[i].subMarketOwnerAddress.toString() +
+      userTabAccounts[i].subMarketIndex.toString())
 
-      calculatedAssetValue += Number(userTabAccounts[i].depositedAmount / Math.pow(10, decimalAmount)) * Number(price)//Convert from fixed point notation to decimal
-      calculatedDebtValue += Number(userTabAccounts[i].borrowedAmount / Math.pow(10, decimalAmount)) * Number(price)//Convert from fixed point notation to decimal
+      const userBalanceWithInterestEarned = calculateNewBalance(
+      tabTokenReserve,
+      subMarket,
+      Number(userTabAccounts[i].depositedAmount),
+      Number(userTabAccounts[i].supplyInterestChangeIndex),
+      timeStamp)
+
+      const userDebtWithInterestAccrued =  calculateNewDebtBalance(
+      tabTokenReserve,
+      Number(userTabAccounts[i].borrowedAmount),
+      Number(userTabAccounts[i].borrowInterestChangeIndex),
+      timeStamp)
+
+      calculatedAssetValue += Number(userBalanceWithInterestEarned / Math.pow(10, decimalAmount)) * Number(price)
+      calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
     }
 
     assetValue.value = '$' + calculatedAssetValue.toLocaleString('en-US', {
@@ -91,12 +106,12 @@
     {
       healthFactor.value = (((calculatedAssetValue * 0.8 - calculatedDebtValue)/(calculatedAssetValue * 0.8)) * 100).toFixed(2)//Convert to percent
       if(healthFactor.value < 0)
-        healthFactor.value = 0
+        healthFactor.value = (0).toFixed(2)
     }
     else if(calculatedDebtValue == 0)
-      healthFactor.value = 100
+      healthFactor.value = (100).toFixed(2)
     else
-      healthFactor.value = 0
+      healthFactor.value = (0).toFixed(2)
 
     if(healthFactor.value >= 70)
       barColor.value = "#39bd39"
@@ -104,6 +119,26 @@
       barColor.value = "#ffd700"
     else
       barColor.value = "#ff0000"
+  }
+
+  function startHealthFactorCalculation()
+  {
+    if(blockChainData.timeStamp == 0)
+      return
+
+    healthFactorIntervalId = setInterval(() =>
+    {
+      calculateHealthFactorValues(blockChainData.timeStamp)
+    }, 55)
+  }
+
+  function stopHealthFactorCalculation()
+  {
+    if(healthFactorIntervalId != undefined)
+    {
+      clearInterval(healthFactorIntervalId)
+      healthFactorIntervalId = undefined
+    }
   }
 </script>
 

@@ -8,7 +8,7 @@
   import { getLendingProtocol,
   getLendingProtocolCEOAccount,
   getTokenReserves,
-  setTokenReserveHashMap,
+  settokenReserveFontEndInfoHashMap,
   getSubMarkets,
   getLendingUserMonthlyStatementsWrapper,
   setLendingUserAccountHashMap,
@@ -55,7 +55,7 @@
     //Token Reserves
     tokenReserves.data = await getTokenReserves()
     
-    setTokenReserveHashMap()
+    settokenReserveFontEndInfoHashMap()
     await listenForNewTokenChanges()
 
     //SubMarkets
@@ -122,7 +122,7 @@
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
-      setTokenReserveHashMap()
+      settokenReserveFontEndInfoHashMap()
     })
   }
 
@@ -143,7 +143,7 @@
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
-      setTokenReserveHashMap()
+      settokenReserveFontEndInfoHashMap()
       subMarkets.data = await getSubMarkets()
       lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
     

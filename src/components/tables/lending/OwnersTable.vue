@@ -235,7 +235,7 @@
   import InputText from 'primevue/inputtext'
   import InputNumber from 'primevue/inputnumber'
   import { search } from 'ionicons/icons'
-  import { tokenReserveHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveFontEndInfoHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -459,7 +459,7 @@
       //This has to be done here as opposed to in the LendingProtocol.vue file since it has to be after it's deep cloned
       for(var j=0; j<unprocessedData[i].ownerData.ownerSubMarketList.length; j++)
       {
-        const tokenReserveFrontEndProperties = tokenReserveHashMap.get(unprocessedData[i].ownerData.ownerSubMarketList[j].tokenMintAddress.toString())
+        const tokenReserveFrontEndProperties = tokenReserveFontEndInfoHashMap.get(unprocessedData[i].ownerData.ownerSubMarketList[j].tokenMintAddress.toString())
         unprocessedData[i].ownerData.ownerSubMarketList[j].tokenSVG = tokenReserveFrontEndProperties.svg
       }
     }

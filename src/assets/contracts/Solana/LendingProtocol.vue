@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as anchor from "@coral-xyz/anchor"
-  import { tokenReserves, tokenReserveHashMap, tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserves, tokenReserveFontEndInfoHashMap, tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets,
     subMarketsHashMap,
     subMarketOwnerHashMap,
@@ -127,7 +127,7 @@
     }
   }
 
-  export function setTokenReserveHashMap()
+  export function settokenReserveFontEndInfoHashMap()
   {
     console.log("Updating Token Reserve Hash Map")
     
@@ -205,7 +205,7 @@
 
       let newIndex = subMarketOwner.ownerSubMarketList.length - 1
 
-      const tokenFrontEndProperties = tokenReserveHashMap.get(subMarketOwner.ownerSubMarketList[newIndex].tokenMintAddress.toBase58())
+      const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(subMarketOwner.ownerSubMarketList[newIndex].tokenMintAddress.toBase58())
 
       subMarketOwner.ownerSubMarketList[newIndex].feeCollectorAddress = subMarketOwner.ownerSubMarketList[newIndex].feeCollectorAddress.toBase58()
       //subMarketOwner.ownerSubMarketList[newIndex].tokenSVG = tokenFrontEndProperties.svg//This has to be marked raw in the Owners Table since it is cloned at the end of this fuction. The cloning is for allowing users to edit the table without updating the original hashmap. It was originally marked Raw in the TokenReserves.vue file
@@ -437,6 +437,7 @@
 
     //stable Coins
     //These loops are done this way to keep the portfolio charts in a certain order
+    //Stable Coins listed, Than Crypto Currency listed
     for(var i=0; i<StableCoins.length; i++)
     {
       for(var j=0; j<lendingUserMonthlyStatements.data.length; j++)
@@ -532,6 +533,7 @@
 
     //Crypto Currencies
     //These loops are done this way to keep the portfolio charts in a certain order
+    //Stable Coins listed, Than Crypto Currency listed
     for(var i=0; i<CryptoCurrency.length; i++)
     {
       for(var j=0; j<lendingUserMonthlyStatements.data.length; j++)
@@ -700,7 +702,7 @@
           {
             const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
             const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-            const tokenFrontEndProperties = tokenReserveHashMap.get(tokenMintAddress)
+            const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
       
             var moreRecentAccountEntry =
             {
@@ -753,7 +755,7 @@
           //Add New Sub Account for Existing User to Lending Leader Board
           const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
           const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-          const tokenFrontEndProperties = tokenReserveHashMap.get(tokenMintAddress)
+          const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
 
           var newAccountEntry =
           {
@@ -807,7 +809,7 @@
         //Add New User and their Sub Account to Lending Leader Board
         const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
         const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-        const tokenFrontEndProperties = tokenReserveHashMap.get(tokenMintAddress)
+        const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
 
         var newAccountEntry =
         {

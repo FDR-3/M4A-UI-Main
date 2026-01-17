@@ -262,7 +262,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { tokenReserves,
-    tokenReserveHashMap, 
+    tokenReserveFontEndInfoHashMap, 
     priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveSubMarketListHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
@@ -478,7 +478,7 @@
       processedTableData.push(newTableData.data[i])
 
       const tokenMintAddressString = processedTableData[i].tokenMintAddress.toString()
-      const tokenReserveFrontEndProperties = tokenReserveHashMap.get(tokenMintAddressString)//These are static and don't need to be reactive
+      const tokenReserveFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddressString)//These are static and don't need to be reactive
       processedTableData[i].name = tokenReserveFrontEndProperties.name
       processedTableData[i].svg = tokenReserveFrontEndProperties.svg
       processedTableData[i].source = tokenReserveFrontEndProperties.source
@@ -598,7 +598,7 @@
     tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
     showTokenSubMarkets.value = true
 
-    const tokenFrontEndProperties = tokenReserveHashMap.get(selectedTokenMintAddress.toString())
+    const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(selectedTokenMintAddress.toString())
     subMarketTokenSVG.value = tokenFrontEndProperties.svg
     subMarketTokenName.value = tokenFrontEndProperties.name
 

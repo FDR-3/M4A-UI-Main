@@ -59,7 +59,7 @@
   import { isBrowserFireFox } from '/src/assets/helperFunctions/browserHelper.ts'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
+  import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'
   import KingobamaMobileT1 from '/src/components/fancy/poly/KingobamaMobileT1.vue'
@@ -117,17 +117,12 @@
     }
 
     await startBlockChainTimeStampRefresh()
+    startBlockChainTimeStampEstimation()
   })
 
   onUnmounted(() =>
   {
     stopBlockChainTimeStampRefresh()
-  })
-
-  watch([tokenReservesHashMap, subMarketsHashMap], async() => 
-  {
-    stopBlockChainTimeStampRefresh()
-    await startBlockChainTimeStampRefresh()
   })
 
   function flipTable()

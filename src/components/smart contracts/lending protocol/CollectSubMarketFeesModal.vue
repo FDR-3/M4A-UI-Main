@@ -152,7 +152,7 @@
     copyFullAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { subMarketOwnerHashMap, subMarketByTokenMintAddressAndOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
@@ -270,7 +270,7 @@
   {
     window.addEventListener('click', handleClickOutside)
 
-    const tokenInfo = tokenReserveHashMap.get(rowData.tokenMintAddress.toString())
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(rowData.tokenMintAddress.toString())
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg

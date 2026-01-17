@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
   import { IonButton } from '@ionic/vue'
   import MarketsTable from '/src/components/tables/lending/MarketsTable.vue'
   import Portfolios from '/src/components/smart contracts/lending protocol/Portfolios.vue'
@@ -65,6 +65,8 @@
   import KingobamaMobileM3Portfolio from '/src/components/fancy/poly/KingobamaMobileM3Portfolio.vue'
   import KingobamaMobileM4LeaderBoard from '/src/components/fancy/poly/KingobamaMobileM4LeaderBoard.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
+  import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   defineProps(['colorName', 'colorHexValue'])//This just keeps a warning from going off since all pages get feed these props
 
@@ -91,7 +93,7 @@
 
   const portfolioChartInfoMSG = "\nInterest earned and\naccrued is updated in the\ncharts after a user updates\ntheir snap shots or does\nany lending activity, IE:\ndepositing, repaying, etc."
   
-  onMounted(() => 
+  onMounted(async() => 
   {
     updateTokenRelatedMarketTableHeight()
 
@@ -106,6 +108,14 @@
       display1stTable.value = "none"
       display2ndTable.value = ""
     }
+
+    await startBlockChainTimeStampRefresh()
+    startBlockChainTimeStampEstimation()
+  })
+
+  onUnmounted(() =>
+  {
+    stopBlockChainTimeStampRefresh()
   })
 
   function flipTable()

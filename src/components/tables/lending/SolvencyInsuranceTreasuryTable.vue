@@ -225,7 +225,7 @@
     else
       isLoading.value = true
 
-    await startFeeCalculation()
+    startFeeCalculation()
   })
 
   onUnmounted(() =>
@@ -265,16 +265,10 @@
     tvl.solvencyTVL = stableValue.value + cryptoValue.value
   })
 
-  watch([tokenReservesHashMap, subMarketsHashMap], async() => 
+  watch([tokenReservesHashMap, subMarketsHashMap], () => 
   {
-    stopFeeCalculation()
-    await startFeeCalculation()
-  })
-
-  watch(blockChainData, async() => 
-  {
-    stopFeeCalculation()
-    await startFeeCalculation()
+    if(subMarketFeesAccruedIntervalId == undefined)
+      startFeeCalculation()
   })
 
   function openTokenPopover(e: Event, rowData: any) 
@@ -473,19 +467,17 @@
       return 0
   }
 
-  async function startFeeCalculation()
+  function startFeeCalculation()
   {
     if(!tokenReservesHashMap.map || !subMarketsHashMap.map)
       return
-
-    var timeStamp = blockChainData.timeStamp
 
     subMarketFeesAccruedIntervalId = setInterval(() =>
     {
       var sevenDayStableCoinProjectionValue = 0
       for(var i=0; i<stableCoinFeeArray.length; i++)
       {
-        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp, stableCoinFeeArray[i].tokenMintAddressString)
+        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, stableCoinFeeArray[i].tokenMintAddressString)
         if(stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
           sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenMintAddressString, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
@@ -493,7 +485,7 @@
       var sevenDayCryptoCurrencyProjectionValue = 0
       for(var i=0; i<cryptoCurrencyFeeArray.length; i++)
       {
-        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp, cryptoCurrencyFeeArray[i].tokenMintAddressString)
+        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, cryptoCurrencyFeeArray[i].tokenMintAddressString)
         if(cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
           sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenMintAddressString, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
@@ -501,8 +493,6 @@
       sevenDayProjectionRate.value = (sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue).toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
-
-      timeStamp += 55/1000//convert milliseconds into seconds
     }, 55)
   }
 

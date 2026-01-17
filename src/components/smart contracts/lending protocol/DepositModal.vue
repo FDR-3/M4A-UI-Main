@@ -137,7 +137,7 @@
     copyTokenMintAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
@@ -262,17 +262,17 @@
     }
   }
 
-  function openDepositModal(tokenMintAddress: string, fdr3SubMarkets: any[])
+  function openDepositModal(tokenMintAddress: string, subMarkets: any[])
   {
     window.addEventListener('click', handleClickOutside)
 
-    const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     tokenProgram = tokenInfo.tokenProgram
 
-    subMarketList.value = fdr3SubMarkets
+    subMarketList.value = subMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     

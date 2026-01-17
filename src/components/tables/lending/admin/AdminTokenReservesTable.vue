@@ -167,7 +167,7 @@
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
-  import { tokenReserves, tokenReserveHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserves, tokenReserveFontEndInfoHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { PublicKey } from "@solana/web3.js"
   import { copyAddress, copyTreasuryATAText, confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
@@ -263,7 +263,7 @@
       processedTableData.push(newTableData.data[i])
 
       const tokenMintAddressString = processedTableData[i].tokenMintAddress.toString()
-      const tokenInfo = tokenReserveHashMap.get(tokenMintAddressString)//These are static and don't need to be reactive
+      const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddressString)//These are static and don't need to be reactive
       const decimalAmount = tokenInfo.decimalAmount
 
       processedTableData[i].name = tokenInfo.name
@@ -309,7 +309,7 @@
 
   async function collectSolvencyFees()
   {
-    const tokenInfo = tokenReserveHashMap.get(event.value.tokenMintAddress.toString())
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(event.value.tokenMintAddress.toString())
     tokenProgram = tokenInfo.tokenProgram
 
     try
@@ -335,7 +335,7 @@
 
   async function collectLiquidationFees()
   {
-    const tokenInfo = tokenReserveHashMap.get(event.value.tokenMintAddress.toString())
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(event.value.tokenMintAddress.toString())
     tokenProgram = tokenInfo.tokenProgram
 
     try

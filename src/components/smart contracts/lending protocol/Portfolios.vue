@@ -1,6 +1,6 @@
 <template>
   <div v-if="isBrowsingAllUsers">
-    <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false); emitPortfolioRelatedTableHeight(); updateBlockChainTimeStamp()">
+    <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false); emitPortfolioRelatedTableHeight()">
       <ion-label color="green">Return</ion-label>
     </ion-button>
     <LendingLeaderBoardTable
@@ -144,7 +144,6 @@
         :userTabIndex="userTabIndex"
         :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
-        :blockChainTimeStamp="blockChainData.timeStamp"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
         @openDepositModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenMintAddress, subMarketOption)"
         @openWithdrawalModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenMintAddress, subMarketOption)"
@@ -203,7 +202,6 @@
         :userTabIndex="userTabIndex"
         :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
-        :blockChainTimeStamp="blockChainData.timeStamp"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
         @openDepositModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenMintAddress, subMarketOption)"
         @openWithdrawalModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenMintAddress, subMarketOption)"
@@ -238,8 +236,6 @@
   import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import HealthFactorBig from '/src/components/smart contracts/lending protocol/HealthFactorBig.vue'
-  import { startBlockChainTimeStampRefresh, stopBlockChainTimeStampRefresh, updateBlockChainTimeStamp } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
   
@@ -468,8 +464,6 @@
 
       setChartData()
       startGradientAnimation()
-
-      await startBlockChainTimeStampRefresh()
     }
 
     emitPortfolioRelatedTableHeight()
@@ -478,7 +472,6 @@
   onUnmounted(() =>
   {
     stopGradientAnimation()
-    stopBlockChainTimeStampRefresh()
   })
 
   //Json string of wallet to detect object property changes
@@ -527,6 +520,8 @@
     setLendingUserAccountList()
     checkForLendingUserAssets()
     emitPortfolioRelatedTableHeight()
+
+    chartReRenderKey.value += 1
   })
 
   watch(lendingUserAccountsHashMap, () =>
@@ -560,9 +555,6 @@
 
     stopGradientAnimation()
     startGradientAnimation()
-    
-    stopBlockChainTimeStampRefresh()
-    await startBlockChainTimeStampRefresh()
   })
 
   watch(customUserNameHashMap,() =>
@@ -574,7 +566,6 @@
   watch(() => props.portfolioReRenderHelper, (() => 
   {
     chartReRenderKey.value += 1
-    //emitLeaderBoardSubTableAndSubRowSet(0,0)
   }))
 
   function setRainbowAnimatedGradient(ctx: any, chartArea:any)
@@ -1240,8 +1231,6 @@
     crypto7DayProjectionRateValue.value = 0
     cryptoLifeTimeInterestEarnedAmount.value = "0"
     cryptoLifeTimeInterestEarnedValue.value = 0
-
-    updateBlockChainTimeStamp()
 
     document.getElementById("protfolioHeader")?.scrollIntoView() 
   }

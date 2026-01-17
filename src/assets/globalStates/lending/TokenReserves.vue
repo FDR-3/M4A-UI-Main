@@ -34,7 +34,7 @@
     data: undefined
   })
 
-  export const tokenReserveHashMap: Map<string, tokenMapObject> = new Map(
+  export const tokenReserveFontEndInfoHashMap: Map<string, tokenMapObject> = new Map(
   [ 
     //Key: Token Mint Address, Value: Token SVG
     [tokenAddressStrings.daiTokenMintAddress,

@@ -59,14 +59,14 @@
       showButtons
       fluid
       @input="(event: { value: any }) => repayAmount = event.value"
-      @update:model-value="repayMax=false"
+      @focus="repayMax=false; repayHalf=false"
     />
     <div class="alignSelfLeft">
-      <button style="background-color: transparent" @click="repayAmount=userDebt; repayMax=true">
+      <button style="background-color: transparent" @click="repayAmount=userDebt; repayHalf=false; repayMax=true">
         <ion-label color="dark">Max</ion-label>
       </button>
 
-      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="repayAmount=userDebt*0.5; repayMax=false">
+      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="repayAmount=userDebt*0.5; repayMax=false; repayHalf=true">
         <ion-label color="dark">Half</ion-label>
       </button>
     </div>
@@ -100,14 +100,19 @@
     copyTokenMintAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
   import * as anchor from "@coral-xyz/anchor"
+  import cloneDeep from 'lodash/cloneDeep'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
+  var tokenReserve: any
+  var lendingUserTabAccount: any
   var subMarketSelect = ref()
   var subMarketList = ref()
   var accountSelect = ref()
@@ -117,11 +122,14 @@
   var repaying = ref(false)
   var repaySVG = ref()
   var repayMax = ref(false)
+  var repayHalf = ref(false)
   var subMarketTokenName = ref()
   var userDebt = ref(0)
+  var userOriginalDebt = 0
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
+  var interestAccruedIntervalId: any
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -141,12 +149,6 @@
         maximumFractionDigits: 2 })   
   })
   
-  watch(connectedWallet, () =>
-  {
-    setDebtBalance()
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-  })
-
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
   {
@@ -158,17 +160,26 @@
     let newWallet = JSON.parse(newJSONObjectString)
     let oldWallet= JSON.parse(oldJSONObjectString)
 
-    //Only want this running if the connected Wallet Address String is changing
-    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+    //Only want this running if the connected Wallet Address String is changing and modal is visible
+    if(!repaying.value ||
+    (newWallet.addressString == oldWallet.addressString
+    && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
       return
 
-    setDebtBalance()
+    stopInterestCalculation()
+    setInitialDebtBalance()
+    startInterestCalculation()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
   })
 
   watch(lendingUserTabAccountsHashMap, () =>
   {
-    setDebtBalance()
+    if(repaying.value)
+    {
+      stopInterestCalculation()
+      setInitialDebtBalance()
+      startInterestCalculation()
+    }
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
@@ -187,23 +198,24 @@
       !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
+        stopInterestCalculation()
         repaying.value = false
         window.removeEventListener('click', handleClickOutside)
       }
     }
   }
 
-  function openRepayModal(tokenMintAddress: string, fdr3SubMarkets: any[])
+  function openRepayModal(tokenMintAddress: string, subMarkets: any[])
   {
     window.addEventListener('click', handleClickOutside)
 
-    const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     tokenProgram = tokenInfo.tokenProgram
     
-    subMarketList.value = fdr3SubMarkets
+    subMarketList.value = subMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
@@ -214,15 +226,18 @@
         accountList.value = userAccountList
     }
 
+    selectedTokenMintAddress = new PublicKey(tokenMintAddress)
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(selectedTokenMintAddress.toString()))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
     repayAmount.value = 0
     repayIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
-    selectedTokenMintAddress = new PublicKey(tokenMintAddress)
     tokenDecimalAmount = decimalAmount
     repaySVG.value = tokenSVG
     subMarketTokenName.value = tokenName
     repaying.value = true
 
-    setDebtBalance()
+    setInitialDebtBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
   }
 
   function openTokenPopover(e: Event) 
@@ -248,12 +263,12 @@
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
   }
 
-  function setDebtBalance()
+  function setInitialDebtBalance()
   {
     if(!lendingUserTabAccountsHashMap.map || subMarketSelect.value == undefined)
       return
 
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
     adminAccounts.lendingCEOAddressString +
     subMarketSelect.value.toString() +
     connectedWallet.addressString +
@@ -270,6 +285,91 @@
     }
     else
       userDebt.value = 0
+
+    userOriginalDebt = userDebt.value
+  }
+
+  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
+  {
+    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
+    adminAccounts.lendingCEOAddressString +
+    mainSubMarketIndex +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    if(lendingUserTabAccount)
+    {
+      const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+
+      if(lendingUserTabAccount)
+        userDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+      else
+        userDebt.value = 0
+    }
+    else
+      userDebt.value = 0
+
+    userOriginalDebt = userDebt.value
+    repayAmount.value = 0
+
+    localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
+
+    stopInterestCalculation()
+    startInterestCalculation()
+  }
+
+  function startInterestCalculation()
+  {
+    if(blockChainData.timeStamp == 0)
+      return
+
+    interestAccruedIntervalId = setInterval(() =>
+    {
+      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
+      calculateUserInterest()
+    }, 55)
+  }
+
+  function stopInterestCalculation()
+  {
+    if(interestAccruedIntervalId != undefined)
+    {
+      clearInterval(interestAccruedIntervalId)
+      interestAccruedIntervalId = undefined
+    }
+  }
+
+  function calculateTokenReserveInterestChangeIndex(timeStamp: number)
+  {
+    if(!tokenReserve)
+      return
+
+    //Token Reserve Borrow Interest Index = Old Borrow Interest Index * (1 + Borrow APY * Δt/Seconds in a Year)
+    const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
+    const changeInTime = timeStamp - oldTime
+    const borrowApy = tokenReserve.borrowApy / 10000 //convert from fixed point to decimal
+
+    tokenReserve.newBorrowInterestChangeIndex = Number(tokenReserve.borrowInterestChangeIndex) * (1 + borrowApy * changeInTime / SECONDS_IN_A_YEAR)
+  }
+
+  function calculateUserInterest()
+  {
+    if(!lendingUserTabAccount)
+      return
+
+    //For tab accounts initialized with no deposits, keeps from dividing by zero
+    //For example, can happen to when claiming submarket fees in different destination submarket on new initial tab account
+    if(Number(lendingUserTabAccount.borrowInterestChangeIndex) == 0)
+      lendingUserTabAccount.borrowInterestChangeIndex = tokenReserve.newBorrowInterestChangeIndex
+
+    //User New Debt = Old Debt * Token Reserve Accrued Interest Index / User Accrued Interest Index
+    //Calculate interest accrued
+    userDebt.value = userOriginalDebt * tokenReserve.newBorrowInterestChangeIndex / Number(lendingUserTabAccount.borrowInterestChangeIndex)
+
+    if(repayHalf.value)
+      repayAmount.value = userDebt.value * 0.5
+    if(repayMax.value)
+      repayAmount.value = userDebt.value
   }
 
   async function repayTokens()
@@ -288,6 +388,7 @@
 
       await confirmLendingTransaction(tx, toast, "repay_tokens")
 
+      stopInterestCalculation()
       repaying.value = false
       repayMax.value = false
     }
@@ -295,31 +396,6 @@
     {
       toastPreTransactionError(error, toast, "repay_tokens")
     }
-  }
-
-  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
-  {
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
-    adminAccounts.lendingCEOAddressString +
-    mainSubMarketIndex +
-    connectedWallet.addressString +
-    accountSelect.value.toString())
-
-    if(lendingUserTabAccount)
-    {
-      const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-
-      if(lendingUserTabAccount)
-        userDebt.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-      else
-        userDebt.value = 0
-    }
-    else
-      userDebt.value = 0
-
-    repayAmount.value = 0
-
-    localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(

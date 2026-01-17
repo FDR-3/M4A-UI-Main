@@ -6,7 +6,7 @@
   >
     <div class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
       <ion-button fill="clear" @click="openTokenPopover($event)">
-        <img v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <img v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress" style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
         <component v-else :is="withdrawSVG" style="width: 44px"></component>
         <ion-text color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>
@@ -61,15 +61,15 @@
       :step="withdrawIncrementAmount"
       showButtons
       fluid
-      @input="updateValues"
-      @update:model-value="calculateHealthFactorValues(); withdrawMax=false"
+      @input="(event: { value: any }) => withdrawAmount = event.value"
+      @focus="withdrawMax=false; withdrawHalf=false"
     />
     <div class="alignSelfLeft">
-      <button style="background-color: transparent" @click="withdrawAmount=availableWithdrawalBalance; calculateHealthFactorValues(); withdrawMax=true">
+      <button style="background-color: transparent" @click="withdrawHalf=false; withdrawMax=true">
         <ion-label color="dark">Max</ion-label>
       </button>
 
-      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="withdrawAmount=availableWithdrawalBalance*0.5; calculateHealthFactorValues(); withdrawMax=false">
+      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="withdrawMax=false; withdrawHalf=true">
         <ion-label color="dark">Half</ion-label>
       </button>
     </div>
@@ -129,7 +129,8 @@
     copyTokenMintAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
     lendingUserTabAccountsHashMap,
     lendingUserTabAccountListHashMap,
@@ -138,14 +139,21 @@
   import { PythSolanaReceiver, InstructionWithEphemeralSigners } from "@pythnetwork/pyth-solana-receiver"
   import { HermesClient } from "@pythnetwork/hermes-client"
   import * as anchor from "@coral-xyz/anchor"
+  import cloneDeep from 'lodash/cloneDeep'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
+  import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
+  var tokenReserve: any
+  var lendingUserTabAccount: any
   var subMarketSelect = ref(0)
   var subMarketList = ref()
+  var subMarketFee = 0
   var accountSelect = ref(0)
   var accountList = ref()
   var withdrawAmount = ref()
@@ -153,12 +161,17 @@
   var withdrawing = ref(false)
   var withdrawSVG = ref()
   var withdrawMax = ref(false)
+  var withdrawHalf = ref(false)
+  var withdrawFullDepositedAmount = false
   var subMarketTokenName = ref()
   var userBalance = ref()
-  var availableWithdrawalBalance = ref()
+  var userOriginalBalance = 0
+  var availableWithdrawalBalance = ref(0)
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
-  var tokenDecimalAmount = ref()
+  var tokenDecimalAmount: number
   var tokenProgram: PublicKey
+  var interestEarnedIntervalId: any
+  var healthFactorIntervalId: any
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -168,11 +181,9 @@
 
   var snapShotValidCountDown = ref(0)
   var snapShotCountDownIntervalId: any
-  var pythAccountCountDownIntervalId: any
 
-  var totalAssetValue = ref()
-  var totalDebtValue = ref()
-  var healthFactor = ref()
+  var totalAssetValue = ref(0)
+  var totalDebtValue = ref(0)
   var modalRef = ref()
 
   var withdrawValue = computed (() =>
@@ -190,16 +201,16 @@
 
   watch(lendingUserTabAccountListHashMap, async() =>
   {
-    if(withdrawing.value)//Don't start another count down if on anothert modal since the withdrawal modal is still mounted even when not visible
+    if(withdrawing.value)//Don't start another count down if on another modal since the withdrawal modal is still mounted even when not visible
     {
+      setInitialBalance()
+      stopInterestCalculation()
+      startInterestCalculation()
+      stopHealthFactorCalculation()
+      startHealthFactorCalculation()
       clearSnapShotIntervalCountDown()
       await setSnapShotIntervalCountDown()
     }
-  })
-
-  watch(priceObjectMap, () =>
-  {
-    calculateHealthFactorValues()
   })
 
   //Json string of wallet to detect object property changes
@@ -213,33 +224,22 @@
     let newWallet = JSON.parse(newJSONObjectString)
     let oldWallet= JSON.parse(oldJSONObjectString)
 
-    //Only want this running if the connected Wallet Address String is changing
-    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+    //Only want this running if the connected Wallet Address String is changing and modal is visible
+    if(!withdrawing.value ||
+    (newWallet.addressString == oldWallet.addressString &&
+    newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
       return
 
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-    
-    if(lendingUserTabAccountsHashMap.map)
-    {
-      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
-      adminAccounts.lendingCEOAddressString +
-      subMarketSelect.value.toString() +
-      connectedWallet.addressString +
-      accountSelect.value.toString())
-
-      if(lendingUserTabAccount)
-      {
-        const decimalAmount = tokenDecimalHashMap.get(selectedTokenMintAddress.toString())
-        userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-      }
-      else
-        userBalance.value = 0
-    }
-    else
-      userBalance.value = 0
-
     withdrawAmount.value = 0
-    calculateHealthFactorValues()
+
+    setInitialBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
+    clearSnapShotIntervalCountDown()
+    await setSnapShotIntervalCountDown()
   })
   
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
@@ -260,26 +260,29 @@
       !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
+        stopInterestCalculation()
+        stopHealthFactorCalculation()
         clearSnapShotIntervalCountDown()
-        clearPythAccountIntervalCountDown()
         withdrawing.value = false
         window.removeEventListener('click', handleClickOutside)
       }  
     }
   }
 
-  async function openWithdrawalModal(tokenMintAddress: string, fdr3SubMarkets: any[])
+  async function openWithdrawalModal(tokenMintAddress: string, subMarkets: any[])
   {
     window.addEventListener('click', handleClickOutside)
 
-    const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     tokenProgram = tokenInfo.tokenProgram
-
-    subMarketList.value = fdr3SubMarkets
+    
+    subMarketList.value = subMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
+    const subMarket = subMarketsHashMap.map.get(tokenMintAddress + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
+    subMarketFee = subMarket.feeOnInterestEarnedRate
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
     if(lendingUserAccountsHashMap.map)
@@ -289,34 +292,29 @@
         accountList.value = userAccountList
     }
 
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
-    adminAccounts.lendingCEOAddressString +
-    subMarketSelect.value.toString() +
-    connectedWallet.addressString +
-    accountSelect.value.toString())
-
-    if(lendingUserTabAccount)
-      userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-    else
-      userBalance.value = 0
-
     withdrawAmount.value = 0
     withdrawIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
-    tokenDecimalAmount.value = decimalAmount
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(selectedTokenMintAddress.toString()))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
+    tokenDecimalAmount = decimalAmount
     withdrawSVG.value = tokenSVG
     subMarketTokenName.value = tokenName
     withdrawing.value = true
 
-    calculateHealthFactorValues()
+    setInitialBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
+    clearSnapShotIntervalCountDown()
     await setSnapShotIntervalCountDown()
   }
   
   async function setSnapShotIntervalCountDown()
   {
     const allUserTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
-    const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
-    const currentBlockTimeStamp = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
+    const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
+    const currentBlockTimeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
     var oldestSnapShot = Number(allUserTabAccounts[0].interestChangeLastUpdatedTimeStamp)
 
     for(var i=0; i<allUserTabAccounts.length; i++)
@@ -353,15 +351,6 @@
     }
   }
 
-  function clearPythAccountIntervalCountDown()
-  {
-    if(pythAccountCountDownIntervalId != undefined)
-    {
-      clearInterval(pythAccountCountDownIntervalId)
-      pythAccountCountDownIntervalId = undefined
-    }
-  }
-
   function openTokenPopover(e: Event) 
   {
     event.value = e
@@ -383,17 +372,25 @@
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
-    clearSnapShotIntervalCountDown()
-    await setSnapShotIntervalCountDown()
   }
 
-  function updateValues(event: { value: number | null })
+  function setInitialBalance()
   {
-    withdrawAmount.value = event.value
-    calculateHealthFactorValues()
+    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+    adminAccounts.lendingCEOAddressString +
+    subMarketSelect.value.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    if(lendingUserTabAccount)
+      userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, tokenDecimalAmount))//Convert from fixed point notation to decimal
+    else
+      userBalance.value = 0
+
+    userOriginalBalance = userBalance.value
   }
 
-  function calculateHealthFactorValues()
+  function calculateHealthFactorValues(timeStamp: number)
   {
     if(!lendingUserTabAccountListHashMap.map || selectedTokenMintAddress.toString()==SYSTEM_PROGRAM_ADDRESS_STRING)
       return
@@ -408,9 +405,26 @@
       {
         const price = priceObjectMap.data[userTabAccounts[i].tokenMintAddress.toString()].usdPrice
         const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenMintAddress.toString())
+        const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString())
+        const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString() +
+        userTabAccounts[i].subMarketOwnerAddress.toString() +
+        userTabAccounts[i].subMarketIndex.toString())
 
-        calculatedAssetValue += Number(userTabAccounts[i].depositedAmount / Math.pow(10, decimalAmount)) * Number(price)
-        calculatedDebtValue += Number(userTabAccounts[i].borrowedAmount / Math.pow(10, decimalAmount)) * Number(price)
+        const userBalanceWithInterestEarned = calculateNewBalance(
+        tabTokenReserve,
+        subMarket,
+        Number(userTabAccounts[i].depositedAmount),
+        Number(userTabAccounts[i].supplyInterestChangeIndex),
+        timeStamp)
+
+        const userDebtWithInterestAccrued =  calculateNewDebtBalance(
+        tabTokenReserve,
+        Number(userTabAccounts[i].borrowedAmount),
+        Number(userTabAccounts[i].borrowInterestChangeIndex),
+        timeStamp)
+
+        calculatedAssetValue += Number(userBalanceWithInterestEarned / Math.pow(10, decimalAmount)) * Number(price)
+        calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
       }
     
     const priceOfSelectedToken = Number(priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice)
@@ -422,18 +436,132 @@
       const availableValueBeforeWithdraw = calculatedAssetValue - calculatedDebtValue / 0.7
       const availableToWithdrawAmount = availableValueBeforeWithdraw / priceOfSelectedToken
 
+      //The available value to withdraw might be higher than a specific token amount that the user has deposited if they have different tokens deposited.
       if(availableToWithdrawAmount >= userBalance.value)
         availableWithdrawalBalance.value = userBalance.value
       else
         availableWithdrawalBalance.value = availableToWithdrawAmount
     }
 
+    if(withdrawHalf.value)
+      withdrawAmount.value = availableWithdrawalBalance.value * 0.5
+    if(withdrawMax.value)
+    {
+      if(calculatedDebtValue == 0)
+      {
+        withdrawFullDepositedAmount = true
+        withdrawAmount.value = availableWithdrawalBalance.value
+      }
+      else
+      {
+        withdrawFullDepositedAmount = false
+        //Withdraw less to keep up with possible available amount countdown
+        const factor = 100_000
+        withdrawAmount.value = Math.floor(availableWithdrawalBalance.value * factor) / factor//Turn last 5 digits into zeros
+      }
+    }
+    else
+      withdrawFullDepositedAmount = false
+
     //Account for value that is about to be withdrawn
+    //Check for less than zero values when doing complete withdrawals, do the price possibly being slighly off
     calculatedAssetValue -= withdrawAmount.value * Number(priceOfSelectedToken)
+    if(calculatedAssetValue < 0)
+      calculatedAssetValue = 0
 
     totalAssetValue.value = calculatedAssetValue
     totalDebtValue.value = calculatedDebtValue
-    healthFactor.value = ((calculatedAssetValue - calculatedDebtValue) / calculatedAssetValue) * 100
+  }
+
+  function startInterestCalculation()
+  {
+    if(blockChainData.timeStamp == 0)
+      return
+
+    interestEarnedIntervalId = setInterval(() =>
+    {
+      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
+      calculateUserInterest()
+    }, 55)
+  }
+
+  function stopInterestCalculation()
+  {
+    if(interestEarnedIntervalId != undefined)
+    {
+      clearInterval(interestEarnedIntervalId)
+      interestEarnedIntervalId = undefined
+    }
+  }
+
+  function startHealthFactorCalculation()
+  {
+    if(blockChainData.timeStamp == 0)
+      return
+
+    healthFactorIntervalId = setInterval(() =>
+    {
+      calculateHealthFactorValues(blockChainData.timeStamp)
+    }, 55)
+  }
+
+  function stopHealthFactorCalculation()
+  {
+    if(healthFactorIntervalId != undefined)
+    {
+      clearInterval(healthFactorIntervalId)
+      healthFactorIntervalId = undefined
+    }
+  }
+  
+  function calculateTokenReserveInterestChangeIndex(timeStamp: number)
+  {
+    if(!tokenReserve)
+      return
+
+    //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
+    const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
+    const changeInTime = timeStamp - oldTime
+    const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
+
+    tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * changeInTime / SECONDS_IN_A_YEAR)
+  }
+
+  function calculateUserInterest()
+  {
+    if(!lendingUserTabAccount)
+      return
+
+    //For tab accounts initialized with no deposits, keeps from dividing by zero
+    //For example, can happen to when claiming submarket fees in different destination submarket on new initial tab account
+    if(Number(lendingUserTabAccount.supplyInterestChangeIndex) == 0)
+      lendingUserTabAccount.supplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex
+
+    //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
+    //Interest Earned Before Fee = New Balance Before Fee - Old Balance
+    //Interest Earned After Fee = Interest Earned Before Fee - (Interest Earned Before Fee * SubMarket Fee Rate)
+    //User New Balance After Fee = Old Balance + Interest Earned After Fee
+    //Calculate interest earned
+    const newBalanceBeforeFee = (userOriginalBalance * tokenReserve.newSupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
+    const interestEarnedBeforeFees = newBalanceBeforeFee - userOriginalBalance
+
+    var formulaSubMarketFee
+    var solvencyInsuranceFee
+    if(subMarketFee + tokenReserve.solvencyInsuranceFeeRate <= 100)
+    {
+      formulaSubMarketFee = subMarketFee
+      solvencyInsuranceFee = tokenReserve.solvencyInsuranceFeeRate
+    }
+    else
+    {
+      solvencyInsuranceFee = tokenReserve.solvencyInsuranceFeeRate
+      formulaSubMarketFee = 100 - tokenReserve.solvencyInsuranceFeeRate
+    }
+
+    var interestEarnedAfterFees = interestEarnedBeforeFees - (interestEarnedBeforeFees * formulaSubMarketFee / 100) - (interestEarnedBeforeFees * solvencyInsuranceFee / 100)
+    interestEarnedAfterFees = Number(interestEarnedAfterFees.toFixed(tokenDecimalAmount))
+
+    userBalance.value = userOriginalBalance + interestEarnedAfterFees
   }
 
   async function updateUserSnapShots()
@@ -473,7 +601,7 @@
 
     for(var i=0; i<remainingTabAccounts.length; i++)
     {
-      const tokenInfo = tokenReserveHashMap.get(remainingTabAccounts[i].tokenMintAddress)
+      const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
       pythIdArray.push(tokenInfo.pythId)
     }
 
@@ -520,8 +648,8 @@
               adminAccounts.lendingCEOAddressKey,
               subMarketSelect.value,
               accountSelect.value,
-              new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount.value)), //convert to fixedpoint notation
-              withdrawMax.value
+              new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount)), //convert to fixedpoint notation
+              withdrawFullDepositedAmount
             )
             .accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram })
             .remainingAccounts(remainingAccounts)
@@ -545,6 +673,8 @@
       else
         await confirmLendingTransaction(tx, toast, "withdraw_tokens")
 
+      stopInterestCalculation()
+      stopHealthFactorCalculation()
       clearSnapShotIntervalCountDown()
       withdrawing.value = false
       withdrawMax.value = false
@@ -560,29 +690,18 @@
     }
   }
 
-  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
+  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, subMarketIndex: string)
   {
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenMintAddress +
-    adminAccounts.lendingCEOAddressString +
-    mainSubMarketIndex +
-    connectedWallet.addressString +
-    accountSelect.value.toString())
-
-    if(lendingUserTabAccount)
-    {
-      const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-
-      if(lendingUserTabAccount)
-        userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-      else
-        userBalance.value = 0
-    }
-    else
-      userBalance.value = 0
-
     withdrawAmount.value = 0
-    calculateHealthFactorValues()
-    localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
+    localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", subMarketIndex)
+    const subMarket = subMarketsHashMap.map.get(tokenMintAddress + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
+    subMarketFee = subMarket.feeOnInterestEarnedRate
+
+    setInitialBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
   }
 
   defineExpose(

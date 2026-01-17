@@ -55,7 +55,10 @@
           </Select>
 
           <div v-if="ownerAddress==connectedWallet.addressString">
-            <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption)"><ion-label color="dark">Deposit</ion-label></ion-button>
+            <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+            $emit('openDepositModal', tokenMintAddress, subMarketSelectOption)">
+              <ion-label color="dark">Deposit</ion-label>
+            </ion-button>
             <ion-button v-else fill="clear" @click="openHActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
             <ion-popover
             :is-open="hActionsPopoverOpen" 
@@ -64,16 +67,20 @@
             side="top" 
             alignment="center"
             >
-              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+              <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+              $emit('openDepositModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
               </ion-button>
-              <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+              <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+              $emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
               </ion-button>
-              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+              <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+              $emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
               </ion-button>
-              <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+              <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+              $emit('openRepayModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Repay</ion-label>
               </ion-button>
             </ion-popover>
@@ -358,8 +365,9 @@
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
-  import { tokenReservesHashMap, tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(
@@ -375,8 +383,7 @@
     'subMarketFee',
     'userTabIndex',
     'chartData',
-    'selectedYear',
-    'blockChainTimeStamp'
+    'selectedYear'
   ])
 
   const emits = defineEmits(['interestEarned', 'changeYear', 'openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal'])
@@ -386,7 +393,7 @@
   var legenHiddenArray = ref([false, false, false])
   var chartTextColor = ref(darkTheme.value ? "#ffffff" : "#000000")
   var animationIntervalId: any
-  var interestEarnedIntervalId: any
+  var interestChangeIntervalId: any
 
   var tokenPopoverOpen = ref(false)
   var hActionsPopoverOpen = ref(false)
@@ -405,7 +412,7 @@
   var tokenReserve: any
   var decimalAmount: number
   var lendingUserTabAccount: any
-  var userOriginalBalance = ref()
+  var userOriginalBalance = 0
   var userCalculatedBalance = ref()
   var balanceValueString = ref()
   var userOriginalInterestEarned = ref()
@@ -435,7 +442,7 @@
 
     if(lendingUserTabAccountsHashMap.map && props.tokenMintAddress && (props.accountIndex != undefined))
     {
-      const tokenInfo = tokenReserveHashMap.get(props.tokenMintAddress)
+      const tokenInfo = tokenReserveFontEndInfoHashMap.get(props.tokenMintAddress)
       tokenName.value = tokenInfo.name
       tokenSVG.value = tokenInfo.svg
 
@@ -445,16 +452,17 @@
       props.ownerAddress +
       props.accountIndex.toString())
 
-      userOriginalBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
+      userOriginalBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
       userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
       userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
 
       yearList.value = getYearList()
 
-      if(props.blockChainTimeStamp != 0)
-        startInterestCalculation(props.blockChainTimeStamp)
+      if(blockChainData.timeStamp != 0)
+        startInterestCalculation()
     }
 
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenMintAddress))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers 
     const subMarket = subMarketsHashMap.map.get(props.tokenMintAddress + props.subMarketOwnerAddress + props.subMarketIndex)
     const option = 
     {
@@ -485,7 +493,7 @@
     props.ownerAddress +
     props.accountIndex.toString())
 
-    userOriginalBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+    userOriginalBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
 
@@ -511,18 +519,12 @@
     props.ownerAddress +
     props.accountIndex.toString()))
 
-    userOriginalBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+    userOriginalBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
 
     yearList.value = getYearList()
     yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
-  }))
-
-  watch(() => [props.blockChainTimeStamp], (() => 
-  {
-    stopInterestCalculation()
-    startInterestCalculation(props.blockChainTimeStamp)
   }))
 
   function getYearList()
@@ -728,8 +730,6 @@
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)
   {
     //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
-    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenMintAddress))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers 
-
     const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
     const changeInTime = timeStamp - oldTime
     const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
@@ -756,8 +756,8 @@
     //Interest Earned After Fee = Interest Earned Before Fee - (Interest Earned Before Fee * SubMarket Fee Rate)
     //User New Balance After Fee = Old Balance + Interest Earned After Fee
     //Calculate interest earned
-    const newBalanceBeforeFee = (userOriginalBalance.value * tokenReserve.newSupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
-    const interestEarnedBeforeFees = newBalanceBeforeFee - userOriginalBalance.value
+    const newBalanceBeforeFee = (userOriginalBalance * tokenReserve.newSupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
+    const interestEarnedBeforeFees = newBalanceBeforeFee - userOriginalBalance
 
     var subMarketFee
     var solvencyInsuranceFee
@@ -775,7 +775,7 @@
     var interestEarnedAfterFees = interestEarnedBeforeFees - (interestEarnedBeforeFees * subMarketFee / 100) - (interestEarnedBeforeFees * solvencyInsuranceFee / 100)
     interestEarnedAfterFees = Number(interestEarnedAfterFees.toFixed(decimalAmount))
 
-    userCalculatedBalance.value = (userOriginalBalance.value + interestEarnedAfterFees).toFixed(decimalAmount)
+    userCalculatedBalance.value = (userOriginalBalance + interestEarnedAfterFees).toFixed(decimalAmount)
     calculatedUserInterestEarned.value = (interestEarnedAfterFees + userOriginalInterestEarned.value).toFixed(decimalAmount)
 
     //User New Debt = Old Debt * Token Reserve Accrued Interest Index / User Accrued Interest Index
@@ -784,8 +784,8 @@
     userCalculatedDebt.value = newDebt.toFixed(decimalAmount)
 
     //Calculate 7 day interest earned
-    const sevenDayUserCalculatedBalanceBeforeFee = (userOriginalBalance.value * tokenReserve.sevenDaySupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
-    const sevenDayInterestEarnedBeforeFee = sevenDayUserCalculatedBalanceBeforeFee - userOriginalBalance.value
+    const sevenDayUserCalculatedBalanceBeforeFee = (userOriginalBalance * tokenReserve.sevenDaySupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
+    const sevenDayInterestEarnedBeforeFee = sevenDayUserCalculatedBalanceBeforeFee - userOriginalBalance
 
     sevenDayCalculatedUserInterestEarned.value = (sevenDayInterestEarnedBeforeFee - (sevenDayInterestEarnedBeforeFee * props.subMarketFee / 100)).toFixed(decimalAmount)
 
@@ -828,24 +828,27 @@
     Number(interestEarnedValueString.value))
   }
 
-  function startInterestCalculation(initialTimeStamp: number)
+  function startInterestCalculation()
   {
-    var timeStamp = initialTimeStamp
-    interestEarnedIntervalId = setInterval(() =>
+    interestChangeIntervalId = setInterval(() =>
     {
-      calculateTokenReserveInterestChangeIndex(timeStamp)
+      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
       calculateUserInterest()
-      timeStamp += 55/1000//convert milliseconds into seconds
     }, 55)
   }
 
   function stopInterestCalculation()
   {
-    if(interestEarnedIntervalId != undefined)
+    if(interestChangeIntervalId != undefined)
     {
-      clearInterval(interestEarnedIntervalId)
-      interestEarnedIntervalId = undefined
+      clearInterval(interestChangeIntervalId)
+      interestChangeIntervalId = undefined
     }
+  }
+
+  function updateStoredSelectedSubMarketIndex()
+  {
+    localStorage.setItem(props.tokenMintAddress + "selectedMainSubMarketIndex", props.subMarketIndex)
   }
 </script>
 

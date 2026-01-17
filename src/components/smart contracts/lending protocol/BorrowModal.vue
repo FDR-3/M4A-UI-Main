@@ -50,7 +50,6 @@
       <HealthFactorSmall :assetValue="totalAssetValue" :debtValue="totalDebtValue"/>
     </div>
 
-
     <ion-label>Available</ion-label>
     <div class="flexCenterRow">
       <ion-label class="alignSelfLeft">Amount: {{ availableToBorrowAmount.toFixed(tokenDecimalAmount) }}</ion-label>
@@ -65,15 +64,15 @@
       :step="borrowIncrementAmount"
       showButtons
       fluid
-      @input="updateValues"
-      @update:model-value="calculateHealthFactorValues()"
+      @input="(event: { value: any }) => borrowAmount = event.value"
+      @focus="borrowMax=false; borrowHalf=false"
     />
     <div class="alignSelfLeft">
-      <button style="background-color: transparent" @click="borrowAmount=availableToBorrowAmount; calculateHealthFactorValues()">
+      <button style="background-color: transparent" @click="borrowHalf=false; borrowMax=true">
         <ion-label color="dark">Max</ion-label>
       </button>
 
-      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="borrowAmount=availableToBorrowAmount*0.5; calculateHealthFactorValues()">
+      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="borrowMax=false; borrowHalf=true;">
         <ion-label color="dark">Half</ion-label>
       </button>
     </div>
@@ -102,7 +101,6 @@
       color="dark"
       @click="updateUserSnapShots()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="healthFactor<30"
     >
       Update SnapShots
     </ion-button>
@@ -113,7 +111,7 @@
       color="dark"
       @click="borrowTokens()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="borrowAmount==0 || snapShotValidCountDown==0 || healthFactor<30"
+      :disabled="borrowAmount==0 || snapShotValidCountDown==0"
     >
       Borrow
     </ion-button>
@@ -133,7 +131,8 @@
     copyTokenMintAddressText,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenReserveHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
     lendingUserTabAccountListHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
@@ -143,6 +142,8 @@
   import * as anchor from "@coral-xyz/anchor"
   import InfoButton from '/src/components/help/InfoButton.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
@@ -155,12 +156,15 @@
   var borrowIncrementAmount = ref()
   var borrowing = ref(false)
   var borrowSVG = ref()
+  var borrowMax = ref(false)
+  var borrowHalf = ref(false)
   var subMarketTokenName = ref()
   var availableToBorrowAmount = ref(0)
   var availableToBorrowValue = ref("$0.00")
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
+  var healthFactorIntervalId: any
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -170,11 +174,9 @@
 
   var snapShotValidCountDown = ref(0)
   var snapShotCountDownIntervalId: any
-  var pythAccountCountDownIntervalId: any
 
-  var totalAssetValue = ref()
-  var totalDebtValue = ref()
-  var healthFactor = ref()
+  var totalAssetValue = ref(0)
+  var totalDebtValue = ref(0)
   var modalRef = ref()
 
   var borrowValue = computed ( () =>
@@ -192,16 +194,13 @@
 
   watch(lendingUserTabAccountListHashMap, async() =>
   {
-    if(borrowing.value)//Don't start another count down if on anothert modal since the withdrawal modal is still mounted even when not visible
+    if(borrowing.value)//Don't start another count down if on another modal since the withdrawal modal is still mounted even when not visible
     {
+      stopHealthFactorCalculation()
+      startHealthFactorCalculation()
       clearSnapShotIntervalCountDown()
       await setSnapShotIntervalCountDown()
     }
-  })
-
-  watch(priceObjectMap, () =>
-  {
-    calculateHealthFactorValues()
   })
 
   //Json string of wallet to detect object property changes
@@ -215,14 +214,19 @@
     let newWallet = JSON.parse(newJSONObjectString)
     let oldWallet= JSON.parse(oldJSONObjectString)
 
-    //Only want this running if the connected Wallet Address String is changing
-    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+    //Only want this running if the connected Wallet Address String is changing and modal is visible
+    if(!borrowing.value ||
+    (newWallet.addressString == oldWallet.addressString &&
+    newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
       return
 
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-    calculateHealthFactorValues()
-
+    
     borrowAmount.value = 0
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
+    clearSnapShotIntervalCountDown()
+    await setSnapShotIntervalCountDown()
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
@@ -243,25 +247,25 @@
       !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
+        stopHealthFactorCalculation()
         clearSnapShotIntervalCountDown()
-        clearPythAccountIntervalCountDown()
         borrowing.value = false
         window.removeEventListener('click', handleClickOutside)
       }  
     }
   }
 
-  async function openBorrowModal(tokenMintAddress: string, fdr3SubMarkets: any[])
+  async function openBorrowModal(tokenMintAddress: string, subMarkets: any[])
   {
     window.addEventListener('click', handleClickOutside)
     
-    const tokenInfo = tokenReserveHashMap.get(tokenMintAddress)
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     tokenProgram = tokenInfo.tokenProgram
 
-    subMarketList.value = fdr3SubMarkets
+    subMarketList.value = subMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
@@ -280,15 +284,16 @@
     subMarketTokenName.value = tokenName
     borrowing.value = true
 
-    calculateHealthFactorValues()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
     await setSnapShotIntervalCountDown()
   }
 
   async function setSnapShotIntervalCountDown()
   {
     const allUserTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
-    const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot();
-    const currentBlockTimeStamp = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot);
+    const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
+    const currentBlockTimeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
     var oldestSnapShot = Number(allUserTabAccounts[0].interestChangeLastUpdatedTimeStamp)
 
     for(var i=0; i<allUserTabAccounts.length; i++)
@@ -325,15 +330,6 @@
     }
   }
 
-  function clearPythAccountIntervalCountDown()
-  {
-    if(pythAccountCountDownIntervalId != undefined)
-    {
-      clearInterval(pythAccountCountDownIntervalId)
-      pythAccountCountDownIntervalId = undefined
-    }
-  }
-
   function openTokenPopover(e: Event) 
   {
     event.value = e
@@ -355,17 +351,9 @@
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
-    clearSnapShotIntervalCountDown()
-    await setSnapShotIntervalCountDown()  
   }
 
-  function updateValues(event: { value: number | null })
-  {
-    borrowAmount.value = event.value
-    calculateHealthFactorValues()
-  }
-
-  function calculateHealthFactorValues()
+  function calculateHealthFactorValues(timeStamp: number)
   {
     if(!lendingUserTabAccountListHashMap.map || selectedTokenMintAddress.toString()==SYSTEM_PROGRAM_ADDRESS_STRING)
       return
@@ -381,9 +369,26 @@
       {
         const price = priceObjectMap.data[userTabAccounts[i].tokenMintAddress.toString()].usdPrice
         const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenMintAddress.toString())
+        const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString())
+        const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString() +
+        userTabAccounts[i].subMarketOwnerAddress.toString() +
+        userTabAccounts[i].subMarketIndex.toString())
 
-        calculatedAssetValue += Number(userTabAccounts[i].depositedAmount / Math.pow(10, decimalAmount)) * Number(price)
-        calculatedDebtValue += Number(userTabAccounts[i].borrowedAmount / Math.pow(10, decimalAmount)) * Number(price)
+        const userBalanceWithInterestEarned = calculateNewBalance(
+        tabTokenReserve,
+        subMarket,
+        Number(userTabAccounts[i].depositedAmount),
+        Number(userTabAccounts[i].supplyInterestChangeIndex),
+        timeStamp)
+
+        const userDebtWithInterestAccrued =  calculateNewDebtBalance(
+        tabTokenReserve,
+        Number(userTabAccounts[i].borrowedAmount),
+        Number(userTabAccounts[i].borrowInterestChangeIndex),
+        timeStamp)
+
+        calculatedAssetValue += Number(userBalanceWithInterestEarned / Math.pow(10, decimalAmount)) * Number(price)
+        calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
       }
     
     const availableValueBeforeBorrow = calculatedAssetValue * 0.7 - calculatedDebtValue
@@ -397,9 +402,36 @@
     //Account for value that is about to be borrowed
     calculatedDebtValue += borrowAmount.value * Number(priceOfSelectedToken)
 
+    if(borrowHalf.value)
+      borrowAmount.value = availableToBorrowAmount.value * 0.5
+    if(borrowMax.value)
+    {
+      const factor = 100_000
+      borrowAmount.value = Math.floor(availableToBorrowAmount.value * factor) / factor//Turn last 5 digits into zeros
+    }
+
     totalAssetValue.value = calculatedAssetValue
     totalDebtValue.value = calculatedDebtValue
-    healthFactor.value = ((calculatedAssetValue - calculatedDebtValue)/calculatedAssetValue) * 100
+  }
+
+  function startHealthFactorCalculation()
+  {
+    if(blockChainData.timeStamp == 0)
+      return
+
+    healthFactorIntervalId = setInterval(() =>
+    {
+      calculateHealthFactorValues(blockChainData.timeStamp)
+    }, 55)
+  }
+
+  function stopHealthFactorCalculation()
+  {
+    if(healthFactorIntervalId != undefined)
+    {
+      clearInterval(healthFactorIntervalId)
+      healthFactorIntervalId = undefined
+    }
   }
 
   async function updateUserSnapShots()
@@ -439,7 +471,7 @@
 
     for(var i=0; i<remainingTabAccounts.length; i++)
     {
-      const tokenInfo = tokenReserveHashMap.get(remainingTabAccounts[i].tokenMintAddress)
+      const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
       pythIdArray.push(tokenInfo.pythId)
     }
 
@@ -510,6 +542,7 @@
       else
         await confirmLendingTransaction(tx, toast, "borrow_tokens")
 
+      stopHealthFactorCalculation()
       clearSnapShotIntervalCountDown()
       borrowing.value = false
     }
