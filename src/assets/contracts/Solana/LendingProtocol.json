@@ -5176,8 +5176,8 @@
                 "path": "sub_market_index"
               },
               {
-                "kind": "account",
-                "path": "signer"
+                "kind": "arg",
+                "path": "user_account_owner_address"
               },
               {
                 "kind": "arg",
@@ -5916,63 +5916,63 @@
   "errors": [
     {
       "code": 6000,
-      "name": "InvalidSubMarketFeeRate",
-      "msg": "The submarket fee on interest earned rate can't be greater than 100%"
+      "name": "InsufficientFunds",
+      "msg": "You can't withdraw more funds than you've deposited"
     },
     {
       "code": 6001,
-      "name": "InvalidSolvencyInsuranceFeeRate",
-      "msg": "The solvency insurance fee on interest earned rate can't be greater than 100%"
+      "name": "InsufficientLiquidity",
+      "msg": "Not enough liquidity in the Token Reserve for this withdraw or borrow"
     },
     {
       "code": 6002,
-      "name": "IncorrectNumberOfTabAccounts",
-      "msg": "You must provide all of the sub user's tab accounts"
+      "name": "TooManyFunds",
+      "msg": "You can't pay back more funds than you've borrowed"
     },
     {
       "code": 6003,
-      "name": "IncorrectNumberOfTabAndPythPriceUpdateAccounts",
-      "msg": "You must provide all of the sub user's tab accounts and Pyth price update accounts"
+      "name": "StalePriceData",
+      "msg": "The price data was stale"
     },
     {
       "code": 6004,
-      "name": "IncorrectOrderOfTabAccounts",
-      "msg": "You must provide the sub user's tab accounts ordered by user_tab_account_index"
+      "name": "StaleSnapShotData",
+      "msg": "The Lending User Snap Shot data was stale"
     },
     {
       "code": 6005,
-      "name": "UnexpectedTabAccount",
-      "msg": "Unexpected Tab Account PDA detected. Feed in only legitimate PDA's ordered by user_tab_account_index"
+      "name": "LiquidationExposure",
+      "msg": "You can't withdraw or borrow an amount that would cause your borrow liabilities to exceed 70% of deposited collateral"
     },
     {
       "code": 6006,
-      "name": "UnexpectedPythPriceUpdateAccount",
-      "msg": "Unexpected Pyth Price Update Account detected. Feed in only legitimate accounts :)"
+      "name": "NotLiquidatable",
+      "msg": "You can't liquidate an account whose borrow liabilities aren't 80% or more of their deposited collateral"
     },
     {
       "code": 6007,
-      "name": "UnexpectedTokenReserveAccount",
-      "msg": "Unexpected Token Reserve Account PDA detected"
+      "name": "OverLiquidation",
+      "msg": "You can't repay more than 50% of a liquidati's debt position"
     },
     {
       "code": 6008,
-      "name": "UnexpectedSubMarketAccount",
-      "msg": "Unexpected SubMarket Account PDA detected"
+      "name": "NotInsolvent",
+      "msg": "You can't zero out an account whose borrow liabilities aren't 100% or more of their deposited collateral"
     },
     {
       "code": 6009,
-      "name": "UnexpectedMonthlyStatementAccount",
-      "msg": "Unexpected Monthly Statement Account PDA detected"
+      "name": "DuplicateSubMarket",
+      "msg": "Duplicate SubMarket Detected"
     },
     {
       "code": 6010,
-      "name": "LendingUserAccountNameTooLong",
-      "msg": "Lending User Account name can't be longer than 25 characters"
+      "name": "NegativePriceDetected",
+      "msg": "Negative Price Detected"
     },
     {
       "code": 6011,
-      "name": "GlobalLimitExceeded",
-      "msg": "You can't deposit more than the global limit"
+      "name": "OraclePriceTooUnstable",
+      "msg": "Oracle Price Too Unstable"
     }
   ],
   "types": [

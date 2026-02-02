@@ -452,6 +452,7 @@
     startTabCalculation()
     stopHealthFactorCalculation()
     startHealthFactorCalculation()
+    clearSnapShotIntervalCountDown()
     await setSnapShotIntervalCountDown()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     
@@ -882,7 +883,7 @@
   async function updateUserSnapShots()
   {
     const lendingUserTabAccounts = lendingUserTabAccountListHashMap.map.get(liquidatiAddress.toString() + liquidatiAccountIndex.toString())
-    const transaction = new Transaction();
+    const transaction = new Transaction()
 
     try
     {

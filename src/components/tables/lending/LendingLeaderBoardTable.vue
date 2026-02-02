@@ -171,7 +171,7 @@
                   <ion-button class="fullWidthButton thinBorder" fill="clear" @click="openSelectedPortfolio()">
                     <ion-label color="green">View</ion-label>
                   </ion-button>
-                  <ion-button class="fullWidthButton thinBorder lendingActionButton" fill="clear" @click="$emit('openLiquidationModal', event.owner, event.accountIndex)" :disabled="false">
+                  <ion-button class="fullWidthButton thinBorder lendingActionButton" fill="clear" @click="$emit('openLiquidationModal', event.owner, event.accountIndex)" :disabled="event.healthFactor > 0">
                     <ion-label color="red" class="noClickEvent">Liquidate</ion-label>
                   </ion-button>
                 </div>
@@ -551,7 +551,11 @@
             var healthFactor
 
             if(depositedValue != 0)
+            {
               healthFactor = ((depositedValue * 0.8 - borrowedValue)/(depositedValue * 0.8)) * 100
+              if(healthFactor < 0)
+                healthFactor = 0
+            }
             else if(borrowedValue == 0)
               healthFactor = 100
             else
@@ -566,7 +570,11 @@
               currentAccountHealthFactor.borrowValue = newBorrowedValue
 
               if(newDepositedValue != 0)
+              {
                 currentAccountHealthFactor.healthFactor = ((newDepositedValue * 0.8 - newBorrowedValue)/(newDepositedValue * 0.8)) * 100
+                if(currentAccountHealthFactor.healthFactor < 0)
+                  currentAccountHealthFactor.healthFactor = 0
+              }
               else if(newBorrowedValue == 0)
                 currentAccountHealthFactor.healthFactor = 100
               else
@@ -911,6 +919,7 @@
     event.value = e
     event.value.owner = rowData.owner
     event.value.accountIndex = rowData.accountIndex
+    event.value.healthFactor = rowData.healthFactor
 
     const healthFactor = healthFactorHashMap.get(rowData.owner + rowData.accountIndex)
     if(healthFactor)

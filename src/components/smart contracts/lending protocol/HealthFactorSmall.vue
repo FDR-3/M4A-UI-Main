@@ -30,11 +30,13 @@
   {
     assetValue:
     {
-      type: Number
+      type: Number,
+      default: 0
     },
     debtValue:
     {
-      type: Number
+      type: Number,
+      default: 0
     },
     openSide:
     {
@@ -68,7 +70,11 @@
           maximumFractionDigits: 2 })
     
     if(props.assetValue != 0)
+    {
       healthFactor.value = ((((props.assetValue * 0.8) - props.debtValue)/(props.assetValue * 0.8)) * 100).toFixed(2)
+      if(Number(healthFactor.value) < 0)
+        healthFactor.value = (0).toFixed(2)
+    }
     else if(props.debtValue == 0)
       healthFactor.value = (100).toFixed(2)
     else

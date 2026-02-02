@@ -286,6 +286,7 @@
 
     stopHealthFactorCalculation()
     startHealthFactorCalculation()
+    clearSnapShotIntervalCountDown()
     await setSnapShotIntervalCountDown()
   }
 
@@ -436,7 +437,7 @@
   async function updateUserSnapShots()
   {
     const lendingUserTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
-    const transaction = new Transaction();
+    const transaction = new Transaction()
 
     try
     {
