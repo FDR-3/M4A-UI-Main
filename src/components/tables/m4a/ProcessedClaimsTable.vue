@@ -1,5 +1,11 @@
 <template>
-  <h1>Processed Claims</h1>
+  <div class="flexCenterRow">
+    <div class="smallMarginBottom">
+      <InfoButton :infoMessage="processedClaimsTableInfoMSG"/>
+    </div>
+    <h1 class="nMediumSmallMarginLeft">Processed Claims</h1>
+  </div>
+
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>
   <h2 class="statSpacing">Total Approved Claims: {{ protocolApprovedClaimCount }}</h2>
   <h2 class="statSpacing">Total Denied Claims: {{ protocolDeniedClaimCount }}</h2>
@@ -292,6 +298,7 @@
   import { trimAddress, copyAddress, copyFullAddressText, confirmM4ATransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   defineEmits(['toggleClaimQueueTable', 'toggleHospitalTable', 'toggleInsuranceCompanyTable', 'toggleProcessedClaimsTable'])
   
@@ -322,6 +329,8 @@
   var event = ref()
 
   var copyFullAddressButtonText = ref(copyFullAddressText)
+
+  const processedClaimsTableInfoMSG = "\nYou can view Submitter,\nHospital, and Insurance\nCompany info by\nclicking on their names\n\n You can also view the\nclaim note by clicking on\nthe ailment"
 
   onMounted(() =>
   {

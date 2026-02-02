@@ -26,7 +26,13 @@
     >
       <template #header>
         <div>
-          <h1>{{stateName}} Hospital List</h1>
+          <div class="flexCenterRow">
+            <div style="margin-bottom: 8px">
+              <InfoButton :infoMessage="stateHospitalTableInfoMSG"/>
+            </div>
+            <h1 class="nMediumSmallMarginLeft">{{stateName}} Hospital List</h1>
+          </div>
+          
           <div class="flexCenterRowWidth" style="gap: 100px">
             <div class="stateStatsContainer">
               <h2 class="flexCenterRow statSpacingTop">State Total Hospitals: {{ stateTotalHospitalCount }}</h2>
@@ -148,6 +154,7 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { givePokemonCenterCreatorCredit } from '/src/assets/helperFunctions/credits.ts'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   defineProps(
   [
@@ -175,6 +182,8 @@
   const tableDownload = ref()
   var hospitalPopoverOpen = ref(false)
   var event = ref()
+
+  const stateHospitalTableInfoMSG = "\nYou can view Hospital\nRecords by clicking on\ntheir names in the table\n\n"
 
   function openHospitalPopover(e: Event, rowData: any)
   {

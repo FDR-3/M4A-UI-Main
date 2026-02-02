@@ -47,7 +47,8 @@
     "solana-wallets-vue": "^0.6.1",
     "vidstack": "^1.11.30",
     "vue": "^3.5.6",
-    "vue-router": "^4.4.3"
+    "vue-router": "^4.4.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@capacitor/cli": "6.1.1",

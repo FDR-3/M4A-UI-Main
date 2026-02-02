@@ -143,24 +143,38 @@
           {{ slotProps.data.liquidatedValueString }}
         </template>
       </Column>
+      <Column field="liquidatableColorStep" header="Liquidatable" style="width: 0%; color: red" sortable>
+        <template #body="slotProps">
+          <ion-text :color="slotProps.data.liquidatable ? 'red' : slotProps.data.healthFactorCaution ? 'yellow' : 'green'">
+            {{ slotProps.data.liquidatable }}
+          </ion-text>
+        </template>
+      </Column>
       <template #expansion="slotProps">
         <DataTable id="lendingLeaderBoardInnerTable" :value="slotProps.data.accountListWithLastestMonthlyStatement" style="font-size: 5px">
           <Column field="accountName" header="Account" style="width: 0%" sortable>
             <template #body="slotProps">
               <ion-button fill="clear" @click="openViewPortfolioPopover($event, slotProps.data)">
-                <ion-label color="dark" class="noWrapText nMediumSmallMarginLeft" style="font-size: 11px">{{ slotProps.data.accountName }}</ion-label>
+                <ion-label :color="slotProps.data.healthFactor>=70 ? 'green' : slotProps.data.healthFactor>=30 ? 'yellow' : 'red'"
+                class="noWrapText nMediumSmallMarginLeft" style="font-size: 11px">{{ slotProps.data.accountName }}</ion-label>
               </ion-button>
               <ion-popover
+              class="popoverWidth"
               :is-open="viewPortfolioPopoverOpen" 
               :event="event" 
               @didDismiss="viewPortfolioPopoverOpen=false"
               side="top" 
-              size="cover"
               alignment="center"
               >
-                <ion-button class="copyAddressButton thinBorder" fill="clear" @click="openSelectedPortfolio()" @mouseleave="closeViewPortfolioPopover($event)">
-                  <ion-label color="green">View</ion-label>
-                </ion-button>
+                <div class="flexCenterColumn" style="margin: 20px" @mouseleave="closeViewPortfolioPopover($event)">
+                  <HealthFactorSmall :assetValue="healthFactorPopUpDepositedValue" :debtValue="healthFactorPopUpBorrowedValue"/>
+                  <ion-button class="fullWidthButton thinBorder" fill="clear" @click="openSelectedPortfolio()">
+                    <ion-label color="green">View</ion-label>
+                  </ion-button>
+                  <ion-button class="fullWidthButton thinBorder lendingActionButton" fill="clear" @click="$emit('openLiquidationModal', event.owner, event.accountIndex)" :disabled="false">
+                    <ion-label color="red" class="noClickEvent">Liquidate</ion-label>
+                  </ion-button>
+                </div>
               </ion-popover>
             </template>
           </Column>
@@ -300,13 +314,28 @@
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
+  import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const emits = defineEmits(['viewPortfolio', 'totalLeaderBoardLendingUsers', 'setLeaderBoardSubTableAndSubRowCount', 'adjustLeaderBoardSubTableAndSubRowCount'])
+  const emits = defineEmits(
+  [
+    'viewPortfolio',
+    'totalLeaderBoardLendingUsers',
+    'setLeaderBoardSubTableAndSubRowCount',
+    'adjustLeaderBoardSubTableAndSubRowCount',
+    'openLiquidationModal'
+  ])
 
   const colorHexValue = inject('colorHexValue') as string
   
+  type HealthFactor = 
+  {
+    depositValue: number,
+    borrowValue: number,
+    healthFactor: number
+  }
+
   var tableRef = ref()
   var tableData = ref()
   var subTableData = ref()
@@ -316,13 +345,15 @@
   var sortOrder = ref(-1)
   var totalNumberOfTopRows = 0
   var totalNumberOfSubRows = 0
+  var healthFactorHashMap: Map<string, HealthFactor>
   var tokenReservesHashMapCopy: Map<string, any>
-  var blockChainTimeStamp = 0
   var timeStampIntervalId: any
 
-  const lendingLeaderBoardInfoMSG = "\nYou can copy a User's\naddress by clicking on\nthem.\nYou can view an Account by\nclicking on them.\n\n"
+  const lendingLeaderBoardInfoMSG = "\nYou can copy a User's\naddress by clicking on\nthem.\nYou can view or liquidate\nan Account by clicking \non them.\n\n"
 
   var event = ref()
+  var healthFactorPopUpDepositedValue = ref(0)
+  var healthFactorPopUpBorrowedValue = ref(0)
   var viewPortfolioPopoverOpen = ref(false)
   var ownerPopoverOpen = ref(false)
   var copyFullAddressButtonText = ref(copyFullAddressText)
@@ -412,18 +443,22 @@
     {
       var topRowCount = 0
       var subRowCount = 0
+      var tempHealthFactorHashMap = new Map<string, HealthFactor>()
 
       calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
 
       for(var i=0; i<tempData.length; i++)
       {
-        var userAccountInterestEarnedTotalValue = 0
-        var userAccountInterestAccruedTotalValue = 0
-        var userAccountDepositedTotalValue = 0
-        var userAccountBorrowedTotalValue = 0
-        var userAccountRepaidTotalValue = 0
-        var userAccountLiquidatorTotalValue = 0
-        var userAccountLiquidatedTotalValue = 0
+        var ownerOverallAccountInterestEarnedTotalValue = 0
+        var ownerOverallAccountInterestAccruedTotalValue = 0
+        var ownerOverallAccountDepositedTotalValue = 0
+        var ownerOverallAccountBorrowedTotalValue = 0
+        var ownerOverallAccountRepaidTotalValue = 0
+        var ownerOverallAccountLiquidatorTotalValue = 0
+        var ownerOverallAccountLiquidatedTotalValue = 0
+        tempData[i].healthFactorCaution = false
+        tempData[i].liquidatable = false
+        tempData[i].liquidatableColorStep = 0
         topRowCount += 1
 
         for(var j=0; j<tempData[i].accountListWithLastestMonthlyStatement.length; j++)
@@ -448,7 +483,7 @@
             tempData[i].accountListWithLastestMonthlyStatement[j].interestEarnedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            userAccountInterestEarnedTotalValue += calculatedValue
+            ownerOverallAccountInterestEarnedTotalValue += calculatedValue
 
             const newInterestAccruedAmount = calculateUserNewInterestAccruedAmount(tempData[i].accountListWithLastestMonthlyStatement[j])
             tempData[i].accountListWithLastestMonthlyStatement[j].newInterestAccruedAmount = Number((tempData[i].accountListWithLastestMonthlyStatement[j].interestAccruedAmount +
@@ -460,7 +495,7 @@
             tempData[i].accountListWithLastestMonthlyStatement[j].interestAccruedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            userAccountInterestAccruedTotalValue += calculatedValue
+            ownerOverallAccountInterestAccruedTotalValue += calculatedValue
 
             tempData[i].accountListWithLastestMonthlyStatement[j].newDepositedAmount = Number((tempData[i].accountListWithLastestMonthlyStatement[j].depositedAmount +
             newInterestEarnedAmount).toFixed(decimalAmount))
@@ -471,7 +506,7 @@
             tempData[i].accountListWithLastestMonthlyStatement[j].depositedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            userAccountDepositedTotalValue += calculatedValue
+            ownerOverallAccountDepositedTotalValue += calculatedValue
 
             tempData[i].accountListWithLastestMonthlyStatement[j].newBorrowedAmount = Number((tempData[i].accountListWithLastestMonthlyStatement[j].borrowedAmount +
             newInterestAccruedAmount).toFixed(decimalAmount))
@@ -482,7 +517,7 @@
             tempData[i].accountListWithLastestMonthlyStatement[j].borrowedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            userAccountBorrowedTotalValue += calculatedValue
+            ownerOverallAccountBorrowedTotalValue += calculatedValue
 
             //Calculate Repaid Value
             calculatedValue = tempData[i].accountListWithLastestMonthlyStatement[j].repaidAmount * priceData.usdPrice
@@ -490,7 +525,7 @@
             tempData[i].accountListWithLastestMonthlyStatement[j].repaidValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            userAccountRepaidTotalValue += calculatedValue
+            ownerOverallAccountRepaidTotalValue += calculatedValue
 
             //Calculate Liquidator Value
             calculatedValue = tempData[i].accountListWithLastestMonthlyStatement[j].liquidatorAmount * priceData.usdPrice
@@ -498,7 +533,7 @@
             tempData[i].accountListWithLastestMonthlyStatement[j].liquidatorValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            userAccountLiquidatorTotalValue += calculatedValue
+            ownerOverallAccountLiquidatorTotalValue += calculatedValue
 
             //Calculate Liquidated Value
             calculatedValue = tempData[i].accountListWithLastestMonthlyStatement[j].liquidatedAmount * priceData.usdPrice
@@ -506,51 +541,132 @@
             tempData[i].accountListWithLastestMonthlyStatement[j].liquidatedValueString = '$' + calculatedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            userAccountLiquidatedTotalValue += calculatedValue
+            ownerOverallAccountLiquidatedTotalValue += calculatedValue
+
+            //Calculate Health Factor
+            const ownerAddressString = tempData[i].owner
+            const ownerAccountIndexString = tempData[i].accountListWithLastestMonthlyStatement[j].accountIndex.toString()
+            const depositedValue = tempData[i].accountListWithLastestMonthlyStatement[j].depositedValue
+            const borrowedValue = tempData[i].accountListWithLastestMonthlyStatement[j].borrowedValue
+            var healthFactor
+
+            if(depositedValue != 0)
+              healthFactor = ((depositedValue * 0.8 - borrowedValue)/(depositedValue * 0.8)) * 100
+            else if(borrowedValue == 0)
+              healthFactor = 100
+            else
+              healthFactor = 0
+
+            const currentAccountHealthFactor = tempHealthFactorHashMap.get(ownerAddressString + ownerAccountIndexString)
+            if(currentAccountHealthFactor)
+            {
+              const newDepositedValue = depositedValue + currentAccountHealthFactor.depositValue
+              const newBorrowedValue = borrowedValue + currentAccountHealthFactor.borrowValue
+              currentAccountHealthFactor.depositValue = newDepositedValue
+              currentAccountHealthFactor.borrowValue = newBorrowedValue
+
+              if(newDepositedValue != 0)
+                currentAccountHealthFactor.healthFactor = ((newDepositedValue * 0.8 - newBorrowedValue)/(newDepositedValue * 0.8)) * 100
+              else if(newBorrowedValue == 0)
+                currentAccountHealthFactor.healthFactor = 100
+              else
+                currentAccountHealthFactor.healthFactor = 0
+
+              tempHealthFactorHashMap.set(ownerAddressString + ownerAccountIndexString, currentAccountHealthFactor)
+            }
+            else
+            {
+              const newHealthFactor: HealthFactor = {depositValue: depositedValue, borrowValue: borrowedValue, healthFactor: healthFactor}
+              tempHealthFactorHashMap.set(ownerAddressString + ownerAccountIndexString, newHealthFactor)
+            }
+          }
+        }
+
+        //Run through owner's accounts again to set Liquidatable State
+        for(var j=0; j<tempData[i].accountListWithLastestMonthlyStatement.length; j++)
+        {
+          const ownerAddressString = tempData[i].owner
+          const ownerAccountIndexString = tempData[i].accountListWithLastestMonthlyStatement[j].accountIndex.toString()
+          const healthFactor = tempHealthFactorHashMap.get(ownerAddressString + ownerAccountIndexString)
+
+          if(healthFactor)
+          {
+            tempData[i].accountListWithLastestMonthlyStatement[j].healthFactor = healthFactor.healthFactor
+
+            if(healthFactor.healthFactor <= 70)
+            {
+              tempData[i].healthFactorCaution = true
+
+              //Used for sorting liquidatable Column
+              if(tempData[i].liquidatableColorStep < 1)
+                tempData[i].liquidatableColorStep = 1
+            }
+
+            if(healthFactor.healthFactor == 0)
+            {
+              tempData[i].liquidatable = true
+
+              //Used for sorting liquidatable Column
+              if(tempData[i].liquidatableColorStep < 2)
+                tempData[i].liquidatableColorStep = 2
+            }
           }
         }
 
         //Set Total Interest Earned Value
-        tempData[i].interestEarnedValue = userAccountInterestEarnedTotalValue
-        tempData[i].interestEarnedValueString = '$' + userAccountInterestEarnedTotalValue.toLocaleString('en-US', {
+        tempData[i].interestEarnedValue = ownerOverallAccountInterestEarnedTotalValue
+        tempData[i].interestEarnedValueString = '$' + ownerOverallAccountInterestEarnedTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Interest Accrued Value
-        tempData[i].interestAccruedValue = userAccountInterestAccruedTotalValue
-        tempData[i].interestAccruedValueString = '$' + userAccountInterestAccruedTotalValue.toLocaleString('en-US', {
+        tempData[i].interestAccruedValue = ownerOverallAccountInterestAccruedTotalValue
+        tempData[i].interestAccruedValueString = '$' + ownerOverallAccountInterestAccruedTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Deposited Value
-        tempData[i].depositedValue = userAccountDepositedTotalValue
-        tempData[i].depositedValueString = '$' + userAccountDepositedTotalValue.toLocaleString('en-US', {
+        tempData[i].depositedValue = ownerOverallAccountDepositedTotalValue
+        tempData[i].depositedValueString = '$' + ownerOverallAccountDepositedTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Borrowed Value
-        tempData[i].borrowedValue = userAccountBorrowedTotalValue
-        tempData[i].borrowedValueString = '$' + userAccountBorrowedTotalValue.toLocaleString('en-US', {
+        tempData[i].borrowedValue = ownerOverallAccountBorrowedTotalValue
+        tempData[i].borrowedValueString = '$' + ownerOverallAccountBorrowedTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Repaid Value
-        tempData[i].repaidValue = userAccountRepaidTotalValue
-        tempData[i].repaidValueString = '$' + userAccountRepaidTotalValue.toLocaleString('en-US', {
+        tempData[i].repaidValue = ownerOverallAccountRepaidTotalValue
+        tempData[i].repaidValueString = '$' + ownerOverallAccountRepaidTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Liquidator Value
-        tempData[i].liquidatorValue = userAccountLiquidatorTotalValue
-        tempData[i].liquidatorValueString = '$' + userAccountLiquidatorTotalValue.toLocaleString('en-US', {
+        tempData[i].liquidatorValue = ownerOverallAccountLiquidatorTotalValue
+        tempData[i].liquidatorValueString = '$' + ownerOverallAccountLiquidatorTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Liquidated Value
-        tempData[i].liquidatedValue = userAccountLiquidatedTotalValue
-        tempData[i].liquidatedValueString = '$' + userAccountLiquidatedTotalValue.toLocaleString('en-US', {
+        tempData[i].liquidatedValue = ownerOverallAccountLiquidatedTotalValue
+        tempData[i].liquidatedValueString = '$' + ownerOverallAccountLiquidatedTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
+      }
+
+      healthFactorHashMap = tempHealthFactorHashMap
+
+      //Update HealthFactor Popover if it's open
+      if(viewPortfolioPopoverOpen.value)
+      {
+        const healthFactor = healthFactorHashMap.get(event.value.owner + event.value.accountIndex)
+        if(healthFactor)
+        {
+          healthFactorPopUpDepositedValue.value = healthFactor.depositValue
+          healthFactorPopUpBorrowedValue.value = healthFactor.borrowValue
+        }
       }
 
       totalNumberOfTopRows = topRowCount
@@ -638,6 +754,9 @@
 
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)
   {
+    if(!tokenReservesHashMapCopy)
+      return
+
     for (const tokenReserve of tokenReservesHashMapCopy.values())
     {
       if(timeStamp == 0)
@@ -661,6 +780,9 @@
 
   function calculateUserNewInterestEarnedAmount(lendingUserMonthlyStatementAccount: any)
   {
+    if(!tokenReservesHashMapCopy)
+      return
+
     const tokenReserve = tokenReservesHashMapCopy.get(lendingUserMonthlyStatementAccount.tokenMintAddress)
     const subMarket = subMarketsHashMap.map.get(lendingUserMonthlyStatementAccount.tokenMintAddress +
     lendingUserMonthlyStatementAccount.subMarketOwnerAddress +
@@ -790,6 +912,13 @@
     event.value.owner = rowData.owner
     event.value.accountIndex = rowData.accountIndex
 
+    const healthFactor = healthFactorHashMap.get(rowData.owner + rowData.accountIndex)
+    if(healthFactor)
+    {
+      healthFactorPopUpDepositedValue.value = healthFactor.depositValue
+      healthFactorPopUpBorrowedValue.value = healthFactor.borrowValue
+    }
+
     viewPortfolioPopoverOpen.value = true
   }
 
@@ -877,7 +1006,7 @@
   
   #lendingLeaderBoardTable :deep(th)
   {
-    font-size: min(4vw, 13px)
+    font-size: min(4vw, 12.5px)
   }
   
   #lendingLeaderBoardTable :deep(.p-datatable-tbody > tr)
@@ -901,8 +1030,13 @@
     font-size: min(4vw, 11px)
   }
 
+  .popoverWidth::part(content)
+  {
+    width: 280px
+  }
+
   .tableMinWidth
   {
-    min-width:1664px
+    min-width:1684px
   }
 </style>

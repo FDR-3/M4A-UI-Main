@@ -80,7 +80,7 @@
 
     <div class="flexCenterRow mediumSmallMarginTop nMediumMarginBottom">
       <div style="margin-left: -15px; margin-right: -4px">
-      <InfoButton :infoMessage="withdrawOrBorrowInfo"/>
+      <InfoButton :infoMessage="snapShotInfo"/>
       </div>
       <div title="Interest Earned and Accrued Snapshot" class="progressBarStep flexCenterColumn nMediumSmallMarginLeft">
         <div class="nMediumSmallMarginTop"><ion-label>{{ snapShotValidCountDown }}</ion-label></div>
@@ -177,7 +177,7 @@
   var event = ref()
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
 
-  const withdrawOrBorrowInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
+  const snapShotInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
 
   var snapShotValidCountDown = ref(0)
   var snapShotCountDownIntervalId: any
@@ -639,7 +639,7 @@
 
           remainingAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
         }
-
+        console.log(tokenProgram.toString())
         return[
           {
             instruction: await anchorPrograms.lending.lendingProgram.methods.withdrawTokens

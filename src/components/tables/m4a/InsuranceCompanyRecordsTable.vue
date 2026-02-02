@@ -1,6 +1,9 @@
 <template>
   <div class="flexCenterRow" style="font-size: 77px; margin-bottom: 10px">
-    <span>💩</span>
+    <div style="margin-bottom: 8px">
+      <InfoButton :infoMessage="insuranceCompanyRecordTableInfoMSG"/>
+    </div>
+    <span class="nLargeMarginLeft">💩</span>
     <h1 style="padding-top: 22px">{{ insuranceCompanyName }}</h1>
   </div>
   <h2 class="statSpacing">Insurance Company Records</h2>
@@ -281,6 +284,7 @@
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   defineEmits(['showInsuranceCompanyList'])
 
@@ -306,6 +310,8 @@
   var insuranceCompanySubmittedAppealCount = ref(0)
   var insuranceCompanyDeniedAppealCount = ref(0)
   var insuranceCompanyRevokedApprovalCount = ref(0)
+
+  const insuranceCompanyRecordTableInfoMSG = "\nYou can view Submitter and \nHospital info by\nclicking on their names\n\n You can also view the\nclaim note by clicking on\nthe ailment\n\n"
 
   onMounted(() =>
   {

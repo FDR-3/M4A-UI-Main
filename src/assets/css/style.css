@@ -98,6 +98,13 @@ ion-textarea
   border-bottom: 2px solid var(--ion-color-green) !important
 }
 
+.fullWidthButton
+{
+  margin: 0px;
+  width: 100% !important;
+  font-weight: bold
+}
+
 #videoFlipButton
 {
   background: none

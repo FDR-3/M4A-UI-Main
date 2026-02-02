@@ -6,7 +6,7 @@
   >
     <div class="nMediumSmallMarginTop nMediumMarginBottom flexCenterRow">
       <ion-button fill="clear" @click="openTokenPopover($event)">
-        <img v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+        <img v-if="selectedTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress" style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
         <component v-else :is="depositSVG" style="width: 44px"></component>
         <ion-text color="dark">{{ subMarketTokenName }}</ion-text><br>
       </ion-button>

@@ -1,5 +1,11 @@
 <template>
-  <h1>Claim Queue</h1>
+  <div class="flexCenterRow">
+    <div class="smallMarginBottom">
+      <InfoButton :infoMessage="claimQueueTableInfoMSG"/>
+    </div>
+    <h1 class="nMediumSmallMarginLeft">Claim Queue</h1>
+  </div>
+
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>
   
   <div v-if="isClaimQueueOn">
@@ -215,6 +221,7 @@
   import { trimAddress, copyAddress, copyFullAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { statusTypes } from '/src/types/statusTypes.ts'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   defineEmits(['toggleHospitalTable', 'toggleInsuranceCompanyTable', 'toggleProcessedClaimsTable'])
 
@@ -234,6 +241,8 @@
   var event = ref()
 
   var copyFullAddressButtonText = ref(copyFullAddressText)
+
+  const claimQueueTableInfoMSG = "\nYou can view Submitter,\nHospital, and Insurance\nCompany info by\nclicking on their names\n\n"
 
   onMounted(async () => 
   {

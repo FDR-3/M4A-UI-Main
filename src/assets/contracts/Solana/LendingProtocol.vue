@@ -381,7 +381,6 @@
       const lendingUserTabRemainingAccount = 
       {
         pubkey: lendingUserTabAccountPDA,
-        pythPriceUpdateKey: lendingUserTabAccount.pythPriceUpdateKey,
         userTabAccountIndex: lendingUserTabAccount.userTabAccountIndex,
         tokenMintAddress: lendingUserTabAccount.tokenMintAddress.toString(),
         isSigner: false,
@@ -873,6 +872,7 @@
           repaidValueString: "$0.00",
           liquidatedValue: 0,
           liquidatedValueString: "$0.00",
+          liquidatable: false,
           accountListWithLastestMonthlyStatement: [newAccountEntry]
         }
 

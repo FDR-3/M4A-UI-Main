@@ -1,6 +1,6 @@
 <template>
   <div class="nSmallMarginTop noClickEvent">
-    <h3 class="" style="margin: 0">Health Factor</h3>
+    <h3 style="margin: 0">Health Factor</h3>
     <div class="flexCenterRow" style="gap: 10px">
       <ion-label>Asset Value: {{ assetValueString }}</ion-label>
       <ion-label>Debt Value: {{ debtValueString }}</ion-label>
@@ -9,7 +9,7 @@
 
   <div class="flexCenterRow nTinyMarginTop healthFactorBarContainer" style="width: 100%">
     <div class="nMediumMarginLeft">
-      <InfoButton :infoMessage="healthFactorInfo"/>
+      <InfoButton :infoMessage="healthFactorInfo" :openSide="openSide"/>
     </div>
     
     <div class="progressBarContainer noClickEvent nMediumSmallMarginLeft">
@@ -25,8 +25,23 @@
   import { IonText, IonLabel } from '@ionic/vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import healthFactorInfo from './HealthFactorInfo.ts'
-  
-  const props = defineProps(['assetValue', 'debtValue'])
+
+  const props = defineProps(
+  {
+    assetValue:
+    {
+      type: Number
+    },
+    debtValue:
+    {
+      type: Number
+    },
+    openSide:
+    {
+      type: String,
+      default: 'top'
+    }
+  })
 
   var assetValueString = ref()
   var debtValueString = ref()

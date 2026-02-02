@@ -3,11 +3,11 @@
     <ion-icon :src="informationCircle" color="dark"></ion-icon>
   </ion-button>
   <ion-popover
-  class="infoButtonPopover"
+  class="infoButtonPopover popoverWidth"
   :is-open="infoPopoverOpen" 
   :event="event" 
   @didDismiss="infoPopoverOpen=false"
-  side="top"
+  :side="openSide"
   alignment="center">
     <ion-text align="center" class="preserveWhiteSpace infoButtonText">{{ infoMessage }}</ion-text>
   </ion-popover>
@@ -18,7 +18,18 @@
   import { IonIcon, IonButton, IonPopover, IonText } from '@ionic/vue'
   import { informationCircle } from 'ionicons/icons'
 
-  defineProps(['infoMessage'])
+  defineProps(
+  {
+    infoMessage:
+    {
+      type: String
+    },
+    openSide:
+    {
+      type: String,
+      default: 'top'
+    }
+  })
 
   var infoPopoverOpen = ref()
   var event = ref()
@@ -35,5 +46,10 @@
   {
     width: 25px;
     height: 25px
+  }
+
+  .popoverWidth::part(content)
+  {
+    width: 355px
   }
 </style>

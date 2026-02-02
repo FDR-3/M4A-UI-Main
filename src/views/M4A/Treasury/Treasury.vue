@@ -57,8 +57,6 @@
   import { PublicKey } from "@solana/web3.js"
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { isBrowserFireFox } from '/src/assets/helperFunctions/browserHelper.ts'
-  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'

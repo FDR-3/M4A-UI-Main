@@ -5,18 +5,18 @@
   
     type Record = 
     {
-        record: String
+      record: String
     }
 
     type VoterRecordTable = 
     {
-        voter: 
-        {
-            address: String,
-            contributions: number,
-            image: String
-        },
-        records: Record[],
+      voter: 
+      {
+        address: String,
+        contributions: number,
+        image: String
+      },
+      records: Record[],
     }
 
   const provider = new ethers.BrowserProvider(window.ethereum)

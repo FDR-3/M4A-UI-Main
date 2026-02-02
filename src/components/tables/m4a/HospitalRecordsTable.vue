@@ -1,6 +1,9 @@
 <template>
   <!--This tableTop id ensures that the top of the table and hospital svg are visible when opening records from the state hospital list table-->
   <div id="tableTop" class="flexCenterRow smallMarginTop" style="font-size: 50px">
+    <div style="margin-top: 10px; margin-right: -30px">
+      <InfoButton :infoMessage="hospitalRecordTableInfoMSG"/>
+    </div>
     <ion-button v-if="hospitalType==HospitalTypes.General" style="margin-top:20px; margin-bottom: -15px; margin-right: -10px" fill="clear" @click="givePokemonCenterCreatorCredit()">
       <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNVb4n4DEhW7MqHDNnjQlr4SsC0pORAEcIoe2B" width="150"/>
     </ion-button>
@@ -275,6 +278,7 @@
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   const emits = defineEmits(['hospitalSelect', 'showHospitalList'])
 
@@ -307,6 +311,8 @@
   var appealReason = ref("")
   var event = ref()
   var copyFullAddressButtonText = ref(copyFullAddressText)
+
+  const hospitalRecordTableInfoMSG = "\nYou can view Submitter and\nInsurance Company info by\nclicking on their names\n\n You can also view the\nclaim note by clicking on\nthe ailment\n\n"
 
   onMounted(() =>
   {

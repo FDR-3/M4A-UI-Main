@@ -1,5 +1,11 @@
 <template>
-  <h1>Hospitals</h1>
+  <div class="flexCenterRow">
+    <div style="margin-bottom: 8px">
+      <InfoButton :infoMessage="hospitalTableInfoMSG"/>
+    </div>
+    <h1 class="nMediumSmallMarginLeft">Hospitals</h1>
+  </div>
+
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>
   <h2 class="statSpacing">Total Hospitals: {{ totalHospitalCount }}</h2>
   <div>
@@ -150,6 +156,7 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { givePokemonCenterCreatorCredit } from '/src/assets/helperFunctions/credits.ts'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   const emits = defineEmits(['toggleClaimQueueTable', 'toggleInsuranceCompanyTable', 'toggleProcessedClaimsTable', 'showHospitalRecords'])
 
@@ -169,6 +176,8 @@
   const hospitalDetails = ref({})
   var hospitalPopoverOpen = ref(false)
   var event = ref()
+
+  const hospitalTableInfoMSG = "\nYou can view Hospital\nRecords by clicking on\ntheir names in the table\n\n"
 
   onMounted(() =>
   {

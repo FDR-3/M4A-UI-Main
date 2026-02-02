@@ -6,10 +6,10 @@
         <h1>Markets</h1>
     
         <ion-button @click="flipTable(); portfolioReRenderHelper+=1" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
-        <MarketsTable @openDepositModal="openDepositAndCloseOthers"
-        @openWithdrawalModal="openWithdrawAndCloseOthers"
-        @openBorrowModal="openBorrowAndCloseOthers"
-        @openRepayModal="openRepayAndCloseOthers"
+        <MarketsTable @openDepositModal="openDepositModal"
+        @openWithdrawalModal="openWithdrawModal"
+        @openBorrowModal="openBorrowModal"
+        @openRepayModal="openRepayModal"
         @marketTableHeightChange="updateUserNameRelatedMarketTableHeight"/>
       </div>
 
@@ -23,10 +23,11 @@
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Markets</ion-button>
         <Portfolios :portfolioReRenderHelper="portfolioReRenderHelper"
-        @openDepositModal="openDepositAndCloseOthers"
-        @openWithdrawalModal="openWithdrawAndCloseOthers"
-        @openBorrowModal="openBorrowAndCloseOthers"
-        @openRepayModal="openRepayAndCloseOthers"
+        @openDepositModal="openDepositModal"
+        @openWithdrawalModal="openWithdrawModal"
+        @openBorrowModal="openBorrowModal"
+        @openRepayModal="openRepayModal"
+        @openLiquidationModal="openLiquidationModal"
         @portfolioHeightChange="updatePortfolioRelatedHeight"
         @totalLeaderBoardLendingUsers="setTotalLeaderBoardLendingUsers"
         @leaderBoardSubTableAndSubRowAdjust="adjustLeaderBoardSubTableAndRowCount"
@@ -39,6 +40,7 @@
   <WithdrawalModal ref="withdrawalModal"/>
   <BorrowModal ref="borrowModal"/>
   <RepayModal ref="repayModal"/>
+  <LiquidationModal ref="liquidationModal"/>
 
   <KingobamaMobileM1Market :style="{display: display1stTable}"/>
   <div :style="{display: display2ndTable}">
@@ -56,7 +58,8 @@
   import DepositModal from '/src/components/smart contracts/lending protocol/DepositModal.vue'
   import WithdrawalModal from '/src/components/smart contracts/lending protocol/WithdrawalModal.vue'
   import BorrowModal from '/src/components/smart contracts/lending protocol/BorrowModal.vue'
-  import RepayModal from '/src/components/smart contracts/lending protocol/repayModal.vue'
+  import RepayModal from '/src/components/smart contracts/lending protocol/RepayModal.vue'
+  import LiquidationModal from '/src/components/smart contracts/lending protocol/LiquidationModal.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { isBrowserFireFox } from '/src/assets/helperFunctions/browserHelper.ts'
   import { isValidSolanaPublicKey } from '/src/assets/contracts/WalletHelper.vue'
@@ -66,8 +69,7 @@
   import KingobamaMobileM4LeaderBoard from '/src/components/fancy/poly/KingobamaMobileM4LeaderBoard.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
-
+  
   defineProps(['colorName', 'colorHexValue'])//This just keeps a warning from going off since all pages get feed these props
 
   var flipping = ref(false)
@@ -80,6 +82,7 @@
   var withdrawalModal = ref()
   var borrowModal = ref()
   var repayModal = ref()
+  var liquidationModal = ref()
   var tokenRelatedDynamicTableHeight = ref(0)
   var userNameRelatedDynamicTableHeight = ref(0)
   var portfolioRelatedDynamicTableHeight = ref(0)
@@ -152,24 +155,29 @@
     }   
   }
 
-  function openDepositAndCloseOthers(tokenMintAddressString: String, fdr3SubMarkets: any[])
+  function openDepositModal(tokenMintAddressString: String, subMarkets: any[])
   {
-    depositModal.value.openDepositModal(tokenMintAddressString, fdr3SubMarkets)
+    depositModal.value.openDepositModal(tokenMintAddressString, subMarkets)
   }
 
-  function openWithdrawAndCloseOthers(tokenMintAddressString: String, fdr3SubMarkets: any[])
+  function openWithdrawModal(tokenMintAddressString: String, subMarkets: any[])
   {
-    withdrawalModal.value.openWithdrawalModal(tokenMintAddressString, fdr3SubMarkets)
+    withdrawalModal.value.openWithdrawalModal(tokenMintAddressString, subMarkets)
   }
 
-  function openBorrowAndCloseOthers(tokenMintAddressString: String, fdr3SubMarkets: any[])
+  function openBorrowModal(tokenMintAddressString: String, subMarkets: any[])
   {
-    borrowModal.value.openBorrowModal(tokenMintAddressString, fdr3SubMarkets)
+    borrowModal.value.openBorrowModal(tokenMintAddressString, subMarkets)
   }
 
-  function openRepayAndCloseOthers(tokenMintAddressString: String, fdr3SubMarkets: any[])
+  function openRepayModal(tokenMintAddressString: String, subMarkets: any[])
   {
-    repayModal.value.openRepayModal(tokenMintAddressString, fdr3SubMarkets)
+    repayModal.value.openRepayModal(tokenMintAddressString, subMarkets)
+  }
+
+  function openLiquidationModal(ownerAddressString: String, accountIndex: number)
+  {
+    liquidationModal.value.openLiquidationModal(ownerAddressString, accountIndex)
   }
 
   function updateTokenRelatedMarketTableHeight()
@@ -561,14 +569,14 @@
   }
 
   /*Set Portfolio Table Height flipped onLeaderBoard*/
-  @media screen and (min-width: 1881.1px)
+  @media screen and (min-width: 1903.1px)
   { 
     .tableFlipContainer.flipped.onLeaderBoard
     {
       height: v-bind('(portfolioRelatedDynamicTableHeight) + "px"')
     } 
   }
-  @media screen and (max-width: 1881px)
+  @media screen and (max-width: 1903px)
   { 
     .tableFlipContainer.flipped.onLeaderBoard
     {
@@ -578,14 +586,14 @@
   /*Set table height for Fire Fox*/
   @-moz-document url-prefix()
   {
-    @media screen and (min-width: 1881.1px)
+    @media screen and (min-width: 1903.1px)
     { 
       .tableFlipContainer.flipped.onLeaderBoard
       {
         height: v-bind('(portfolioRelatedDynamicTableHeight) + "px"')
       } 
     }
-    @media screen and (max-width: 1881px)
+    @media screen and (max-width: 1903px)
     { 
       .tableFlipContainer.flipped.onLeaderBoard
       {

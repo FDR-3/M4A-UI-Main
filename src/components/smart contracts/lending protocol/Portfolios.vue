@@ -7,7 +7,8 @@
     @viewPortfolio="viewPortfolio"
     @totalLeaderBoardLendingUsers="emitTotalLeaderBoardLendingUsers"
     @adjustLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowAdjustment"
-    @setLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowSet"/>
+    @setLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowSet"
+    @openLiquidationModal="emitOpenLiquidationModal"/>
   </div>
 
   <div v-if="!isBrowsingAllUsers" class="tableContainer">
@@ -246,6 +247,7 @@
     'openWithdrawalModal',
     'openBorrowModal',
     'openRepayModal',
+    'openLiquidationModal',
     'portfolioHeightChange',
     'totalLeaderBoardLendingUsers',
     'leaderBoardSubTableAndSubRowAdjust',
@@ -1248,6 +1250,11 @@
   function emitLeaderBoardSubTableAndSubRowSet(subTableCountSet: number, subTableRowCountSet: number)
   {
     emits('leaderBoardSubTableAndSubRowSet', subTableCountSet, subTableRowCountSet)
+  }
+
+  function emitOpenLiquidationModal(accountOwner: string, accountIndex: number)
+  {
+    emits('openLiquidationModal', accountOwner, accountIndex)
   }
 
   function setIsBrowsingAllLendingUsers(flag: boolean)

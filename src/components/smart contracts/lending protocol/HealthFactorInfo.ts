@@ -64,5 +64,5 @@ timeStamp: number)
   return originalBorrowedAmount * newBorrowInterestChangeIndex / userBorrowInterestChangeIndex
 }
 
-export const healthFactorInfo = "\nHealth Factor equals\n\n(Assets * 0.8 - Debt)\n-----------------\n(Assets * 0.8)\n\nWhen Debt is equal or more \nthan 80% of Assets, IE:\nHealth Factor is 0% or\nnegative, the Account is\nexposed to Liquidation.\n\nA User can borrow up to 70%\nof the value of their\nassets initially\n"
+export const healthFactorInfo = "\nHealth Factor equals\n\n(Assets * 0.8 - Debt)\n-----------------\n(Assets * 0.8)\n\nWhen Debt is equal or more than 80%\nof Assets, IE: Health Factor is 0%,\n the Account is exposed to Liquidation.\n\n The Account is insolvent when Debt\nValue is 100% or more of Asset Value.\n\nA User can borrow up to 70% of the\nvalue of their assets initially.\n\n"
 export default  healthFactorInfo

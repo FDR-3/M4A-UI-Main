@@ -1,6 +1,9 @@
 <template>
   <div class="flexCenterRow" style="font-size: 77px; margin-bottom: 10px">
-    <span>💩</span>
+    <div style="margin-bottom: 8px">
+      <InfoButton :infoMessage="insuranceCompanyTableInfoMSG"/>
+    </div>
+    <span class="nLargeMarginLeft">💩</span>
     <h1 style="padding-top: 22px">Insurance Companies</h1>
   </div>
   <h2 class="statSpacingTop">Total Charges Against: $<span class="poopText">{{ approvedClaimAmountString }}</span></h2>
@@ -101,6 +104,7 @@
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
   import { FilterMatchMode } from '@primevue/core/api'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   const emits = defineEmits(['toggleClaimQueueTable', 'toggleHospitalTable', 'toggleProcessedClaimsTable', 'insuranceCompanySelect'])
 
@@ -115,6 +119,8 @@
   const tableDownload = ref()
   var insuranceCompanyPopoverOpen = ref(false)
   var event = ref()
+
+  const insuranceCompanyTableInfoMSG = "\nYou can view Insurance \nCompany Records by clicking\non their names in the table\n\n"
 
   onMounted(() =>
   {
