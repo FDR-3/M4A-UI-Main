@@ -21,6 +21,7 @@
     <ion-button color="dark" @click="pageSelect(12)">11-VSDC Video Editing Software</ion-button>
     <ion-button color="dark" @click="pageSelect(13)">12-Illegally Fired In Retaliation</ion-button>
     <ion-button color="dark" @click="pageSelect(14)">13-Patriot Software Is Lying To The Government On Me!🤬</ion-button>
+    <ion-button color="dark" @click="pageSelect(15)">14-OBS Studio Background Remover</ion-button>
   </div>
 </template>
 

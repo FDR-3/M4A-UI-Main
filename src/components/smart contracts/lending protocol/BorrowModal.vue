@@ -533,7 +533,7 @@
     {
       const tx = await pythSolanaReceiver.provider.sendAll
       (
-        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 }), { skipPreflight: false }
+        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 100 }), { skipPreflight: false }
       )
     
       if(tx.length)

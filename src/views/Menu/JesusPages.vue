@@ -17,11 +17,13 @@
           <component 
             v-if="navigation.navBarIndex == 0 && 
             navigation.pageIndex >= 2"
+            :totalPages="jesusTotalPages"
             :is="Jesus110PagesAfterPathSelection[navigation.operatingSystemIndex][navigation.pageIndex-2]">
           </component>
           <!--Pages-->
           <component 
             v-else
+            :totalPages="jesusTotalPages"
             :is="pages[navigation.navBarIndex][navigation.pageIndex]">
           </component>
         </div>
@@ -45,8 +47,8 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
+  const jesusTotalPages = 14
   const pageContent = ref()
-
   const colorName = "yellow"
   const buttonShadow = "goldenrod"
 

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>YT-DLP 5/13</h1>
+    <h1>YT-DLP 5/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/6_YT_DLP/YT DLP.mp4">
@@ -8,7 +8,16 @@
         <media-plyr-layout thumbnails=""></media-plyr-layout>
       </media-player>-->
       
-      <iframe class="videoContainer" src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2F61578948853626%2Fvideos%2F1075503857569972%2F&show_text=false&width=560&t=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
+      <iframe
+        class="videoContainer"
+        src="https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2F61578948853626%2Fvideos%2F1075503857569972%2F&show_text=false&width=560&t=0"
+        style="border:none;overflow:hidden"
+        scrolling="no"
+        frameborder="0"
+        allowfullscreen="true"
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; xr-spatial-tracking"
+        allowFullScreen="true">
+      </iframe>
       <NextPageButton/>
     </div>
     <div class="sources">
@@ -33,4 +42,6 @@
 <script setup lang="ts">
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
+
+  defineProps(['totalPages'])
 </script>

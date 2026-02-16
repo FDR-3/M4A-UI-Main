@@ -18,6 +18,7 @@
             container="body"
           />
         </div>
+        <SettingsButton/>
         <ThemeButton/>
         <MenuButton id="menuButton"/>
       </div>
@@ -30,15 +31,16 @@
   import { IonHeader, IonToolbar } from '@ionic/vue'
   import HomeButton from '/src/components/navbar/HomeButton.vue'
   import NavButtons from '/src/components/navbar/NavButtons.vue'
+  import SettingsButton from '/src/components/navbar/SettingsButton.vue'
   import ThemeButton from '/src/components/navbar/ThemeButton.vue'
   import MenuButton from '/src/components/navbar/MenuButton.vue'
   import WalletButton from '/src/components/navbar/SolanaWalletButton/WalletButton.vue'
-  import { useWindowResize } from '/src/assets/globalStates/WindowWidth.ts';
+  import { useWindowResize } from '/src/assets/globalStates/WindowWidth.ts'
 
   defineProps(['navButtons', 'colorName', 'buttonShadow', 'colorHexValue'])
 
-  const { width } = useWindowResize(); // Use the composable to get the reactive width
-  const breakpoint = 629; // Define your breakpoint
+  const { width } = useWindowResize() //Use the composable to get the reactive width
+  const breakpoint = 655 //Define your breakpoint
 
 </script>
 
@@ -61,7 +63,7 @@
     display: block
   }
 
-  @media screen and (min-width: 629px) 
+  @media screen and (min-width: 655px) 
   { 
     .solanaWalletButtonContainer
     {
@@ -70,7 +72,7 @@
       flex-grow: 1
     } 
   }
-  @media screen and (max-width: 628.9px) 
+  @media screen and (max-width: 654.9px) 
   { 
     .buttonContainer
     {

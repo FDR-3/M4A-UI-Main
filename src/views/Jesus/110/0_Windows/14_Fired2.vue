@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>After Firing Me Illegally In Retaliation, Patriot Software Lied To The Government On Me 13/13</h1>
+    <h1>After Firing Me Illegally In Retaliation, Patriot Software Lied To The Government On Me 13/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="https://mega.nz/file/8BATlSjL#G-A3GG4_Mlejp4Qgz416S1BhMzqAAylz26lUx0CCoWM">
@@ -25,4 +25,6 @@
 <script setup lang="ts">
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
+
+  defineProps(['totalPages'])
 </script>

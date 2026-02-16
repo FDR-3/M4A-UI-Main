@@ -639,7 +639,7 @@
 
           remainingAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
         }
-        console.log(tokenProgram.toString())
+
         return[
           {
             instruction: await anchorPrograms.lending.lendingProgram.methods.withdrawTokens
@@ -664,7 +664,7 @@
     {
       const tx = await pythSolanaReceiver.provider.sendAll
       (
-        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 }), { skipPreflight: false }
+        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 0 }), { skipPreflight: false }
       )
     
       if(tx.length)

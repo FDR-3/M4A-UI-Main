@@ -61,7 +61,7 @@
     margin-right: -13px
   }
 
-  @media screen and (min-width: 380px)
+  @media screen and (min-width: 420px)
   {
     #fullHomeButton
     {
@@ -74,7 +74,7 @@
     }
   }
 
-  @media screen and (max-width: 379.9px)
+  @media screen and (max-width: 419.9px)
   {
     #fullHomeButton
     {

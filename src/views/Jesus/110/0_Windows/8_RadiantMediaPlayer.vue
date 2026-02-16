@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Radiant Media Player Thumbnails 7/13</h1>
+    <h1>Radiant Media Player Thumbnails 7/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/8_RadiantMediaPlayer/RadiantMediaPlayer.mp4">
@@ -25,4 +25,6 @@
 <script setup lang="ts">
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
+
+  defineProps(['totalPages'])
 </script>

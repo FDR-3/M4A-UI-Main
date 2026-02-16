@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Train A Custom RVC Voice Model 4/13</h1>
+    <h1>Train A Custom RVC Voice Model 4/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/5_TrainAIVoice/TrainAIVoice.mp4">
@@ -30,4 +30,6 @@
 <script setup lang="ts">
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
+
+  defineProps(['totalPages'])
 </script>

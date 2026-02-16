@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>OBS Studio 2/{{ totalPages }}</h1>
+    <h1>OBS Studio Background Remover 14/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/3_OBS/OBS.mp4">
@@ -8,7 +8,7 @@
         <media-plyr-layout thumbnails=""></media-plyr-layout>
       </media-player>-->
       <iframe class="videoContainer"
-        src="https://www.youtube.com/embed/VJOewYSjnsE?cc_load_policy=1&cc_lang_pref=en"
+        src="https://www.youtube.com/embed/0kJcxyddF1E?cc_load_policy=1&cc_lang_pref=en"
         allowfullscreen
       ></iframe>
       <NextPageButton/>

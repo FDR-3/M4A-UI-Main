@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Ref } from 'vue'
   import { metaMaskWalletConnected } from '/src/assets/globalStates/MetaMaskWalletConnected.vue'
-  import { PublicKey } from "@solana/web3.js"
+  import { Connection, PublicKey } from "@solana/web3.js"
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
 
@@ -46,6 +46,21 @@
 
       metaMaskWalletConnected.connected = false
     }
+  }
+
+  export async function getDynamicPriorityFeePrice(connection: Connection, accountKeys: PublicKey[])
+  {
+    //Returns an array of fees for the last 150 blocks
+    const recentFees = await connection.getRecentPrioritizationFees({lockedWritableAccounts: accountKeys})
+
+    if(recentFees.length === 0)
+      return 5000
+
+    const recentRecent = recentFees.slice(-20)
+    const medianFee = recentRecent.sort((a: { prioritizationFee: number }, b: { prioritizationFee: number }) =>
+    a.prioritizationFee - b.prioritizationFee)[Math.floor(recentRecent.length / 2)].prioritizationFee
+
+    return Math.max(medianFee, 5000)
   }
 
   export function toastPreTransactionError(error: string, toast: any, contractFunctionName: string)

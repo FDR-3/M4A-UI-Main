@@ -142,7 +142,7 @@
     font-size: min(7vw, 15px)
   }
 
-  @media screen and (min-width: 1064px)
+  @media screen and (min-width: 1101px)
   {
     #lilNavSelector
     {
@@ -150,7 +150,7 @@
     }
   }
 
-  @media screen and (max-width: 1063.9px)
+  @media screen and (max-width: 1100.9px)
   {
     .bigNavButtons
     {

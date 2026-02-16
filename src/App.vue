@@ -106,8 +106,8 @@
   var buttonShadow = ref()
   var currentMenuIndex: number
 
-  const { width } = useWindowResize() // Use the composable to get the reactive width
-  const breakpoint = 629 // Define your breakpoint
+  const { width } = useWindowResize() //Use the composable to get the reactive width
+  const breakpoint = 655 //Define your breakpoint
 
   const appPages = 
   [
@@ -318,7 +318,7 @@
     text-decoration-thickness: 2px
   }
 
-  @media screen and (min-width: 629px) 
+  @media screen and (min-width: 655px) 
   { 
     .menuIcon
     {
@@ -326,7 +326,7 @@
      height: 80px
     }
   }
-  @media screen and (max-width: 628.9px) 
+  @media screen and (max-width: 654.9px) 
   { 
     #menuHeaderContainer
     {

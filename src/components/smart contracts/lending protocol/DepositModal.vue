@@ -140,6 +140,8 @@
   import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import { getDynamicPriorityFeePrice } from '/src/assets/contracts/WalletHelper.vue'
+  import { getTokenReservePDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -403,6 +405,32 @@
   {
     try
     {
+      //Simulate Transaction and Calculate Compute Units
+      const instruction = await anchorPrograms.lending.lendingProgram.methods.depositTokens
+      (
+        selectedTokenMintAddress,
+        adminAccounts.lendingCEOAddressKey,
+        subMarketSelect.value,
+        accountSelect.value,
+        new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
+        accountName.value
+      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram })
+      .instruction()
+
+      const transaction = new anchor.web3.Transaction().add(instruction)
+      transaction.recentBlockhash = (await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()).blockhash
+      transaction.feePayer = connectedWallet.publicKey
+
+      const simulation = await anchorPrograms.lending.lendingProgram.provider.connection.simulateTransaction(transaction)
+      const unitsConsumed = simulation.value.unitsConsumed
+      const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: unitsConsumed * 1.1 })//Increase units by 10% for safety
+
+      //Calculate Dynamic Priority Fee
+      /*const tokenReservePDA = getTokenReservePDA(selectedTokenMintAddress)
+      const priorityFeePrice = await getDynamicPriorityFeePrice(anchorPrograms.lending.lendingProgram.provider.connection, [tokenReservePDA])
+      const addPriorityFee = anchor.web3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityFeePrice })*/
+
+      //Execute Transaction
       const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
         selectedTokenMintAddress,
@@ -411,7 +439,9 @@
         accountSelect.value,
         new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
         accountName.value
-      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram }).rpc()
+      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram })
+      .preInstructions([modifyComputeUnits/*, addPriorityFee*/])
+      .rpc()
 
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
 

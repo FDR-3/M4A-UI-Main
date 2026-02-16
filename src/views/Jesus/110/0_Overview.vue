@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>A Debate About Jesus 1/13</h1>
+    <h1>A Debate About Jesus 1/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/Jesus Debate/110/0_Overview/Just a Debate About Jesus.mp4">
@@ -49,4 +49,6 @@
 <script setup lang="ts">
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
+
+  defineProps(['totalPages'])
 </script>
