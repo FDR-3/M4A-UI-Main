@@ -15,7 +15,7 @@
         scrolling="no"
         frameborder="0"
         allowfullscreen="true"
-        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share; xr-spatial-tracking"
+        allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
         allowFullScreen="true">
       </iframe>
       <NextPageButton/>

@@ -58,15 +58,15 @@
 <style scoped>
   #themeButton
   {
-    margin-left: -11px;
-    margin-right: -13px;
-    padding: 0px
+    border-radius: 50%;  /*Makes the clickable area a circle*/
+    width: min(30px, 9vw);
+    --padding-start: 0px;
+    --padding-end: 0px;
   }
 
   #themeIcon
   {
     width: min(30px, 9vw);
-    margin: 0px;
-    height: 27px
+    height: 27px;
   }
 </style>

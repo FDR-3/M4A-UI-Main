@@ -1,53 +1,141 @@
 <template>
   <div v-if="navigation.menuIndex!=MenuIndex.Jesus">
-    <ion-button id="settingsButton" fill="clear" @click="openSettingsModal()"
-    >
+    <ion-button id="settingsButton" fill="clear" @click="openSettingsModal()">
       <ion-icon id="settingsIcon" color="dark" :src="settingsSharp"></ion-icon>
     </ion-button>
 
     <ion-modal :is-open="isSettingsModalOpen" @didDismiss="isSettingsModalOpen=false">
       <ion-content class="ion-padding">
         <div class="flexCenterColumn">
-          <h2 style="margin-top: 0">Settings</h2>
-          <p>Place Holder</p>
-          <p>Your settings options go here...</p>
-          
-          <ion-button @click="isSettingsModalOpen=false">Save & Close</ion-button>
+          <ion-button id="modalCloseButton" class="nMediumSmallMarginTop" fill="clear" @click="isSettingsModalOpen=false">
+            <ion-icon id="modalCloseIcon":src="closeCircle" color="dark"></ion-icon>
+          </ion-button>
+          <h2 class="marginZero">Settings</h2>
+          <br>
+          <ion-text class="underLine bold">Set Lending Protocol RPC</ion-text>
         </div>
+
+        <ion-radio-group v-model="radioGroupSelection" @ionChange="handleRadioChange($event)">
+          <ion-radio :color="colorName" value="Extrnode" label-placement="end">{{ defaultRPCName }}</ion-radio><br>
+          <ion-radio :color="colorName" value="Custom" label-placement="end">Custom</ion-radio><br>
+        </ion-radio-group>
+        <ion-input
+          v-model="rpcString"
+          fill="outline"
+          :style="{ '--highlight-color': colorHexValue }"
+          :disabled="radioGroupSelection==='Extrnode'">
+            <ion-button v-if="radioGroupSelection==='Custom'" slot="end" :color="colorName" @click="saveCustomRPCEndPoint()">Save</ion-button>
+        </ion-input>
       </ion-content>
     </ion-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, inject, onMounted } from 'vue'
   import { navigation, MenuIndex } from '/src/assets/globalStates/Navigation.vue'
-  import { IonButton, IonIcon, IonModal, IonContent, modalController } from '@ionic/vue'
-  import { settingsSharp } from 'ionicons/icons'
+  import { IonButton, IonIcon, IonModal, IonContent, IonText, IonRadio, IonRadioGroup, IonInput } from '@ionic/vue'
+  import { settingsSharp, closeCircle } from 'ionicons/icons'
+  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { validateRpcEndpoint } from '/src/assets/contracts/WalletHelper.vue'
+  import { updateRpcEndpoint } from '/src/assets/contracts/Solana/AnchorLendingWorkSpace.vue'
+  import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
+  import { isProduction } from '/src/assets/helperFunctions/browserHelper.ts'
+  import { toastRPCChangeSuccess, toastRPCChangeFailure } from '/src/assets/contracts/WalletHelper.vue'
 
+  const toast = inject('toast')
+  const colorName = inject('colorName') as string
+  const colorHexValue = inject('colorHexValue') as string
+
+  var radioGroupSelection = ref("Extrnode")
+  var defaultRPCName = ref("")
+  var rpcString = ref(anchorPrograms.lending.lendingProgram.provider.connection.rpcEndpoint)
   var isSettingsModalOpen = ref(false)
+
+  onMounted(() =>
+  {
+    const rpcSetting = localStorage.getItem("rpcSetting")
+    if(rpcSetting == "Extrnode")
+    {
+      radioGroupSelection.value = "Extrnode"
+      if(isProduction())
+      {
+        rpcString.value = "https://m4a.io/proxyCORS"
+        defaultRPCName.value = "Extrnode"
+      }
+      else
+      {
+        rpcString.value = "https://api.devnet.solana.com"
+        defaultRPCName.value = "Solana Fondation"
+      }
+    }
+    else if(rpcSetting == "Custom")
+    {
+      radioGroupSelection.value = "Custom"
+      const customRPCEndPoint = localStorage.getItem("customRPCEndPoint") || ""
+
+      if(customRPCEndPoint != "")
+        rpcString.value = customRPCEndPoint
+      else
+        rpcString.value = "https://"
+    }
+  })
 
   function openSettingsModal()
   {
     isSettingsModalOpen.value = true
   }
+
+  function test()
+  {
+    console.log(window.location.hostname)
+    console.log(radioGroupSelection.value)
+    console.log(anchorPrograms.lending.lendingProgram.provider.connection.rpcEndpoint)
+  }
+
+  const handleRadioChange = (event: CustomEvent) =>
+  {
+    radioGroupSelection.value = event.detail.value
+    
+    if(radioGroupSelection.value == "Extrnode")
+    {
+      localStorage.setItem("rpcSetting", "Extrnode")
+
+      if(isProduction())
+        rpcString.value = "https://m4a.io/proxyCORS"
+      else
+        rpcString.value = DEV_MODE ? "https://api.devnet.solana.com" : "https://solana-rpc.publicnode.com"
+
+      toastRPCChangeSuccess(toast, rpcString.value)
+    }
+    else if(radioGroupSelection.value == "Custom")
+    {
+      const customRPCEndPoint = localStorage.getItem("customRPCEndPoint") || ""
+
+      if(customRPCEndPoint != "")
+        rpcString.value = customRPCEndPoint
+      else
+        rpcString.value = "https://"
+    }
+  }
+
+  async function saveCustomRPCEndPoint()
+  {
+    if(await validateRpcEndpoint(rpcString.value))
+    {
+      localStorage.setItem("rpcSetting", "Custom")
+      localStorage.setItem("customRPCEndPoint", rpcString.value)
+      updateRpcEndpoint(rpcString.value)
+      toastRPCChangeSuccess(toast, rpcString.value)
+    }
+    else
+    {
+      toastRPCChangeFailure(toast, rpcString.value)
+    }
+  }
 </script>
 
 <style scoped>
-  #settingsButton
-  {
-    margin-left: -11px;
-    margin-right: -17px;
-    padding: 0px
-  }
-
-  #settingsIcon
-  {
-    width: min(30px, 9vw);
-    margin: 0px;
-    height: 27px
-  }
-
   ion-modal
   {
     --width: 90%;      /* How wide the box is */
@@ -67,5 +155,34 @@
   {
     background-color: rgb(0, 0, 0);
     opacity: 0.5 /* Higher number = darker background */
+  }
+
+  #settingsButton
+  {
+    border-radius: 50%; /*Makes the clickable area a circle*/
+    width: min(30px, 9vw);
+    --padding-start: 0px;
+    --padding-end: 0px;
+  }
+
+  #settingsIcon
+  {
+    width: min(30px, 9vw);
+    height: 27px
+  }
+
+  #modalCloseButton
+  {
+    display: flex;
+    align-self: end;
+    --padding-start: 0px;
+    --padding-end: 0px;
+    margin-right: -7px
+  }
+
+  #modalCloseIcon
+  {
+    width: 35px;
+    height: 35px
   }
 </style>

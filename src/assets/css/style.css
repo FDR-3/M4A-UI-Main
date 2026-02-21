@@ -69,6 +69,11 @@ div
   text-decoration-thickness: 4px
 }
 
+.bold
+{
+  font-weight: bold
+}
+
 ion-textarea
 {
   padding-top: 20px;

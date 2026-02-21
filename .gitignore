@@ -30,6 +30,5 @@ npm-debug.log*
 /platforms
 /plugins
 /www
-public/_worker.js
 src/views/M4A/Markets/transactionBuilder.ts
 src/views/M4A/Markets/TranscationAPIExample.vue

@@ -10,7 +10,9 @@
 <style scoped>
   #menuButton
   {
-    width: min(40px, 17vw);
-    margin-left: -7px
+    border-radius: 50%; /*Makes the clickable area a circle*/
+    width: min(30px, 9vw);
+    --padding-start: 0px;
+    --padding-end: 0px;
   }
 </style>

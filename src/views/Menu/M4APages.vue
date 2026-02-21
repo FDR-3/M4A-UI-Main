@@ -1,9 +1,27 @@
 <template>
   <ion-page>
     <Alerter v-if="anchorPrograms.hasWebSiteBeenUpdated"/>
-    <Toast position="center" id="m4aSuccessToast">
+    <Toast position="center" class="m4aToast">
       <template #message="slotProps">
         <div class="flexCenterColumn noClickEvent">
+          <div class="flexCenterRow nSmallMarginBottom">
+            <i v-if="slotProps.message.severity == 'success'" class="pi pi-check toastIcon"></i>
+            <i v-else-if="slotProps.message.severity == 'error'" class="pi pi-times-circle toastIcon"></i>
+            <p>{{ slotProps.message.summary }}</p>
+          </div>
+          <div class="flexCenterColumn toastMessageContainer">
+            <ion-text color="dark">{{ slotProps.message.detail }}</ion-text>
+            <TimerProgressBar v-if="slotProps.message.severity == 'success'" 
+            :secondsToCount="TOAST_TIME_LEN_SECONDS" :colorHexValue="colorHexValue" class="smallMarginTop"/>
+            <TimerProgressBar v-else-if="slotProps.message.severity == 'error'" 
+            :secondsToCount="TOAST_TIME_LEN_SECONDS" colorHexValue="#ff0000" class="smallMarginTop"/>
+          </div>
+        </div>
+      </template>
+    </Toast>
+    <Toast position="bottom-left" group="bottom-left-group" class="m4aToast">
+      <template #message="slotProps">
+        <div class="flexCenterColumn noClickEvent" style="width: 85%">
           <div class="flexCenterRow nSmallMarginBottom">
             <i v-if="slotProps.message.severity == 'success'" class="pi pi-check toastIcon"></i>
             <i v-else-if="slotProps.message.severity == 'error'" class="pi pi-times-circle toastIcon"></i>
@@ -145,9 +163,9 @@
   //localStorage.setItem("navigationPageIndex", "0")
 
   //Provide the colorName for the Video Voter Component
-  provide('colorName', colorName);
+  provide('colorName', colorName)
   //Provide the colorName for the Video Voter Component
-  provide('colorHexValue', colorHexValue);
+  provide('colorHexValue', colorHexValue)
 
   watch(navigation, () => 
   {
@@ -186,7 +204,7 @@
 </script>
 
 <style>
-  #m4aSuccessToast
+  .m4aToast
   {
     --p-toast-success-background: light-dark(rgb(211, 255, 224, 1), rgb(0, 94, 28, 1)) !important;
     --p-toast-success-border-color: light-dark(rgb(211, 255, 224, 1), rgb(0, 94, 28, 1)) !important;

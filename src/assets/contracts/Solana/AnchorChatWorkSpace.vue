@@ -7,7 +7,8 @@
   //import idl2 from "/src/assets/contracts/Solana/ChatProtocol2.json"
   import { ChatProtocol } from "./chat.ts"//including the type doesn't seem to help with auto complete/IDE suggestions when programing in the front end, not sure how to fix that
   import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
-
+  import { isProduction } from '/src/assets/helperFunctions/browserHelper.ts'
+  
   const preflightCommitment = "processed"
   const commitment = "confirmed"
 
@@ -19,16 +20,11 @@
   {
     const wallet = useAnchorWallet()
 
-    if(DEV_MODE)
-    {
-      //connection = new Connection('http://127.0.0.1:8899') //For testing with local validator
-      connection = new Connection(clusterApiUrl("devnet"), preflightCommitment)
-    }
+    if(isProduction())
+      connection = new Connection("https://m4a.io/proxyCORS", preflightCommitment)
     else
-    {
-      connection = new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
-      //connection = new Connection(clusterApiUrl("mainnet-beta"), preflightCommitment) //mainnet-beta seems to refuse everything and doesn't allow testing
-    }
+      connection = DEV_MODE ? new Connection(clusterApiUrl("devnet"), preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)//Interchangeable with "https://api.devnet.solana.com"
+      //connection = DEV_MODE ? new Connection("https://api.devnet.solana.com", preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)//Interchangeable with "https://api.devnet.solana.com"
 
     const provider = computed
     (

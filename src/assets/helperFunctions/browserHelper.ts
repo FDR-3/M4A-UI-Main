@@ -6,6 +6,14 @@ import { getM4ALv4ReplyPDA, getPLILv4ReplyPDA, getAboutLv4ReplyPDA } from '/src/
 import { PublicKey } from "@solana/web3.js"
 import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
 
+export function isProduction()
+{
+  if(window.location.hostname === "m4a.io")
+    return true
+  else
+    return false
+}
+
 export function isBrowserFireFox()
 {
   // Check if we are in a browser environment (important for SSR/Node.js)

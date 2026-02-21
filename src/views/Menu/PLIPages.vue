@@ -1,9 +1,27 @@
 <template>
   <ion-page>
     <Alerter v-if="anchorPrograms.hasWebSiteBeenUpdated"/>
-    <Toast position="center" id="pliSuccessToast">
+    <Toast position="center" class="pliToast">
       <template #message="slotProps">
         <div class="flexCenterColumn noClickEvent">
+          <div class="flexCenterRow nSmallMarginBottom">
+            <i v-if="slotProps.message.severity == 'success'" class="pi pi-check toastIcon"></i>
+            <i v-else-if="slotProps.message.severity == 'error'" class="pi pi-times-circle toastIcon"></i>
+            <p>{{ slotProps.message.summary }}</p>
+          </div>
+          <div class="flexCenterColumn toastMessageContainer">
+            <ion-text color="dark">{{ slotProps.message.detail }}</ion-text>
+            <TimerProgressBar v-if="slotProps.message.severity == 'success'" 
+            :secondsToCount="TOAST_TIME_LEN_SECONDS" :colorHexValue="colorHexValue" class="smallMarginTop"/>
+            <TimerProgressBar v-else-if="slotProps.message.severity == 'error'" 
+            :secondsToCount="TOAST_TIME_LEN_SECONDS" colorHexValue="#ff0000" class="smallMarginTop"/>
+          </div>
+        </div>
+      </template>
+    </Toast>
+    <Toast position="bottom-left" group="bottom-left-group" class="pliToast">
+      <template #message="slotProps">
+        <div class="flexCenterColumn noClickEvent" style="width: 85%">
           <div class="flexCenterRow nSmallMarginBottom">
             <i v-if="slotProps.message.severity == 'success'" class="pi pi-check toastIcon"></i>
             <i v-else-if="slotProps.message.severity == 'error'" class="pi pi-times-circle toastIcon"></i>
@@ -151,7 +169,7 @@
 </script>
 
 <style>
-  #pliSuccessToast
+  .pliToast
   {
     --p-toast-success-background: light-dark(rgb(232, 237, 252, 1), rgb(8, 44, 207, 1)) !important;
     --p-toast-success-border-color: light-dark(rgb(232, 237, 252, 1), rgb(8, 44, 207, 1)) !important;

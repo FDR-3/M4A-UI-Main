@@ -60,6 +60,16 @@ h3, h4
   margin-left: -5px
 }
 
+.tinyMarginRight
+{
+  margin-right: 5px
+}
+
+.nTinyMarginRight
+{
+  margin-right: -5px
+}
+
 .tinyMarginBottom
 {
   margin-bottom: 5px
@@ -90,6 +100,16 @@ h3, h4
   margin-left: -10px !important
 }
 
+.smallMarginRight
+{
+  margin-right: 10px !important
+}
+
+.nSmallMarginRight
+{
+  margin-right: -10px !important
+}
+
 .smallMarginBottom
 {
   margin-bottom: 10px
@@ -118,6 +138,11 @@ h3, h4
 .nMediumSmallMarginLeft
 {
   margin-left: -15px
+}
+
+.mediumSmallMarginRight
+{
+  margin-right: 15px
 }
 
 .nMediumSmallMarginRight
@@ -195,6 +220,16 @@ h3, h4
   margin-left: -25px
 }
 
+.mediumLargeMarginRight
+{
+  margin-right: 25px
+}
+
+.nMediumLargeMarginRight
+{
+  margin-right: -25px
+}
+
 .mediumLargeMarginBottom
 {
   margin-bottom: 25px
@@ -215,11 +250,6 @@ h3, h4
   margin-top: -30px
 }
 
-.nLargeMarginRight
-{
-  margin-right: -30px !important
-}
-
 .largeMarginLeft
 {
   margin-left: 30px
@@ -228,6 +258,16 @@ h3, h4
 .nLargeMarginLeft
 {
   margin-left: -30px
+}
+
+.largeMarginRight
+{
+  margin-right: 30px
+}
+
+.nLargeMarginRight
+{
+  margin-right: -30px !important
 }
 
 .largeMarginBottom

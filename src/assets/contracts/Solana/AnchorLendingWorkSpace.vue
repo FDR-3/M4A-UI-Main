@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { computed } from "vue"
+  import { computed, shallowRef, ref } from "vue"
   import { useAnchorWallet } from 'solana-wallets-vue'
   import { Connection, clusterApiUrl } from "@solana/web3.js"
   import { AnchorProvider, Program } from "@coral-xyz/anchor"
@@ -7,33 +7,55 @@
   //import idl2 from "/src/assets/contracts/Solana/LendingProtocol2.json"
   import { LendingProtocol } from "./lending.ts"//including the type doesn't seem to help with auto complete/IDE suggestions when programing in the front end, not sure how to fix that
   import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
+  import { isProduction } from '/src/assets/helperFunctions/browserHelper.ts'
 
   const preflightCommitment = "processed"
   const commitment = "confirmed"
-
   var workspace: any = null
-  var connection: any = null
 
   export const useLendingWorkspace = () => workspace
+
+  const rpcSetting = localStorage.getItem("rpcSetting") || ""
+  const customRPCEndPoint = localStorage.getItem("customRPCEndPoint") || ""
+  const rpcUrl = ref("")
+
+  if(rpcSetting == "Custom")
+  {
+    if(customRPCEndPoint != "")
+      rpcUrl.value = customRPCEndPoint
+    else
+    {
+      if(isProduction())
+        rpcUrl.value = "https://m4a.io/proxyCORS"
+      else
+        rpcUrl.value = DEV_MODE ? clusterApiUrl("devnet") : "https://solana-rpc.publicnode.com"//Interchangeable with "https://api.devnet.solana.com"
+        //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com" : "https://solana-rpc.publicnode.com"//Interchangeable with clusterApiUrl("devnet")
+    }
+  }
+  else
+  {
+    if(isProduction())
+      rpcUrl.value = "https://m4a.io/proxyCORS"
+    else
+      rpcUrl.value = DEV_MODE ? clusterApiUrl("devnet") : "https://solana-rpc.publicnode.com"//Interchangeable with "https://api.devnet.solana.com"
+      //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com" : "https://solana-rpc.publicnode.com"//Interchangeable with clusterApiUrl("devnet")
+  }
+
+  const connection = shallowRef(new Connection(rpcUrl.value, preflightCommitment))
+  export const updateRpcEndpoint = (newUrl: string) =>
+  {
+    rpcUrl.value = newUrl
+    connection.value = new Connection(newUrl, preflightCommitment)
+  }
+
   export const initLendingWorkspace = (contractVersion: number) =>
   { 
     const wallet = useAnchorWallet()
 
-    if(DEV_MODE)
-    {
-      //connection = new Connection('http://127.0.0.1:8899') //For testing with local validator
-      connection = new Connection(clusterApiUrl("devnet"), preflightCommitment)
-    }
-    else
-    {
-      connection = new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
-      //connection = new Connection(clusterApiUrl("mainnet-beta"), preflightCommitment) //mainnet-beta seems to refuse everything and doesn't allow testing
-    }
-    
     const provider = computed
     (
       () =>
-        new AnchorProvider(connection, wallet.value,
+        new AnchorProvider(connection.value, wallet.value,
         {
           preflightCommitment,
           commitment,
