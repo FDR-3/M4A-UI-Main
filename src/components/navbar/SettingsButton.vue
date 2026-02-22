@@ -36,7 +36,6 @@
   import { navigation, MenuIndex } from '/src/assets/globalStates/Navigation.vue'
   import { IonButton, IonIcon, IonModal, IonContent, IonText, IonRadio, IonRadioGroup, IonInput } from '@ionic/vue'
   import { settingsSharp, closeCircle } from 'ionicons/icons'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { validateRpcEndpoint } from '/src/assets/contracts/WalletHelper.vue'
   import { updateRpcEndpoint } from '/src/assets/contracts/Solana/AnchorLendingWorkSpace.vue'
   import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
@@ -49,13 +48,13 @@
 
   var radioGroupSelection = ref("Extrnode")
   var defaultRPCName = ref("")
-  var rpcString = ref(anchorPrograms.lending.lendingProgram.provider.connection.rpcEndpoint)
+  var rpcString = ref("")
   var isSettingsModalOpen = ref(false)
 
   onMounted(() =>
   {
-    const rpcSetting = localStorage.getItem("rpcSetting")
-    if(rpcSetting == "Extrnode")
+    const rpcSetting = localStorage.getItem("rpcSetting") || ""
+    if(rpcSetting == "Extrnode" || rpcSetting == "")
     {
       radioGroupSelection.value = "Extrnode"
       if(isProduction())
@@ -84,13 +83,6 @@
   function openSettingsModal()
   {
     isSettingsModalOpen.value = true
-  }
-
-  function test()
-  {
-    console.log(window.location.hostname)
-    console.log(radioGroupSelection.value)
-    console.log(anchorPrograms.lending.lendingProgram.provider.connection.rpcEndpoint)
   }
 
   const handleRadioChange = (event: CustomEvent) =>
