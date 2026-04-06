@@ -3,7 +3,7 @@
     <div class="smallMarginTop">
       <h2>Current Statement Month And Year:</h2>
       <div class="flexCenterRow preserveWhiteSpace nMediumMarginTop">
-        <h2>{{ anchorPrograms.currentStatementMonth + ", " }}</h2>
+        <h2>{{ anchorPrograms.currentStatementMonthName + ", " }}</h2>
         <h2>{{ anchorPrograms.currentStatementYear }}</h2>
       </div>
       <ion-text>Change Current Statement Month And Year</ion-text>
@@ -52,8 +52,8 @@
     <div class=" flexCenterRow">
       <div style="width: 90%">
         <ion-input v-model="tokenMintAddressInput" class="mediumMarginBottom" fill="outline" placeholder="Enter The Mint Address"></ion-input>
-        <ion-input v-model="pythPriceFeedID" class="mediumMarginBottom" fill="outline" placeholder="Enter The Pyth Price Update Key"></ion-input>
-        <ion-input v-model="tokenDecmialCountInput" class="mediumMarginBottom" fill="outline" type="number" min="0" max="10" step="1" placeholder="Enter The Token Decimal"></ion-input>
+        <ion-input v-model="pythPriceFeedID" class="mediumMarginBottom" fill="outline" placeholder="Enter The Pyth Price Feed ID"></ion-input>
+        <ion-input v-model="tokenDecimalCountInput" class="mediumMarginBottom" fill="outline" type="number" min="0" max="10" step="1" placeholder="Enter The Token Decimal"></ion-input>
 
         <ion-label>Token Program</ion-label><br>
         <Select
@@ -151,7 +151,7 @@
 
   var tokenMintAddressInput = ref()
   var pythPriceFeedID = ref()
-  var tokenDecmialCountInput = ref()
+  var tokenDecimalCountInput = ref()
   var createSubMarketModal = ref()
   var editTokenReserveModal = ref()
   var monthSelect = ref()
@@ -202,7 +202,7 @@
     
     tokenMintAddressInput.value = tokenAddress
     pythPriceFeedID.value = tokenInfo.pythId.slice(2)
-    tokenDecmialCountInput.value = tokenInfo.decimalAmount
+    tokenDecimalCountInput.value = tokenInfo.decimalAmount
     tokenProgramSelect.value = tokenInfo.tokenProgram
 
     await addTokenReserve()
@@ -215,19 +215,18 @@
       const mintAddressKey = new PublicKey(tokenMintAddressInput.value)
 
       const tx = await anchorPrograms.lending.lendingProgram.methods.addTokenReserve(
-        mintAddressKey,
-        tokenDecmialCountInput.value,
+        tokenDecimalCountInput.value,
         Array.from(Buffer.from(pythPriceFeedID.value, "hex")),
         borrowAPY.value * 100,//convert to fixedpoint notation
         trueFalseSelect.value,
-        new anchor.BN(globalLimitInput.value * Math.pow(10, tokenDecmialCountInput.value)),//convert to fixedpoint notation
+        new anchor.BN(globalLimitInput.value * Math.pow(10, tokenDecimalCountInput.value)),//convert to fixedpoint notation
         solvencyInsurance.value * 100)//convert to fixedpoint notation
-      .accounts({ mint: mintAddressKey, tokenProgram: tokenProgramSelect.value })
+      .accounts({ tokenMint: mintAddressKey, tokenProgram: tokenProgramSelect.value })
       .rpc()
 
       tokenMintAddressInput.value = ""
       pythPriceFeedID.value = []
-      tokenDecmialCountInput.value = ""
+      tokenDecimalCountInput.value = ""
       await confirmLendingTransaction(tx, toast, "add_token_reserve")
     }
     catch(error)

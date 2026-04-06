@@ -898,10 +898,10 @@
           accountSelect.value
         ).instruction()
 
-        transaction.add(instruction);
+        transaction.add(instruction)
       }
 
-      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, []);
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])
       await confirmLendingTransaction(tx, toast, "update_user_snap_shots")
     }
     catch(error)

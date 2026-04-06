@@ -452,10 +452,10 @@
           accountSelect.value
         ).instruction()
 
-        transaction.add(instruction);
+        transaction.add(instruction)
       }
 
-      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, []);
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])
       await confirmLendingTransaction(tx, toast, "update_user_snap_shots")
     }
     catch(error)
@@ -520,7 +520,7 @@
                 accountSelect.value,
                 new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount))//convert to fixedpoint notation
               )
-              .accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram })
+              .accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
               .remainingAccounts(remainingAccounts)
               .instruction(),
             signers: []

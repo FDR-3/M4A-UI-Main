@@ -254,7 +254,7 @@
     var value = 0
     var processedTableData = []
     var newTableData = cloneDeep(tokenReserves)
-    console.log(tokenReserves)
+
     if(!newTableData.data)
       return
 
@@ -321,7 +321,7 @@
         0, //Use Submarket Index 0, needed for monthly statement
         adminAccounts.solvencyTreasuryLendingAccountIndex, //Use Solvency account index 0
         null
-      ).accounts({ mint: event.value.tokenMintAddress, tokenProgram: tokenProgram })
+      ).accounts({ tokenMint: event.value.tokenMintAddress, tokenProgram: tokenProgram })
       .rpc()
       await confirmLendingTransaction(tx, toast, "claim_solvency_insurance_fees")
 
@@ -347,7 +347,7 @@
         1, //Use Submarket Index 1, HODL Treasury uses the 100% fee submarket
         adminAccounts.hodlTreasuryLendingAccountIndex, //Use HODL account index 0
         null
-      ).accounts({ mint: event.value.tokenMintAddress, tokenProgram: tokenProgram })
+      ).accounts({ tokenMint: event.value.tokenMintAddress, tokenProgram: tokenProgram })
       .rpc()
       await confirmLendingTransaction(tx, toast, "claim_liquidation_fees")
 

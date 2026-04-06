@@ -2,7 +2,7 @@
   import { reactive } from 'vue'
   import { PublicKey } from "@solana/web3.js"
 
-  const newData = new Date()
+  const newDate = new Date()
 
   export const monthList = 
   [
@@ -83,8 +83,9 @@
     usdcFeeTokenAddress: new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"),//Devnet USDC_MINT_ADDRESS
     isM4AFeeTokenAccountReady: false,
     isChatFeeTokenAccountReady: false,
-    currentStatementMonth: monthList[newData.getMonth()].monthName,
-    currentStatementYear: newData.getFullYear(),
+    currentStatementMonthName: undefined, //monthList[newDate.getMonth()].monthName,
+    currentStatementMonthNumber: undefined, //newDate.getMonth() + 1,
+    currentStatementYear: undefined, //newDate.getFullYear(),
     blockChainTimeStamp: 0
   })
 

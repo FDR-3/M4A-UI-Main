@@ -8,7 +8,7 @@
   import { getLendingProtocol,
   getLendingProtocolCEOAccount,
   getTokenReserves,
-  settokenReserveFontEndInfoHashMap,
+  setTokenReserveFontEndInfoHashMap,
   getSubMarkets,
   getLendingUserMonthlyStatementsWrapper,
   setLendingUserAccountHashMap,
@@ -55,7 +55,7 @@
     //Token Reserves
     tokenReserves.data = await getTokenReserves()
     
-    settokenReserveFontEndInfoHashMap()
+    setTokenReserveFontEndInfoHashMap()
     await listenForNewTokenChanges()
 
     //SubMarkets
@@ -75,7 +75,8 @@
     const lendingProtocol = await getLendingProtocol()
     if(lendingProtocol)
     {
-      anchorPrograms.currentStatementMonth = monthList[lendingProtocol.currentStatementMonth-1].monthName
+      anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
+      anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
       anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
     }
     await listenForLendingProtocolChanges()
@@ -122,7 +123,7 @@
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
-      settokenReserveFontEndInfoHashMap()
+      setTokenReserveFontEndInfoHashMap()
     })
   }
 
@@ -143,7 +144,7 @@
     {
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
-      settokenReserveFontEndInfoHashMap()
+      setTokenReserveFontEndInfoHashMap()
       subMarkets.data = await getSubMarkets()
       lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
     
@@ -171,7 +172,8 @@
     {
       //Handle account change..
       const lendingProtocol = await getLendingProtocol()
-      anchorPrograms.currentStatementMonth = monthList[lendingProtocol.currentStatementMonth-1].monthName
+      anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
+      anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
       anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
     })
   }

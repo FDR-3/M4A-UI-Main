@@ -91,6 +91,7 @@
     for(var i=0; i<tokenReserves.length; i++)
     {
       const tokenReserve = tokenReserves[i].account
+      tokenReserve.pda = tokenReserves[i].publicKey
 
       //Convert Deposit Amount To Decimal from Fixed Point
       const decimalAmount = tokenDecimalHashMap.get(tokenReserve.tokenMintAddress.toBase58())
@@ -127,7 +128,7 @@
     }
   }
 
-  export function settokenReserveFontEndInfoHashMap()
+  export function setTokenReserveFontEndInfoHashMap()
   {
     console.log("Updating Token Reserve Hash Map")
     
@@ -169,6 +170,7 @@
     for(var i=0; i<allSubMarkets.length; i++)
     {
       const subMarket = allSubMarkets[i].account
+      subMarket.pda = allSubMarkets[i].publicKey
 
       //Populate Token Reserve hash map
       var ownerTokenReserveList: any = []
@@ -359,7 +361,7 @@
       lendingUserTabAccount.owner.toBase58() +
       lendingUserTabAccount.userAccountIndex.toString(), lendingUserTabAccount)
 
-      //Set user  tab account list hash map
+      //Set user tab account list hash map
       var list = []
       const previousLendingUserTabList = userTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
 
@@ -371,7 +373,7 @@
 
       userTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
 
-      //Set user remaining tab acout list hash map
+      //Set user remaining tab account list hash map
       var list = []
       const previousLendingUserRemainingTabList = userRemainingAccountsTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
 
@@ -383,6 +385,8 @@
         pubkey: lendingUserTabAccountPDA,
         userTabAccountIndex: lendingUserTabAccount.userTabAccountIndex,
         tokenMintAddress: lendingUserTabAccount.tokenMintAddress.toString(),
+        subMarketOwnerAddress: lendingUserTabAccount.subMarketOwnerAddress.toString(),
+        subMarketIndex: lendingUserTabAccount.subMarketIndex,
         isSigner: false,
         isWritable: true
       }
@@ -645,6 +649,7 @@
     for(var i=0; i<lendingUserMonthlyStatements.data.length; i++)
     {
       const lendingUserMonthlyStatementAccount = lendingUserMonthlyStatements.data[i].account
+      lendingUserMonthlyStatementAccount.pda = lendingUserMonthlyStatements.data[i].publicKey
 
       const tokenMintAddress = lendingUserMonthlyStatementAccount.tokenMintAddress.toString()
       const subMarketOwnerAddress = lendingUserMonthlyStatementAccount.subMarketOwnerAddress.toString()

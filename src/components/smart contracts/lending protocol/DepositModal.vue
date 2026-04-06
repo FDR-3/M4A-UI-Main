@@ -408,13 +408,12 @@
       //Simulate Transaction and Calculate Compute Units
       const instruction = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
-        selectedTokenMintAddress,
         adminAccounts.lendingCEOAddressKey,
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
         accountName.value
-      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram })
+      ).accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
       .instruction()
 
       const transaction = new anchor.web3.Transaction().add(instruction)
@@ -433,13 +432,12 @@
       //Execute Transaction
       const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
-        selectedTokenMintAddress,
         adminAccounts.lendingCEOAddressKey,
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
         accountName.value
-      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram })
+      ).accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
       .preInstructions([modifyComputeUnits/*, addPriorityFee*/])
       .rpc()
 

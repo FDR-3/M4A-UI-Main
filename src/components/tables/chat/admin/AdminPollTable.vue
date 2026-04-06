@@ -268,7 +268,7 @@
     <div class=" flexCenterRow">
       <div style="width: 90%">
         <ion-input v-model="tokenMintAddressInput" fill="outline" placeholder="Enter The Mint Address For The Fee Token"></ion-input>
-        <ion-input v-model="tokenDecmialCountInput" fill="outline" type="number" min="0" placeholder="Enter The Token Decimal Count When Adding" class="tinyMarginTop"></ion-input>
+        <ion-input v-model="tokenDecimalCountInput" fill="outline" type="number" min="0" placeholder="Enter The Token Decimal Count When Adding" class="tinyMarginTop"></ion-input>
         
         <div class="flexCenterRow">
           <ion-button class="smallMarginBottom" color="dark" @click="addChatFeeTokenAccount()" style="width:77px">Add</ion-button>
@@ -311,7 +311,7 @@
   var event = ref()
 
   var tokenMintAddressInput = ref()
-  var tokenDecmialCountInput = ref()
+  var tokenDecimalCountInput = ref()
 
   function exportCSV(e: Event) 
   {
@@ -446,9 +446,9 @@
   {
     try
     {
-      const tx = await anchorPrograms.chat.chatProgram.methods.addFeeTokenEntry(new PublicKey(tokenMintAddressInput.value), tokenDecmialCountInput.value).rpc()
+      const tx = await anchorPrograms.chat.chatProgram.methods.addFeeTokenEntry(new PublicKey(tokenMintAddressInput.value), tokenDecimalCountInput.value).rpc()
       tokenMintAddressInput.value = ""
-      tokenDecmialCountInput.value = ""
+      tokenDecimalCountInput.value = ""
       await confirmChatTransaction(tx, toast, "add_fee_token_entry")
     }
     catch(error)
@@ -463,7 +463,7 @@
     {
       const tx = await anchorPrograms.chat.chatProgram.methods.removeFeeTokenEntry(new PublicKey(tokenMintAddressInput.value)).rpc()
       tokenMintAddressInput.value = ""
-      tokenDecmialCountInput.value = ""
+      tokenDecimalCountInput.value = ""
       await confirmChatTransaction(tx, toast, "remove_fee_token_entry")
     }
     catch(error)

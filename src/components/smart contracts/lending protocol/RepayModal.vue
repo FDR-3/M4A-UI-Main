@@ -384,7 +384,7 @@
         accountSelect.value,
         new anchor.BN(repayAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
         repayMax.value
-      ).accounts({ mint: selectedTokenMintAddress, tokenProgram: tokenProgram }).rpc()
+      ).accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram }).rpc()
 
       await confirmLendingTransaction(tx, toast, "repay_tokens")
 
