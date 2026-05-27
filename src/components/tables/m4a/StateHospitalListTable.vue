@@ -146,7 +146,7 @@
 </template>
   
 <script setup lang="ts">
-  import { ref, defineProps } from 'vue'
+  import { ref } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonInput, IonPopover } from '@ionic/vue'
   import { search, download } from 'ionicons/icons'
   import DataTable from 'primevue/datatable'

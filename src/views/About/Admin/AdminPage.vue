@@ -80,7 +80,10 @@
     confirmChatTransaction,
     confirmLendingTransaction,
     confirmAlertTransaction,
+    doesKeyExistInLookUpTable,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { Transaction, AddressLookupTableProgram } from '@solana/web3.js'
+  import { getLendingProtocolPDA, getLendingStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
 
   const toast = inject('toast')
   const colorName = inject('colorName') as string
@@ -127,7 +130,37 @@
   {
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol(monthSelect.value, Number(statementYearInput.value)).rpc()
+      const transaction = new Transaction()
+      
+      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot("finalized")
+      const [createLookUpTableInstruction, lookUpTableAddress] = 
+      AddressLookupTableProgram.createLookupTable({
+        authority: connectedWallet.publicKey,
+        payer: connectedWallet.publicKey,
+        recentSlot: slot
+      })
+      transaction.add(createLookUpTableInstruction)
+
+      const lendingProtocolPDA = getLendingProtocolPDA()
+      const lendingStatsPDA = getLendingStatsPDA()
+
+      if(!doesKeyExistInLookUpTable(anchorPrograms.lendingProtocolLookUpTableAccount, lendingProtocolPDA) && !doesKeyExistInLookUpTable(anchorPrograms.lendingProtocolLookUpTableAccount, lendingStatsPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          lookupTable: lookUpTableAddress,
+          addresses: [lendingProtocolPDA, lendingStatsPDA]
+        })
+        transaction.add(extendLookUpTableInstruction)
+      }
+    
+      const initializeLendingProtocolInstruction = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol(monthSelect.value, Number(statementYearInput.value), lookUpTableAddress).instruction()
+      transaction.add(initializeLendingProtocolInstruction)
+
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])
+
       await confirmLendingTransaction(tx, toast, "initialize_lending_protocol")
     }
     catch(error)

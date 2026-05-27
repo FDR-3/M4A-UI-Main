@@ -23,6 +23,11 @@
     data: undefined
   })
 
+  export const tokenReserveStats = reactive(
+  {
+    data: undefined
+  })
+
   //Key: Token Mint Address, Value: Specific Token Reserve
   export const tokenReservesHashMap = reactive(
   {

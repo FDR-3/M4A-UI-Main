@@ -213,7 +213,7 @@
     </div>
   </div>
 
-  <div v-else-if="!isBrowsingAllUsers" class="mediumMarginTop">No Lending User Found At That PublicKey</div>
+  <div v-else-if="!isBrowsingAllUsers" class="mediumMarginTop">{{ anchorPrograms.isLendingProtocolReady ? 'No Lending User Found At That PublicKey' : 'Loading' }}</div>
 </template>
 
 <script setup lang="ts">
@@ -234,7 +234,7 @@
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import LendingLeaderBoardTable from '/src/components/tables/lending/LendingLeaderBoardTable.vue'
   import PortfolioChart from '/src/components/charts/lending/PortfolioChart.vue'
-  import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import HealthFactorBig from '/src/components/smart contracts/lending protocol/HealthFactorBig.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -479,7 +479,11 @@
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
   {
-    return JSON.stringify(connectedWallet)
+    return JSON.stringify(
+    {
+      addressString: connectedWallet.addressString,
+      selectedLendingUserAccountIndex: connectedWallet.selectedLendingUserAccountIndex
+    })
   })
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
@@ -708,13 +712,13 @@
             {
               labels.push(monthList[month-1].monthName)
 
-              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(tokenMintAddress +
+              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
+              year.toString() +
+              tokenMintAddress +
               subMarketOwnerAddress +
               subMarketIndex.toString() +
               searchAddress.value +
-              accountSelect.value.toString() +
-              year.toString() +
-              month.toString())
+              accountSelect.value.toString())
 
               if(userMonthlyStatement)
               {
@@ -794,13 +798,13 @@
             {
               labels.push(monthList[month-1].monthName)
 
-              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(tokenMintAddress +
+              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
+              year.toString() +
+              tokenMintAddress +
               subMarketOwnerAddress +
               subMarketIndex.toString() +
               searchAddress.value +
-              accountSelect.value.toString() +
-              year.toString() +
-              month.toString())
+              accountSelect.value.toString())
 
               if(userMonthlyStatement)
               {
@@ -922,13 +926,13 @@
             {
               labels.push(monthList[month-1].monthName)
 
-              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(tokenMintAddress +
+              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
+              year.toString() +
+              tokenMintAddress +
               subMarketOwnerAddress +
               subMarketIndex.toString() +
               searchAddress.value +
-              accountSelect.value.toString() +
-              year.toString() +
-              month.toString())
+              accountSelect.value.toString())
 
               if(userMonthlyStatement)
               {
@@ -1008,13 +1012,13 @@
             {
               labels.push(monthList[month-1].monthName)
 
-              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(tokenMintAddress +
+              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
+              year.toString() +
+              tokenMintAddress +
               subMarketOwnerAddress +
               subMarketIndex.toString() +
               searchAddress.value +
-              accountSelect.value.toString() +
-              year.toString() +
-              month.toString())
+              accountSelect.value.toString())
 
               if(userMonthlyStatement)
               {

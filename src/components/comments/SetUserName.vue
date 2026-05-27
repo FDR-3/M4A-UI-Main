@@ -153,7 +153,7 @@
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
   {
-    return JSON.stringify(connectedWallet)
+    return JSON.stringify({addressString: connectedWallet.addressString})
   })
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>

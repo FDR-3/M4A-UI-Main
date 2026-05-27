@@ -6,6 +6,7 @@
       show-gridlines
       size="small" 
       :value="stableCoinTableData"
+      :loading=isLoading
       :globalFilterFields="
       [
         'tokenMintAddressString',
@@ -96,6 +97,7 @@
       v-model:filters="filters" 
       show-gridlines size="small" 
       :value="CryptoCurrencyTableData"
+      :loading=isLoading
       :globalFilterFields="
       [
         'tokenMintAddressString',

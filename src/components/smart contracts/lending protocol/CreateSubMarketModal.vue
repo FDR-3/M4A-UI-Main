@@ -78,9 +78,12 @@
     copyTokenMintAddressText,
     isValidSolanaPublicKey,
     confirmLendingTransaction,
+    doesKeyExistInLookUpTable,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
-  import { getUserNextSubMarketIndex } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { getUserNextSubMarketIndex, getSubMarketPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { Transaction, AddressLookupTableProgram } from '@solana/web3.js'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
@@ -155,16 +158,61 @@
   {
     try
     {
-      const userNextSubMarketIndex = getUserNextSubMarketIndex(selectedTokenMintAddress.toString(), connectedWallet.addressString)
+      const transaction = new Transaction()
 
-      const tx = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
+      var createLookUpTableInstruction = undefined
+      var lookUpTableAddress = undefined
+
+      //Check if Sub Market Owner Look Up Table Account has already been initialized
+      const subMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(connectedWallet.addressString)
+      if(!subMarketOwnerLookUpTableAccount)
+      {
+        const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot("finalized"); //Need a semi colon before a tuple reassignment.
+
+        [createLookUpTableInstruction, lookUpTableAddress] = 
+        AddressLookupTableProgram.createLookupTable({
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          recentSlot: slot
+        })
+
+        transaction.add(createLookUpTableInstruction)
+      }
+      else
+        lookUpTableAddress = subMarketOwnerLookUpTableAccount.key
+
+      const userNextSubMarketIndex = getUserNextSubMarketIndex(selectedTokenMintAddress.toString(), connectedWallet.addressString)
+      const subMarketPDA = getSubMarketPDA(selectedTokenMintAddress, connectedWallet.publicKey, userNextSubMarketIndex)
+
+      if(!doesKeyExistInLookUpTable(subMarketOwnerLookUpTableAccount, subMarketPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          lookupTable: lookUpTableAddress,
+          addresses: [subMarketPDA]
+        })
+
+        transaction.add(extendLookUpTableInstruction)
+      }
+
+      const createSubMarketInstruction = await anchorPrograms.lending.lendingProgram.methods.createSubMarket
       (
         selectedTokenMintAddress,
         userNextSubMarketIndex,
         new PublicKey(feeCollectorAddress.value),
-        feePercentage.value * 100//convert to fixedpoint notation
-      ).rpc()
+        feePercentage.value * 100,//convert to fixedpoint notation
+        lookUpTableAddress
+      ).instruction()
+
+      
+      transaction.add(createSubMarketInstruction)
+
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])
+
       await confirmLendingTransaction(tx, toast, "create_sub_market")
+
       creatingSubMarket.value = false
     }
     catch(error)

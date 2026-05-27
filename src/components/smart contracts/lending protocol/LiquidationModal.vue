@@ -11,9 +11,9 @@
 
     <HealthFactorSmall :assetValue="totalAssetValue" :debtValue="totalDebtValue" :openSide="'bottom'"/>
    
-    <div class="nMediumMarginTop flexCenterRow tinyMarginBottom">
+    <div class="nMediumMarginLeft nMediumMarginTop flexCenterRow tinyMarginBottom">
       <InfoButton :infoMessage="liquidationInfoMSG" :openSide="'bottom'"/>
-      <div class="nMediumSmallMarginLeft">
+      <div class="nMediumLargeMarginLeft">
         <ion-text v-if="solvent" color="green">Solvent</ion-text>
         <ion-text v-else color="red">Insolvent</ion-text>
       </div>
@@ -155,19 +155,10 @@
       </ion-input>
     </div>
 
-    <div class="flexCenterRow">
-      <div style="margin-left: -15px; margin-right: -4px">
-      <InfoButton :infoMessage="snapShotInfo"/>
-      </div>
-      <div title="Interest Earned and Accrued Snapshot" class="progressBarStep flexCenterColumn nMediumSmallMarginLeft">
-        <div class="nMediumSmallMarginTop"><ion-label>{{ snapShotValidCountDown }}</ion-label></div>
-        <div v-if="snapShotValidCountDown!=0" class="finishedCircle"></div>
-        <div v-else class="inProgressCircle"></div>
-      </div>
-      <div title="Withdraw" class="progressBarStep flexCenterColumn">
-        <div class="inProgressCircle"></div>
-      </div>
-    </div>
+    <ion-radio-group v-model="radioGroupSelection" @ionChange="handleRadioChange($event)">
+      <ion-radio :color="colorName" value="Wallet" label-placement="end">Deposit Liquidation To Wallet</ion-radio><br>
+      <ion-radio :color="colorName" value="Account" label-placement="end">Deposit Liquidation To Lending Account</ion-radio><br>
+    </ion-radio-group>
 
     <ion-text v-if="!connectedWallet.isConnected" class="" style="font-size: 11px"
     >
@@ -175,30 +166,21 @@
     </ion-text>
 
     <ion-button
-      v-else-if="snapShotValidCountDown==0"
-      id="borrowModalButton"
-      color="dark"
-      @click="updateUserSnapShots()"
-      class="mediumSmallMarginTop nTinyMarginBottom"
-    >
-      Update SnapShots
-    </ion-button>
-
-    <ion-button
-      v-else
+      v-else-if="anchorPrograms.isLendingProtocolReady"
       color="dark"
       @click="liquidateAccount()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="overByteSizeLimit || repayAmount==0 || snapShotValidCountDown==0"
+      :disabled="overByteSizeLimit || repayAmount==0"
     >
       Liquidate
     </ion-button>
+    <ion-text v-else>Loading</ion-text>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, watch, computed, onUpdated } from 'vue'
-  import { IonButton, IonText, IonLabel, IonInput, IonIcon } from '@ionic/vue'
+  import { ref, inject, watch, computed, onUpdated, onMounted } from 'vue'
+  import { IonButton, IonText, IonLabel, IonInput, IonIcon, IonRadio, IonRadioGroup, } from '@ionic/vue'
   import { close } from 'ionicons/icons'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
@@ -207,14 +189,24 @@
     SYSTEM_PROGRAM_ADDRESS_STRING,
     MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey, Transaction } from "@solana/web3.js"
-  import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { VersionedTransaction, TransactionMessage, PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
+  import { confirmLendingTransaction,
+    parseProgramErrorCode,
+    doesKeyExistInLookUpTable,
+    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { subMarketsHashMap, subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserHashMap,
     lendingUserAccountsHashMap,
+    lendingUserTabAccountsHashMap,
     lendingUserTabAccountListHashMap,
+    lendingUserMonthlyStatementsHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { getLendingStatsPDA,
+    getSubMarketPDA,
+    getLendingUserAccountPDA,
+    getLendingUserTabAccountPDA,
+    getLendingUserMonthlyStatementAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
@@ -226,8 +218,10 @@
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
+  const colorName = inject('colorName') as string
   const colorHexValue = inject('colorHexValue')
 
+  var radioGroupSelection = ref()
   var liquidatiDisplayName = ref()
   var accountDisplayName = ref()
   var borrowPositionToRepaySelect = ref()
@@ -259,6 +253,7 @@
   var repaymentTokenProgram = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var repaymentTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var liquidationTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
+  var liquidationTokenProgram = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var healthFactorIntervalId: any
   var tabIntervalId: any
 
@@ -271,9 +266,33 @@
   var tabDepositHashMap = new Map<string, string>()
   var tabBorrowHashMap = new Map<string, string>()
 
-  const snapShotInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
-  var snapShotValidCountDown = ref(0)
-  var snapShotCountDownIntervalId: any
+  onMounted (() =>
+  {
+    const liquidatorDepositToWalletSetting = localStorage.getItem("depositLiquidationToWallet")
+
+    if(liquidatorDepositToWalletSetting == "false")
+      radioGroupSelection.value = "Account"
+    else
+      radioGroupSelection.value = "Wallet"
+  })
+
+  const handleRadioChange = (event: CustomEvent) =>
+  {
+    radioGroupSelection.value = event.detail.value
+
+    if(radioGroupSelection.value == "Wallet")
+      localStorage.setItem("depositLiquidationToWallet", "true")
+    else
+      localStorage.setItem("depositLiquidationToWallet", "false")
+  }
+
+  var depositLiquidationToWallet = computed (() =>
+  {
+    if(radioGroupSelection.value == "Wallet")
+      return true
+    else
+      return false
+  })
 
   var solvent = computed (() =>
   {
@@ -367,7 +386,7 @@
       return 0
   })
 
-  const liquidationInfoMSG = "\nYou can repay up to 50% of\na Liquidati's debt position\nif it isn't insolvent and\nclaim a 7% bonus value on\nthe liquidated deposited\ncollateral that you choose.\n\nIf it is insolvent, you can\nrepay up to 100% of their\ndebt position, although\nthis is not immediately\nprofitable.\n\n A 1% bonus value fee is\nalso collected for the\nHODL Treasury\n"
+  const liquidationInfoMSG = "\nYou can repay up to 50% of\na Liquidati's debt position\nif it isn't insolvent and\nclaim a 7% bonus value on\nthe liquidated deposited\ncollateral that you choose.\n\nIf it is insolvent, you can\nrepay up to 100% of their\ndebt position, although\nthis is not immediately\nprofitable.\n\n A 1% value fee is\nalso collected for the\nHODL Treasury\n"
 
   //Move cursor back after emoji insert
   onUpdated(() => 
@@ -389,8 +408,6 @@
     {
       stopTabCalculation()
       startTabCalculation()
-      clearSnapShotIntervalCountDown()
-      await setSnapShotIntervalCountDown()
     }
   })
 
@@ -427,7 +444,6 @@
           {
             stopTabCalculation()
             stopHealthFactorCalculation()
-            clearSnapShotIntervalCountDown()
             cancelAddingAdditionalLendingAccount()
             addingAdditionalLendingAccount.value = false
           }
@@ -452,8 +468,6 @@
     startTabCalculation()
     stopHealthFactorCalculation()
     startHealthFactorCalculation()
-    clearSnapShotIntervalCountDown()
-    await setSnapShotIntervalCountDown()
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     
     if(lendingUserAccountsHashMap.map)
@@ -483,47 +497,6 @@
       if(inputElement)
         inputElement.focus()
     }, 10)
-  }
-
-  async function setSnapShotIntervalCountDown()
-  {
-    const allUserTabAccounts = lendingUserTabAccountListHashMap.map.get(liquidatiAddress.toString() + liquidatiAccountIndex.toString())
-    const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
-    const currentBlockTimeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
-    var oldestSnapShot = Number(allUserTabAccounts[0].interestChangeLastUpdatedTimeStamp)
-
-    for(var i=0; i<allUserTabAccounts.length; i++)
-    {
-      if(allUserTabAccounts[i].interestChangeLastUpdatedTimeStamp < oldestSnapShot)
-        oldestSnapShot = Number(allUserTabAccounts[i].interestChangeLastUpdatedTimeStamp)
-    }
-    
-    const timeDiff = currentBlockTimeStamp - oldestSnapShot
-
-    if(timeDiff < 120)
-    {
-      snapShotValidCountDown.value = 120 - timeDiff
-
-      snapShotCountDownIntervalId = setInterval(() =>
-      {
-        snapShotValidCountDown.value--
-
-        if(snapShotValidCountDown.value <= 0)
-          clearSnapShotIntervalCountDown()
-
-      }, 1000)
-    }
-    else
-      snapShotValidCountDown.value = 0
-  }
-
-  function clearSnapShotIntervalCountDown()
-  {
-    if(snapShotCountDownIntervalId != undefined)
-    {
-      clearInterval(snapShotCountDownIntervalId)
-      snapShotCountDownIntervalId = undefined
-    }
   }
 
   function calculateHealthFactorValues(timeStamp: number)
@@ -732,6 +705,7 @@
     const tokenInfo = tokenReserveFontEndInfoHashMap.get(liquidationTokenMintAddress.toString())
     depositSVG.value = tokenInfo.svg
     liquidationDecimalAmount = tokenInfo.decimalAmount
+    liquidationTokenProgram = tokenInfo.tokenProgram
     repayAmount.value = 0
   }
   
@@ -865,6 +839,7 @@
       
       const tokenInfo = tokenReserveFontEndInfoHashMap.get(liquidationTokenMintAddress.toString())
       liquidationDecimalAmount = tokenInfo.decimalAmount
+      liquidationTokenProgram = tokenInfo.tokenProgram
       depositSVG.value = tokenInfo.svg
 
       selectedDepositedAmount.value = tabDepositHashMap.get(liquidationTokenMintAddress.toString() +
@@ -880,138 +855,598 @@
     }
   }
 
-  async function updateUserSnapShots()
+  function generateLiquidateAccountRemainingAccounts()
   {
-    const lendingUserTabAccounts = lendingUserTabAccountListHashMap.map.get(liquidatiAddress.toString() + liquidatiAccountIndex.toString())
-    const transaction = new Transaction()
+    var liquidationInstructionRemainingAccounts = []
 
-    try
+    //Populate Lending Stats remaining account
+    const lendingStatsPDA = getLendingStatsPDA()
+    const lendingStatsRemainingAccount = 
     {
-      for(var i=0; i<lendingUserTabAccounts.length; i++)
+      pubkey: lendingStatsPDA,
+      isSigner: false,
+      isWritable: true
+    }
+    liquidationInstructionRemainingAccounts.push(lendingStatsRemainingAccount)
+
+    //Populate Repayment Sub Market remaining account
+    const repaymentSubMarketPDA = getSubMarketPDA(repaymentTokenMintAddress,
+    borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress,
+    borrowPositionToRepaySelect.value.repaymentSubMarketIndex)
+    const repaymentSubMarketRemainingAccount = 
+    {
+      pubkey: repaymentSubMarketPDA,
+      isSigner: false,
+      isWritable: true
+    }
+    liquidationInstructionRemainingAccounts.push(repaymentSubMarketRemainingAccount)
+
+    //Populate Liquidation Sub Market remaining account
+    const liquidationSubMarketPDA = getSubMarketPDA(liquidationTokenMintAddress,
+    depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress,
+    depositPositionToLiquidateSelect.value.liquidationSubMarketIndex)
+    const liquidationSubMarketRemainingAccount = 
+    {
+      pubkey: liquidationSubMarketPDA,
+      isSigner: false,
+      isWritable: true
+    }
+    liquidationInstructionRemainingAccounts.push(liquidationSubMarketRemainingAccount)
+
+    //Populate Liquidati Repayment Lending User Tab remaining account
+    const liquidatiRepaymentLendingUserTabPDA = getLendingUserTabAccountPDA(repaymentTokenMintAddress,
+    borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress,
+    borrowPositionToRepaySelect.value.repaymentSubMarketIndex,
+    liquidatiAddress,
+    liquidatiAccountIndex)
+    const liquidatiRepaymentLendingUserTabRemainingAccount = 
+    {
+      pubkey: liquidatiRepaymentLendingUserTabPDA,
+      isSigner: false,
+      isWritable: true
+    }
+    liquidationInstructionRemainingAccounts.push(liquidatiRepaymentLendingUserTabRemainingAccount)
+
+    //Populate Liquidati Liquidation Lending User Tab remaining account
+    const liquidatiLiquidationLendingUserTabPDA = getLendingUserTabAccountPDA(liquidationTokenMintAddress,
+    depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress,
+    depositPositionToLiquidateSelect.value.liquidationSubMarketIndex,
+    liquidatiAddress,
+    liquidatiAccountIndex)
+    const liquidatiLiquidationLendingUserTabRemainingAccount = 
+    {
+      pubkey: liquidatiLiquidationLendingUserTabPDA,
+      isSigner: false,
+      isWritable: true
+    }
+    liquidationInstructionRemainingAccounts.push(liquidatiLiquidationLendingUserTabRemainingAccount)
+
+    //Populate Liquidati Repayment Monthly Statement remaining account
+    const liquidatiRepaymentMonthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+    anchorPrograms.currentStatementYear,
+    repaymentTokenMintAddress,
+    borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress,
+    borrowPositionToRepaySelect.value.repaymentSubMarketIndex,
+    liquidatiAddress,
+    liquidatiAccountIndex)
+    const liquidatiRepaymentMonthlyStatementRemainingAccount = 
+    {
+      pubkey: liquidatiRepaymentMonthlyStatementPDA,
+      isSigner: false,
+      isWritable: true
+    }
+    liquidationInstructionRemainingAccounts.push(liquidatiRepaymentMonthlyStatementRemainingAccount)
+
+    //Populate Liquidati Liquidation Monthly Statement remaining account
+    const liquidatiLiquidationMonthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+    anchorPrograms.currentStatementYear,
+    liquidationTokenMintAddress,
+    depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress,
+    depositPositionToLiquidateSelect.value.liquidationSubMarketIndex,
+    liquidatiAddress,
+    liquidatiAccountIndex)
+    const liquidatiLiquidationMonthlyStatementRemainingAccount = 
+    {
+      pubkey: liquidatiLiquidationMonthlyStatementPDA,
+      isSigner: false,
+      isWritable: true
+    }
+    liquidationInstructionRemainingAccounts.push(liquidatiLiquidationMonthlyStatementRemainingAccount)
+
+    return liquidationInstructionRemainingAccounts
+  }
+
+  async function createLiquidatorLookUpTableInstructions()
+  {
+    var liquidatorLookUpTableInstructionsToSend = []
+    var liquidatorLookUpTableAddress = null
+
+    //Check if Liquidator Lending User Account has been initialized
+    const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    if(!lendingUserAccount)
+    {
+      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot("finalized"); //Need a semi colon before a tuple reassignment.
+
+      const [createLookUpTableInstruction, lendingUserLookUpTableAddress] = 
+      AddressLookupTableProgram.createLookupTable({
+        authority: connectedWallet.publicKey,
+        payer: connectedWallet.publicKey,
+        recentSlot: slot
+      })
+      console.log("Creating Lending User Look Up Table: " + lendingUserLookUpTableAddress.toBase58())
+      liquidatorLookUpTableAddress = lendingUserLookUpTableAddress
+      liquidatorLookUpTableInstructionsToSend.push(createLookUpTableInstruction)
+
+      //Determine PDA for new Lending User Account that will be created
+      const lendingUserAccountPDA = getLendingUserAccountPDA(connectedWallet.publicKey, accountSelect.value)
+
+      if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserAccountPDA))
       {
-        const instruction = await anchorPrograms.lending.lendingProgram.methods.updateUserSnapShot
-        (
-          lendingUserTabAccounts[i].tokenMintAddress,
-          lendingUserTabAccounts[i].subMarketOwnerAddress,
-          lendingUserTabAccounts[i].subMarketIndex,
-          lendingUserTabAccounts[i].owner,
-          accountSelect.value
-        ).instruction()
-
-        transaction.add(instruction)
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          lookupTable: lendingUserLookUpTableAddress,
+          addresses: [lendingUserAccountPDA]
+        })
+        console.log("Lending User account to extend: " + lendingUserAccountPDA.toBase58())
+        liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
       }
+    }
+    else
+      liquidatorLookUpTableAddress = lendingUserAccount.lookUpTableAddress
 
-      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])
-      await confirmLendingTransaction(tx, toast, "update_user_snap_shots")
-    }
-    catch(error)
+    //Check if Liquidator Repayment Tab Account has been initialized
+    const liquidatorRepaymentTabAccount = lendingUserTabAccountsHashMap.map.get(repaymentTokenMintAddress.toString() +
+    borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress.toString() +
+    borrowPositionToRepaySelect.value.repaymentSubMarketIndex.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
+    if(!liquidatorRepaymentTabAccount)
     {
-      toastPreTransactionError(error, toast, "update_user_snap_shots")
+      //Determine PDA for new LendingUserTabAccount that will be created
+      const liquidatorRepaymentTabAccountPDA = getLendingUserTabAccountPDA(repaymentTokenMintAddress,
+      borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress,
+      borrowPositionToRepaySelect.value.repaymentSubMarketIndex,
+      connectedWallet.publicKey,
+      accountSelect.value)
+
+      if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, liquidatorRepaymentTabAccountPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          lookupTable: liquidatorLookUpTableAddress,
+          addresses: [liquidatorRepaymentTabAccountPDA]
+        })
+        console.log("Liquidator Repayment Tab account to extend: " + liquidatorRepaymentTabAccountPDA.toBase58())
+        liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+      }
     }
+
+    //Check if Liquidator Liquidation Tab Account has been initialized
+    const liquidatorLiquidationTabAccount = lendingUserTabAccountsHashMap.map.get(liquidationTokenMintAddress.toString() +
+    depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress.toString() +
+    depositPositionToLiquidateSelect.value.liquidationSubMarketIndex.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
+    if(!liquidatorLiquidationTabAccount)
+    {
+      //Determine PDA for new LendingUserTabAccount that will be created
+      const liquidatorLiquidationTabAccountPDA = getLendingUserTabAccountPDA(liquidationTokenMintAddress,
+      depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress,
+      depositPositionToLiquidateSelect.value.liquidationSubMarketIndex,
+      connectedWallet.publicKey,
+      accountSelect.value)
+
+      if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, liquidatorLiquidationTabAccountPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          lookupTable: liquidatorLookUpTableAddress,
+          addresses: [liquidatorLiquidationTabAccountPDA]
+        })
+        console.log("Liquidator Liquidation Tab account to extend: " + liquidatorLiquidationTabAccountPDA.toBase58())
+        liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+      }
+    }
+
+    //Check if Liquidator Repayment Monthly Statement Account has been initialized
+    const liquidatorRepaymentMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+    anchorPrograms.currentStatementYear.toString() +
+    repaymentTokenMintAddress.toString() +
+    borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress.toString() +
+    borrowPositionToRepaySelect.value.repaymentSubMarketIndex.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
+    if(!liquidatorRepaymentMonthlyStatement)
+    {
+      //Determine PDA for new MonthlyStatementAccount that will be created
+      const liquidatorRepaymentMonthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+      anchorPrograms.currentStatementYear,
+      repaymentTokenMintAddress,
+      borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress,
+      borrowPositionToRepaySelect.value.repaymentSubMarketIndex,
+      connectedWallet.publicKey,
+      accountSelect.value)
+
+      if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, liquidatorRepaymentMonthlyStatementPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          lookupTable: liquidatorLookUpTableAddress,
+          addresses: [liquidatorRepaymentMonthlyStatementPDA]
+        })
+        console.log("Liquidator Repayment Monthly statement account to extend: " + liquidatorRepaymentMonthlyStatementPDA.toBase58())
+        liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+      }
+    }
+
+    //Check if Liquidator Liquidation Monthly Statement Account has been initialized
+    const liquidatorLiquidationMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+    anchorPrograms.currentStatementYear.toString() +
+    liquidationTokenMintAddress.toString() +
+    depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress.toString() +
+    depositPositionToLiquidateSelect.value.liquidationSubMarketIndex.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
+    if(!liquidatorLiquidationMonthlyStatement)
+    {
+      //Determine PDA for new MonthlyStatementAccount that will be created
+      const liquidatorLiquidationMonthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+      anchorPrograms.currentStatementYear,
+      liquidationTokenMintAddress,
+      depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress,
+      depositPositionToLiquidateSelect.value.liquidationSubMarketIndex,
+      connectedWallet.publicKey,
+      accountSelect.value)
+
+      if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, liquidatorLiquidationMonthlyStatementPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          lookupTable: liquidatorLookUpTableAddress,
+          addresses: [liquidatorLiquidationMonthlyStatementPDA]
+        })
+        console.log("Liquidator Liquidation Monthly statement account to extend: " + liquidatorLiquidationMonthlyStatementPDA.toBase58())
+        liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+      }
+    }
+
+    return[liquidatorLookUpTableAddress, liquidatorLookUpTableInstructionsToSend]
   }
 
   async function liquidateAccount()
   {
-    var payingOffInsolventAccount = false
-
-    if(repayMax.value && !solvent)
-      payingOffInsolventAccount = true
-
-    const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(liquidatiAddress.toString() + liquidatiAccountIndex.toString())
-    var pythIdArray: string[] = []
-
-    for(var i=0; i<remainingTabAccounts.length; i++)
+    try
     {
-      const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
-      pythIdArray.push(tokenInfo.pythId)
-    }
+      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Accounts for some weird error
+      if(lendingUserHashMap.map == undefined)
+        throw new Error("Lending User hash map is undefined. Cannot proceed.")
 
-    const hermesClient = new HermesClient("https://hermes.pyth.network/")
-    const pythSolanaReceiver = new PythSolanaReceiver(
-    {
-      connection: anchorPrograms.lending.connection,
-      wallet: anchorPrograms.lending.wallet,
-    })
+      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Tab Accounts for some weird error
+      if(lendingUserTabAccountsHashMap.map == undefined)
+        throw new Error("Lending User Tab hash map is undefined. Cannot proceed.")
 
-    const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
-    const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
+      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Monthly Statement Accounts for some weird error
+      if(lendingUserMonthlyStatementsHashMap.map == undefined)
+        throw new Error("Monthly Statement hash map is undefined. Cannot proceed.")
 
-    await transactionBuilder.addPostPriceUpdates(priceUpdateData.binary.data)
-    await transactionBuilder.addPriceConsumerInstructions
-    (
-      async(
-        getPriceUpdateAccount: (priceFeedId: string) => PublicKey
-      ): Promise<InstructionWithEphemeralSigners[]> =>
+      var liquidatorLookUpTableInstructionsToSend: anchor.web3.TransactionInstruction[] = []
+      var liquidatorUserLookUpTableAddress: PublicKey | undefined = undefined
+      var payingOffInsolventAccount = false
+      var createMonthlyStatementInstructions: anchor.web3.TransactionInstruction[] = []
+      var repaymentTokenPriceAccountIndex: number | null = null
+      var liquidationTokenPriceAccountIndex: number | null = null
+      const uniqueSubMarketOwnersAddressStrings = new Set<string>()
+
+      if(repayMax.value && !solvent.value)
+        payingOffInsolventAccount = true;
+
+      [liquidatorUserLookUpTableAddress, liquidatorLookUpTableInstructionsToSend] = await createLiquidatorLookUpTableInstructions()
+
+      const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(liquidatiAddress.toString() + liquidatiAccountIndex.toString())
+      var pythIdArray: string[] = []
+
+      for(var i=0; i<remainingTabAccounts.length; i++)
       {
-        var remainingAccounts = []
+        const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
+        uniqueSubMarketOwnersAddressStrings.add(remainingTabAccounts[i].subMarketOwnerAddress)
+        pythIdArray.push(tokenInfo.pythId)
+ 
+        //Get index for the repayment token to use later
+        if(remainingTabAccounts[i].tokenMintAddress == repaymentTokenMintAddress.toString())
+          repaymentTokenPriceAccountIndex = i
 
-        for(var i=0; i<pythIdArray.length; i++)
+        //Get index for the liquidation token to use later
+        if(remainingTabAccounts[i].tokenMintAddress == liquidationTokenMintAddress.toString())
+          liquidationTokenPriceAccountIndex = i
+      }
+
+      const hermesClient = new HermesClient("https://hermes.pyth.network/")
+      const pythSolanaReceiver = new PythSolanaReceiver(
+      {
+        connection: anchorPrograms.lending.connection,
+        wallet: anchorPrograms.lending.wallet,
+      })
+
+      const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
+      const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
+
+      await transactionBuilder.addPostPriceUpdates(priceUpdateData.binary.data)
+      await transactionBuilder.addPriceConsumerInstructions
+      (
+        async(
+          getPriceUpdateAccount: (priceFeedId: string) => PublicKey
+        ): Promise<InstructionWithEphemeralSigners[]> =>
         {
-          remainingAccounts.push(remainingTabAccounts[i])
+          var remainingRefreshAccounts = []
 
-          const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[i]);
-
-          const ephemeralPythPriceUpdateRemainingAccount = 
+          for(var i=0; i<pythIdArray.length; i++)
           {
-            pubkey: ephemeralPythKey,
+            //Push Remaining Tab Account
+            remainingRefreshAccounts.push(remainingTabAccounts[i])
+
+            //Push Remaining Token Reserve Account
+            const tokenReserve = tokenReservesHashMap.map.get(remainingTabAccounts[i].tokenMintAddress)
+            const tokenReserveRemainingAccount =
+            {
+              pubkey: tokenReserve.pda,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingRefreshAccounts.push(tokenReserveRemainingAccount)
+
+            //Push Remaining SubMarket Account
+            const subMarket = subMarketsHashMap.map.get(remainingTabAccounts[i].tokenMintAddress +
+            remainingTabAccounts[i].subMarketOwnerAddress +
+            remainingTabAccounts[i].subMarketIndex.toString())
+            const subMarketRemainingAccount =
+            {
+              pubkey: subMarket.pda,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingRefreshAccounts.push(subMarketRemainingAccount)
+
+            //Push Remaining Monthly Statement Account
+            const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+            anchorPrograms.currentStatementYear.toString() +
+            remainingTabAccounts[i].tokenMintAddress +
+            remainingTabAccounts[i].subMarketOwnerAddress +
+            remainingTabAccounts[i].subMarketIndex.toString() +
+            liquidatiAddress.toString() +
+            liquidatiAccountIndex.toString())
+ 
+            var monthlyStatementPDA: PublicKey
+
+            //Create monthly statement for the new month if it doesn't exist
+            if(!monthlyStatement)
+            {
+              const createNewMonthlyStatementInstruction = await anchorPrograms.lending.lendingProgram.methods.createNewMonthlyStatement
+              (
+                new PublicKey(remainingTabAccounts[i].tokenMintAddress),
+                new PublicKey(remainingTabAccounts[i].subMarketOwnerAddress),
+                remainingTabAccounts[i].subMarketIndex,
+                liquidatiAddress.toString() +
+                liquidatiAccountIndex.toString()
+              )
+              .instruction()
+
+              createMonthlyStatementInstructions.push(createNewMonthlyStatementInstruction)
+
+              //Determine PDA for new MonthlyStatementAccount that will be created
+              monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+              anchorPrograms.currentStatementYear,
+              new PublicKey(remainingTabAccounts[i].tokenMintAddress),
+              new PublicKey(remainingTabAccounts[i].subMarketOwnerAddress),
+              remainingTabAccounts[i].subMarketIndex,
+              liquidatiAddress.toString() +
+              liquidatiAccountIndex.toString())
+
+              //Need to get look up table of person being liquidated
+              /*if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
+              {
+                const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+                {
+                  authority: connectedWallet.publicKey,
+                  payer: connectedWallet.publicKey,
+                  lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+                  addresses: [monthlyStatementPDA]
+                })
+                console.log("Borrow - Existing Tab, Monthly statement account to extend: " + monthlyStatementPDA.toBase58())
+                createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
+              }*/
+            }
+            else
+              monthlyStatementPDA = monthlyStatement.pda
+
+            const monthlyStatementRemainingAccount =
+            {
+              pubkey: monthlyStatementPDA,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingRefreshAccounts.push(monthlyStatementRemainingAccount)
+
+            //Push Remaining Pyth Account For Account Refresh
+            const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[i])
+            const ephemeralPythPriceUpdateRemainingAccount = 
+            {
+              pubkey: ephemeralPythKey,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingRefreshAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
+          }
+
+          if(repaymentTokenPriceAccountIndex == null)
+            throw new Error("The Token Mint Address for the Repayment Token wasn't Found")
+
+          if(liquidationTokenPriceAccountIndex == null)
+            throw new Error("The Token Mint Address for the Liquidation Token wasn't Found")
+
+          const refreshUserHealthAndTokenReservesInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshUserHealthChunkAndTokenReserves(liquidatiAddress, liquidatiAccountIndex)
+          .remainingAccounts(remainingRefreshAccounts)
+          .instruction()
+
+          const liquidationInstructionRemainingAccounts = generateLiquidateAccountRemainingAccounts()
+
+          //Push Repayment Token Pyth Account For Liquidate Account Instruction
+          const repaymentTokenEphemeralPythKey = getPriceUpdateAccount(pythIdArray[repaymentTokenPriceAccountIndex])
+          const repaymentTokenEphemeralPythPriceUpdateRemainingAccount = 
+          {
+            pubkey: repaymentTokenEphemeralPythKey,
             isSigner: false,
             isWritable: true
           }
+          liquidationInstructionRemainingAccounts.push(repaymentTokenEphemeralPythPriceUpdateRemainingAccount)
 
-          remainingAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
-        } 
-
-        return [
+          //Push Liquidation Token Pyth Account For Liquidate Account Instruction
+          const liquidationTokenEphemeralPythKey = getPriceUpdateAccount(pythIdArray[liquidationTokenPriceAccountIndex])
+          const liquidationTokenEphemeralPythPriceUpdateRemainingAccount = 
           {
-            instruction: await anchorPrograms.lending.lendingProgram.methods.liquidateAccount
-            (
-              repaymentTokenMintAddress,
-              liquidationTokenMintAddress,
-              borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress,
-              borrowPositionToRepaySelect.value.repaymentSubMarketIndex,
-              depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress,
-              depositPositionToLiquidateSelect.value.liquidationSubMarketIndex,
-              liquidatiAddress,
-              liquidatiAccountIndex,
-              accountSelect.value,
-              new anchor.BN(repayAmount.value * Math.pow(10, repaymentTokenDecimalAmount)),//convert to fixedpoint notation
-              repayMax.value,
-              payingOffInsolventAccount,
-              accountName.value
-            ).accounts({ repaymentMint: repaymentTokenMintAddress, repaymentTokenProgram: repaymentTokenProgram })
-            .remainingAccounts(remainingAccounts)
-            .instruction(),
-            signers: []
-          },
-        ]
-      }
-    )
+            pubkey: liquidationTokenEphemeralPythKey,
+            isSigner: false,
+            isWritable: true
+          }
+          liquidationInstructionRemainingAccounts.push(liquidationTokenEphemeralPythPriceUpdateRemainingAccount)
+          console.log("Deposit Liquidation To Wallet: " + depositLiquidationToWallet.value)
+          const liquidateAccountInstruction = await anchorPrograms.lending.lendingProgram.methods.liquidateAccount
+          (
+            borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress,
+            borrowPositionToRepaySelect.value.repaymentSubMarketIndex,
+            depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress,
+            depositPositionToLiquidateSelect.value.liquidationSubMarketIndex,
+            liquidatiAddress,
+            liquidatiAccountIndex,
+            accountSelect.value,
+            new anchor.BN(repayAmount.value * Math.pow(10, repaymentTokenDecimalAmount)),//convert to fixedpoint notation
+            repayMax.value,
+            payingOffInsolventAccount,
+            depositLiquidationToWallet.value,
+            accountName.value,
+            liquidatorUserLookUpTableAddress
+          ).accounts({ repaymentMint: repaymentTokenMintAddress, repaymentTokenProgram: repaymentTokenProgram, liquidationMint: liquidationTokenMintAddress, liquidationTokenProgram: liquidationTokenProgram })
+          .remainingAccounts(liquidationInstructionRemainingAccounts)
+          .instruction()
 
-    try
-    {
+          return[
+            { instruction: refreshUserHealthAndTokenReservesInstruction, signers: [] },
+            { instruction: liquidateAccountInstruction, signers: [] },
+          ]
+        }
+      )
+
+      //Get Look Up Table Accounts for all instructions to reduce transaction size
+      var lookUpTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
+
+      //Get Protocol Look Up Table
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      //Get SubMarket Look Up Table By Owner
+      var subMarketLookTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
+      uniqueSubMarketOwnersAddressStrings.forEach((subMarketOwnersAddressString) =>
+      {
+        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(subMarketOwnersAddressString)
+        if(subMarketLookTableAccount)
+          subMarketLookTableAccounts.push(subMarketLookTableAccount)
+      })
+      lookUpTableAccounts.push(...subMarketLookTableAccounts)
+
+      //Get Liquidati Lending User Look Up Table Account
+      //lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+
+      //Get Liquidator Lending User Look Up Table Account
+      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first liquidation if liquidator has never deposited before
+        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+
+      const transactionsToSend = []
+      const initialInstructionsToSend = []
+
+      initialInstructionsToSend.push(...liquidatorLookUpTableInstructionsToSend)
+      initialInstructionsToSend.push(...createMonthlyStatementInstructions)
+
+      if(initialInstructionsToSend.length > 0)
+      {
+        console.log("Creating Initial Liquidator Transaction")
+        const { blockhash } = await anchorPrograms.lending.connection.getLatestBlockhash()
+        console.log("before message v0")
+        console.log(initialInstructionsToSend)
+        console.log()
+        const messageV0 = new TransactionMessage({
+          payerKey: connectedWallet.publicKey,
+          recentBlockhash: blockhash,
+          instructions: initialInstructionsToSend,
+        }).compileToV0Message(lookUpTableAccounts)
+        console.log("after message v0")
+        const initTx = new VersionedTransaction(messageV0)
+        transactionsToSend.push({ tx: initTx, signers: [] })
+      }
+      else
+        console.log("No new monthly statement accounts needed")
+
+      console.log("before pyths")
+      const pythTxs = await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 })
+
+      /*const fullyCompressedTxs = pythTxs.map((pythTxWrapper) =>
+      {
+        // Extract the original message directly from the internal tx object
+        const message = pythTxWrapper.tx.message;
+
+        // Compile a new V0 message with your custom lookup tables added
+        const updatedMessageV0 = anchor.web3.TransactionMessage.decompile(message, {
+          // If Pyth used any lookup tables internally, they would be passed here, otherwise empty
+          addressLookupTableAccounts: lookUpTableAccounts 
+        }).compileToV0Message(lookUpTableAccounts); 
+
+        // Return a fresh VersionedTransaction containing the compressed message
+        const newTx = new anchor.web3.VersionedTransaction(updatedMessageV0);
+
+        // CRITICAL: Pass Pyth's generated signers (like ephemeral price update accounts) 
+        // along with your newly compressed versioned transaction.
+        return { 
+          tx: newTx, 
+          signers: pythTxWrapper.signers 
+        }
+      })*/
+      console.log("after fully loops")
+      transactionsToSend.push(...pythTxs)
+      //transactionsToSend.push(...fullyCompressedTxs)
+      console.log("before sendall")
       const tx = await pythSolanaReceiver.provider.sendAll
       (
-        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 }), { skipPreflight: false }
+        transactionsToSend, { skipPreflight: false }
       )
     
       if(tx.length)
         for(var i=0; i<tx.length; i++)
-          await confirmLendingTransaction(tx[i], toast, "borrow_tokens")
+          await confirmLendingTransaction(tx[i], toast, "liquidate_account")
       else
-        await confirmLendingTransaction(tx, toast, "borrow_tokens")
+        await confirmLendingTransaction(tx, toast, "liquidate_account")
 
       stopHealthFactorCalculation()
-      clearSnapShotIntervalCountDown()
       liquidating.value = false
     }
     catch(error: any)
     {
-      if(error.message.includes("\"Custom\":6000"))//These error code numbers don't match the idl exactly for some reason, but I've confirmed these are the proper error messages
-        toastPreTransactionError("StalePriceData: The price data was stale", toast, "liquidate_account")
-      else if(error.message.includes("\"Custom\":6001"))//These error code numbers don't match the idl exactly for some reason, but I've confirmed these are the proper error messages
-        toastPreTransactionError("StaleSnapShot: The Lending User snap shot data was stale", toast, "liquidate_account")
-      else
-        toastPreTransactionError(error, toast, "liquidate_account")  
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, "liquidate_account")  
     }
   }
 

@@ -28,8 +28,8 @@
       if(isProduction())
         rpcUrl.value = "https://m4a.io/proxyCORS"
       else
-        rpcUrl.value = DEV_MODE ? clusterApiUrl("devnet") : "https://solana-rpc.publicnode.com"//Interchangeable with "https://api.devnet.solana.com"
-        //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com" : "https://solana-rpc.publicnode.com"//Interchangeable with clusterApiUrl("devnet")
+        rpcUrl.value = DEV_MODE ? clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
+        //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com"/*Interchangeable with clusterApiUrl("devnet")*/ : "https://solana-rpc.publicnode.com"
     }
   }
   else
@@ -37,8 +37,8 @@
     if(isProduction())
       rpcUrl.value = "https://m4a.io/proxyCORS"
     else
-      rpcUrl.value = DEV_MODE ? clusterApiUrl("devnet") : "https://solana-rpc.publicnode.com"//Interchangeable with "https://api.devnet.solana.com"
-      //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com" : "https://solana-rpc.publicnode.com"//Interchangeable with clusterApiUrl("devnet")
+      rpcUrl.value = DEV_MODE ? clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
+      //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com"/*Interchangeable with clusterApiUrl("devnet")*/ : "https://solana-rpc.publicnode.com"
   }
 
   const connection = shallowRef(new Connection(rpcUrl.value, preflightCommitment))
@@ -57,8 +57,7 @@
       () =>
         new AnchorProvider(connection.value, wallet.value,
         {
-          preflightCommitment,
-          commitment,
+          preflightCommitment
         },
       )
     )

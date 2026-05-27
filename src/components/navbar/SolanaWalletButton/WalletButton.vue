@@ -90,6 +90,8 @@
   import WalletConnectButton from '/src/components/navbar/SolanaWalletButton/WalletConnectButton.vue'
   import WalletIcon from './WalletIcon.vue'
   import WalletModalProvider from '/src/components/navbar/SolanaWalletButton/WalletModalProvider.vue'
+  import { getAddressLookUpTableProgramAccountWrapper } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { lendingUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { isSubmitterAccountInitialized, getProcessorAccount } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { getChatAccount } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { submitterHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
@@ -111,7 +113,9 @@
   const popoverOpen = ref()
   const event = ref()
 
-  onMounted(() =>
+  var lendingUserLookUpTableWatcherId: any
+
+  onMounted(async() =>
   {
     if(publicKey.value == null || publicKey.value.toBase58() == SYSTEM_PROGRAM_ADDRESS_STRING)
     {
@@ -125,12 +129,35 @@
       connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.addressString = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.isConnected = false
+      connectedWallet.lendingUserLookUpTableAddress = undefined
+      connectedWallet.lendingUserLookUpTableAccount = undefined
     }
     else
     { 
       connectedWallet.publicKey = publicKey.value
       connectedWallet.addressString = publicKey.value.toBase58()
       connectedWallet.isConnected = true
+
+      if(lendingUserHashMap.map)
+      {
+        const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+        if(lendingUserAccount)
+        {
+          connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
+          connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+          await listenForLendingUserLookUpTableChanges()
+        }
+        else
+        {
+          connectedWallet.lendingUserLookUpTableAddress = undefined
+          connectedWallet.lendingUserLookUpTableAccount = undefined
+        }
+      }
+      else
+      {
+        connectedWallet.lendingUserLookUpTableAddress = undefined
+        connectedWallet.lendingUserLookUpTableAccount = undefined
+      }
 
       const chatAccount = getChatAccount(connectedWallet.addressString)
       if(chatAccount)
@@ -183,8 +210,14 @@
     }
   })
 
-  watch(publicKey, () =>
+  watch(publicKey, async() =>
   {
+    if(lendingUserLookUpTableWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserLookUpTableWatcherId)
+      lendingUserLookUpTableWatcherId = undefined
+    }
+
     if(publicKey.value == null || publicKey.value.toBase58() == SYSTEM_PROGRAM_ADDRESS_STRING)
     {
       connectedWallet.isChatAccountReady = false
@@ -196,13 +229,36 @@
       connectedWallet.isProcessorAccountSuperAdmin = false
       connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.addressString = SYSTEM_PROGRAM_ADDRESS_STRING
-      connectedWallet.isConnected = false
+      connectedWallet.isConnected = false,
+      connectedWallet.lendingUserLookUpTableAddress = undefined
+      connectedWallet.lendingUserLookUpTableAccount = undefined
     }
     else
     {
       connectedWallet.publicKey = publicKey.value
       connectedWallet.addressString = publicKey.value.toBase58()
       connectedWallet.isConnected = true
+
+      if(lendingUserHashMap.map)
+      {
+        const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+        if(lendingUserAccount)
+        {
+          connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
+          connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+          await listenForLendingUserLookUpTableChanges()
+        }
+        else
+        {
+          connectedWallet.lendingUserLookUpTableAddress = undefined
+          connectedWallet.lendingUserLookUpTableAccount = undefined
+        }
+      }
+      else
+      {
+        connectedWallet.lendingUserLookUpTableAddress = undefined
+        connectedWallet.lendingUserLookUpTableAccount = undefined
+      }
 
       const chatAccount = getChatAccount(connectedWallet.addressString)
       if(chatAccount)
@@ -379,6 +435,48 @@
       }
     }
   })
+
+  watch(lendingUserHashMap, async() =>
+  {
+    if(connectedWallet.lendingUserLookUpTableAddress == undefined)
+    {
+      const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+      if(lendingUserAccount)
+      {
+        connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
+        connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+        await listenForLendingUserLookUpTableChanges()
+      }
+      else
+      {
+        connectedWallet.lendingUserLookUpTableAddress = undefined
+        connectedWallet.lendingUserLookUpTableAccount = undefined
+      }
+    }
+  })
+
+  async function listenForLendingUserLookUpTableChanges()
+  {
+    //Remove previous listener before starting another one if it exists
+    if(lendingUserLookUpTableWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserLookUpTableWatcherId)
+      lendingUserLookUpTableWatcherId = undefined
+    }
+
+    //Subscribe to account changes
+    lendingUserLookUpTableWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.lendingUserLookUpTableAddress, (accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+    {
+      //Handle account change..
+      const lookupTableState = anchor.web3.AddressLookupTableAccount.deserialize(accountInfo.data);
+      const lookupTableAccountInstance = new anchor.web3.AddressLookupTableAccount({
+        key: connectedWallet.lendingUserLookUpTableAddress,
+        state: lookupTableState
+      })
+
+      connectedWallet.lendingUserLookUpTableAccount = lookupTableAccountInstance
+    })
+  }
 
   function openPopOver(e: Event) 
   {

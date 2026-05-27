@@ -163,6 +163,7 @@
         <template #body="slotProps">
           <div class="flexCenterRow">
             <ion-text v-if="!slotProps.data?.subMarketList?.length" class="noWrapText">No fdr-3 Submarkets</ion-text>
+            <ion-text v-else-if="!anchorPrograms.isLendingProtocolReady" class="noWrapText">Loading</ion-text>
             <div v-else>
               <ion-button
               v-if="depositedAssetAmount==0"
@@ -297,6 +298,7 @@
         <template #body="slotProps">
           <div class="flexCenterRow">
             <ion-text v-if="!slotProps.data?.subMarketList?.length" class="noWrapText">No fdr-3 Submarkets</ion-text>
+            <ion-text v-else-if="!anchorPrograms.isLendingProtocolReady" class="noWrapText">Loading</ion-text>
             <div v-else>
               <ion-button
               v-if="depositedAssetAmount==0"
@@ -383,7 +385,7 @@
   var accountNameEditInputRef = ref()
   var savedEmojiCursorPosition: any
   var overByteSizeLimit = ref()
-  var depositedAssetAmount = ref()
+  var depositedAssetAmount = ref(0)
 
   onMounted(() =>
   {
@@ -418,10 +420,14 @@
     updateTokenReserveRelatedMarketData()
   })
 
-  //Json string of wallet to detect object property changes
+  //Watch only the properties that matter to avoid BigInt serialization issues
   const walletWatch = computed(() =>
   {
-    return JSON.stringify(connectedWallet)
+    return JSON.stringify(
+    {
+      addressString: connectedWallet.addressString,
+      selectedLendingUserAccountIndex: connectedWallet.selectedLendingUserAccountIndex
+    })
   })
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>

@@ -146,7 +146,7 @@
     SYSTEM_PROGRAM_ADDRESS_STRING,
     MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey } from "@solana/web3.js"
+  import { PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     copyFullAddressText,

@@ -134,11 +134,10 @@
                 slotProps.data.useFixedBorrowApy,
                 slotProps.data.globalLimit)"
               >
-                <ion-label color="dark">Edit TokenReserve</ion-label>
+                <ion-label color="dark" class="noClickEvent">Edit TokenReserve</ion-label>
               </ion-button>
               <ion-button
               v-if="connectedWallet.addressString==solvencyTreasuryWalletPublicKeyString"
-              id="openEditTokenReserveModalButton"
               fill="clear"
               @click="collectSolvencyFees()"
               >
@@ -146,7 +145,6 @@
               </ion-button>
               <ion-button
               v-if="connectedWallet.addressString==adminAccounts.liquidationTreasuryAddress.toString()"
-              id="openEditTokenReserveModalButton"
               fill="clear"
               @click="collectLiquidationFees()"
               >
@@ -169,7 +167,7 @@
   import { search } from 'ionicons/icons'
   import { tokenReserves, tokenReserveFontEndInfoHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
-  import { PublicKey } from "@solana/web3.js"
+  import { PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
   import { copyAddress, copyTreasuryATAText, confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts, tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { solvencyTreasuryWalletPublicKeyString } from '/src/assets/constants/Addresses.ts'
@@ -239,8 +237,6 @@
   {
     event.value = e
     event.value.tokenMintAddress = tokenMintAddress
-    console.log(tokenMintAddress)
-    console.log(tokenMintAddress.toString())
     actionsPopoverOpen.value = true
   }
 
@@ -316,7 +312,6 @@
     {
       const tx = await anchorPrograms.lending.lendingProgram.methods.claimSolvencyInsuranceFees
       (
-        event.value.tokenMintAddress,
         adminAccounts.lendingCEOAddressKey,
         0, //Use Submarket Index 0, needed for monthly statement
         adminAccounts.solvencyTreasuryLendingAccountIndex, //Use Solvency account index 0

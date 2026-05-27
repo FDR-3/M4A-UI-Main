@@ -3,8 +3,12 @@
     <div class="smallMarginTop">
       <h2>Current Statement Month And Year:</h2>
       <div class="flexCenterRow preserveWhiteSpace nMediumMarginTop">
-        <h2>{{ anchorPrograms.currentStatementMonthName + ", " }}</h2>
-        <h2>{{ anchorPrograms.currentStatementYear }}</h2>
+        <div v-if="anchorPrograms.isLendingProtocolInitialized">
+          <h2>{{ anchorPrograms.currentStatementMonthName + ", " + anchorPrograms.currentStatementYear }}</h2>
+        </div>
+        <div v-else>
+          <h2>Loading</h2>
+        </div>
       </div>
       <ion-text>Change Current Statement Month And Year</ion-text>
     </div>
@@ -21,21 +25,20 @@
         </Select>
         <ion-input
         v-model="statementYearInput"
-       
         fill="outline"
         placeholder="Enter Statement Year"
         type="number"
         step="1"
         min="2022">
         </ion-input>
-        <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentStatementMonthAndYear()" style="width:77px" :disabled="statementYearInput == ''">
+        <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentStatementMonthAndYear()" style="width:77px" :disabled="statementYearInput == '' || noChangeDetected">
           Update
         </ion-button>
       </div>
     </div>
   </div>
 
-  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop">
+  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString && anchorPrograms.isLendingProtocolInitialized" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
       <h2>Add Lending Token Reserve Account</h2>
       <div class="nMediumMarginTop smallMarginBottom">
@@ -130,11 +133,11 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, type Component, onMounted } from 'vue'
+  import { ref, inject, type Component, onMounted, computed} from 'vue'
   import { IonButton, IonInput, IonText, IonLabel } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { confirmLendingTransaction, doesKeyExistInLookUpTable, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { tokenAddressStrings, LegacyTokenProgramID, TokenProgram2022ID } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveFontEndInfoHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
@@ -144,7 +147,8 @@
   import AdminTokenReservesTable from '/src/components/tables/lending/admin/AdminTokenReservesTable.vue'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import EditTokenReserveModal from '/src/components/smart contracts/lending protocol/EditTokenReserveModal.vue'
-  import { PublicKey } from "@solana/web3.js"
+  import { PublicKey, Transaction, AddressLookupTableProgram } from "@solana/web3.js"
+  import { getTokenReservePDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -188,6 +192,15 @@
     }
   ]
 
+  const noChangeDetected = computed(() =>
+  {
+    if((anchorPrograms.currentStatementMonthNumber == monthSelect.value) &&
+    (anchorPrograms.currentStatementYear.toString() == statementYearInput.value))
+      return true
+    else
+      return false
+  })
+
   onMounted(() =>
   {
     const currentDate = new Date()
@@ -212,9 +225,23 @@
   {
     try
     {
+      const transaction = new Transaction()
       const mintAddressKey = new PublicKey(tokenMintAddressInput.value)
+      const tokenReservePDA = getTokenReservePDA(mintAddressKey)
 
-      const tx = await anchorPrograms.lending.lendingProgram.methods.addTokenReserve(
+      if(!doesKeyExistInLookUpTable(anchorPrograms.lendingProtocolLookUpTableAccount, tokenReservePDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          lookupTable: anchorPrograms.lendingProtocolLookUpTableAddress,
+          addresses: [tokenReservePDA]
+        })
+        transaction.add(extendLookUpTableInstruction)
+      }
+
+      const addTokenReserveInstruction = await anchorPrograms.lending.lendingProgram.methods.addTokenReserve(
         tokenDecimalCountInput.value,
         Array.from(Buffer.from(pythPriceFeedID.value, "hex")),
         borrowAPY.value * 100,//convert to fixedpoint notation
@@ -222,12 +249,16 @@
         new anchor.BN(globalLimitInput.value * Math.pow(10, tokenDecimalCountInput.value)),//convert to fixedpoint notation
         solvencyInsurance.value * 100)//convert to fixedpoint notation
       .accounts({ tokenMint: mintAddressKey, tokenProgram: tokenProgramSelect.value })
-      .rpc()
+      .instruction()
+      transaction.add(addTokenReserveInstruction)
+
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])
+
+      await confirmLendingTransaction(tx, toast, "add_token_reserve")
 
       tokenMintAddressInput.value = ""
       pythPriceFeedID.value = []
       tokenDecimalCountInput.value = ""
-      await confirmLendingTransaction(tx, toast, "add_token_reserve")
     }
     catch(error)
     {

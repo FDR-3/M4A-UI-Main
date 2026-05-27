@@ -312,5 +312,52 @@
     }
   }
 
+  export function parseProgramErrorCode(error: any, program: any)
+  {console.log(error.message)
+    var errorMessage = ""
+    var idlError = null
+
+    const errorMatch1 = error.message.match(/Error Number: (\d+)/)
+    const errorMatch2 = error.message.match(/"Custom":(\d+)/)
+
+    if(errorMatch1)
+    {
+      if(errorMatch1[1])
+        idlError = program.idl.errors.find((error: { code: number }) => error.code === parseInt(errorMatch1[1]))
+    }
+    else if(errorMatch2)
+    {
+      if(errorMatch2[1])
+        idlError = program.idl.errors.find((error: { code: number }) => error.code === parseInt(errorMatch2[1]))
+    }
+
+    if(idlError)
+      errorMessage = idlError.msg
+    else
+      errorMessage = error.message
+
+    return errorMessage
+  }
+
+  export function doesKeyExistInLookUpTable(lookUpTableAccount: any, key: PublicKey | string)
+  {
+    var searchKey = typeof key === "string" ? key : key.toString()
+    let addressesAlreadyExists = false
+
+    if(!lookUpTableAccount)
+      return addressesAlreadyExists
+
+    for(var i=0; i<lookUpTableAccount.state.addresses.length; i++)
+    {
+      if(lookUpTableAccount.state.addresses[i].toString() == searchKey)
+      {
+        addressesAlreadyExists = true
+        break
+      }
+    }
+
+    return addressesAlreadyExists
+  }
+
   export default toastPreTransactionError
 </script>

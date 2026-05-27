@@ -1,5 +1,5 @@
 {
-  "address": "E1PyxE9ee7xfxpdsQ6dJaEjomFkNyxkidaXNgUXeHPRf",
+  "address": "AyjtTAkQUQyCBJAHntC97ZiVEmhCJTx3zH4TidivSEKZ",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -1017,6 +1017,12 @@
           "type": {
             "option": "string"
           }
+        },
+        {
+          "name": "look_up_table_address",
+          "type": {
+            "option": "pubkey"
+          }
         }
       ]
     },
@@ -1458,6 +1464,12 @@
           "type": {
             "option": "string"
           }
+        },
+        {
+          "name": "look_up_table_address",
+          "type": {
+            "option": "pubkey"
+          }
         }
       ]
     },
@@ -1783,6 +1795,12 @@
           "name": "account_name",
           "type": {
             "option": "string"
+          }
+        },
+        {
+          "name": "look_up_table_address",
+          "type": {
+            "option": "pubkey"
           }
         }
       ]
@@ -2276,6 +2294,12 @@
           "type": {
             "option": "string"
           }
+        },
+        {
+          "name": "look_up_table_address",
+          "type": {
+            "option": "pubkey"
+          }
         }
       ]
     },
@@ -2550,6 +2574,48 @@
           }
         },
         {
+          "name": "sub_market_owner_look_up_table",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  77,
+                  97,
+                  114,
+                  107,
+                  101,
+                  116,
+                  79,
+                  119,
+                  110,
+                  101,
+                  114,
+                  76,
+                  111,
+                  111,
+                  107,
+                  85,
+                  112,
+                  84,
+                  97,
+                  98,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
           "name": "token_reserve",
           "pda": {
             "seeds": [
@@ -2603,6 +2669,12 @@
         {
           "name": "fee_on_interest_earned_rate",
           "type": "u16"
+        },
+        {
+          "name": "look_up_table_address",
+          "type": {
+            "option": "pubkey"
+          }
         }
       ]
     },
@@ -3052,6 +3124,12 @@
           "name": "account_name",
           "type": {
             "option": "string"
+          }
+        },
+        {
+          "name": "look_up_table_address",
+          "type": {
+            "option": "pubkey"
           }
         }
       ]
@@ -3525,6 +3603,10 @@
         {
           "name": "statement_year",
           "type": "u16"
+        },
+        {
+          "name": "look_up_table_address",
+          "type": "pubkey"
         }
       ]
     },
@@ -4255,6 +4337,12 @@
           "name": "account_name",
           "type": {
             "option": "string"
+          }
+        },
+        {
+          "name": "look_up_table_address",
+          "type": {
+            "option": "pubkey"
           }
         }
       ]
@@ -5143,6 +5231,75 @@
       ]
     },
     {
+      "name": "update_lending_user_look_up_table_address",
+      "discriminator": [
+        175,
+        89,
+        161,
+        81,
+        199,
+        134,
+        68,
+        202
+      ],
+      "accounts": [
+        {
+          "name": "lending_user_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "user_account_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "look_up_table_address",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "update_token_reserve",
       "discriminator": [
         4,
@@ -5858,6 +6015,19 @@
       ]
     },
     {
+      "name": "SubMarketOwnerLookUpTable",
+      "discriminator": [
+        29,
+        245,
+        213,
+        117,
+        32,
+        15,
+        98,
+        162
+      ]
+    },
+    {
       "name": "SubMarketStats",
       "discriminator": [
         214,
@@ -5920,131 +6090,141 @@
     },
     {
       "code": 6004,
-      "name": "InvalidSubMarketFeeRate",
-      "msg": "The submarket fee on interest earned rate can't be greater than 100%"
+      "name": "MissingSubMarketLookUpTable",
+      "msg": "You must include a Look Up Table Address when a user creates their first Sub Market"
     },
     {
       "code": 6005,
+      "name": "InvalidSubMarketFeeRate",
+      "msg": "The Sub Market fee on interest earned rate can't be greater than 100%"
+    },
+    {
+      "code": 6006,
       "name": "InvalidSolvencyInsuranceFeeRate",
       "msg": "The solvency insurance fee on interest earned rate can't be greater than 100%"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "IncorrectNumberOfTabAccounts",
       "msg": "You must provide all of the sub user's tab accounts"
     },
     {
-      "code": 6007,
+      "code": 6008,
+      "name": "MissingLendingUserLookUpTable",
+      "msg": "You must include a Look Up Table Address when a user initializes their Lending User Account"
+    },
+    {
+      "code": 6009,
       "name": "IncorrectOrderOfTabAccounts",
       "msg": "You must provide the sub user's tab accounts ordered by user_tab_account_index"
     },
     {
-      "code": 6008,
+      "code": 6010,
       "name": "UnexpectedLendingStatsAccount",
       "msg": "Unexpected Lending Stats PDA detected. Feed in only legitimate PDA's ordered by user_tab_account_index"
     },
     {
-      "code": 6009,
+      "code": 6011,
       "name": "UnexpectedTabAccount",
       "msg": "Unexpected Tab Account PDA detected. Feed in only legitimate PDA's ordered by user_tab_account_index"
     },
     {
-      "code": 6010,
+      "code": 6012,
       "name": "UnexpectedPythPriceUpdateAccount",
       "msg": "Unexpected Pyth Price Update Account detected. Feed in only legitimate accounts :)"
     },
     {
-      "code": 6011,
+      "code": 6013,
       "name": "UnexpectedTokenReserveAccount",
       "msg": "Unexpected Token Reserve Account PDA detected"
     },
     {
-      "code": 6012,
+      "code": 6014,
       "name": "UnexpectedSubMarketAccount",
       "msg": "Unexpected SubMarket Account PDA detected"
     },
     {
-      "code": 6013,
+      "code": 6015,
       "name": "UnexpectedMonthlyStatementAccount",
       "msg": "Unexpected Monthly Statement Account PDA detected"
     },
     {
-      "code": 6014,
+      "code": 6016,
       "name": "LendingUserAccountNameTooLong",
       "msg": "Lending User Account name can't be longer than 25 characters"
     },
     {
-      "code": 6015,
+      "code": 6017,
       "name": "GlobalLimitExceeded",
       "msg": "You can't deposit more than the global limit"
     },
     {
-      "code": 6016,
+      "code": 6018,
       "name": "InsufficientFunds",
       "msg": "You can't withdraw more funds than you've deposited"
     },
     {
-      "code": 6017,
+      "code": 6019,
       "name": "InsufficientLiquidity",
       "msg": "Not enough liquidity in the Token Reserve for this withdraw or borrow"
     },
     {
-      "code": 6018,
+      "code": 6020,
       "name": "TooManyFunds",
       "msg": "You can't pay back more funds than you've borrowed"
     },
     {
-      "code": 6019,
+      "code": 6021,
       "name": "StaleTokenReserve",
       "msg": "The token reserve was stale"
     },
     {
-      "code": 6020,
+      "code": 6022,
       "name": "StaleLendingUser",
       "msg": "The lending user health data was stale"
     },
     {
-      "code": 6021,
+      "code": 6023,
       "name": "StalePriceDataOrWrongFeedID",
       "msg": "The price data was stale or the feed id was incorrect"
     },
     {
-      "code": 6022,
+      "code": 6024,
       "name": "GriefingRepayment",
       "msg": "You must repay atleast 10% of the borrow position if the account is in an unhealthy state. This prevents 'griefing'"
     },
     {
-      "code": 6023,
+      "code": 6025,
       "name": "LiquidationExposure",
       "msg": "You can't withdraw or borrow an amount that would cause your borrow liabilities to exceed 70% of deposited collateral"
     },
     {
-      "code": 6024,
+      "code": 6026,
       "name": "NotLiquidatable",
       "msg": "You can't liquidate an account whose borrow liabilities aren't 80% or more of their deposited collateral"
     },
     {
-      "code": 6025,
+      "code": 6027,
       "name": "OverLiquidation",
       "msg": "You can't repay more than 50% of a liquidati's debt position"
     },
     {
-      "code": 6026,
+      "code": 6028,
       "name": "NotInsolvent",
       "msg": "You can't zero out an account whose borrow liabilities aren't 100% or more of their deposited collateral"
     },
     {
-      "code": 6027,
+      "code": 6029,
       "name": "DuplicateSubMarket",
       "msg": "Duplicate SubMarket Detected"
     },
     {
-      "code": 6028,
+      "code": 6030,
       "name": "NegativePriceDetected",
       "msg": "Negative Price Detected"
     },
     {
-      "code": 6029,
+      "code": 6031,
       "name": "OraclePriceTooUnstable",
       "msg": "Oracle Price Too Unstable"
     }
@@ -6062,6 +6242,10 @@
           {
             "name": "current_statement_year",
             "type": "u16"
+          },
+          {
+            "name": "look_up_table_address",
+            "type": "pubkey"
           }
         ]
       }
@@ -6170,6 +6354,10 @@
           {
             "name": "next_tab_index_to_refresh",
             "type": "u16"
+          },
+          {
+            "name": "look_up_table_address",
+            "type": "pubkey"
           }
         ]
       }
@@ -6574,6 +6762,26 @@
           {
             "name": "last_lending_activity_time_stamp",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubMarketOwnerLookUpTable",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "look_up_table_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "look_up_table_added",
+            "type": "bool"
           }
         ]
       }

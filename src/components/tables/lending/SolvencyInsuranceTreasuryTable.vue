@@ -6,6 +6,7 @@
       show-gridlines
       size="small" 
       :value="stableCoinTableData"
+      :loading=isLoading
       :globalFilterFields="
       [
         'tokenMintAddressString',
@@ -97,6 +98,7 @@
       v-model:filters="filters" 
       show-gridlines size="small" 
       :value="CryptoCurrencyTableData"
+      :loading=isLoading
       :globalFilterFields="
       [
         'tokenMintAddressString',
@@ -239,7 +241,7 @@
     processHODLCryptoCurrencyTableData()
     tvl.solvencyTVL = stableValue.value + cryptoValue.value
 
-    if(isLoading.value)
+    if(isLoading.value && lendingUserTabAccountsHashMap.map)
       isLoading.value = false
   })
 
@@ -249,7 +251,7 @@
     processHODLCryptoCurrencyTableData()
     tvl.solvencyTVL = stableValue.value + cryptoValue.value
 
-    if(isLoading.value)
+    if(isLoading.value && solvencyInsuranceTreasuryWalletBalancesHashMap.map)
       isLoading.value = false
   })
 

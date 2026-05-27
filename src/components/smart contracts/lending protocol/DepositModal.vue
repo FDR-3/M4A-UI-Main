@@ -109,7 +109,7 @@
       Connect wallet to deposit
     </ion-text>
     <ion-button
-      v-else
+      v-else-if="anchorPrograms.isLendingProtocolReady"
       color="dark"
       @click="depositTokens()"
       class="mediumSmallMarginTop nTinyMarginBottom"
@@ -117,6 +117,7 @@
     >
       Deposit
     </ion-button>
+    <ion-text v-else>Loading</ion-text>
   </div>
 </template>
 
@@ -132,16 +133,19 @@
     MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey } from "@solana/web3.js"
+  import { PublicKey, VersionedTransaction, TransactionMessage, AddressLookupTableProgram } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     confirmLendingTransaction,
+    parseProgramErrorCode,
+    doesKeyExistInLookUpTable,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { lendingUserHashMap, lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, lendingUserMonthlyStatementsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { getLendingUserAccountPDA, getLendingUserTabAccountPDA, getLendingUserMonthlyStatementAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { getDynamicPriorityFeePrice } from '/src/assets/contracts/WalletHelper.vue'
-  import { getTokenReservePDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -190,7 +194,11 @@
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
   {
-    return JSON.stringify(connectedWallet)
+    return JSON.stringify(
+    {
+      addressString: connectedWallet.addressString,
+      selectedLendingUserAccountIndex: connectedWallet.selectedLendingUserAccountIndex
+    })
   })
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
@@ -381,7 +389,6 @@
     previousAccountSelect = accountSelect.value
     accountSelect.value = userAccountList.length
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
-
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     addingAdditionalLendingAccount.value = true
   }
@@ -405,41 +412,173 @@
   {
     try
     {
-      //Simulate Transaction and Calculate Compute Units
-      const instruction = await anchorPrograms.lending.lendingProgram.methods.depositTokens
+      var instructionsToSend = []
+      var createLookUpTableInstruction = undefined
+      var lendingUserLookUpTableAddress = undefined
+
+      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Accounts for some weird error
+      if(lendingUserHashMap.map == undefined)
+        throw new Error("Lending User hash map is undefined. Cannot proceed.")
+
+      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Tab Accounts for some weird error
+      if(lendingUserTabAccountsHashMap.map == undefined)
+        throw new Error("Lending User Tab hash map is undefined. Cannot proceed.")
+
+      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Monthly Statement Accounts for some weird error
+      if(lendingUserMonthlyStatementsHashMap.map == undefined)
+        throw new Error("Monthly Statement hash map is undefined. Cannot proceed.")
+
+      //Check if Lending User Account has been initialized
+      const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+      if(!lendingUserAccount)
+      {
+        const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot("finalized"); //Need a semi colon before a tuple reassignment.
+
+        [createLookUpTableInstruction, lendingUserLookUpTableAddress] = 
+        AddressLookupTableProgram.createLookupTable({
+          authority: connectedWallet.publicKey,
+          payer: connectedWallet.publicKey,
+          recentSlot: slot
+        })
+        console.log("Creating Lending User Look Up Table: " + lendingUserLookUpTableAddress.toBase58())
+        instructionsToSend.push(createLookUpTableInstruction)
+
+        //Determine PDA for new Lending User Account that will be created
+        const lendingUserAccountPDA = getLendingUserAccountPDA(connectedWallet.publicKey, accountSelect.value)
+
+        if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserAccountPDA))
+        {
+          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+          {
+            authority: connectedWallet.publicKey,
+            payer: connectedWallet.publicKey,
+            lookupTable: lendingUserLookUpTableAddress,
+            addresses: [lendingUserAccountPDA]
+          })
+          console.log("Lending User account to extend: " + lendingUserAccountPDA.toBase58())
+          instructionsToSend.push(extendLookUpTableInstruction)
+        }
+      }
+      else
+        lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
+
+      //Check if Lending User Tab Account has been initialized
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+      adminAccounts.lendingCEOAddressString +
+      subMarketSelect.value.toString() +
+      connectedWallet.addressString +
+      accountSelect.value.toString())
+
+      //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
+      if(!lendingUserTabAccount)
+      {
+        //Determine PDA for new LendingUserTabAccount that will be created
+        const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenMintAddress,
+        adminAccounts.lendingCEOAddressKey,
+        subMarketSelect.value,
+        connectedWallet.publicKey,
+        accountSelect.value)
+
+        if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
+        {
+          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+          {
+            authority: connectedWallet.publicKey,
+            payer: connectedWallet.publicKey,
+            lookupTable: lendingUserLookUpTableAddress,
+            addresses: [lendingUserTabAccountPDA]
+          })
+          console.log("Tab account to extend: " + lendingUserTabAccountPDA.toBase58())
+          instructionsToSend.push(extendLookUpTableInstruction)
+        }
+      }
+
+      //Check if Monthly Statement Account has been initialized
+      const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+      anchorPrograms.currentStatementYear.toString() +
+      selectedTokenMintAddress.toString() +
+      adminAccounts.lendingCEOAddressString +
+      subMarketSelect.value.toString() +
+      connectedWallet.addressString +
+      accountSelect.value.toString())
+
+      //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
+      if(!monthlyStatement)
+      {
+        //Determine PDA for new MonthlyStatementAccount that will be created
+        const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+        anchorPrograms.currentStatementYear,
+        selectedTokenMintAddress,
+        adminAccounts.lendingCEOAddressKey,
+        subMarketSelect.value,
+        connectedWallet.publicKey,
+        accountSelect.value)
+
+        if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
+        {
+          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+          {
+            authority: connectedWallet.publicKey,
+            payer: connectedWallet.publicKey,
+            lookupTable: lendingUserLookUpTableAddress,
+            addresses: [monthlyStatementPDA]
+          })
+          console.log("Monthly statement account to extend: " + monthlyStatementPDA.toBase58())
+          instructionsToSend.push(extendLookUpTableInstruction)
+        }
+      }
+
+      const depositTokensInstruction = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
         adminAccounts.lendingCEOAddressKey,
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
-        accountName.value
+        accountName.value,
+        lendingUserLookUpTableAddress,
       ).accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
       .instruction()
 
-      const transaction = new anchor.web3.Transaction().add(instruction)
-      transaction.recentBlockhash = (await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()).blockhash
-      transaction.feePayer = connectedWallet.publicKey
+      instructionsToSend.push(depositTokensInstruction)
 
-      const simulation = await anchorPrograms.lending.lendingProgram.provider.connection.simulateTransaction(transaction)
+      const { blockhash } = await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()
+
+      //Get Look Up Table Accounts
+      var lookUpTableAccounts = []
+
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      //Get Sub Market Look Up Table Account By Owner
+      const subMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
+      lookUpTableAccounts.push(subMarketOwnerLookUpTableAccount)
+
+      //Get Lending User Look Up Table Account
+      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
+        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+
+      console.log("Protocol Look Up Table Account:", anchorPrograms.lendingProtocolLookUpTableAccount)
+      console.log("SubMarket Look Up Table Account:", subMarketOwnerLookUpTableAccount)
+      console.log("Lending User Look Up Table Account:", connectedWallet.lendingUserLookUpTableAccount)
+
+      const messageV0 = new TransactionMessage({
+        payerKey: connectedWallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions: instructionsToSend
+      }).compileToV0Message(lookUpTableAccounts)
+
+      // Create and sign the Versioned Transaction
+      const transaction = new VersionedTransaction(messageV0)
+      //await program.provider.wallet.signTransaction(transaction)
+
+      const size = transaction.serialize().length
+      console.log(`Current Transaction Size: ${size} bytes`)
+
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction)
+
+      /*const simulation = await anchorPrograms.lending.lendingProgram.provider.connection.simulateTransaction(transaction)
       const unitsConsumed = simulation.value.unitsConsumed
-      const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: unitsConsumed * 1.1 })//Increase units by 10% for safety
-
-      //Calculate Dynamic Priority Fee
-      /*const tokenReservePDA = getTokenReservePDA(selectedTokenMintAddress)
-      const priorityFeePrice = await getDynamicPriorityFeePrice(anchorPrograms.lending.lendingProgram.provider.connection, [tokenReservePDA])
-      const addPriorityFee = anchor.web3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityFeePrice })*/
-
-      //Execute Transaction
-      const tx = await anchorPrograms.lending.lendingProgram.methods.depositTokens
-      (
-        adminAccounts.lendingCEOAddressKey,
-        subMarketSelect.value,
-        accountSelect.value,
-        new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
-        accountName.value
-      ).accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
-      .preInstructions([modifyComputeUnits/*, addPriorityFee*/])
-      .rpc()
+      const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: unitsConsumed * 1.1 })//Increase units by 10% for safety */
 
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
 
@@ -448,7 +587,8 @@
     }
     catch(error)
     {
-      toastPreTransactionError(error, toast, "deposit_tokens")
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, "deposit_tokens")  
     }
   }
 

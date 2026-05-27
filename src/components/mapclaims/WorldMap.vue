@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
   import 'maplibre-gl/dist/maplibre-gl.css'
-  import { watch, onMounted, onUnmounted, defineEmits } from 'vue'
+  import { watch, onMounted, onUnmounted } from 'vue'
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
   import maplibregl from 'maplibre-gl'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'

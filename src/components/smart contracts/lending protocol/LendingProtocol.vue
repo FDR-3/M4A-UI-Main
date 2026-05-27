@@ -14,13 +14,15 @@
   setLendingUserAccountHashMap,
   setLendingUserTabHashMaps,
   setLendingUserPortfolioHashMaps,
-  setMonthlyStementHashMapAndLendingLeaderBoard,
+  setMonthlyStatementHashMapAndLendingLeaderBoard,
   getLendingProtocolPDA,
   getLendingProtocolCEOAccountPDA,
   getTokenReserveStatsPDA,
   getSubMarketStatsPDA,
   getLendingStatsPDA,
-  getUserLendingStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  getUserLendingStatsPDA,
+  getAddressLookUpTableProgramAccountWrapper,
+  setSubMarketLookUpTableHashMap } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenReserves } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserMonthlyStatements } from '/src/assets/globalStates/lending/LendingUsers.vue'
@@ -28,6 +30,7 @@
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import PriceUpdater from './PriceUpdater.vue'
   import WalletBalanceUpdater from './WalletBalanceUpdater.vue'
+  import { sleep } from '/src/assets/helperFunctions/sleep.ts'
 
   var lendingProtocolWatcherId: any
   var lendingProtocolCEOAccountWatcherId: any
@@ -38,6 +41,19 @@
 
   onMounted(async() =>
   {
+    //Lending Protocol (Current Statement Info)
+    const lendingProtocol = await getLendingProtocol()
+    if(lendingProtocol)
+    {
+      anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
+      anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
+      anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
+      anchorPrograms.lendingProtocolLookUpTableAddress = lendingProtocol.lookUpTableAddress
+      anchorPrograms.lendingProtocolLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(anchorPrograms.lendingProtocolLookUpTableAddress)
+      anchorPrograms.isLendingProtocolInitialized = true
+    }
+    await listenForLendingProtocolChanges()
+
     //Lending Protocol CEO Account 
     const lendingCEOAccount = await getLendingProtocolCEOAccount()
     if(lendingCEOAccount)
@@ -56,10 +72,11 @@
     tokenReserves.data = await getTokenReserves()
     
     setTokenReserveFontEndInfoHashMap()
-    await listenForNewTokenChanges()
+    await listenForTokenReserveChanges()
 
     //SubMarkets
     subMarkets.data = await getSubMarkets()
+    await setSubMarketLookUpTableHashMap()
     await listenForSubMarketChanges()
 
     //Lending Users
@@ -67,19 +84,11 @@
     await setLendingUserTabHashMaps() //adminAccounts.lendingCEOAddressString needs to be set before this is called
     lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
     await setLendingUserPortfolioHashMaps()
-    await setMonthlyStementHashMapAndLendingLeaderBoard()
+    await setMonthlyStatementHashMapAndLendingLeaderBoard()
     await listenForLendingStatChanges()
     await listenForLendingUserStatChanges()
 
-    //Lending Protocol (Current Statement Info)
-    const lendingProtocol = await getLendingProtocol()
-    if(lendingProtocol)
-    {
-      anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
-      anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
-      anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
-    }
-    await listenForLendingProtocolChanges()
+    anchorPrograms.isLendingProtocolReady = true
   })
 
   onUnmounted(() => 
@@ -116,7 +125,7 @@
     }
   })
 
-  async function listenForNewTokenChanges()
+  async function listenForTokenReserveChanges()
   {
     //Subscribe to account changes
     tokenReserveStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getTokenReserveStatsPDA(), async() => 
@@ -124,6 +133,9 @@
       //Handle account change..
       tokenReserves.data = await getTokenReserves()
       setTokenReserveFontEndInfoHashMap()
+
+      await sleep(1000) //1000 milliseconds = 1 second. Waiting for next block slot if a new token reserve pda was added to look up table
+      anchorPrograms.lendingProtocolLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(anchorPrograms.lendingProtocolLookUpTableAddress)
     })
   }
 
@@ -134,6 +146,8 @@
     {
       //Handle account change..
       subMarkets.data = await getSubMarkets()
+
+      await setSubMarketLookUpTableHashMap()
     })
   }
 
@@ -151,7 +165,7 @@
       await setLendingUserAccountHashMap()
       await setLendingUserTabHashMaps()
       await setLendingUserPortfolioHashMaps()
-      await setMonthlyStementHashMapAndLendingLeaderBoard()
+      await setMonthlyStatementHashMapAndLendingLeaderBoard()
     })
   }
 
@@ -168,23 +182,33 @@
   async function listenForLendingProtocolChanges()
   {
     //Subscribe to account changes
-    lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(), async() => 
+    lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(),
+    async(accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
     {
       //Handle account change..
-      const lendingProtocol = await getLendingProtocol()
+      const lendingProtocol = anchorPrograms.lending.lendingProgram.account.lendingProtocol.coder.accounts.decode("lendingProtocol", accountInfo.data)
+
       anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
       anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
       anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
+      anchorPrograms.lendingProtocolLookUpTableAddress = lendingProtocol.lookUpTableAddress
+
+      if(!anchorPrograms.lendingProtocolLookUpTableAccount)
+        anchorPrograms.lendingProtocolLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(anchorPrograms.lendingProtocolLookUpTableAddress)
+      if(!anchorPrograms.isLendingProtocolInitialized)
+        anchorPrograms.isLendingProtocolInitialized = true
     })
   }
 
-  async function listenForLendingCEOAccountInitialization()
+  function listenForLendingCEOAccountInitialization()
   {
     //Subscribe to account changes
-    lendingProtocolCEOAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolCEOAccountPDA(), async() => 
+    lendingProtocolCEOAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolCEOAccountPDA(),
+    (accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
     {
       //Handle account change..
-      const lendingCEOAccount = await getLendingProtocolCEOAccount()
+      //const lendingCEOAccount = await getLendingProtocolCEOAccount()
+      const lendingCEOAccount = anchorPrograms.lending.lendingProgram.account.lendingProtocolCeo.coder.accounts.decode("lendingProtocolCeo", accountInfo.data)
       adminAccounts.isLendingCEOAccountReady = true
       adminAccounts.lendingCEOAddressKey = lendingCEOAccount.address
       adminAccounts.lendingCEOAddressString = lendingCEOAccount.address.toBase58()

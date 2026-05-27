@@ -171,7 +171,7 @@
                   <ion-button class="fullWidthButton thinBorder" fill="clear" @click="openSelectedPortfolio()">
                     <ion-label color="green">View</ion-label>
                   </ion-button>
-                  <ion-button class="fullWidthButton thinBorder lendingActionButton" fill="clear" @click="$emit('openLiquidationModal', event.owner, event.accountIndex)" :disabled="event.healthFactor > 0">
+                  <ion-button class="fullWidthButton thinBorder lendingActionButton" fill="clear" @click="$emit('openLiquidationModal', event.owner, event.accountIndex)" >
                     <ion-label color="red" class="noClickEvent">Liquidate</ion-label>
                   </ion-button>
                 </div>
@@ -835,6 +835,9 @@
 
   function calculateUserNewInterestAccruedAmount(lendingUserMonthlyStatementAccount: any)
   {
+    if(!tokenReservesHashMapCopy)
+      return
+
     const tokenReserve = tokenReservesHashMapCopy.get(lendingUserMonthlyStatementAccount.tokenMintAddress)
     const userDebt = lendingUserMonthlyStatementAccount.borrowedAmount
     const lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(lendingUserMonthlyStatementAccount.tokenMintAddress +

@@ -86,6 +86,10 @@
     currentStatementMonthName: undefined, //monthList[newDate.getMonth()].monthName,
     currentStatementMonthNumber: undefined, //newDate.getMonth() + 1,
     currentStatementYear: undefined, //newDate.getFullYear(),
+    lendingProtocolLookUpTableAddress: undefined,
+    lendingProtocolLookUpTableAccount: undefined,
+    isLendingProtocolInitialized: false,
+    isLendingProtocolReady: false,
     blockChainTimeStamp: 0
   })
 

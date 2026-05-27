@@ -260,7 +260,7 @@
 </template>
   
 <script setup lang="ts">
-  import { ref, defineProps, onMounted, watch, inject } from 'vue'
+  import { ref, onMounted, watch, inject } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonInput, IonTextarea, IonText, IonPopover } from '@ionic/vue'
   import { search } from 'ionicons/icons'
   import Select from 'primevue/select'

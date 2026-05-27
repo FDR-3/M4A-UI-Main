@@ -4,6 +4,7 @@
   import { subMarkets,
     subMarketsHashMap,
     subMarketOwnerHashMap,
+    subMarketLookUpTableByOwnerHashMap,
     subMarketByTokenMintAddressAndOwnerHashMap,
     tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
@@ -24,7 +25,6 @@
   import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import { PublicKey } from "@solana/web3.js"
   import cloneDeep from 'lodash/cloneDeep'
@@ -278,9 +278,79 @@
     }
   }
 
-  export function getUserNextSubMarketIndex(tokenMintAddress: string, subMarketOwner: string)
+  export async function setSubMarketLookUpTableHashMap()
   {
-    const userSubMarketListByTokenMintAddress = subMarketByTokenMintAddressAndOwnerHashMap.map.get(tokenMintAddress + subMarketOwner)
+    console.log("Setting SubMarket Look Up By Owner Table Hash Map")
+    
+    var subMarketLookUpTableMap = new Map<string, any>()
+
+    const allSubMarketOwnerLookUpTables = await getSubMarketLookUpTablesWrapper()
+
+    //Create TokenReserve/SubMarket hash map and SubMarket list for tables
+    for(var i=0; i<allSubMarketOwnerLookUpTables.length; i++)
+    {
+      const nativeProgramSubMarketOwnerLookUpTableAccount = allSubMarketOwnerLookUpTables[i].account
+
+      const addressLookupTableProgramSubMarketOwnerLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(nativeProgramSubMarketOwnerLookUpTableAccount.lookUpTableAddress)
+
+      subMarketLookUpTableMap.set(nativeProgramSubMarketOwnerLookUpTableAccount.owner.toString(), addressLookupTableProgramSubMarketOwnerLookUpTableAccount)  
+    }
+
+    subMarketLookUpTableByOwnerHashMap.map = cloneDeep(subMarketLookUpTableMap)
+  }
+
+
+  async function getSubMarketLookUpTablesWrapper()
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return await anchorPrograms.lending.lendingProgram.account.subMarketOwnerLookUpTable.all()
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return []
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export async function getAddressLookUpTableProgramAccountWrapper(lookUpTableAddress: PublicKey)
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        return (await anchorPrograms.lending.lendingProgram.provider.connection.getAddressLookupTable(lookUpTableAddress)).value
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.log(error)
+          return undefined
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  export function getUserNextSubMarketIndex(tokenMintAddress: string, subMarketOwnerAddress: string)
+  {
+    const userSubMarketListByTokenMintAddress = subMarketByTokenMintAddressAndOwnerHashMap.map.get(tokenMintAddress + subMarketOwnerAddress)
 
     if(userSubMarketListByTokenMintAddress)
       return userSubMarketListByTokenMintAddress.length
@@ -296,22 +366,28 @@
     var lendingUserAccountListHashMap = new Map<string, any>()
     const lendingUserAccounts = await getLendingUserAccountsWrapper()
 
-    for(var i=0; i<lendingUserAccounts.length; i++)
+    if(lendingUserAccounts)
     {
-      var list = []
-      const previousLendingUserList = lendingUserAccountListHashMap.get(lendingUserAccounts[i].account.owner.toBase58())
+      for(var i=0; i<lendingUserAccounts.length; i++)
+      {
+        var list = []
+        const previousLendingUserList = lendingUserAccountListHashMap.get(lendingUserAccounts[i].account.owner.toBase58())
 
-      if(previousLendingUserList)
-        list = previousLendingUserList
+        if(previousLendingUserList)
+          list = previousLendingUserList
 
-      list.push(lendingUserAccounts[i].account)
-      list = list.sort((a: any, b: any) => a.userAccountIndex - b.userAccountIndex) 
+        list.push(lendingUserAccounts[i].account)
+        list = list.sort((a: any, b: any) => a.userAccountIndex - b.userAccountIndex) 
 
-      lendingUserAccountHashMap.set(lendingUserAccounts[i].account.owner.toBase58() + lendingUserAccounts[i].account.userAccountIndex.toString(), lendingUserAccounts[i].account)
-      lendingUserAccountListHashMap.set(lendingUserAccounts[i].account.owner.toBase58(), list)
+        lendingUserAccountHashMap.set(lendingUserAccounts[i].account.owner.toBase58() + lendingUserAccounts[i].account.userAccountIndex.toString(), lendingUserAccounts[i].account)
+        lendingUserAccountListHashMap.set(lendingUserAccounts[i].account.owner.toBase58(), list)
+      }
+
+      lendingUserHashMap.map = lendingUserAccountHashMap
     }
+    else
+      lendingUserHashMap.map = undefined //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Accounts for some weird error
 
-    lendingUserHashMap.map = lendingUserAccountHashMap
     lendingUserAccountsHashMap.map = lendingUserAccountListHashMap
   }
 
@@ -328,7 +404,7 @@
         if(!error.message.includes(ERROR_429))
         {
           console.log(error)
-          return []
+          return undefined
         }
         else
         {
@@ -349,55 +425,61 @@
     
     const lendingUserTabs = await getLendingUserTabsWrapper()
     
-    for(var i=0; i<lendingUserTabs.length; i++)
+    if(lendingUserTabs)
     {
-      const lendingUserTabAccount = lendingUserTabs[i].account
-      const lendingUserTabAccountPDA = lendingUserTabs[i].publicKey
-
-      //Set user tab hash map
-      userTabAccountsHashMap.set(lendingUserTabAccount.tokenMintAddress.toBase58() +
-      lendingUserTabAccount.subMarketOwnerAddress.toBase58() +
-      lendingUserTabAccount.subMarketIndex.toString() +
-      lendingUserTabAccount.owner.toBase58() +
-      lendingUserTabAccount.userAccountIndex.toString(), lendingUserTabAccount)
-
-      //Set user tab account list hash map
-      var list = []
-      const previousLendingUserTabList = userTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
-
-      if(previousLendingUserTabList)
-        list = previousLendingUserTabList
-
-      list.push(lendingUserTabAccount)
-      list = list.sort((a: any, b: any) => a.userTabAccountIndex - b.userTabAccountIndex) 
-
-      userTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
-
-      //Set user remaining tab account list hash map
-      var list = []
-      const previousLendingUserRemainingTabList = userRemainingAccountsTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
-
-      if(previousLendingUserRemainingTabList)
-        list = previousLendingUserRemainingTabList
-
-      const lendingUserTabRemainingAccount = 
+      for(var i=0; i<lendingUserTabs.length; i++)
       {
-        pubkey: lendingUserTabAccountPDA,
-        userTabAccountIndex: lendingUserTabAccount.userTabAccountIndex,
-        tokenMintAddress: lendingUserTabAccount.tokenMintAddress.toString(),
-        subMarketOwnerAddress: lendingUserTabAccount.subMarketOwnerAddress.toString(),
-        subMarketIndex: lendingUserTabAccount.subMarketIndex,
-        isSigner: false,
-        isWritable: true
+        const lendingUserTabAccount = lendingUserTabs[i].account
+        const lendingUserTabAccountPDA = lendingUserTabs[i].publicKey
+
+        //Set user tab hash map
+        userTabAccountsHashMap.set(lendingUserTabAccount.tokenMintAddress.toBase58() +
+        lendingUserTabAccount.subMarketOwnerAddress.toBase58() +
+        lendingUserTabAccount.subMarketIndex.toString() +
+        lendingUserTabAccount.owner.toBase58() +
+        lendingUserTabAccount.userAccountIndex.toString(), lendingUserTabAccount)
+
+        //Set user tab account list hash map
+        var list = []
+        const previousLendingUserTabList = userTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
+
+        if(previousLendingUserTabList)
+          list = previousLendingUserTabList
+
+        list.push(lendingUserTabAccount)
+        list = list.sort((a: any, b: any) => a.userTabAccountIndex - b.userTabAccountIndex) 
+
+        userTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
+
+        //Set user remaining tab account list hash map
+        var list = []
+        const previousLendingUserRemainingTabList = userRemainingAccountsTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
+
+        if(previousLendingUserRemainingTabList)
+          list = previousLendingUserRemainingTabList
+
+        const lendingUserTabRemainingAccount = 
+        {
+          pubkey: lendingUserTabAccountPDA,
+          userTabAccountIndex: lendingUserTabAccount.userTabAccountIndex,
+          tokenMintAddress: lendingUserTabAccount.tokenMintAddress.toString(),
+          subMarketOwnerAddress: lendingUserTabAccount.subMarketOwnerAddress.toString(),
+          subMarketIndex: lendingUserTabAccount.subMarketIndex,
+          isSigner: false,
+          isWritable: true
+        }
+
+        list.push(lendingUserTabRemainingAccount)
+        list = list.sort((a: any, b: any) => a.userTabAccountIndex - b.userTabAccountIndex) 
+
+        userRemainingAccountsTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
       }
 
-      list.push(lendingUserTabRemainingAccount)
-      list = list.sort((a: any, b: any) => a.userTabAccountIndex - b.userTabAccountIndex) 
-
-      userRemainingAccountsTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
+      lendingUserTabAccountsHashMap.map = userTabAccountsHashMap
     }
+    else
+      lendingUserTabAccountsHashMap.map = undefined //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Tab Accounts for some weird error
 
-    lendingUserTabAccountsHashMap.map = userTabAccountsHashMap
     lendingUserTabAccountListHashMap.map = userTabListHashMap
     lendingUserRemainingTabAccountListHashMap.map = userRemainingAccountsTabListHashMap
   }
@@ -415,7 +497,7 @@
         if(!error.message.includes(ERROR_429))
         {
           console.log(error)
-          return []
+          return undefined
         }
         else
         {
@@ -636,9 +718,9 @@
     lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map = availableCryptoCurrencyYearStatementsBySubMarketHashMap
   }
 
-  export async function setMonthlyStementHashMapAndLendingLeaderBoard()
+  export async function setMonthlyStatementHashMapAndLendingLeaderBoard()
   {
-    if(!lendingUserMonthlyStatements.data)
+    if(!lendingUserMonthlyStatements.data) //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Monthly Statement Accounts for some weird error.
       return
 
     console.log("Setting Monthly Statement HashMap and Lending Leader Board Data")
@@ -660,13 +742,13 @@
       const statementMonth = lendingUserMonthlyStatementAccount.statementMonth.toString()
 
       //Set User Monthly Statements hash map
-      monthlyStatementsHashMap.set(tokenMintAddress +
+      monthlyStatementsHashMap.set(statementMonth +
+      statementYear +
+      tokenMintAddress +
       subMarketOwnerAddress +
       subMarketIndex +
       owner +
-      userAccountIndex +
-      statementYear +
-      statementMonth, lendingUserMonthlyStatementAccount)
+      userAccountIndex, lendingUserMonthlyStatementAccount)
 
       //Set leader board data
       var existingOwner = undefined
@@ -902,7 +984,7 @@
         if(!error.message.includes(ERROR_429))
         {
           console.log(error)
-          return []
+          return undefined
         }
         else
         {
@@ -974,6 +1056,34 @@
     return submarketStatsPDA
   }
 
+  export function getSubMarketPDA(tokenMintAddress: PublicKey, subMarketOwner: PublicKey, subMarketIndex: number)
+  {
+    const [subMarketPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("subMarket"),
+        tokenMintAddress.toBuffer(),
+        subMarketOwner.toBuffer(),
+        new anchor.BN(subMarketIndex).toArrayLike(Uint8Array, "le", 2)
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return subMarketPDA
+  }
+
+  export function getSubMarketOwnerLookUpTablePDA(ownerAddress: PublicKey)
+  {
+    const [subMarketOwnerLookUpTablePDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("subMarketOwnerLookUpTable"),
+        ownerAddress.toBuffer()
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return subMarketOwnerLookUpTablePDA
+  }
+
   export function getLendingStatsPDA()
   {
     const [lendingStatsPDA] = anchor.web3.PublicKey.findProgramAddressSync
@@ -998,9 +1108,23 @@
     return lendingUserStatsPDA
   }
 
+  export function getLendingUserAccountPDA(lendingUserAddress: PublicKey, lendingUserAccountIndex: number)
+  {
+    const [lendingUserAccountPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("lendingUserAccount"),
+        lendingUserAddress.toBuffer(),
+        new anchor.BN(lendingUserAccountIndex).toArrayLike(Uint8Array, "le", 1)
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return lendingUserAccountPDA
+  }
+
   export function getLendingUserTabAccountPDA(
     tokenMintAddress: PublicKey,
-    subMarketOwner: PublicKey,
+    subMarketOwnerAddress: PublicKey,
     subMarketIndex: number,
     lendingUserAddress: PublicKey,
     lendingUserAccountIndex: number)
@@ -1010,7 +1134,33 @@
       [
         new TextEncoder().encode("lendingUserTabAccount"),
         tokenMintAddress.toBuffer(),
-        subMarketOwner.toBuffer(),
+        subMarketOwnerAddress.toBuffer(),
+        new anchor.BN(subMarketIndex).toArrayLike(Uint8Array, "le", 2),
+        lendingUserAddress.toBuffer(),
+        new anchor.BN(lendingUserAccountIndex).toArrayLike(Uint8Array, "le", 1)
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return lendingUserTabAccountPDA
+  }
+
+  export function getLendingUserMonthlyStatementAccountPDA(
+    currentStatementMonth: number,
+    currentStatementYear: number,
+    tokenMintAddress: PublicKey,
+    subMarketOwnerAddress: PublicKey,
+    subMarketIndex: number,
+    lendingUserAddress: PublicKey,
+    lendingUserAccountIndex: number)
+  {
+    const [lendingUserTabAccountPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("userMonthlyStatementAccount"),
+        new anchor.BN(currentStatementMonth).toArrayLike(Uint8Array, "le", 1),
+        new anchor.BN(currentStatementYear).toArrayLike(Uint8Array, "le", 2),
+        tokenMintAddress.toBuffer(),
+        subMarketOwnerAddress.toBuffer(),
         new anchor.BN(subMarketIndex).toArrayLike(Uint8Array, "le", 2),
         lendingUserAddress.toBuffer(),
         new anchor.BN(lendingUserAccountIndex).toArrayLike(Uint8Array, "le", 1)

@@ -60,6 +60,7 @@
   import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'
+  import { lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import KingobamaMobileT1 from '/src/components/fancy/poly/KingobamaMobileT1.vue'
   import KingobamaMobileT2 from '/src/components/fancy/poly/KingobamaMobileT2.vue'
   import M4AProtocolTVLLongHTMLText from './M4AProtocolTVLLongHTMLText.vue'
@@ -123,6 +124,12 @@
     stopBlockChainTimeStampRefresh()
   })
 
+  const stopMyWatcher = watch(lendingUserTabAccountsHashMap, () =>
+  { 
+    updateTokenRelatedTreasuryTableHeight()
+    stopMyWatcher()
+  })
+
   function flipTable()
   {
     document.getElementById("topOfPage")?.scrollIntoView()
@@ -160,24 +167,22 @@
   function updateTokenRelatedTreasuryTableHeight()
   {
     var baseTableHeight
-    var tokenRelatedHeight = 0
+    var rowRelatedHeight = 0
 
     if(!isBrowserFireFox())
       baseTableHeight = 1334
     else
       baseTableHeight = 1384
-    
-    if(StableCoins.length == 0)
-      tokenRelatedHeight += 14 * 3//3 Treasuries
-    else
-      tokenRelatedHeight += StableCoins.length * 70 * 3//3 Treasuries
 
-    if(CryptoCurrency.length == 0)
-      tokenRelatedHeight += 14 * 3//3 Treasuries
+    if(!lendingUserTabAccountsHashMap.map)
+      rowRelatedHeight += 28 * 3//3 Treasuries
     else
-      tokenRelatedHeight += CryptoCurrency.length * 70 * 3//3 Treasuries
-
-    tokenRelatedDynamicTableHeight.value = baseTableHeight + tokenRelatedHeight
+    {
+      rowRelatedHeight += StableCoins.length * 70 * 3//3 Treasuries
+      rowRelatedHeight += CryptoCurrency.length * 70 * 3//3 Treasuries
+    }
+      
+    tokenRelatedDynamicTableHeight.value = baseTableHeight + rowRelatedHeight
   }
 
   function updateTokenTableSizing(tokenReserveCount: number, tokenSubMarketCount: number, showTokenSubMarkets: boolean)

@@ -19,6 +19,12 @@
     map: undefined
   })
 
+  //Key: SubMarket Owner PublicKey, Value: SubMarket Look Up Table Account of owner (All Submarkets that the owner creates should be added to their Look Up Table when the createSubMarket instruction is called)
+  export const subMarketLookUpTableByOwnerHashMap = reactive(
+  {
+    map: undefined
+  })
+
   //Key: TokenMintAddress + SubMarket Owner PublicKey, Value: List of SubMarket Accounts that the owner has for a specific TokenMintAddress
   export const subMarketByTokenMintAddressAndOwnerHashMap = reactive(
   {

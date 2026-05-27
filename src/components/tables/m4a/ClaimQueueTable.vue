@@ -209,7 +209,7 @@
 </template>
   
 <script setup lang="ts">
-  import { ref, defineProps, onMounted } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonInput, IonPopover } from '@ionic/vue'
   import { search } from 'ionicons/icons'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'

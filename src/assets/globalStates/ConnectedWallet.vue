@@ -18,7 +18,9 @@
     submitterAddressOfClaimBeingProcessed: "",
     tokenBalanceMap: new Map<string, string>(), //Balances in the user's wallet
     depositedTokenMap: new Map<string, string>(), //Balances that the user has deposited into the lending protocol
-    selectedLendingUserAccountIndex: 0
+    selectedLendingUserAccountIndex: 0,
+    lendingUserLookUpTableAddress: undefined,
+    lendingUserLookUpTableAccount: undefined
   })
 
   export default connectedWallet

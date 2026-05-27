@@ -81,66 +81,49 @@
       <ion-text>Value: ${{ borrowValue }}</ion-text>
     </div>
 
-    <div class="flexCenterRow mediumSmallMarginTop nMediumMarginBottom">
-      <div style="margin-left: -15px; margin-right: -4px">
-      <InfoButton :infoMessage="snapShotInfo"/>
-      </div>
-      <div title="Interest Earned and Accrued Snapshot" class="progressBarStep flexCenterColumn nMediumSmallMarginLeft">
-        <div class="nMediumSmallMarginTop"><ion-label>{{ snapShotValidCountDown }}</ion-label></div>
-        <div v-if="snapShotValidCountDown!=0" class="finishedCircle"></div>
-        <div v-else class="inProgressCircle"></div>
-      </div>
-      <div title="Withdraw" class="progressBarStep flexCenterColumn">
-        <div class="inProgressCircle"></div>
-      </div>
-    </div>
-
     <ion-button
-      v-if="snapShotValidCountDown==0"
+      v-if="anchorPrograms.isLendingProtocolReady"
       id="borrowModalButton"
       color="dark"
-      @click="updateUserSnapShots()"
+      @click="borrowTokens1()"
       class="mediumSmallMarginTop nTinyMarginBottom"
-    >
-      Update SnapShots
-    </ion-button>
-
-    <ion-button
-      v-else
-      id="borrowModalButton"
-      color="dark"
-      @click="borrowTokens()"
-      class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="borrowAmount==0 || snapShotValidCountDown==0"
+      :disabled="borrowAmount==0"
     >
       Borrow
     </ion-button>
+    <ion-text v-else>Loading</ion-text>
   </div>
 </template>
 
 <script setup lang="ts">
   import { ref, inject, watch, computed } from 'vue'
+  import { toRaw } from 'vue';
   import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey, Transaction } from "@solana/web3.js"
+  import { VersionedTransaction, TransactionMessage, PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     confirmLendingTransaction,
+    parseProgramErrorCode,
+    doesKeyExistInLookUpTable,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { getLendingUserTabAccountPDA, getLendingUserMonthlyStatementAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { subMarketsHashMap, subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
+    lendingUserTabAccountsHashMap,
     lendingUserTabAccountListHashMap,
+    lendingUserMonthlyStatementsHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { PythSolanaReceiver, InstructionWithEphemeralSigners } from "@pythnetwork/pyth-solana-receiver"
+  import { sendTransactions } from "@pythnetwork/solana-utils";
   import { HermesClient } from "@pythnetwork/hermes-client"
   import * as anchor from "@coral-xyz/anchor"
-  import InfoButton from '/src/components/help/InfoButton.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
@@ -170,11 +153,6 @@
   var event = ref()
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
 
-  const snapShotInfo = "Info\n\n1. Snapshots of user earned\nand accrued interest no\nolder than 120 seconds are\nrequired for withdrawals\nand borrows.\n2. Withdraw tokens while\nSnapshots and are still\nvalid."
-
-  var snapShotValidCountDown = ref(0)
-  var snapShotCountDownIntervalId: any
-
   var totalAssetValue = ref(0)
   var totalDebtValue = ref(0)
   var modalRef = ref()
@@ -198,15 +176,17 @@
     {
       stopHealthFactorCalculation()
       startHealthFactorCalculation()
-      clearSnapShotIntervalCountDown()
-      await setSnapShotIntervalCountDown()
     }
   })
 
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
   {
-    return JSON.stringify(connectedWallet)
+    return JSON.stringify(
+    {
+      addressString: connectedWallet.addressString,
+      selectedLendingUserAccountIndex: connectedWallet.selectedLendingUserAccountIndex
+    })
   })
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
@@ -225,8 +205,6 @@
     borrowAmount.value = 0
     stopHealthFactorCalculation()
     startHealthFactorCalculation()
-    clearSnapShotIntervalCountDown()
-    await setSnapShotIntervalCountDown()
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
@@ -248,7 +226,6 @@
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
         stopHealthFactorCalculation()
-        clearSnapShotIntervalCountDown()
         borrowing.value = false
         window.removeEventListener('click', handleClickOutside)
       }  
@@ -286,50 +263,8 @@
 
     stopHealthFactorCalculation()
     startHealthFactorCalculation()
-    clearSnapShotIntervalCountDown()
-    await setSnapShotIntervalCountDown()
   }
 
-  async function setSnapShotIntervalCountDown()
-  {
-    const allUserTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
-    const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
-    const currentBlockTimeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
-    var oldestSnapShot = Number(allUserTabAccounts[0].interestChangeLastUpdatedTimeStamp)
-
-    for(var i=0; i<allUserTabAccounts.length; i++)
-    {
-      if(allUserTabAccounts[i].interestChangeLastUpdatedTimeStamp < oldestSnapShot)
-        oldestSnapShot = Number(allUserTabAccounts[i].interestChangeLastUpdatedTimeStamp)
-    }
-    
-    const timeDiff = currentBlockTimeStamp - oldestSnapShot
-
-    if(timeDiff < 120)
-    {
-      snapShotValidCountDown.value = 120 - timeDiff
-
-      snapShotCountDownIntervalId = setInterval(() =>
-      {
-        snapShotValidCountDown.value--
-
-        if(snapShotValidCountDown.value <= 0)
-          clearSnapShotIntervalCountDown()
-
-      }, 1000)
-    }
-    else
-      snapShotValidCountDown.value = 0
-  }
-
-  function clearSnapShotIntervalCountDown()
-  {
-    if(snapShotCountDownIntervalId != undefined)
-    {
-      clearInterval(snapShotCountDownIntervalId)
-      snapShotCountDownIntervalId = undefined
-    }
-  }
 
   function openTokenPopover(e: Event) 
   {
@@ -434,106 +369,847 @@
     }
   }
 
-  async function updateUserSnapShots()
-  {
-    const lendingUserTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
-    const transaction = new Transaction()
-
-    try
-    {
-      for(var i=0; i<lendingUserTabAccounts.length; i++)
-      {
-        const instruction = await anchorPrograms.lending.lendingProgram.methods.updateUserSnapShot
-        (
-          lendingUserTabAccounts[i].tokenMintAddress,
-          lendingUserTabAccounts[i].subMarketOwnerAddress,
-          lendingUserTabAccounts[i].subMarketIndex,
-          lendingUserTabAccounts[i].owner,
-          accountSelect.value
-        ).instruction()
-
-        transaction.add(instruction)
-      }
-
-      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])
-      await confirmLendingTransaction(tx, toast, "update_user_snap_shots")
-    }
-    catch(error)
-    {
-      toastPreTransactionError(error, toast, "update_user_snap_shots")
-    }
-  }
-
-  async function borrowTokens()
+  async function borrowTokens1()
   {
     const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
     var pythIdArray: string[] = []
-
-    for(var i=0; i<remainingTabAccounts.length; i++)
-    {
-      const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
-      pythIdArray.push(tokenInfo.pythId)
-    }
-
-    const hermesClient = new HermesClient("https://hermes.pyth.network/")
-    const pythSolanaReceiver = new PythSolanaReceiver(
-    {
-      connection: anchorPrograms.lending.connection,
-      wallet: anchorPrograms.lending.wallet,
-    })
-
-    const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
-    const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
-
-    await transactionBuilder.addPostPriceUpdates(priceUpdateData.binary.data)
-    await transactionBuilder.addPriceConsumerInstructions
-    (
-      async(
-        getPriceUpdateAccount: (priceFeedId: string) => PublicKey
-      ): Promise<InstructionWithEphemeralSigners[]> =>
-      {
-        var remainingAccounts = []
-
-        for(var i=0; i<pythIdArray.length; i++)
-        {
-          remainingAccounts.push(remainingTabAccounts[i])
-
-          const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[i]);
-
-          const ephemeralPythPriceUpdateRemainingAccount = 
-          {
-            pubkey: ephemeralPythKey,
-            isSigner: false,
-            isWritable: true
-          }
-
-          remainingAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
-        }
-        
-        return [
-          {
-            instruction: await anchorPrograms.lending.lendingProgram.methods.borrowTokens
-              (
-                selectedTokenMintAddress,
-                adminAccounts.lendingCEOAddressKey,
-                subMarketSelect.value,
-                accountSelect.value,
-                new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount))//convert to fixedpoint notation
-              )
-              .accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
-              .remainingAccounts(remainingAccounts)
-              .instruction(),
-            signers: []
-          },
-        ]
-      }
-    )
+    var createMonthlyStatementInstructions: anchor.web3.TransactionInstruction[] = []
+    var borrowTokenPriceAccountIndex: number | null = null
+    const uniqueSubMarketOwnersAddressStrings = new Set<string>()
 
     try
-    {
+    { 
+      for(var i=0; i<remainingTabAccounts.length; i++)
+      {
+        const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
+        pythIdArray.push(tokenInfo.pythId)
+
+        //Get index for the selected token to use later
+        if(remainingTabAccounts[i].tokenMintAddress == selectedTokenMintAddress.toString())
+          borrowTokenPriceAccountIndex = i
+
+        uniqueSubMarketOwnersAddressStrings.add(remainingTabAccounts[i].subMarketOwnerAddress)
+      }
+
+      //If user is borrowing from a token they have never interacted with before, add it to the array for price checks
+      if(borrowTokenPriceAccountIndex == null)
+      {
+        const newTokenInfo = tokenReserveFontEndInfoHashMap.get(selectedTokenMintAddress.toString())
+        pythIdArray.push(newTokenInfo.pythId)
+      }
+
+      const hermesClient = new HermesClient("https://hermes.pyth.network/")
+      const pythSolanaReceiver = new PythSolanaReceiver(
+      {
+        connection: anchorPrograms.lending.connection,
+        wallet: anchorPrograms.lending.wallet,
+      })
+
+      const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
+      const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
+
+      await transactionBuilder.addPostPriceUpdates(priceUpdateData.binary.data)
+      await transactionBuilder.addPriceConsumerInstructions
+      (
+        async(
+          getPriceUpdateAccount: (priceFeedId: string) => PublicKey
+        ): Promise<InstructionWithEphemeralSigners[]> =>
+        {
+          var remainingRefreshAccounts = []
+          var remainingBorrowTokenPriceUpdateAccount = []
+
+          //Don't count the pythIdArray that was added because the user has never interacted before with it here
+          const refreshAccountLoopNumber = borrowTokenPriceAccountIndex == null ? pythIdArray.length-1 : pythIdArray.length
+
+          for(var i=0; i<refreshAccountLoopNumber; i++)
+          {
+            //Push Remaining Tab Account
+            remainingRefreshAccounts.push(remainingTabAccounts[i])
+
+            //Push Remaining Token Reserve Account
+            const tokenReserve = tokenReservesHashMap.map.get(remainingTabAccounts[i].tokenMintAddress)
+            const tokenReserveRemainingAccount =
+            {
+              pubkey: tokenReserve.pda,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingRefreshAccounts.push(tokenReserveRemainingAccount)
+
+            //Push Remaining SubMarket Account
+            const subMarket = subMarketsHashMap.map.get(remainingTabAccounts[i].tokenMintAddress +
+            remainingTabAccounts[i].subMarketOwnerAddress +
+            remainingTabAccounts[i].subMarketIndex.toString())
+            const subMarketRemainingAccount =
+            {
+              pubkey: subMarket.pda,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingRefreshAccounts.push(subMarketRemainingAccount)
+
+            //Push Remaining Monthly Statement Account
+            const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+            anchorPrograms.currentStatementYear.toString() +
+            remainingTabAccounts[i].tokenMintAddress +
+            remainingTabAccounts[i].subMarketOwnerAddress +
+            remainingTabAccounts[i].subMarketIndex.toString() +
+            connectedWallet.addressString +
+            accountSelect.value.toString())
+
+            var monthlyStatementPDA: PublicKey
+
+            //Create monthly statement for the new month if it doesn't exist
+            if(!monthlyStatement)
+            {
+              const createNewMonthlyStatementInstruction = await anchorPrograms.lending.lendingProgram.methods.createNewMonthlyStatement
+              (
+                new PublicKey(remainingTabAccounts[i].tokenMintAddress),
+                new PublicKey(remainingTabAccounts[i].subMarketOwnerAddress),
+                remainingTabAccounts[i].subMarketIndex,
+                connectedWallet.publicKey,
+                accountSelect.value
+              )
+              .instruction()
+
+              createMonthlyStatementInstructions.push(createNewMonthlyStatementInstruction)
+
+              //Determine PDA for new MonthlyStatementAccount that will be created
+              monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+              anchorPrograms.currentStatementYear,
+              new PublicKey(remainingTabAccounts[i].tokenMintAddress),
+              new PublicKey(remainingTabAccounts[i].subMarketOwnerAddress),
+              remainingTabAccounts[i].subMarketIndex,
+              connectedWallet.publicKey,
+              accountSelect.value)
+
+              if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
+              {
+                const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+                {
+                  authority: connectedWallet.publicKey,
+                  payer: connectedWallet.publicKey,
+                  lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+                  addresses: [monthlyStatementPDA]
+                })
+                console.log("Borrow - Existing Tab, Monthly statement account to extend: " + monthlyStatementPDA.toBase58())
+                createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
+              }
+            }
+            else
+              monthlyStatementPDA = monthlyStatement.pda
+
+            const monthlyStatementRemainingAccount =
+            {
+              pubkey: monthlyStatementPDA,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingRefreshAccounts.push(monthlyStatementRemainingAccount)
+
+            //Push Remaining Pyth Account For Account Refresh
+            const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[i])
+            const ephemeralPythPriceUpdateRemainingAccount = 
+            {
+              pubkey: ephemeralPythKey,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingRefreshAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
+
+            //Push Remaining Pyth Account for borrowToken Instruction. It only requires the selected token's price account
+            if(borrowTokenPriceAccountIndex == i)
+              remainingBorrowTokenPriceUpdateAccount.push(ephemeralPythPriceUpdateRemainingAccount)
+          }
+
+          //If borrowing from a token a user has never interacted with before, the pyth price account will be at the end of the array
+          if(borrowTokenPriceAccountIndex == null)
+          {
+            const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[pythIdArray.length-1])
+            const ephemeralPythPriceUpdateRemainingAccount = 
+            {
+              pubkey: ephemeralPythKey,
+              isSigner: false,
+              isWritable: true
+            }
+            remainingBorrowTokenPriceUpdateAccount.push(ephemeralPythPriceUpdateRemainingAccount)
+          }
+
+          //If borrowing from a Sub Market the user has never interacted with before, extend the Lending User Look Up Table with the new Tab Account
+          const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+          adminAccounts.lendingCEOAddressString +
+          subMarketSelect.value.toString() +
+          connectedWallet.addressString +
+          accountSelect.value.toString())
+          console.log(lendingUserTabAccount)
+
+          //For this scenario, the borrow_tokens function will initialize a new Lending User Tab Account and Monthly Statement Account, but we still want to extend the Look Up Table
+          //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
+          console.log("Account Select: ", accountSelect.value)
+          if(!lendingUserTabAccount)
+          {console.log("Not lending user tab account found, creating new one...")
+            //Determine PDA for new MonthlyStatementAccount that will be created
+            const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenMintAddress,
+            adminAccounts.lendingCEOAddressKey,
+            subMarketSelect.value,
+            connectedWallet.publicKey,
+            accountSelect.value)
+          
+            if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
+            {
+              const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+              {
+                authority: connectedWallet.publicKey,
+                payer: connectedWallet.publicKey,
+                lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+                addresses: [lendingUserTabAccountPDA]
+              })
+              console.log("Borrow - Tab account to extend: " + lendingUserTabAccountPDA.toBase58())
+              createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
+              console.log(createMonthlyStatementInstructions)
+            }
+
+            const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+            anchorPrograms.currentStatementYear.toString() +
+            selectedTokenMintAddress.toString() +
+            adminAccounts.lendingCEOAddressString +
+            subMarketSelect.value.toString() +
+            connectedWallet.addressString +
+            accountSelect.value.toString())
+
+            //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
+            if(!monthlyStatement)
+            {
+              //Determine PDA for new MonthlyStatementAccount that will be created
+              const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+              anchorPrograms.currentStatementYear,
+              selectedTokenMintAddress,
+              adminAccounts.lendingCEOAddressKey,
+              subMarketSelect.value,
+              connectedWallet.publicKey,
+              accountSelect.value)
+
+              if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
+              {
+                const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+                {
+                  authority: connectedWallet.publicKey,
+                  payer: connectedWallet.publicKey,
+                  lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+                  addresses: [monthlyStatementPDA]
+                })
+                console.log("Borrow - Non-Existing Tab, Monthly statement account to extend: " + monthlyStatementPDA.toBase58())
+                createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
+                console.log(createMonthlyStatementInstructions)
+              }
+            }
+          }
+          console.log(connectedWallet.lendingUserLookUpTableAccount)
+          const refreshUserHealthAndTokenReservesInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshUserHealthChunkAndTokenReserves(connectedWallet.publicKey, accountSelect.value)
+          .remainingAccounts(remainingRefreshAccounts)
+          .instruction()
+
+          //For when the user is borrowing from a Token Reserve they have never interacted with before. RefreshUserHealthChunkAndTokenReserves will miss the new Token Reserve in this case.
+          const refreshTokenReserveInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshTokenReserveOnly(selectedTokenMintAddress).instruction()
+
+          const borrowInstruction = await anchorPrograms.lending.lendingProgram.methods.borrowTokens
+          (
+            adminAccounts.lendingCEOAddressKey,
+            subMarketSelect.value,
+            accountSelect.value,
+            new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount))//convert to fixedpoint notation
+          )
+          .accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
+          .remainingAccounts(remainingBorrowTokenPriceUpdateAccount)
+          .instruction()
+
+          if(borrowTokenPriceAccountIndex == null)
+          {console.log("refresh extra token reserve instruction")
+            return[
+              { instruction: refreshTokenReserveInstruction, signers: [] },
+              { instruction: refreshUserHealthAndTokenReservesInstruction, signers: [] },
+              { instruction: borrowInstruction, signers: [] }
+            ]
+          }
+          else
+          {console.log("no refresh extra token reserve instruction")
+            return[
+              { instruction: refreshUserHealthAndTokenReservesInstruction, signers: [] },
+              { instruction: borrowInstruction, signers: [] }
+            ]
+          }
+        }
+      )
+
+      //Get Look Up Table Accounts for all instructions to reduce transaction size
+      var lookUpTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
+
+      //Get Protocol Look Up Table
+      lookUpTableAccounts.push(toRaw(anchorPrograms.lendingProtocolLookUpTableAccount))
+
+      //Get SubMarket Look Up Table By Owner
+      var subMarketLookTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
+      uniqueSubMarketOwnersAddressStrings.forEach((subMarketOwnersAddressString) =>
+      {
+        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(subMarketOwnersAddressString)
+        if(subMarketLookTableAccount)
+          subMarketLookTableAccounts.push(toRaw(subMarketLookTableAccount))
+      })
+      lookUpTableAccounts.push(...subMarketLookTableAccounts)
+
+      //Get Lending User Look Up Table Account
+      lookUpTableAccounts.push(toRaw(connectedWallet.lendingUserLookUpTableAccount))
+
+      const transactionsToSend = []
+      const intialInstructionToSend = []
+
+      if(createMonthlyStatementInstructions.length > 0)
+      {
+        console.log("creating new monthly statement accounts")
+        console.log(createMonthlyStatementInstructions)
+        intialInstructionToSend.push(...createMonthlyStatementInstructions)
+
+        const { blockhash } = await anchorPrograms.lending.connection.getLatestBlockhash()
+        console.log("Before initalMessageV0")
+        console.log("Initial instructions to send:", intialInstructionToSend)
+        console.log("Look up table accounts to send:", lookUpTableAccounts)
+        const initialMessageV0 = new TransactionMessage({
+          payerKey: connectedWallet.publicKey,
+          recentBlockhash: blockhash,
+          instructions: intialInstructionToSend,
+        }).compileToV0Message(lookUpTableAccounts)
+        console.log("After initalMessageV0")
+        const initTx = new VersionedTransaction(initialMessageV0)
+        transactionsToSend.push({ tx: initTx, signers: [] })
+      }
+      else
+        console.log("No new monthly statement accounts needed")
+      console.log("Before pythTxs")
+      const pythTxs = await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 })
+      console.log(pythTxs)
+      console.log(transactionsToSend)
+      const fullyCompressedTxs = pythTxs.map((pythTxWrapper: { tx: { message: any; }; signers: any; }) =>
+      {
+        //Extract the original message directly from the internal tx object
+        const message = pythTxWrapper.tx.message;
+
+        //Compile a new V0 message with your custom lookup tables added
+        const updatedMessageV0 = anchor.web3.TransactionMessage.decompile(message, {
+          //If Pyth used any lookup tables internally, they would be passed here, otherwise empty
+          addressLookupTableAccounts: lookUpTableAccounts 
+        }).compileToV0Message(lookUpTableAccounts); 
+
+        //Return a fresh VersionedTransaction containing the compressed message
+        const newTx = new anchor.web3.VersionedTransaction(updatedMessageV0);
+        console.log(newTx.version)
+        //CRITICAL: Pass Pyth's generated signers (like ephemeral price update accounts) 
+        //along with your newly compressed versioned transaction.
+        return { 
+          tx: newTx, 
+          signers: pythTxWrapper.signers 
+        }
+      })
+      //transactionsToSend.push(...pythTxs)
+      transactionsToSend.push(...fullyCompressedTxs)
+      console.log(pythTxs)
+      console.log(fullyCompressedTxs)
+      console.log(transactionsToSend)
+      console.log("Before sendAll")
+
+      /*const tx = await anchorPrograms.lending.lendingProgram.provider.sendAll
+      (
+        transactionsToSend, { skipPreflight: false }
+      )*/
+
+      /*const tx = await sendTransactions(
+        transactionsToSend,
+        pythSolanaReceiver.connection,
+        pythSolanaReceiver.wallet
+      )*/
+
       const tx = await pythSolanaReceiver.provider.sendAll
       (
-        await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 100 }), { skipPreflight: false }
+        transactionsToSend, { skipPreflight: false, "maxSupportedTransactionVersion": 0 }
+      )
+      
+      /*const tx = await pythSolanaReceiver.provider.sendAll(
+      transactionsToSend, 
+      { 
+        skipPreflight: false,
+        maxSupportedTransactionVersion: 0 // Explicitly authorizes Versioned Transactions (V0)
+      })*/
+
+     // Extract and pre-sign transactions with internal/ephemeral keypairs
+      /*const preparedTxs = transactionsToSend.map((payload) => {
+        const { tx: versionedTx, signers } = payload;
+        
+        // Apply secondary signers (e.g., Pyth oracle update accounts) if they exist
+        if (signers && signers.length > 0) {
+          versionedTx.sign(signers);
+        }
+        
+        return versionedTx;
+      });
+
+      const connection = anchorPrograms.lending.connection;
+      const wallet = anchorPrograms.lending.lendingProgram.provider.wallet;
+
+      // 1. ONE WALLET POPUP: Sign everything at once (Single click experience)
+      console.log("Opening single wallet prompt for all transactions...");
+      const signedTxs = await wallet.signAllTransactions(preparedTxs);
+
+      const txSignatures: string[] = [];
+
+      // 2. Pipeline Execution: Process sequentially but with ultra-fast 'processed' gating
+      for (let i = 0; i < signedTxs.length; i++) {
+        const signedTx = signedTxs[i];
+        console.log(`Dispatched transaction ${i + 1} of ${signedTxs.length}...`);
+        
+        // Keep skipPreflight: false while debugging so RPC errors bubble up accurately
+        const signature = await connection.sendRawTransaction(signedTx.serialize(), {
+          skipPreflight: false, 
+          maxRetries: 3,
+        });
+        
+        txSignatures.push(signature);
+
+        // If there are dependent transactions following this one, pause until the bank registers the state
+        if (i < signedTxs.length - 1) {
+          const latestBlockhash = await connection.getLatestBlockhash("processed");
+          await connection.confirmTransaction({
+            signature,
+            blockhash: latestBlockhash.blockhash,
+            lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+          }, "processed"); // Only takes ~400ms; guarantees correct account initialization order
+          
+          console.log(`Transaction ${i + 1} acknowledged by bank. Moving to next step...`);
+        }
+      }
+
+      // 3. Final Confirmation: Wait for full network confirmation on the final Borrow transaction
+      console.log("All prerequisite data on-chain. Finalizing borrow execution...");
+      const finalBlockhash = await connection.getLatestBlockhash("confirmed");
+      await connection.confirmTransaction({
+        signature: txSignatures[txSignatures.length - 1],
+        blockhash: finalBlockhash.blockhash,
+        lastValidBlockHeight: finalBlockhash.lastValidBlockHeight,
+      }, "confirmed");
+
+      // Map back to your downstream logic seamlessly
+      const tx = txSignatures;*/
+
+      /*console.log("Lending User Look Up Table Account for the transaction:", connectedWallet.lendingUserLookUpTableAccount)
+      console.log("Look up table accounts for the transaction:", lookUpTableAccounts)
+      const { blockhash } = await anchorPrograms.lending.connection.getLatestBlockhash()
+
+      console.log("Before message V0")
+      const messageV0 = new TransactionMessage({
+        payerKey: connectedWallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions: instructionsToAdd,
+      }).compileToV0Message(lookUpTableAccounts)
+      console.log("After message V0")
+      const transaction = new VersionedTransaction(messageV0)
+      console.log("After transaction initialisation")*/
+      //const size = transaction.serialize().length
+      //console.log(`Current Transaction Size: ${size} bytes`)
+
+      //const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, pythEphemeralSigners)
+      
+      /*if(tx.length)
+        for(var i=0; i<tx.length; i++)
+          await confirmLendingTransaction(tx[i], toast, "borrow_tokens")
+      else
+        await confirmLendingTransaction(tx, toast, "borrow_tokens")*/
+
+      if(tx.length)
+        for(var i=0; i<tx.length; i++)
+      {
+          await confirmLendingTransaction(tx[i], toast, "borrow_tokens")
+          console.log(`Borrow transaction ${i + 1} confirmed: ${tx[i]}`)
+      }
+      else
+      {
+        await confirmLendingTransaction(tx, toast, "borrow_tokens")
+        console.log(`Borrow transaction confirmed: ${tx}`)
+      }
+
+      stopHealthFactorCalculation()
+      borrowing.value = false
+    }
+    catch(error: any)
+    {
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, "borrow_tokens")  
+    }
+  }
+
+  async function borrowTokens2()
+  {
+    const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+    var pythIdArray: string[] = []
+    var createMonthlyStatementInstructions: anchor.web3.TransactionInstruction[] = []
+    var borrowTokenPriceAccountIndex: number | null = null
+    const uniqueSubMarketOwnersAddressStrings = new Set<string>()
+
+    try
+    { 
+      for(var i=0; i<remainingTabAccounts.length; i++)
+      {
+        const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
+        uniqueSubMarketOwnersAddressStrings.add(remainingTabAccounts[i].subMarketOwnerAddress)
+        pythIdArray.push(tokenInfo.pythId)
+
+        //Get index for the selected token to use later
+        if(remainingTabAccounts[i].tokenMintAddress == selectedTokenMintAddress.toString())
+          borrowTokenPriceAccountIndex = i
+      }
+
+      //If user is borrowing from a token they have never interacted with before, add it to the array for price checks
+      if(borrowTokenPriceAccountIndex == null)
+      {
+        const newTokenInfo = tokenReserveFontEndInfoHashMap.get(selectedTokenMintAddress.toString())
+        pythIdArray.push(newTokenInfo.pythId)
+      }
+
+      const hermesClient = new HermesClient("https://hermes.pyth.network/")
+      const pythSolanaReceiver = new PythSolanaReceiver(
+      {
+        connection: anchorPrograms.lending.connection,
+        wallet: anchorPrograms.lending.wallet,
+      })
+
+      const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
+      const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
+
+      //const priceConsumerInstructions: anchor.web3.TransactionInstruction[] = []
+
+      const
+      {
+        postInstructions,
+        priceFeedIdToPriceUpdateAccount,
+        closeInstructions,
+      } = await pythSolanaReceiver.buildPostPriceUpdateAtomicInstructions(priceUpdateData.binary.data)
+
+      console.log("priceFeedIdToPriceUpdateAccount: ", priceFeedIdToPriceUpdateAccount)
+      console.log("postInstructions", postInstructions)
+      console.log("closeInstructions", closeInstructions)
+      const pythPostInstructions = postInstructions.map((i: { instruction: any; }) => i.instruction)
+      const pythCloseInstructions = closeInstructions.map((i: { instruction: any; }) => i.instruction)
+
+      // 2. Extract the associated Keypair/Signer objects
+      const pythPostSigners = postInstructions.flatMap((i: { signers: any; }) => i.signers);
+      const pythCloseSigners = closeInstructions.flatMap((i: { signers: any; }) => i.signers);
+
+      // Combine them into a single array of additional signers
+      const pythEphemeralSigners = [...pythPostSigners, ...pythCloseSigners];
+
+      var remainingRefreshAccounts = []
+      var remainingBorrowTokenPriceUpdateAccount = []
+
+      //Don't count the pythIdArray that was added because the user has never interacted before with it here
+      const refreshAccountLoopNumber = borrowTokenPriceAccountIndex == null ? pythIdArray.length-1 : pythIdArray.length
+
+      for(var i=0; i<refreshAccountLoopNumber; i++)
+      {
+        //Push Remaining Tab Account
+        remainingRefreshAccounts.push(remainingTabAccounts[i])
+
+        //Push Remaining Token Reserve Account
+        const tokenReserve = tokenReservesHashMap.map.get(remainingTabAccounts[i].tokenMintAddress)
+        const tokenReserveRemainingAccount =
+        {
+          pubkey: tokenReserve.pda,
+          isSigner: false,
+          isWritable: true
+        }
+        remainingRefreshAccounts.push(tokenReserveRemainingAccount)
+
+        //Push Remaining SubMarket Account
+        const subMarket = subMarketsHashMap.map.get(remainingTabAccounts[i].tokenMintAddress +
+        remainingTabAccounts[i].subMarketOwnerAddress +
+        remainingTabAccounts[i].subMarketIndex.toString())
+        const subMarketRemainingAccount =
+        {
+          pubkey: subMarket.pda,
+          isSigner: false,
+          isWritable: true
+        }
+        remainingRefreshAccounts.push(subMarketRemainingAccount)
+
+        //Push Remaining Monthly Statement Account
+        const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+        anchorPrograms.currentStatementYear.toString() +
+        remainingTabAccounts[i].tokenMintAddress +
+        remainingTabAccounts[i].subMarketOwnerAddress +
+        remainingTabAccounts[i].subMarketIndex.toString() +
+        connectedWallet.addressString +
+        accountSelect.value.toString())
+
+        var monthlyStatementPDA: PublicKey
+
+        //Create monthly statement for the new month if it doesn't exist
+        if(!monthlyStatement)
+        {
+          const createNewMonthlyStatementInstruction = await anchorPrograms.lending.lendingProgram.methods.createNewMonthlyStatement
+          (
+            new PublicKey(remainingTabAccounts[i].tokenMintAddress),
+            new PublicKey(remainingTabAccounts[i].subMarketOwnerAddress),
+            remainingTabAccounts[i].subMarketIndex,
+            connectedWallet.publicKey,
+            accountSelect.value
+          )
+          .instruction()
+
+          createMonthlyStatementInstructions.push(createNewMonthlyStatementInstruction)
+
+          //Determine PDA for new MonthlyStatementAccount that will be created
+          monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+          anchorPrograms.currentStatementYear,
+          new PublicKey(remainingTabAccounts[i].tokenMintAddress),
+          new PublicKey(remainingTabAccounts[i].subMarketOwnerAddress),
+          remainingTabAccounts[i].subMarketIndex,
+          connectedWallet.publicKey,
+          accountSelect.value)
+
+          if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
+          {
+            const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+            {
+              authority: connectedWallet.publicKey,
+              payer: connectedWallet.publicKey,
+              lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+              addresses: [monthlyStatementPDA]
+            })
+            console.log("Borrow - Existing Tab, Monthly statement account to extend: " + monthlyStatementPDA.toBase58())
+            createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
+          }
+        }
+        else
+          monthlyStatementPDA = monthlyStatement.pda
+
+        const monthlyStatementRemainingAccount =
+        {
+          pubkey: monthlyStatementPDA,
+          isSigner: false,
+          isWritable: true
+        }
+        remainingRefreshAccounts.push(monthlyStatementRemainingAccount)
+
+        //Push Remaining Pyth Account For Account Refresh
+        const priceAccountPDA = priceFeedIdToPriceUpdateAccount[pythIdArray[i]]
+        //const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[i])
+        const pythPriceUpdateRemainingAccount = 
+        {
+          pubkey: priceAccountPDA,
+          isSigner: false,
+          isWritable: true
+        }
+        remainingRefreshAccounts.push(pythPriceUpdateRemainingAccount)
+
+        //Push Remaining Pyth Account for borrowToken Instruction. It only requires the selected token's price account
+        if(borrowTokenPriceAccountIndex == i)
+          remainingBorrowTokenPriceUpdateAccount.push(pythPriceUpdateRemainingAccount)
+      }
+
+      //If borrowing from a token a user has never interacted with before, the pyth price account will be at the end of the array
+      if(borrowTokenPriceAccountIndex == null)
+      {
+        const priceAccountPDA = priceFeedIdToPriceUpdateAccount[pythIdArray[pythIdArray.length-1]]
+        const pythPriceUpdateRemainingAccount = 
+        {
+          pubkey: priceAccountPDA,
+          isSigner: false,
+          isWritable: true
+        }
+
+        //Push Remaining Pyth Account for borrowToken Instruction. It only requires the selected token's price account
+        remainingBorrowTokenPriceUpdateAccount.push(pythPriceUpdateRemainingAccount)
+      }
+
+      //If borrowing from a Sub Market the user has never interacted with before, extend the Lending User Look Up Table with the new Tab Account
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+      adminAccounts.lendingCEOAddressString +
+      subMarketSelect.value.toString() +
+      connectedWallet.addressString +
+      accountSelect.value.toString())
+      console.log(lendingUserTabAccount)
+
+      //For this scenario, the borrow_tokens function will initialize a new Lending User Tab Account and Monthly Statement Account, but we still want to extend the Look Up Table
+      //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
+      console.log("Account Select: ", accountSelect.value)
+      if(!lendingUserTabAccount)
+      {console.log("Not lending user tab account found, creating new one...")
+        //Determine PDA for new MonthlyStatementAccount that will be created
+        const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenMintAddress,
+        adminAccounts.lendingCEOAddressKey,
+        subMarketSelect.value,
+        connectedWallet.publicKey,
+        accountSelect.value)
+      
+        if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
+        {
+          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+          {
+            authority: connectedWallet.publicKey,
+            payer: connectedWallet.publicKey,
+            lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+            addresses: [lendingUserTabAccountPDA]
+          })
+          console.log("Borrow - Tab account to extend: " + lendingUserTabAccountPDA.toBase58())
+          createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
+          console.log(createMonthlyStatementInstructions)
+        }
+
+        const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+        anchorPrograms.currentStatementYear.toString() +
+        selectedTokenMintAddress.toString() +
+        adminAccounts.lendingCEOAddressString +
+        subMarketSelect.value.toString() +
+        connectedWallet.addressString +
+        accountSelect.value.toString())
+
+        //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
+        if(!monthlyStatement)
+        {
+          //Determine PDA for new MonthlyStatementAccount that will be created
+          const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+          anchorPrograms.currentStatementYear,
+          selectedTokenMintAddress,
+          adminAccounts.lendingCEOAddressKey,
+          subMarketSelect.value,
+          connectedWallet.publicKey,
+          accountSelect.value)
+
+          if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
+          {
+            const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+            {
+              authority: connectedWallet.publicKey,
+              payer: connectedWallet.publicKey,
+              lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+              addresses: [monthlyStatementPDA]
+            })
+            console.log("Borrow - Non-Existing Tab, Monthly statement account to extend: " + monthlyStatementPDA.toBase58())
+            createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
+            console.log(createMonthlyStatementInstructions)
+          }
+        }
+      }
+      console.log(connectedWallet.lendingUserLookUpTableAccount)
+      const refreshUserHealthAndTokenReservesInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshUserHealthChunkAndTokenReserves(connectedWallet.publicKey, accountSelect.value)
+      .remainingAccounts(remainingRefreshAccounts)
+      .instruction()
+
+      //For when the user is borrowing from a Token Reserve they have never interacted with before. RefreshUserHealthChunkAndTokenReserves will miss the new Token Reserve in this case.
+      
+      const refreshTokenReserveInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshTokenReserveOnly(selectedTokenMintAddress).instruction()
+
+      const borrowInstruction = await anchorPrograms.lending.lendingProgram.methods.borrowTokens
+      (
+        adminAccounts.lendingCEOAddressKey,
+        subMarketSelect.value,
+        accountSelect.value,
+        new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount))//convert to fixedpoint notation
+      )
+      .accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
+      .remainingAccounts(remainingBorrowTokenPriceUpdateAccount)
+      .instruction()
+
+      //priceConsumerInstructions.push(refreshUserHealthAndTokenReservesInstruction)
+      /*const instructionsWithSigners: InstructionWithEphemeralSigners[] = [
+          { instruction: refreshUserHealthAndTokenReservesInstruction, signers: [] }
+      ];*/
+
+      //if(refreshTokenReserveInstruction)
+        //priceConsumerInstructions.push(refreshTokenReserveInstruction)
+
+      //priceConsumerInstructions.push(borrowInstruction)
+
+      //instructionsWithSigners.push({ instruction: borrowInstruction, signers: [] });
+
+      //return instructionsWithSigners;
+
+
+      
+      const instructionsToAdd: anchor.web3.TransactionInstruction[] = []
+
+      //priceConsumerInstructions.push()
+      console.log(instructionsToAdd)
+
+      instructionsToAdd.push(...pythPostInstructions)
+      instructionsToAdd.push(refreshUserHealthAndTokenReservesInstruction)
+      if(refreshTokenReserveInstruction)
+        instructionsToAdd.push(refreshTokenReserveInstruction)
+      instructionsToAdd.push(borrowInstruction)
+      instructionsToAdd.push(...pythCloseInstructions)
+
+      console.log(instructionsToAdd)
+
+      //Get Look Up Table Accounts for all instructions to reduce transaction size
+      var lookUpTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
+
+      //Get Protocol Look Up Table
+      lookUpTableAccounts.push(toRaw(anchorPrograms.lendingProtocolLookUpTableAccount))
+
+      //Get SubMarket Look Up Table By Owner
+      var subMarketLookTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
+      uniqueSubMarketOwnersAddressStrings.forEach((subMarketOwnersAddressString) =>
+      {
+        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(subMarketOwnersAddressString)
+        if(subMarketLookTableAccount)
+          subMarketLookTableAccounts.push(toRaw(subMarketLookTableAccount))
+      })
+      lookUpTableAccounts.push(...subMarketLookTableAccounts)
+
+      //Get Lending User Look Up Table Account
+      lookUpTableAccounts.push(toRaw(connectedWallet.lendingUserLookUpTableAccount))
+
+      const transactionsToSend = []
+      const intialInstructionToSend = []
+
+      if(createMonthlyStatementInstructions.length > 0)
+      {
+        console.log("creating new monthly statement accounts")
+        console.log(createMonthlyStatementInstructions)
+        //instructionsToAdd.push(...createMonthlyStatementInstructions)
+        intialInstructionToSend.push(...createMonthlyStatementInstructions)
+
+        const { blockhash } = await anchorPrograms.lending.connection.getLatestBlockhash()
+        console.log("Before initalMessageV0")
+        console.log("Initial instructions to send:", intialInstructionToSend)
+        console.log("Look up table accounts to send:", lookUpTableAccounts)
+        const initialMessageV0 = new TransactionMessage({
+          payerKey: connectedWallet.publicKey,
+          recentBlockhash: blockhash,
+          instructions: intialInstructionToSend,
+        }).compileToV0Message(lookUpTableAccounts)
+        console.log("After initalMessageV0")
+        const initTx = new VersionedTransaction(initialMessageV0)
+        transactionsToSend.push({ tx: initTx, signers: [] })
+      }
+      else
+        console.log("No new monthly statement accounts needed")
+
+      console.log("Lending User Look Up Table Account for the transaction:", connectedWallet.lendingUserLookUpTableAccount)
+      console.log("Look up table accounts for the transaction:", lookUpTableAccounts)
+      const { blockhash } = await anchorPrograms.lending.connection.getLatestBlockhash()
+
+      console.log("Before message V0")
+      const messageV0 = new TransactionMessage({
+        payerKey: connectedWallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions: instructionsToAdd,
+      }).compileToV0Message(lookUpTableAccounts)
+      console.log("After message V0")
+      const transaction = new VersionedTransaction(messageV0)
+      console.log("After transaction initialisation")
+      const size = transaction.serialize().length
+      console.log(`Current Transaction Size: ${size} bytes`)
+
+      const tx = await pythSolanaReceiver.provider.sendAll
+      (
+        [transaction], { skipPreflight: false }
       )
     
       if(tx.length)
@@ -543,24 +1219,19 @@
         await confirmLendingTransaction(tx, toast, "borrow_tokens")
 
       stopHealthFactorCalculation()
-      clearSnapShotIntervalCountDown()
       borrowing.value = false
     }
     catch(error: any)
     {
-      if(error.message.includes("\"Custom\":6000"))//These error code numbers don't match the idl exactly for some reason, but I've confirmed these are the proper error messages
-        toastPreTransactionError("StalePriceData: The price data was stale", toast, "borrow_tokens")
-      else if(error.message.includes("\"Custom\":6001"))//These error code numbers don't match the idl exactly for some reason, but I've confirmed these are the proper error messages
-        toastPreTransactionError("StaleSnapShot: The Lending User snap shot data was stale", toast, "borrow_tokens")
-      else
-        toastPreTransactionError(error, toast, "borrow_tokens")  
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, "borrow_tokens")  
     }
   }
 
   function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
   {
     borrowAmount.value = 0
-    localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
+    localStorage.setItem(tokenMintAddress + "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(

@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, defineProps } from 'vue'
+  import { ref } from 'vue'
   import { IonButton, IonLabel, IonIcon, IonPopover, IonInput } from '@ionic/vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
