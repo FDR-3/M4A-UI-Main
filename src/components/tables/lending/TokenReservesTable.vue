@@ -331,8 +331,6 @@
     }
     else
       isLoading.value = true
-
-    console.log("OnMounted: isLoading =", isLoading.value)
   })
 
   watch(priceObjectMap, () =>
@@ -346,8 +344,7 @@
 
     if(isLoading.value)
       isLoading.value = false
-    console.log("Watcher went off")
-    console.log(isLoading.value)
+
     //Update inner table if it's already opened
     if(showTokenSubMarkets.value)
       processNewSubMarketData()

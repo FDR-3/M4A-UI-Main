@@ -493,7 +493,7 @@
                   lookupTable: connectedWallet.lendingUserLookUpTableAddress,
                   addresses: [monthlyStatementPDA]
                 })
-                console.log("Repay - Existing Tab, Monthly statement account to extend: " + monthlyStatementPDA.toBase58())
+
                 createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
               }
             }
@@ -564,7 +564,6 @@
 
       if(createMonthlyStatementInstructions.length > 0)
       {
-        console.log("creating new monthly statement accounts")
         const { blockhash } = await anchorPrograms.lending.connection.getLatestBlockhash()
 
         const messageV0 = new TransactionMessage({
@@ -576,27 +575,24 @@
         const initTx = new VersionedTransaction(messageV0)
         transactionsToSend.push({ tx: initTx, signers: [] })
       }
-      else
-        console.log("No new monthly statement accounts needed")
 
-      const pythTxs = await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 0 })
-
-      const fullyCompressedTxs = pythTxs.map((pythTxWrapper) =>
+      const pythTxs = await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 })
+      const fullyCompressedTxs = pythTxs.map((pythTxWrapper: { tx: { message: any; }; signers: any; }) =>
       {
-        // Extract the original message directly from the internal tx object
+        //Extract the original message directly from the internal tx object
         const message = pythTxWrapper.tx.message;
 
-        // Compile a new V0 message with your custom lookup tables added
+        //Compile a new V0 message with your custom lookup tables added
         const updatedMessageV0 = anchor.web3.TransactionMessage.decompile(message, {
-          // If Pyth used any lookup tables internally, they would be passed here, otherwise empty
+          //If Pyth used any lookup tables internally, they would be passed here, otherwise empty
           addressLookupTableAccounts: lookUpTableAccounts 
         }).compileToV0Message(lookUpTableAccounts); 
 
-        // Return a fresh VersionedTransaction containing the compressed message
+        //Return a fresh VersionedTransaction containing the compressed message
         const newTx = new anchor.web3.VersionedTransaction(updatedMessageV0);
 
-        // CRITICAL: Pass Pyth's generated signers (like ephemeral price update accounts) 
-        // along with your newly compressed versioned transaction.
+        //CRITICAL: Pass Pyth's generated signers (like ephemeral price update accounts) 
+        //along with your newly compressed versioned transaction.
         return { 
           tx: newTx, 
           signers: pythTxWrapper.signers 

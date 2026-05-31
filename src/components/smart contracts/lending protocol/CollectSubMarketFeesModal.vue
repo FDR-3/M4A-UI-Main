@@ -64,7 +64,7 @@
     <Select
     class="standardFontSize mediumMarginTop nTinyMarginBottom"
     style="width: min(290px, 70vw)"
-    v-model="subMarketSelect" 
+    v-model="destinationSubMarketSelect" 
     :options="subMarketList" 
     optionLabel="subMarketDescription" 
     optionValue="subMarketIndex" 
@@ -146,25 +146,29 @@
     SYSTEM_PROGRAM_ADDRESS_STRING,
     MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
+  import { PublicKey, VersionedTransaction, TransactionMessage } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     copyFullAddressText,
     confirmLendingTransaction,
+    parseProgramErrorCode,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { getLendingUserLookUpTableAddressAndInstructions } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { subMarketOwnerHashMap, subMarketByTokenMintAddressAndOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
   var ownerSelect = ref()
   var ownerList = ref()
-  var subMarketSelect = ref()
+  var destinationSubMarketSelect = ref()
   var subMarketList = ref()
   var initialSubMarketOwnerAddress: PublicKey
   var initialSubMarketIndex: number
@@ -181,7 +185,7 @@
   var depositSVG = ref()
   var subMarketTokenName = ref()
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
-  var subMarketOwnerAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
+  var destinationSubMarketOwnerAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
 
   var tokenPopoverOpen = ref(false)
@@ -277,7 +281,7 @@
     
     uncollectedAmount.value = rowData.uncollectedSubMarketFeesAmount
     selectedTokenMintAddress = new PublicKey(rowData.tokenMintAddress.toString())
-    subMarketOwnerAddress = new PublicKey(rowData.owner.toString())
+    destinationSubMarketOwnerAddress = new PublicKey(rowData.owner.toString())
     trimmedOwnerAddress.value = trimAddress(rowData.owner.toString())
     tokenDecimalAmount = decimalAmount
     depositSVG.value = tokenSVG
@@ -286,7 +290,7 @@
     generateOwnersSelectList()
     generateSubMarketList()
     ownerSelect.value = rowData.owner.toString()
-    subMarketSelect.value = rowData.subMarketIndex
+    destinationSubMarketSelect.value = rowData.subMarketIndex
     initialSubMarketOwnerAddress = rowData.owner
     initialSubMarketIndex = rowData.subMarketIndex
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
@@ -353,7 +357,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyAddress(copyFullAddressButtonText, subMarketOwnerAddress)
+    copyAddress(copyFullAddressButtonText, destinationSubMarketOwnerAddress)
   }
 
   const customFormatter = (inputLength: number, maxLength: number) => 
@@ -421,10 +425,10 @@
 
   function setSelectedOwner()
   {
-    subMarketOwnerAddress = new PublicKey(ownerSelect.value)
+    destinationSubMarketOwnerAddress = new PublicKey(ownerSelect.value)
     trimmedOwnerAddress.value = trimAddress(ownerSelect.value)
     generateSubMarketList()
-    subMarketSelect.value = 0
+    destinationSubMarketSelect.value = 0
   }
 
   function generateOwnersSelectList()
@@ -452,7 +456,7 @@
     if(!subMarketByTokenMintAddressAndOwnerHashMap.map)
       return
 
-    const ownerSubMarketListArray = subMarketByTokenMintAddressAndOwnerHashMap.map.get(selectedTokenMintAddress.toString() + subMarketOwnerAddress.toString())
+    const ownerSubMarketListArray = subMarketByTokenMintAddressAndOwnerHashMap.map.get(selectedTokenMintAddress.toString() + destinationSubMarketOwnerAddress.toString())
     var tempSubMarketList = []
 
     if(!ownerSubMarketListArray || ownerSubMarketListArray.length == 0)
@@ -470,49 +474,105 @@
 
   async function claimSubMarketFees()
   {
-    if(initialSubMarketOwnerAddress.toString() == subMarketOwnerAddress.toString() && initialSubMarketIndex == subMarketSelect.value)
+    var functionCallName = ""
+
+    try
     {
-      try
+      var lendingUserLookUpTableAddress: PublicKey
+      var instructionsToSend: anchor.web3.TransactionInstruction[] = []
+
+      if(initialSubMarketOwnerAddress.toString() == destinationSubMarketOwnerAddress.toString() && initialSubMarketIndex == destinationSubMarketSelect.value)
       {
-        const tx = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFees
+        [lendingUserLookUpTableAddress, instructionsToSend] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
+        accountSelect.value,
+        connectedWallet.lendingUserLookUpTableAccount,
+        selectedTokenMintAddress,
+        initialSubMarketOwnerAddress,
+        initialSubMarketIndex)
+
+        const claimSubMarketFeesInstruction = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFees
         (
           selectedTokenMintAddress,
           initialSubMarketOwnerAddress,
           initialSubMarketIndex,
           accountSelect.value,
-          accountName.value
-        ).rpc()
-        await confirmLendingTransaction(tx, toast, "claim_sub_market_fees")
+          accountName.value,
+          lendingUserLookUpTableAddress
+        ).instruction()
 
-        collecting.value = false
+        instructionsToSend.push(claimSubMarketFeesInstruction)
+        functionCallName = "claim_sub_market_fees"
       }
-      catch(error)
+      else
       {
-        toastPreTransactionError(error, toast, "claim_sub_market_fees")
+        [lendingUserLookUpTableAddress, instructionsToSend] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
+        accountSelect.value,
+        connectedWallet.lendingUserLookUpTableAccount,
+        selectedTokenMintAddress,
+        initialSubMarketOwnerAddress,
+        initialSubMarketIndex,
+        destinationSubMarketOwnerAddress,
+        destinationSubMarketSelect.value)
+        
+        const claimSubMarketFeesAndDepositInDifferentSubMarketInstruction = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFeesAndDepositInDifferentSubMarket
+        (
+          selectedTokenMintAddress,
+          initialSubMarketOwnerAddress,
+          initialSubMarketIndex,
+          destinationSubMarketOwnerAddress,
+          destinationSubMarketSelect.value,
+          accountSelect.value,
+          accountName.value,
+          lendingUserLookUpTableAddress
+        ).instruction()
+
+        instructionsToSend.push(claimSubMarketFeesAndDepositInDifferentSubMarketInstruction)
+        functionCallName = "claim_sub_market_fees_and_deposit_in_different_sub_market"
       }
+
+      const { blockhash } = await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()
+
+      //Get Look Up Table Accounts
+      var lookUpTableAccounts = []
+
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      //Get Sub Market Look Up Table Account By Owner
+      const subInitialMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(initialSubMarketOwnerAddress.toString())
+      lookUpTableAccounts.push(subInitialMarketOwnerLookUpTableAccount)
+      if(initialSubMarketOwnerAddress.toString() != destinationSubMarketOwnerAddress.toString())
+      {
+        const subDestinationMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(destinationSubMarketOwnerAddress.toString())
+        lookUpTableAccounts.push(subDestinationMarketOwnerLookUpTableAccount)
+      }
+
+      //Get Lending User Look Up Table Account
+      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available if first lending action
+        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+
+      const messageV0 = new TransactionMessage({
+        payerKey: connectedWallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions: instructionsToSend
+      }).compileToV0Message(lookUpTableAccounts)
+
+      //Create and sign the Versioned Transaction
+      const transaction = new VersionedTransaction(messageV0)
+
+      //const size = transaction.serialize().length
+      //console.log(`Current Transaction Size: ${size} bytes`)
+
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction)
+
+      await confirmLendingTransaction(tx, toast, functionCallName)
+
+      collecting.value = false
     }
-    else
+    catch(error)
     {
-      try
-      {
-        const tx = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFeesAndDepositInDifferentSubMarket
-        (
-          selectedTokenMintAddress,
-          initialSubMarketOwnerAddress,
-          initialSubMarketIndex,
-          subMarketOwnerAddress,
-          subMarketSelect.value,
-          accountSelect.value,
-          accountName.value
-        ).rpc()
-        await confirmLendingTransaction(tx, toast, "claim_sub_market_fees_and_deposit_in_different_sub_market")
-
-        collecting.value = false
-      }
-      catch(error)
-      {
-        toastPreTransactionError(error, toast, "claim_sub_market_fees_and_deposit_in_different_sub_market")
-      }
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, functionCallName)
     }
   }
 

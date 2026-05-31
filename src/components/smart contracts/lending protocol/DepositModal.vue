@@ -133,17 +133,16 @@
     MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey, VersionedTransaction, TransactionMessage, AddressLookupTableProgram } from "@solana/web3.js"
+  import { PublicKey, VersionedTransaction, TransactionMessage } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     confirmLendingTransaction,
     parseProgramErrorCode,
-    doesKeyExistInLookUpTable,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingUserHashMap, lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, lendingUserMonthlyStatementsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { getLendingUserAccountPDA, getLendingUserTabAccountPDA, getLendingUserMonthlyStatementAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { getLendingUserLookUpTableAddressAndInstructions } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { getDynamicPriorityFeePrice } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
@@ -412,121 +411,12 @@
   {
     try
     {
-      var instructionsToSend = []
-      var createLookUpTableInstruction = undefined
-      var lendingUserLookUpTableAddress = undefined
-
-      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Accounts for some weird error
-      if(lendingUserHashMap.map == undefined)
-        throw new Error("Lending User hash map is undefined. Cannot proceed.")
-
-      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Tab Accounts for some weird error
-      if(lendingUserTabAccountsHashMap.map == undefined)
-        throw new Error("Lending User Tab hash map is undefined. Cannot proceed.")
-
-      //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Monthly Statement Accounts for some weird error
-      if(lendingUserMonthlyStatementsHashMap.map == undefined)
-        throw new Error("Monthly Statement hash map is undefined. Cannot proceed.")
-
-      //Check if Lending User Account has been initialized
-      const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
-      if(!lendingUserAccount)
-      {
-        const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot("finalized"); //Need a semi colon before a tuple reassignment.
-
-        [createLookUpTableInstruction, lendingUserLookUpTableAddress] = 
-        AddressLookupTableProgram.createLookupTable({
-          authority: connectedWallet.publicKey,
-          payer: connectedWallet.publicKey,
-          recentSlot: slot
-        })
-        console.log("Creating Lending User Look Up Table: " + lendingUserLookUpTableAddress.toBase58())
-        instructionsToSend.push(createLookUpTableInstruction)
-
-        //Determine PDA for new Lending User Account that will be created
-        const lendingUserAccountPDA = getLendingUserAccountPDA(connectedWallet.publicKey, accountSelect.value)
-
-        if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserAccountPDA))
-        {
-          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-          {
-            authority: connectedWallet.publicKey,
-            payer: connectedWallet.publicKey,
-            lookupTable: lendingUserLookUpTableAddress,
-            addresses: [lendingUserAccountPDA]
-          })
-          console.log("Lending User account to extend: " + lendingUserAccountPDA.toBase58())
-          instructionsToSend.push(extendLookUpTableInstruction)
-        }
-      }
-      else
-        lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
-
-      //Check if Lending User Tab Account has been initialized
-      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
-      adminAccounts.lendingCEOAddressString +
-      subMarketSelect.value.toString() +
-      connectedWallet.addressString +
-      accountSelect.value.toString())
-
-      //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
-      if(!lendingUserTabAccount)
-      {
-        //Determine PDA for new LendingUserTabAccount that will be created
-        const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenMintAddress,
-        adminAccounts.lendingCEOAddressKey,
-        subMarketSelect.value,
-        connectedWallet.publicKey,
-        accountSelect.value)
-
-        if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
-        {
-          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-          {
-            authority: connectedWallet.publicKey,
-            payer: connectedWallet.publicKey,
-            lookupTable: lendingUserLookUpTableAddress,
-            addresses: [lendingUserTabAccountPDA]
-          })
-          console.log("Tab account to extend: " + lendingUserTabAccountPDA.toBase58())
-          instructionsToSend.push(extendLookUpTableInstruction)
-        }
-      }
-
-      //Check if Monthly Statement Account has been initialized
-      const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
-      anchorPrograms.currentStatementYear.toString() +
-      selectedTokenMintAddress.toString() +
-      adminAccounts.lendingCEOAddressString +
-      subMarketSelect.value.toString() +
-      connectedWallet.addressString +
-      accountSelect.value.toString())
-
-      //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
-      if(!monthlyStatement)
-      {
-        //Determine PDA for new MonthlyStatementAccount that will be created
-        const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
-        anchorPrograms.currentStatementYear,
-        selectedTokenMintAddress,
-        adminAccounts.lendingCEOAddressKey,
-        subMarketSelect.value,
-        connectedWallet.publicKey,
-        accountSelect.value)
-
-        if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
-        {
-          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-          {
-            authority: connectedWallet.publicKey,
-            payer: connectedWallet.publicKey,
-            lookupTable: lendingUserLookUpTableAddress,
-            addresses: [monthlyStatementPDA]
-          })
-          console.log("Monthly statement account to extend: " + monthlyStatementPDA.toBase58())
-          instructionsToSend.push(extendLookUpTableInstruction)
-        }
-      }
+      var [lendingUserLookUpTableAddress, instructionsToSend] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
+      accountSelect.value,
+      connectedWallet.lendingUserLookUpTableAccount,
+      selectedTokenMintAddress,
+      adminAccounts.lendingCEOAddressKey,
+      subMarketSelect.value)
 
       const depositTokensInstruction = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
@@ -557,22 +447,17 @@
       if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
         lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
 
-      console.log("Protocol Look Up Table Account:", anchorPrograms.lendingProtocolLookUpTableAccount)
-      console.log("SubMarket Look Up Table Account:", subMarketOwnerLookUpTableAccount)
-      console.log("Lending User Look Up Table Account:", connectedWallet.lendingUserLookUpTableAccount)
-
       const messageV0 = new TransactionMessage({
         payerKey: connectedWallet.publicKey,
         recentBlockhash: blockhash,
         instructions: instructionsToSend
       }).compileToV0Message(lookUpTableAccounts)
 
-      // Create and sign the Versioned Transaction
+      //Create and sign the Versioned Transaction
       const transaction = new VersionedTransaction(messageV0)
-      //await program.provider.wallet.signTransaction(transaction)
 
-      const size = transaction.serialize().length
-      console.log(`Current Transaction Size: ${size} bytes`)
+      //const size = transaction.serialize().length
+      //console.log(`Current Transaction Size: ${size} bytes`)
 
       const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction)
 

@@ -166,9 +166,15 @@
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
   import { tokenReserves, tokenReserveFontEndInfoHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { getLendingUserLookUpTableAddressAndInstructions } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
-  import { PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
-  import { copyAddress, copyTreasuryATAText, confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { PublicKey, VersionedTransaction, TransactionMessage } from "@solana/web3.js"
+  import { copyAddress,
+    copyTreasuryATAText,
+    confirmLendingTransaction,
+    parseProgramErrorCode,
+    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts, tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { solvencyTreasuryWalletPublicKeyString } from '/src/assets/constants/Addresses.ts'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
@@ -305,52 +311,133 @@
 
   async function collectSolvencyFees()
   {
-    const tokenInfo = tokenReserveFontEndInfoHashMap.get(event.value.tokenMintAddress.toString())
-    tokenProgram = tokenInfo.tokenProgram
-
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.claimSolvencyInsuranceFees
+      var [lendingUserLookUpTableAddress, instructionsToSend] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
+      adminAccounts.solvencyTreasuryLendingAccountIndex, //Use Solvency account index 0
+      connectedWallet.lendingUserLookUpTableAccount,
+      event.value.tokenMintAddress,
+      adminAccounts.lendingCEOAddressKey,
+      0) //Solvency Fees are collected to a wallet to keep it separate from the Lending Protocol. The Submarket choice is just to determine which Tab and Monthly Statement account will get updated
+
+      const tokenInfo = tokenReserveFontEndInfoHashMap.get(event.value.tokenMintAddress.toString())
+      tokenProgram = tokenInfo.tokenProgram
+
+      const claimSolvencyInsuranceFeesInstruction = await anchorPrograms.lending.lendingProgram.methods.claimSolvencyInsuranceFees
       (
         adminAccounts.lendingCEOAddressKey,
-        0, //Use Submarket Index 0, needed for monthly statement
+        0, //Solvency Fees are collected to a wallet to keep it separate from the Lending Protocol. The Submarket choice is just to determine which Tab and Monthly Statement account will get updated
         adminAccounts.solvencyTreasuryLendingAccountIndex, //Use Solvency account index 0
-        null
+        null,
+        lendingUserLookUpTableAddress
       ).accounts({ tokenMint: event.value.tokenMintAddress, tokenProgram: tokenProgram })
-      .rpc()
+      .instruction()
+
+      instructionsToSend.push(claimSolvencyInsuranceFeesInstruction)
+
+      const { blockhash } = await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()
+
+      //Get Look Up Table Accounts
+      var lookUpTableAccounts = []
+
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      //Get Sub Market Look Up Table Account By Owner
+      const subMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
+      lookUpTableAccounts.push(subMarketOwnerLookUpTableAccount)
+
+      //Get Lending User Look Up Table Account
+      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available if first lending action
+        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+
+      const messageV0 = new TransactionMessage({
+        payerKey: connectedWallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions: instructionsToSend
+      }).compileToV0Message(lookUpTableAccounts)
+
+      //Create and sign the Versioned Transaction
+      const transaction = new VersionedTransaction(messageV0)
+
+      //const size = transaction.serialize().length
+      //console.log(`Current Transaction Size: ${size} bytes`)
+
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction)
+
       await confirmLendingTransaction(tx, toast, "claim_solvency_insurance_fees")
 
       actionsPopoverOpen.value = false
     }
     catch(error)
     {
-      toastPreTransactionError(error, toast, "claim_solvency_insurance_fees")
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, "claim_solvency_insurance_fees")
     }
   }
 
   async function collectLiquidationFees()
-  {
-    const tokenInfo = tokenReserveFontEndInfoHashMap.get(event.value.tokenMintAddress.toString())
-    tokenProgram = tokenInfo.tokenProgram
-
+  { 
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.claimLiquidationFees
+      var [lendingUserLookUpTableAddress, instructionsToSend] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
+      adminAccounts.hodlTreasuryLendingAccountIndex, //Use HODL account index 0
+      connectedWallet.lendingUserLookUpTableAccount,
+      event.value.tokenMintAddress,
+      adminAccounts.lendingCEOAddressKey,
+      1) //Use Submarket Index 1, HODL Treasury uses the 100% fee submarket, so it should collect in that sub market. Solvency Fees come from the Token Reserve but you choose with Sub Market to Credit.
+
+      const claimLiquidationFeesInstruction = await anchorPrograms.lending.lendingProgram.methods.claimLiquidationFees
       (
         event.value.tokenMintAddress,
         adminAccounts.lendingCEOAddressKey,
-        1, //Use Submarket Index 1, HODL Treasury uses the 100% fee submarket
+        1, //Use Submarket Index 1, HODL Treasury uses the 100% fee submarket, so it should collect in that sub market. Solvency Fees come from the Token Reserve but you choose with Sub Market to Credit.
         adminAccounts.hodlTreasuryLendingAccountIndex, //Use HODL account index 0
-        null
-      ).accounts({ tokenMint: event.value.tokenMintAddress, tokenProgram: tokenProgram })
-      .rpc()
+        null,
+        lendingUserLookUpTableAddress
+      )
+      .instruction()
+
+      instructionsToSend.push(claimLiquidationFeesInstruction)
+
+      const { blockhash } = await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()
+
+      //Get Look Up Table Accounts
+      var lookUpTableAccounts = []
+
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      //Get Sub Market Look Up Table Account By Owner
+      const subMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
+      lookUpTableAccounts.push(subMarketOwnerLookUpTableAccount)
+
+      //Get Lending User Look Up Table Account
+      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available if first lending action
+        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+
+      const messageV0 = new TransactionMessage({
+        payerKey: connectedWallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions: instructionsToSend
+      }).compileToV0Message(lookUpTableAccounts)
+
+      //Create and sign the Versioned Transaction
+      const transaction = new VersionedTransaction(messageV0)
+
+      //const size = transaction.serialize().length
+      //console.log(`Current Transaction Size: ${size} bytes`)
+
+      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction)
+
       await confirmLendingTransaction(tx, toast, "claim_liquidation_fees")
 
       actionsPopoverOpen.value = false
     }
     catch(error)
     {
-      toastPreTransactionError(error, toast, "claim_liquidation_fees")
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, "claim_liquidation_fees")
     }
   }
 </script>

@@ -41,11 +41,11 @@
       //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com"/*Interchangeable with clusterApiUrl("devnet")*/ : "https://solana-rpc.publicnode.com"
   }
 
-  const connection = shallowRef(new Connection(rpcUrl.value, preflightCommitment))
+  const connection = shallowRef(new Connection(rpcUrl.value, commitment))
   export const updateRpcEndpoint = (newUrl: string) =>
   {
     rpcUrl.value = newUrl
-    connection.value = new Connection(newUrl, preflightCommitment)
+    connection.value = new Connection(newUrl, commitment)
   }
 
   export const initLendingWorkspace = (contractVersion: number) =>
@@ -57,7 +57,7 @@
       () =>
         new AnchorProvider(connection.value, wallet.value,
         {
-          preflightCommitment
+          commitment
         },
       )
     )

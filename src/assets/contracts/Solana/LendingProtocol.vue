@@ -22,11 +22,11 @@
     lendingLeaderBoardTable } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
-  import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
+  import { trimAddress, doesKeyExistInLookUpTable } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
-  import { PublicKey } from "@solana/web3.js"
+  import { PublicKey, AddressLookupTableProgram, AddressLookupTableAccount } from "@solana/web3.js"
   import cloneDeep from 'lodash/cloneDeep'
 
   export async function getLendingProtocol()
@@ -1168,6 +1168,209 @@
       anchorPrograms.lending.lendingProgram.programId
     )
     return lendingUserTabAccountPDA
+  }
+
+  //This is identical for the Deposit, Collect, and Claim functions since user Lending Accounts get created when those are called. Liquidation does as well, but it is slightly different since it has 2 tokens to worry about.
+  export async function getLendingUserLookUpTableAddressAndInstructions(lendingUserAddress: PublicKey,
+  lendingUserAccountIndex: number,
+  lendingUserLookUpTableAccount: AddressLookupTableAccount,
+  selectedTokenMintAddress: PublicKey,
+  destinationSubMarketOwnerAddress: PublicKey,
+  destinationSubMarketSelect: number,
+  initialSubMarketOwnerAddress: PublicKey | undefined = undefined,
+  initialSubMarketSelect: number | undefined = undefined)
+  {
+    var lendingUserLookUpTableInstructionsToSend = []
+    var lendingUserLookUpTableAddress = null
+    var createLookUpTableInstruction: anchor.web3.TransactionInstruction
+
+    //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Accounts for some weird error
+    if(lendingUserHashMap.map == undefined)
+      throw new Error("Lending User hash map is undefined. Cannot proceed.")
+
+    //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Tab Accounts for some weird error
+    if(lendingUserTabAccountsHashMap.map == undefined)
+      throw new Error("Lending User Tab hash map is undefined. Cannot proceed.")
+
+    //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Monthly Statement Accounts for some weird error
+    if(lendingUserMonthlyStatementsHashMap.map == undefined)
+      throw new Error("Monthly Statement hash map is undefined. Cannot proceed.")
+
+    //Check if Lending User Account has been initialized
+    const lendingUserAccount = lendingUserHashMap.map.get(lendingUserAddress.toString() + lendingUserAccountIndex.toString())
+
+    if(!lendingUserAccount)
+    {
+      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot("finalized"); //Need a semi colon before a tuple reassignment.
+
+      [createLookUpTableInstruction, lendingUserLookUpTableAddress] = 
+      AddressLookupTableProgram.createLookupTable({
+        authority: lendingUserAddress,
+        payer: lendingUserAddress,
+        recentSlot: slot
+      })
+
+      lendingUserLookUpTableInstructionsToSend.push(createLookUpTableInstruction)
+
+      //Determine PDA for new Lending User Account that will be created
+      const lendingUserAccountPDA = getLendingUserAccountPDA(lendingUserAddress, lendingUserAccountIndex)
+
+      if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, lendingUserAccountPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: lendingUserAddress,
+          payer: lendingUserAddress,
+          lookupTable: lendingUserLookUpTableAddress,
+          addresses: [lendingUserAccountPDA]
+        })
+
+        lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+      }
+    }
+    else
+      lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
+
+    //Check if Lending User Tab Account has been initialized
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+    destinationSubMarketOwnerAddress.toString() +
+    destinationSubMarketSelect.toString() +
+    lendingUserAddress.toString() +
+    lendingUserAccountIndex.toString())
+
+    //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
+    if(!lendingUserTabAccount)
+    {
+      //Determine PDA for new LendingUserTabAccount that will be created
+      const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenMintAddress,
+      destinationSubMarketOwnerAddress,
+      destinationSubMarketSelect,
+      lendingUserAddress,
+      lendingUserAccountIndex)
+
+      if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: lendingUserAddress,
+          payer: lendingUserAddress,
+          lookupTable: lendingUserLookUpTableAddress,
+          addresses: [lendingUserTabAccountPDA]
+        })
+
+        lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+      }
+    }
+
+    //Check if Monthly Statement Account has been initialized
+    const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+    anchorPrograms.currentStatementYear.toString() +
+    selectedTokenMintAddress.toString() +
+    destinationSubMarketOwnerAddress.toString() +
+    destinationSubMarketSelect.toString() +
+    lendingUserAddress.toString() +
+    lendingUserAccountIndex.toString())
+
+    //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
+    if(!monthlyStatement)
+    {
+      //Determine PDA for new MonthlyStatementAccount that will be created
+      const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+      anchorPrograms.currentStatementYear,
+      selectedTokenMintAddress,
+      destinationSubMarketOwnerAddress,
+      destinationSubMarketSelect,
+      lendingUserAddress,
+      lendingUserAccountIndex)
+
+      if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, monthlyStatementPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+        {
+          authority: lendingUserAddress,
+          payer: lendingUserAddress,
+          lookupTable: lendingUserLookUpTableAddress,
+          addresses: [monthlyStatementPDA]
+        })
+
+        lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+      }
+    }
+
+    //This is for the claimSubMarketFeesAndDepositInDifferentSubMarket function
+    if((initialSubMarketOwnerAddress && initialSubMarketSelect) &&
+    (destinationSubMarketOwnerAddress.toString() != initialSubMarketOwnerAddress.toString() ||
+    destinationSubMarketSelect != initialSubMarketSelect))
+    {
+      //Check if Lending User Tab Account has been initialized
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+      initialSubMarketOwnerAddress.toString() +
+      initialSubMarketSelect.toString() +
+      lendingUserAddress.toString() +
+      lendingUserAccountIndex.toString())
+
+      //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
+      if(!lendingUserTabAccount)
+      {
+        //Determine PDA for new LendingUserTabAccount that will be created
+        const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenMintAddress,
+        initialSubMarketOwnerAddress,
+        initialSubMarketSelect,
+        lendingUserAddress,
+        lendingUserAccountIndex)
+
+        if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
+        {
+          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+          {
+            authority: lendingUserAddress,
+            payer: lendingUserAddress,
+            lookupTable: lendingUserLookUpTableAddress,
+            addresses: [lendingUserTabAccountPDA]
+          })
+
+          lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+        }
+      }
+
+      //Check if Monthly Statement Account has been initialized
+      const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+      anchorPrograms.currentStatementYear.toString() +
+      selectedTokenMintAddress.toString() +
+      initialSubMarketOwnerAddress.toString() +
+      initialSubMarketSelect.toString() +
+      lendingUserAddress.toString() +
+      lendingUserAccountIndex.toString())
+
+      //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
+      if(!monthlyStatement)
+      {
+        //Determine PDA for new MonthlyStatementAccount that will be created
+        const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+        anchorPrograms.currentStatementYear,
+        selectedTokenMintAddress,
+        initialSubMarketOwnerAddress,
+        initialSubMarketSelect,
+        lendingUserAddress,
+        lendingUserAccountIndex)
+
+        if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, monthlyStatementPDA))
+        {
+          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+          {
+            authority: lendingUserAddress,
+            payer: lendingUserAddress,
+            lookupTable: lendingUserLookUpTableAddress,
+            addresses: [monthlyStatementPDA]
+          })
+
+          lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+        }
+      }
+    }
+    //console.log("Lending User Look Up Table Address: " + lendingUserLookUpTableAddress?.toString())
+    //console.log("Lending User Look Up Table Instructions to Send: " + lendingUserLookUpTableInstructionsToSend.length)
+    return[lendingUserLookUpTableAddress, lendingUserLookUpTableInstructionsToSend]
   }
 
   export default getLendingProtocolCEOAccount
