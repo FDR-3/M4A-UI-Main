@@ -9,8 +9,7 @@
     TokenProgram2022ID,
     tokenAddressStrings,
     tokenReserveATAKeys,
-    pythPriceUpdateKeys,
-    pythIds } from '/src/assets/constants/Addresses.ts'
+    pythFeedIds } from '/src/assets/constants/Addresses.ts'
   import { sourceDAI,
     sourceUSDC,
     sourceSOL,
@@ -49,8 +48,7 @@
       svg: markRaw(DAISVG),
       source: () => {sourceDAI()},
       ata: tokenReserveATAKeys.daiATA,
-      pythKey: pythPriceUpdateKeys.daiPythId,
-      pythId: pythIds.daiPythId,
+      pythFeedId: pythFeedIds.daiPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }],
     [tokenAddressStrings.usdcTokenMintAddress,
@@ -60,8 +58,7 @@
       svg: markRaw(USDCSVG),
       source: () => {sourceUSDC()},
       ata: tokenReserveATAKeys.usdcATA,
-      pythKey: pythPriceUpdateKeys.usdcPythId,
-      pythId: pythIds.usdcPythId,
+      pythFeedId: pythFeedIds.usdcPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }],
     [tokenAddressStrings.solTokenMintAddress,
@@ -70,8 +67,7 @@
       svg: markRaw(SOLSVG),
       source: () => {sourceSOL()},
       ata: tokenReserveATAKeys.solATA,
-      pythKey: pythPriceUpdateKeys.solPythId,
-      pythId: pythIds.solPythId,
+      pythFeedId: pythFeedIds.solPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }],
     [tokenAddressStrings.wethTokenMintAddress,
@@ -81,8 +77,7 @@
       svg: markRaw(WETHSVG),
       source: () => {sourceWETH()},
       ata: tokenReserveATAKeys.wethATA,
-      pythKey: pythPriceUpdateKeys.wethPythId,
-      pythId: pythIds.wethPythId,
+      pythFeedId: pythFeedIds.wethPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }],
     [tokenAddressStrings.wbtcTokenMintAddress,
@@ -92,8 +87,7 @@
       svg: markRaw(WBTCSVG),
       source: () => {sourceWBTC()},
       ata: tokenReserveATAKeys.wbtcATA,
-      pythKey: pythPriceUpdateKeys.wbtcPythId,
-      pythId: pythIds.wbtcPythId,
+      pythFeedId: pythFeedIds.wbtcPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }]
   ])

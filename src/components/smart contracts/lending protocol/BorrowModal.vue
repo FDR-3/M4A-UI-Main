@@ -381,7 +381,7 @@
       for(var i=0; i<remainingTabAccounts.length; i++)
       {
         const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
-        pythIdArray.push(tokenInfo.pythId)
+        pythIdArray.push(tokenInfo.pythFeedId)
 
         //Get index for the selected token to use later
         if(remainingTabAccounts[i].tokenMintAddress == selectedTokenMintAddress.toString())
@@ -394,7 +394,7 @@
       if(borrowTokenPriceAccountIndex == null)
       {
         const newTokenInfo = tokenReserveFontEndInfoHashMap.get(selectedTokenMintAddress.toString())
-        pythIdArray.push(newTokenInfo.pythId)
+        pythIdArray.push(newTokenInfo.pythFeedId)
       }
 
       const hermesClient = new HermesClient("https://hermes.pyth.network/")

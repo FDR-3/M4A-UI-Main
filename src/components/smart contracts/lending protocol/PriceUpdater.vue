@@ -1,14 +1,12 @@
 <template></template>
 <script async setup lang="ts">
   import { onUnmounted } from 'vue'
-  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings, jupiterPriceUpdateMainnetTokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   
   var intervalId: any
-
-  var usdcTokenMintAddressMainNet = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
-  var usdcTokenMintAddressDevNet = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
 
   await getTokenPrices()
 
@@ -38,25 +36,40 @@
     const price = await(await fetch
     (
       "https://lite-api.jup.ag/price/v3?ids=" +
-      `${tokenAddressStrings.daiTokenMintAddress},` +
-      `${usdcTokenMintAddressMainNet},` +
-      `${tokenAddressStrings.solTokenMintAddress},` +
-      `${tokenAddressStrings.wethTokenMintAddress},` +
-      `${tokenAddressStrings.wbtcTokenMintAddress}`
+      `${jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress},` +
+      `${jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress},` +
+      `${jupiterPriceUpdateMainnetTokenAddressStrings.solTokenMintAddress},` +
+      `${jupiterPriceUpdateMainnetTokenAddressStrings.wethTokenMintAddress},` +
+      `${jupiterPriceUpdateMainnetTokenAddressStrings.wbtcTokenMintAddress}`
     )).json()
 
     for(var i=0; i<StableCoins.length; i++)
     {
-      //Update Price for Dev USDC
-      if(StableCoins[i].tokenMintAddressString == usdcTokenMintAddressDevNet)
+      if(DEV_MODE)
       {
-        StableCoins[i].price = price[usdcTokenMintAddressMainNet].usdPrice
-        StableCoins[i].priceString = '$' + price[usdcTokenMintAddressMainNet].usdPrice.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })
-        StableCoins[i].percentChange24h = price[usdcTokenMintAddressMainNet].priceChange24h.toFixed(2)
-        price[usdcTokenMintAddressDevNet] = price[usdcTokenMintAddressMainNet]
-        continue
+        //Update Price for Dev DAI
+        if(StableCoins[i].tokenMintAddressString == tokenAddressStrings.daiTokenMintAddress)
+        {
+          StableCoins[i].price = price[jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress].usdPrice
+          StableCoins[i].priceString = '$' + price[jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress].usdPrice.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+          StableCoins[i].percentChange24h = price[jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress].priceChange24h.toFixed(2)
+          price[tokenAddressStrings.daiTokenMintAddress] = price[jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress]
+          continue
+        }
+
+        //Update Price for Dev USDC
+        if(StableCoins[i].tokenMintAddressString == tokenAddressStrings.usdcTokenMintAddress)
+        {
+          StableCoins[i].price = price[jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress].usdPrice
+          StableCoins[i].priceString = '$' + price[jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress].usdPrice.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+          StableCoins[i].percentChange24h = price[jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress].priceChange24h.toFixed(2)
+          price[tokenAddressStrings.usdcTokenMintAddress] = price[jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress]
+          continue
+        }
       }
 
       StableCoins[i].price = price[StableCoins[i].tokenMintAddressString].usdPrice
@@ -72,6 +85,33 @@
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
+      if(DEV_MODE)
+      {
+        //Update Price for Dev WEth
+        if(CryptoCurrency[i].tokenMintAddressString == tokenAddressStrings.wethTokenMintAddress)
+        {
+          CryptoCurrency[i].price = price[jupiterPriceUpdateMainnetTokenAddressStrings.wethTokenMintAddress].usdPrice
+          CryptoCurrency[i].priceString = '$' + price[jupiterPriceUpdateMainnetTokenAddressStrings.wethTokenMintAddress].usdPrice.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+          CryptoCurrency[i].percentChange24h = price[jupiterPriceUpdateMainnetTokenAddressStrings.wethTokenMintAddress].priceChange24h.toFixed(2)
+          price[tokenAddressStrings.wethTokenMintAddress] = price[jupiterPriceUpdateMainnetTokenAddressStrings.wethTokenMintAddress]
+          continue
+        }
+
+        //Update Price for Dev WBtc
+        if(CryptoCurrency[i].tokenMintAddressString == tokenAddressStrings.wbtcTokenMintAddress)
+        {
+          CryptoCurrency[i].price = price[jupiterPriceUpdateMainnetTokenAddressStrings.wbtcTokenMintAddress].usdPrice
+          CryptoCurrency[i].priceString = '$' + price[jupiterPriceUpdateMainnetTokenAddressStrings.wbtcTokenMintAddress].usdPrice.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+          CryptoCurrency[i].percentChange24h = price[jupiterPriceUpdateMainnetTokenAddressStrings.wbtcTokenMintAddress].priceChange24h.toFixed(2)
+          price[tokenAddressStrings.wbtcTokenMintAddress] = price[jupiterPriceUpdateMainnetTokenAddressStrings.wbtcTokenMintAddress]
+          continue
+        }
+      }
+
       CryptoCurrency[i].price = price[CryptoCurrency[i].tokenMintAddressString].usdPrice
       CryptoCurrency[i].priceString = '$' + price[CryptoCurrency[i].tokenMintAddressString].usdPrice.toLocaleString('en-US', {
         minimumFractionDigits: 2,

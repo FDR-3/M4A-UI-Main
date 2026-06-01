@@ -6,12 +6,12 @@
       class="tableMinWidth"
       v-model:filters="filters"
       show-gridlines
-      sortField="tokenMintAddress" 
+      sortField="tokenMintAddressString" 
       :sortOrder="-1" 
       size="small" 
       :value="tokenReserveTableData"
       :loading="isLoading"
-      :globalFilterFields="['name', 'tokenMintAddress', 'tokenReserveATA', 'price', 'percentChange24h', 'depositedAmount', 'value', 'subMarketCount']"  
+      :globalFilterFields="['name', 'tokenMintAddressString', 'tokenReserveATA', 'price', 'percentChange24h', 'depositedAmount', 'value', 'subMarketCount']"  
     >
       <template #header>
         <div class="flexCenterRow">
@@ -479,6 +479,7 @@
 
       const tokenMintAddressString = processedTableData[i].tokenMintAddress.toString()
       const tokenReserveFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddressString)//These are static and don't need to be reactive
+      processedTableData[i].tokenMintAddressString = tokenMintAddressString
       processedTableData[i].name = tokenReserveFrontEndProperties.name
       processedTableData[i].svg = tokenReserveFrontEndProperties.svg
       processedTableData[i].source = tokenReserveFrontEndProperties.source

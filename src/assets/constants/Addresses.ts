@@ -5,6 +5,12 @@ import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
 
 export const solvencyTreasuryWalletPublicKeyString = "2TnxW9qAgPjHmHUXde6zgxNa8F4nY3kfDpdRJsT8HdPU"
 
+const DAI_MAINNET_TOKEN_MINT_ADDRESS = "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o"
+const USDC_MAINNET_TOKEN_MINT_ADDRESS = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+const SOL_MAINNET_TOKEN_MINT_ADDRESS = "So11111111111111111111111111111111111111112"
+const WETH_MAINNET_TOKEN_MINT_ADDRESS = "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs"
+const WBTC_MAINNET_TOKEN_MINT_ADDRESS = "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh"
+
 var DAI_TOKEN_MINT_ADDRESS = "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o"
 var USDC_TOKEN_MINT_ADDRESS = ""
 var SOL_TOKEN_MINT_ADDRESS = "So11111111111111111111111111111111111111112"
@@ -29,7 +35,11 @@ var TOKEN_RESERVE_WBTC_ATA = ""
 
 if(DEV_MODE)
 {
+  DAI_TOKEN_MINT_ADDRESS = "5V413iK9J5wcLVrgj4TN93zTuNczGcsMbDVWewWWHpvA"
   USDC_TOKEN_MINT_ADDRESS = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU"
+  SOL_TOKEN_MINT_ADDRESS = "So11111111111111111111111111111111111111112"
+  WETH_TOKEN_MINT_ADDRESS = "49omHmMjcWSy6b2yFb1RTaAN5zraDLpvx2LNCWX2opkZ"
+  WBTC_TOKEN_MINT_ADDRESS = "EcNB579EvvgaGkqhZ6RHhryuivgJWUvqvYzr1c5KT9cV"
 
   HODL_USDC_WALLET_ATA = "CNJ2Jb4dMWF8TsMEKsqdaJUkCMnY8AKz5gr9GDjN9cQB"
 
@@ -43,7 +53,11 @@ if(DEV_MODE)
 }
 else
 {
+  DAI_TOKEN_MINT_ADDRESS = "EjmyN6qEC1Tf1JxiG1ae7UTJhUxSwk1TCWNWqxWV4J6o"
   USDC_TOKEN_MINT_ADDRESS = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  SOL_TOKEN_MINT_ADDRESS = "So11111111111111111111111111111111111111112"
+  WETH_TOKEN_MINT_ADDRESS = "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs"
+  WBTC_TOKEN_MINT_ADDRESS = "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh"
 
   HODL_USDC_WALLET_ATA = "9JxyN8T2apS2GRE9d6sVYAZWC6CHjd6H9qsy748ydaNF"
 
@@ -56,23 +70,25 @@ else
   TOKEN_RESERVE_WBTC_ATA = SYSTEM_PROGRAM_ADDRESS_STRING
 }
 
-const PYTH_PRICE_UPDATE_KEY_DAI = new PublicKey("FmfrxJ7YH8yVxoYpJ9ZDMeb8gUceYXYaSrQiBJ1uSZjN")
-const PYTH_PRICE_UPDATE_KEY_USDC = new PublicKey("Dpw1EAVrSB1ibxiDQyTAW6Zip3J4Btk2x4SgApQCeFbX")
-const PYTH_PRICE_UPDATE_KEY_SOL = new PublicKey("7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE")
-const PYTH_PRICE_UPDATE_KEY_WETH = new PublicKey("4TQ1VVWkrYUvyQ6hMmjepwr7swvqsyvLi75BiJi13Tf3")
-const PYTH_PRICE_UPDATE_KEY_WBTC = new PublicKey("9gNX5vguzarZZPjTnE1hWze3s6UsZ7dsU3UnAmKPnMHG")
-
 const PYTH_HEX_ID_DAI = "0xb0948a5e5313200c632b51bb5ca32f6de0d36e9950a942d19751e833f70dabfd"
 const PYTH_HEX_ID_USDC= "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
 const PYTH_HEX_ID_SOL = "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d"
 const PYTH_HEX_ID_WETH = "0x9d4294bbcd1174d6f2003ec365831e64cc31d9f6f15a2b85399db8d5000960f6"
 const PYTH_HEX_ID_WBTC = "0xc9d8b075a5c69303365ae23633d4e085199bf5c520a3b90fed1322a0342ffc33"
 
-
 //Currently on @solana/spl-token version 1.8 as updating introduces npm vunlerabilities
 //The official Token-2022 Program ID
 export const TokenProgram2022ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb")
 export const LegacyTokenProgramID = TOKEN_PROGRAM_ID
+
+export const jupiterPriceUpdateMainnetTokenAddressStrings = 
+{
+    daiTokenMintAddress: DAI_MAINNET_TOKEN_MINT_ADDRESS,
+    usdcTokenMintAddress: USDC_MAINNET_TOKEN_MINT_ADDRESS,
+    solTokenMintAddress: SOL_MAINNET_TOKEN_MINT_ADDRESS,
+    wethTokenMintAddress: WETH_MAINNET_TOKEN_MINT_ADDRESS,
+    wbtcTokenMintAddress: WBTC_MAINNET_TOKEN_MINT_ADDRESS
+}
 
 export const tokenAddressStrings = 
 {
@@ -147,20 +163,11 @@ export const tokenDecimalHashMap: Map<string, number> = new Map(
     [tokenAddressStrings.wbtcTokenMintAddress,8]
 ])
 
-export const pythPriceUpdateKeys =
+export const pythFeedIds =
 {
-    daiPythId: PYTH_PRICE_UPDATE_KEY_DAI,
-    usdcPythId: PYTH_PRICE_UPDATE_KEY_USDC,
-    solPythId: PYTH_PRICE_UPDATE_KEY_SOL,
-    wethPythId: PYTH_PRICE_UPDATE_KEY_WETH,
-    wbtcPythId: PYTH_PRICE_UPDATE_KEY_WBTC
-}
-
-export const pythIds =
-{
-    daiPythId: PYTH_HEX_ID_DAI,
-    usdcPythId: PYTH_HEX_ID_USDC,
-    solPythId: PYTH_HEX_ID_SOL,
-    wethPythId: PYTH_HEX_ID_WETH,
-    wbtcPythId: PYTH_HEX_ID_WBTC
+    daiPythFeedId: PYTH_HEX_ID_DAI,
+    usdcPythFeedId: PYTH_HEX_ID_USDC,
+    solPythFeedId: PYTH_HEX_ID_SOL,
+    wethPythFeedId: PYTH_HEX_ID_WETH,
+    wbtcPythFeedId: PYTH_HEX_ID_WBTC
 }

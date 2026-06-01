@@ -11,7 +11,7 @@
       :value="StableCoins"
       :globalFilterFields="
       [
-        'tokenMintAddress',
+        'tokenMintAddressString',
         'asset.name',
         'chain.name',
         'priceString',
@@ -214,7 +214,7 @@
       :value="CryptoCurrency"
       :globalFilterFields="
       [
-        'tokenMintAddress',
+        'tokenMintAddressString',
         'asset.name',
         'chain.name',
         'priceString',

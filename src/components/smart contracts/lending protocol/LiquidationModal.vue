@@ -1178,7 +1178,7 @@
       {
         const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
         uniqueSubMarketOwnersAddressStrings.add(remainingTabAccounts[i].subMarketOwnerAddress)
-        pythIdArray.push(tokenInfo.pythId)
+        pythIdArray.push(tokenInfo.pythFeedId)
  
         //Get index for the repayment token to use later
         if(remainingTabAccounts[i].tokenMintAddress == repaymentTokenMintAddress.toString())

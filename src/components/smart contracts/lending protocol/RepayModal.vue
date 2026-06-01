@@ -399,7 +399,7 @@
       for(var i=0; i<remainingTabAccounts.length; i++)
       {
         const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
-        pythIdArray.push(tokenInfo.pythId)
+        pythIdArray.push(tokenInfo.pythFeedId)
         uniqueSubMarketOwnersAddressStrings.add(remainingTabAccounts[i].subMarketOwnerAddress)
       }
 

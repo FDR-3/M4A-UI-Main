@@ -42,6 +42,10 @@
     <div class="smallMarginTop">
       <h2>Add Lending Token Reserve Account</h2>
       <div class="nMediumMarginTop smallMarginBottom">
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.daiTokenMintAddress)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.daiTokenMintAddress).svg"> </component>
+          <ion-label> </ion-label>Init DAI Token Reserve
+        </ion-button>
         <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.usdcTokenMintAddress)">
           <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.usdcTokenMintAddress).svg"> </component>
           <ion-label> </ion-label>Init USDC Token Reserve
@@ -49,6 +53,14 @@
         <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.solTokenMintAddress)">
           <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.solTokenMintAddress).svg" style="width: 48px; margin-left: -20px; margin-right: -8px"> </component>
           <ion-label> </ion-label>Init SOL Token Reserve
+        </ion-button>
+        <ion-button color="dark" style="width: 240px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.wethTokenMintAddress)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.wethTokenMintAddress).svg" style="width: 48px; margin-left: 0px; margin-right: -8px"> </component>
+          <ion-label> </ion-label>Init WETH Token Reserve
+        </ion-button>
+        <ion-button color="dark" style="width: 240px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.wbtcTokenMintAddress)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.wbtcTokenMintAddress).svg" style="width: 48px; margin-left: 0px; margin-right: -8px"> </component>
+          <ion-label> </ion-label>Init WBTC Token Reserve
         </ion-button>
       </div>
     </div>
@@ -58,27 +70,33 @@
         <ion-input v-model="pythPriceFeedID" class="mediumMarginBottom" fill="outline" placeholder="Enter The Pyth Price Feed ID"></ion-input>
         <ion-input v-model="tokenDecimalCountInput" class="mediumMarginBottom" fill="outline" type="number" min="0" max="10" step="1" placeholder="Enter The Token Decimal"></ion-input>
 
-        <ion-label>Token Program</ion-label><br>
-        <Select
-        class="tinyMarginTop tinyMarginBottom"
-        v-model="tokenProgramSelect" 
-        :options="tokenProgramList" 
-        optionLabel="programName" 
-        optionValue="programPublicKey" 
-        placeholder="Select Program"
-        appendTo="self">
-        </Select><br><br>
+        <div class="spaceRowEvenly" style="width: 100%">
+          <div>
+            <ion-label>Token Program</ion-label><br>
+            <Select
+            class="tinyMarginTop tinyMarginBottom"
+            v-model="tokenProgramSelect" 
+            :options="tokenProgramList" 
+            optionLabel="programName" 
+            optionValue="programPublicKey" 
+            placeholder="Select Program"
+            appendTo="self">
+            </Select><br><br>
+          </div>
 
-        <ion-label>Use Fixed Borrow APY</ion-label><br>
-        <Select
-        class="tinyMarginTop tinyMarginBottom"
-        v-model="trueFalseSelect" 
-        :options="trueFalseList" 
-        optionLabel="booleanName" 
-        optionValue="booleanValue" 
-        placeholder="Select Boolean"
-        appendTo="self">
-        </Select><br><br>
+          <div>
+            <ion-label>Use Fixed Borrow APY</ion-label><br>
+            <Select
+            class="tinyMarginTop tinyMarginBottom"
+            v-model="trueFalseSelect" 
+            :options="trueFalseList" 
+            optionLabel="booleanName" 
+            optionValue="booleanValue" 
+            placeholder="Select Boolean"
+            appendTo="self">
+            </Select><br><br>
+          </div>
+        </div>
 
         <ion-label>Fixed Borrow APY:</ion-label>
         <InputNumber
@@ -116,6 +134,8 @@
     </div>
   </div>
 
+  
+
   <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
   createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"/>
   <AdminTokenReservesTable @editTokenReserveModal="(tokenMintAddress: PublicKey,
@@ -126,6 +146,9 @@
   useFixedBorrowApy: boolean,
   globalLimit: number) =>
   editTokenReserveModal.openEditTokenReserveModal(tokenMintAddress, tokenSVG, tokenName, solvencyInsuranceFeeRate, fixedBorrowAPY, useFixedBorrowApy, globalLimit)"/>
+  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString && anchorPrograms.isLendingProtocolInitialized">
+    <MintDevNetTestToken/>
+  </div>
 
   <CreateSubMarketModal ref="createSubMarketModal"/>
   <EditTokenReserveModal ref="editTokenReserveModal"/>
@@ -145,6 +168,7 @@
   import InputNumber from 'primevue/inputnumber'
   import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
   import AdminTokenReservesTable from '/src/components/tables/lending/admin/AdminTokenReservesTable.vue'
+  import MintDevNetTestToken from '/src/components/smart contracts/lending protocol/admin/MintDevNetTestToken.vue'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import EditTokenReserveModal from '/src/components/smart contracts/lending protocol/EditTokenReserveModal.vue'
   import { PublicKey, Transaction, AddressLookupTableProgram } from "@solana/web3.js"
@@ -214,7 +238,7 @@
     const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenAddress)
     
     tokenMintAddressInput.value = tokenAddress
-    pythPriceFeedID.value = tokenInfo.pythId.slice(2)
+    pythPriceFeedID.value = tokenInfo.pythFeedId.slice(2)
     tokenDecimalCountInput.value = tokenInfo.decimalAmount
     tokenProgramSelect.value = tokenInfo.tokenProgram
 
