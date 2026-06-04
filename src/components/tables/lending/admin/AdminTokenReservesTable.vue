@@ -109,7 +109,7 @@
             v-else
             class="actionsPopoverButton"
             color="dark"
-            @click="openActionsPopover($event, slotProps.data.tokenMintAddress)"
+            @click="openActionsPopover($event, slotProps.data)"
             >
               Actions
             </ion-button>
@@ -124,15 +124,15 @@
               v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString"
               id="openEditTokenReserveModalButton"
               fill="clear"
-              @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
+              @click="selectedTokenMintAddress=event.tokenMintAddress;
               $emit('editTokenReserveModal', 
-                slotProps.data.tokenMintAddress,
-                slotProps.data.svg,
-                slotProps.data.name,
-                slotProps.data.solvencyInsuranceFeeRate,
-                slotProps.data.fixedBorrowAPY,
-                slotProps.data.useFixedBorrowApy,
-                slotProps.data.globalLimit)"
+                event.tokenMintAddress,
+                event.svg,
+                event.name,
+                event.solvencyInsuranceFeeRate,
+                event.fixedBorrowAPY,
+                event.useFixedBorrowApy,
+                event.globalLimit)"
               >
                 <ion-label color="dark" class="noClickEvent">Edit TokenReserve</ion-label>
               </ion-button>
@@ -239,10 +239,16 @@
     copyAddress(copyTokenReserveATAButtonText, event.value.tokenReserveATA)
   }
 
-  function openActionsPopover(e: Event, tokenMintAddress: PublicKey)
+  function openActionsPopover(e: Event, rowData: any)
   {
     event.value = e
-    event.value.tokenMintAddress = tokenMintAddress
+    event.value.tokenMintAddress = rowData.tokenMintAddress
+    event.value.svg = rowData.svg
+    event.value.name = rowData.name
+    event.value.solvencyInsuranceFeeRate = rowData.solvencyInsuranceFeeRate
+    event.value.fixedBorrowAPY = rowData.fixedBorrowAPY
+    event.value.useFixedBorrowApy = rowData.useFixedBorrowApy
+    event.value.globalLimit = rowData.globalLimit
     actionsPopoverOpen.value = true
   }
 

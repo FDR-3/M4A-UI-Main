@@ -50,13 +50,16 @@
       <HealthFactorSmall :assetValue="totalAssetValue" :debtValue="totalDebtValue"/>
     </div>
 
+    <div>
     <ion-label class="alignSelfLeft">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <ion-label class="alignSelfLeft">Available: {{ availableWithdrawalBalance.toFixed(tokenDecimalAmount) }}</ion-label>
+    <ion-label class="alignSelfLeft">Token Reserve: {{ availableInTokenReserveAmount.toFixed(tokenDecimalAmount) }}</ion-label>
+    </div>
     <InputNumber
       v-model="withdrawAmount"
       :inputStyle="{'text-align': 'center'}"
       :minFractionDigits="tokenDecimalAmount" :maxFractionDigits="tokenDecimalAmount"
-      :max="availableWithdrawalBalance"
+      :max="maxWithdrawAmount"
       :min="0"
       :step="withdrawIncrementAmount"
       showButtons
@@ -146,6 +149,8 @@
   var userBalance = ref()
   var userOriginalBalance = 0
   var availableWithdrawalBalance = ref(0)
+  var availableInTokenReserveAmount = ref(0)
+  var maxWithdrawAmount = 0
   var userHasDebt = false
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
@@ -172,6 +177,13 @@
       return (0).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })   
+  })
+
+  watch(tokenReservesHashMap, () =>
+  {
+    const tokenReserve = tokenReservesHashMap.map.get(selectedTokenMintAddress.toString())
+    if(tokenReserve)
+      availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
   })
 
   watch(lendingUserTabAccountListHashMap, async() =>
@@ -247,12 +259,13 @@
   {
     window.addEventListener('click', handleClickOutside)
 
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(tokenMintAddress))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
     const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     tokenProgram = tokenInfo.tokenProgram
-    
+    availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
     subMarketList.value = subMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
     const subMarket = subMarketsHashMap.map.get(tokenMintAddress + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
@@ -269,7 +282,7 @@
     withdrawAmount.value = 0
     withdrawIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
-    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(selectedTokenMintAddress.toString()))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
+    
     tokenDecimalAmount = decimalAmount
     withdrawSVG.value = tokenSVG
     subMarketTokenName.value = tokenName
@@ -379,25 +392,31 @@
       userHasDebt = true
     }
 
-    if(withdrawHalf.value)
-      withdrawAmount.value = availableWithdrawalBalance.value * 0.5
-    if(withdrawMax.value)
+    withdrawFullDepositedAmount = false;
+
+    if(withdrawHalf.value || withdrawMax.value)
     {
-      if(calculatedDebtValue == 0)
-      {
-        withdrawFullDepositedAmount = true
-        withdrawAmount.value = availableWithdrawalBalance.value
-      }
+      if(availableInTokenReserveAmount.value < 0)
+        withdrawAmount.value = 0
+      else if(availableInTokenReserveAmount.value < availableWithdrawalBalance.value)
+        withdrawAmount.value = availableInTokenReserveAmount.value * 0.999
       else
-      {
-        withdrawFullDepositedAmount = false
-        //Withdraw less to keep up with possible available amount countdown
-        const factor = 100_000
-        withdrawAmount.value = Math.floor(availableWithdrawalBalance.value * factor) / factor//Turn last 5 digits into zeros
-      }
+        if(withdrawHalf.value)
+          withdrawAmount.value = availableWithdrawalBalance.value * 0.5
+        else if(withdrawMax.value)
+          if(calculatedDebtValue === 0)
+          {
+            withdrawAmount.value = availableWithdrawalBalance.value
+            withdrawFullDepositedAmount = true
+          }
+          else
+          {
+            const factor = 100_000;
+            withdrawAmount.value = Math.floor(availableWithdrawalBalance.value * factor) / factor
+          }
+
+      maxWithdrawAmount = withdrawAmount.value
     }
-    else
-      withdrawFullDepositedAmount = false
 
     //Account for value that is about to be withdrawn
     //Check for less than zero values when doing complete withdrawals, do the price possibly being slighly off
@@ -667,8 +686,11 @@
           .remainingAccounts(remainingWithdrawalTokenPriceUpdateAcccount)
           .instruction()
 
+          const setComputeLimitInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 })
+
           return[
             { instruction: refreshUserHealthAndTokenReservesInstruction, signers: [] },
+            { instruction: setComputeLimitInstruction, signers: [] },
             { instruction: withdrawInstruction, signers: [] },
           ]
         }

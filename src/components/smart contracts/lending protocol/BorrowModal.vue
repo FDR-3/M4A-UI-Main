@@ -55,11 +55,15 @@
       <ion-label class="alignSelfLeft">Amount: {{ availableToBorrowAmount.toFixed(tokenDecimalAmount) }}</ion-label>
       <ion-label class="alignSelfLeft">Value: {{ availableToBorrowValue }}</ion-label>
     </div>
+    <div>
+      <ion-label>Available in Token Reserve: {{ availableInTokenReserveAmount.toFixed(tokenDecimalAmount) }}</ion-label>
+    </div>
+    
     <InputNumber
       v-model="borrowAmount"
       :inputStyle="{'text-align': 'center'}"
       :minFractionDigits="tokenDecimalAmount" :maxFractionDigits="tokenDecimalAmount"
-      :max="availableToBorrowAmount"
+      :max="maxBorrowAmount"
       :min="0"
       :step="borrowIncrementAmount"
       showButtons
@@ -141,8 +145,10 @@
   var borrowMax = ref(false)
   var borrowHalf = ref(false)
   var subMarketTokenName = ref()
+  var availableInTokenReserveAmount = ref(0)
   var availableToBorrowAmount = ref(0)
   var availableToBorrowValue = ref("$0.00")
+  var maxBorrowAmount = 0 
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
@@ -167,6 +173,13 @@
       return (0).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })   
+  })
+
+  watch(tokenReservesHashMap, () =>
+  {
+    const tokenReserve = tokenReservesHashMap.map.get(selectedTokenMintAddress.toString())
+    if(tokenReserve)
+      availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
   })
 
   watch(lendingUserTabAccountListHashMap, async() =>
@@ -235,12 +248,13 @@
   {
     window.addEventListener('click', handleClickOutside)
     
+    const tokenReserve = tokenReservesHashMap.map.get(tokenMintAddress)
     const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     tokenProgram = tokenInfo.tokenProgram
-
+    availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
     subMarketList.value = subMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
@@ -336,12 +350,20 @@
     //Account for value that is about to be borrowed
     calculatedDebtValue += borrowAmount.value * Number(priceOfSelectedToken)
 
-    if(borrowHalf.value)
-      borrowAmount.value = availableToBorrowAmount.value * 0.5
-    if(borrowMax.value)
+    if(borrowHalf.value || borrowMax.value)
     {
-      const factor = 100_000
-      borrowAmount.value = Math.floor(availableToBorrowAmount.value * factor) / factor//Turn last 5 digits into zeros
+      const targetBorrowAmount = borrowHalf.value 
+        ? availableToBorrowAmount.value * 0.5 
+        : availableToBorrowAmount.value
+
+      if(availableInTokenReserveAmount.value < 0)
+        borrowAmount.value = 0
+      else if(availableInTokenReserveAmount.value < targetBorrowAmount)
+        borrowAmount.value = availableInTokenReserveAmount.value * 0.999
+      else
+        borrowAmount.value = targetBorrowAmount
+
+      maxBorrowAmount = borrowAmount.value
     }
 
     totalAssetValue.value = calculatedAssetValue
@@ -615,8 +637,11 @@
           .remainingAccounts(remainingBorrowTokenPriceUpdateAccount)
           .instruction()
 
+          const setComputeLimitInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 })
+
           return[
             { instruction: refreshUserHealthAndTokenReservesInstruction, signers: [] },
+            { instruction: setComputeLimitInstruction, signers: [] },
             { instruction: borrowInstruction, signers: [] }
           ]
         }

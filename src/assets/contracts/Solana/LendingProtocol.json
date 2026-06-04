@@ -6709,8 +6709,8 @@
     },
     {
       "code": 6022,
-      "name": "StaleLendingUser",
-      "msg": "The lending user health data was stale"
+      "name": "StaleTokenReserveOrLendingUser",
+      "msg": "The token reserve or lending user health data was stale"
     },
     {
       "code": 6023,

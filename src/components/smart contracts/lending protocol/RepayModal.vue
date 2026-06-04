@@ -534,8 +534,11 @@
           .accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
           .instruction()
 
+          const setComputeLimitInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 })
+
           return[
             { instruction: refreshUserHealthAndTokenReservesInstruction, signers: [] },
+            { instruction: setComputeLimitInstruction, signers: [] },
             { instruction: repayInstruction, signers: [] },
           ]
         }

@@ -1390,7 +1390,7 @@
             liquidateFunctionCallName = "liquidate_account_same_token"
           }
 
-          const setComputeLimitInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 });
+          const setComputeLimitInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 300_000 })
 
           return[
             
