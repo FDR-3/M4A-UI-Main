@@ -28,7 +28,7 @@
       if(isProduction())
         rpcUrl.value = "https://m4a.io/proxyCORS"
       else
-        rpcUrl.value = DEV_MODE ? clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
+        rpcUrl.value = DEV_MODE ? "http://127.0.0.1:8899"/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
         //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com"/*Interchangeable with clusterApiUrl("devnet")*/ : "https://solana-rpc.publicnode.com"
     }
   }
@@ -37,15 +37,15 @@
     if(isProduction())
       rpcUrl.value = "https://m4a.io/proxyCORS"
     else
-      rpcUrl.value = DEV_MODE ? clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
+      rpcUrl.value = DEV_MODE ? "http://127.0.0.1:8899"/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
       //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com"/*Interchangeable with clusterApiUrl("devnet")*/ : "https://solana-rpc.publicnode.com"
   }
 
-  const connection = shallowRef(new Connection(rpcUrl.value, commitment))
+  const connection = shallowRef(new Connection(rpcUrl.value, preflightCommitment))
   export const updateRpcEndpoint = (newUrl: string) =>
   {
     rpcUrl.value = newUrl
-    connection.value = new Connection(newUrl, commitment)
+    connection.value = new Connection(newUrl, preflightCommitment)
   }
 
   export const initLendingWorkspace = (contractVersion: number) =>
@@ -57,7 +57,7 @@
       () =>
         new AnchorProvider(connection.value, wallet.value,
         {
-          commitment
+          preflightCommitment
         },
       )
     )

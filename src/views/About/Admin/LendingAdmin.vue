@@ -42,32 +42,31 @@
     <div class="smallMarginTop">
       <h2>Add Lending Token Reserve Account</h2>
       <div class="nMediumMarginTop smallMarginBottom">
-        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.daiTokenMintAddress)">
-          <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.daiTokenMintAddress).svg"> </component>
-          <ion-label> </ion-label>Init DAI Token Reserve
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenIds.daiTokenId)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.daiTokenId).svg"></component>
+          Init DAI Token Reserve
         </ion-button>
-        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.usdcTokenMintAddress)">
-          <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.usdcTokenMintAddress).svg"> </component>
-          <ion-label> </ion-label>Init USDC Token Reserve
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenIds.usdcTokenId)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.usdcTokenId).svg"></component>
+          Init USDC Token Reserve
         </ion-button>
-        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.solTokenMintAddress)">
-          <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.solTokenMintAddress).svg" style="width: 48px; margin-left: -20px; margin-right: -8px"> </component>
-          <ion-label> </ion-label>Init SOL Token Reserve
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenIds.solTokenId)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.solTokenId).svg" style="width: 48px; margin-left: -20px; margin-right: -8px"></component>
+          Init SOL Token Reserve
         </ion-button>
-        <ion-button color="dark" style="width: 240px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.wethTokenMintAddress)">
-          <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.wethTokenMintAddress).svg" style="width: 48px; margin-left: 0px; margin-right: -8px"> </component>
-          <ion-label> </ion-label>Init WETH Token Reserve
+        <ion-button color="dark" style="width: 240px; height: 45px" @click="addTokenReserveQuick(tokenIds.wethTokenId)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.wethTokenId).svg" style="width: 48px; margin-left: 0px; margin-right: -8px"></component>
+          Init WETH Token Reserve
         </ion-button>
-        <ion-button color="dark" style="width: 240px; height: 45px" @click="addTokenReserveQuick(tokenAddressStrings.wbtcTokenMintAddress)">
-          <component :is="tokenReserveFontEndInfoHashMap.get(tokenAddressStrings.wbtcTokenMintAddress).svg" style="width: 48px; margin-left: 0px; margin-right: -8px"> </component>
-          <ion-label> </ion-label>Init WBTC Token Reserve
+        <ion-button color="dark" style="width: 240px; height: 45px" @click="addTokenReserveQuick(tokenIds.wbtcTokenId)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.wbtcTokenId).svg" style="width: 48px; margin-left: 0px; margin-right: -8px"></component>
+          Init WBTC Token Reserve
         </ion-button>
       </div>
     </div>
     <div class=" flexCenterRow">
       <div style="width: 90%">
         <ion-input v-model="tokenMintAddressInput" class="mediumMarginBottom" fill="outline" placeholder="Enter The Mint Address"></ion-input>
-        <ion-input v-model="pythPriceFeedID" class="mediumMarginBottom" fill="outline" placeholder="Enter The Pyth Price Feed ID"></ion-input>
         <ion-input v-model="tokenDecimalCountInput" class="mediumMarginBottom" fill="outline" type="number" min="0" max="10" step="1" placeholder="Enter The Token Decimal"></ion-input>
 
         <div class="spaceRowEvenly" style="width: 100%">
@@ -88,7 +87,7 @@
             <ion-label>Use Fixed Borrow APY</ion-label><br>
             <Select
             class="tinyMarginTop tinyMarginBottom"
-            v-model="trueFalseSelect" 
+            v-model="useFixedAPYSelect" 
             :options="trueFalseList" 
             optionLabel="booleanName" 
             optionValue="booleanValue" 
@@ -136,22 +135,25 @@
 
   
 
-  <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
-  createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"/>
-  <AdminTokenReservesTable @editTokenReserveModal="(tokenMintAddress: PublicKey,
+  <TokenReservesTable @createSubMarketModal="(tokenId: number, tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
+  createSubMarketModal.openCreateSubMarketModal(tokenId, tokenMintAddress, tokenSVG, tokenName)"
+  @collectSubMarketFeesModal="(rowData: any) => collectSubMarketFeesModal.openCollectSubMarketFeesModal(rowData)"/>
+  <AdminTokenReservesTable @editTokenReserveModal="(tokenId: number,
+  tokenMintAddress: PublicKey,
   tokenSVG: Component,
   tokenName:string,
   solvencyInsuranceFeeRate: number,
   fixedBorrowAPY: number,
   useFixedBorrowApy: boolean,
   globalLimit: number) =>
-  editTokenReserveModal.openEditTokenReserveModal(tokenMintAddress, tokenSVG, tokenName, solvencyInsuranceFeeRate, fixedBorrowAPY, useFixedBorrowApy, globalLimit)"/>
+  editTokenReserveModal.openEditTokenReserveModal(tokenId, tokenMintAddress, tokenSVG, tokenName, solvencyInsuranceFeeRate, fixedBorrowAPY, useFixedBorrowApy, globalLimit)"/>
   <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString && anchorPrograms.isLendingProtocolInitialized">
     <MintDevNetTestToken/>
   </div>
 
-  <CreateSubMarketModal ref="createSubMarketModal"/>
   <EditTokenReserveModal ref="editTokenReserveModal"/>
+  <CreateSubMarketModal ref="createSubMarketModal"/>
+  <CollectSubMarketFeesModal ref="collectSubMarketFeesModal"/>
   
 </template>
 
@@ -162,28 +164,30 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { confirmLendingTransaction, doesKeyExistInLookUpTable, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { tokenAddressStrings, LegacyTokenProgramID, TokenProgram2022ID } from '/src/assets/constants/Addresses.ts'
+  import { tokenIds, LegacyTokenProgramID, TokenProgram2022ID } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveFontEndInfoHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
   import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
   import AdminTokenReservesTable from '/src/components/tables/lending/admin/AdminTokenReservesTable.vue'
   import MintDevNetTestToken from '/src/components/smart contracts/lending protocol/admin/MintDevNetTestToken.vue'
-  import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import EditTokenReserveModal from '/src/components/smart contracts/lending protocol/EditTokenReserveModal.vue'
-  import { PublicKey, Transaction, AddressLookupTableProgram } from "@solana/web3.js"
-  import { getTokenReservePDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
+  import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'
+  import { PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
+  import { getTokenReservePDA, sendVersionedLendingProtocolTransaction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
 
   var tokenMintAddressInput = ref()
-  var pythPriceFeedID = ref()
   var tokenDecimalCountInput = ref()
-  var createSubMarketModal = ref()
+  
   var editTokenReserveModal = ref()
+  var createSubMarketModal = ref()
+  var collectSubMarketFeesModal = ref()
+  
   var monthSelect = ref()
-
   var statementYearInput = ref("")
 
   var borrowAPY = ref(5)
@@ -203,7 +207,7 @@
     }
   ]
 
-  var trueFalseSelect = ref(true)
+  var useFixedAPYSelect = ref(true)
   var trueFalseList = 
   [
     {
@@ -233,12 +237,11 @@
     monthSelect.value = currentDate.getMonth() + 1
   })
 
-  async function addTokenReserveQuick(tokenAddress: String)
+  async function addTokenReserveQuick(tokenId: number)
   {
-    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenAddress)
-    
-    tokenMintAddressInput.value = tokenAddress
-    pythPriceFeedID.value = tokenInfo.pythFeedId.slice(2)
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenId)
+
+    tokenMintAddressInput.value = tokenInfo.publicKey
     tokenDecimalCountInput.value = tokenInfo.decimalAmount
     tokenProgramSelect.value = tokenInfo.tokenProgram
 
@@ -249,9 +252,9 @@
   {
     try
     {
-      const transaction = new Transaction()
-      const mintAddressKey = new PublicKey(tokenMintAddressInput.value)
-      const tokenReservePDA = getTokenReservePDA(mintAddressKey)
+      var instructionsToSend = []
+      var lookUpTableAccounts = []
+      const tokenReservePDA = getTokenReservePDA(tokenMintAddressInput.value)
 
       if(!doesKeyExistInLookUpTable(anchorPrograms.lendingProtocolLookUpTableAccount, tokenReservePDA))
       {
@@ -262,26 +265,27 @@
           lookupTable: anchorPrograms.lendingProtocolLookUpTableAddress,
           addresses: [tokenReservePDA]
         })
-        transaction.add(extendLookUpTableInstruction)
+        instructionsToSend.push(extendLookUpTableInstruction)
       }
 
       const addTokenReserveInstruction = await anchorPrograms.lending.lendingProgram.methods.addTokenReserve(
         tokenDecimalCountInput.value,
-        Array.from(Buffer.from(pythPriceFeedID.value, "hex")),
         borrowAPY.value * 100,//convert to fixedpoint notation
-        trueFalseSelect.value,
+        useFixedAPYSelect.value,
         new anchor.BN(globalLimitInput.value * Math.pow(10, tokenDecimalCountInput.value)),//convert to fixedpoint notation
         solvencyInsurance.value * 100)//convert to fixedpoint notation
-      .accounts({ tokenMint: mintAddressKey, tokenProgram: tokenProgramSelect.value })
+      .accounts({ tokenMint: tokenMintAddressInput.value, tokenProgram: tokenProgramSelect.value })
       .instruction()
-      transaction.add(addTokenReserveInstruction)
+      instructionsToSend.push(addTokenReserveInstruction)
 
-      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      const tx = await sendVersionedLendingProtocolTransaction(instructionsToSend, lookUpTableAccounts)
 
       await confirmLendingTransaction(tx, toast, "add_token_reserve")
 
       tokenMintAddressInput.value = ""
-      pythPriceFeedID.value = []
       tokenDecimalCountInput.value = ""
     }
     catch(error)
@@ -294,7 +298,17 @@
   {
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.updateCurrentStatementMonthAndYear(monthSelect.value, Number(statementYearInput.value)).rpc()
+      var instructionsToSend = []
+      var lookUpTableAccounts = []
+
+      instructionsToSend.push(await anchorPrograms.lending.lendingProgram.methods.updateCurrentStatementMonthAndYear(
+        monthSelect.value, Number(statementYearInput.value)).instruction())
+
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      const tx = await sendVersionedLendingProtocolTransaction(instructionsToSend, lookUpTableAccounts)
+
       await confirmLendingTransaction(tx, toast, "update_current_statement_month_and_year")
     }
     catch(error)

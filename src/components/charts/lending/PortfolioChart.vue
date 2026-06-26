@@ -29,7 +29,7 @@
 
         
         <div class="nSmallMarginTop smallMarginBottom">
-          <div class="showTrimmedAddress"><ion-text >SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br></div>
+          <div class="showTrimmedAddress"><ion-text>SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br></div>
           <div class="showNonTrimmedAddress"><ion-text>SubMarket Owner: {{ subMarketOwnerAddress }}</ion-text><br></div>
           <ion-text>SubMarket Index: {{ subMarketIndex }}</ion-text><br>
           <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text>
@@ -56,7 +56,7 @@
 
           <div v-if="ownerAddress==connectedWallet.addressString">
             <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-            $emit('openDepositModal', tokenMintAddress, subMarketSelectOption)">
+            $emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption)">
               <ion-label color="dark">Deposit</ion-label>
             </ion-button>
             <ion-button v-else fill="clear" @click="openHActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
@@ -68,19 +68,19 @@
             alignment="center"
             >
               <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-              $emit('openDepositModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+              $emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
               </ion-button>
               <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-              $emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+              $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
               </ion-button>
               <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-              $emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+              $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
               </ion-button>
               <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-              $emit('openRepayModal', tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+              $emit('openRepayModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Repay</ion-label>
               </ion-button>
             </ion-popover>
@@ -113,7 +113,7 @@
         </ion-button>
       </ion-popover><br>
 
-      <ion-text >SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br>
+      <ion-text>SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br>
       <ion-text>SubMarket Index: {{ subMarketIndex }}</ion-text><br>
       <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text><br>
 
@@ -158,7 +158,7 @@
         @change="$emit('changeYear', tokenMintAddress, subMarketOwnerAddress, subMarketIndex, yearSelect)">
         </Select>
         <div v-if="ownerAddress==connectedWallet.addressString" class="nSmallMarginTop">
-          <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption)"><ion-label color="dark">Deposit</ion-label></ion-button>
+          <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption)"><ion-label color="dark">Deposit</ion-label></ion-button>
           <ion-button v-else fill="clear" @click="openVActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
           <ion-popover
           :is-open="vActionsPopoverOpen" 
@@ -167,16 +167,16 @@
           side="top" 
           alignment="center"
           >
-            <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+            <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
               <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
             </ion-button>
-            <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+            <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
               <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
             </ion-button>
-            <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+            <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
               <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
             </ion-button>
-            <ion-button v-if="userOriginalDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+            <ion-button v-if="userOriginalDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
               <ion-label class="noClickEvent" color="dark">Repay</ion-label>
             </ion-button>
           </ion-popover>
@@ -360,12 +360,12 @@
   import Chart from 'primevue/chart'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { lendingUserAvailableStableCoinYearsBySubMarketHashMap, lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap, tokenIdHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { copyAddress, copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
-  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
@@ -374,7 +374,7 @@
   [
     'isStableCoin',
     'depositedAssetAmount',
-    'tokenMintAddress',
+    'tokenId',
     'subMarketOwnerAddress',
     'subMarketOwnerAddressTrimmed',
     'subMarketIndex',
@@ -410,6 +410,7 @@
   var subMarketSelectOption: any[] = []
 
   var tokenReserve: any
+  var tokenMintAddress: string
   var decimalAmount: number
   var lendingUserTabAccount: any
   var userOriginalBalance = 0
@@ -438,15 +439,16 @@
 
   onMounted(() =>
   {
-    decimalAmount = tokenDecimalHashMap.get(props.tokenMintAddress)
+    tokenMintAddress = tokenIdHashMap.map.get(props.tokenId)
+    decimalAmount = tokenDecimalHashMap.get(props.tokenId)
 
-    if(lendingUserTabAccountsHashMap.map && props.tokenMintAddress && (props.accountIndex != undefined))
+    if(lendingUserTabAccountsHashMap.map && props.tokenId && (props.accountIndex != undefined))
     {
-      const tokenInfo = tokenReserveFontEndInfoHashMap.get(props.tokenMintAddress)
+      const tokenInfo = tokenReserveFontEndInfoHashMap.get(props.tokenId)
       tokenName.value = tokenInfo.name
       tokenSVG.value = tokenInfo.svg
 
-      lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
+      lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenId +
       props.subMarketOwnerAddress +
       props.subMarketIndex.toString() +
       props.ownerAddress +
@@ -462,8 +464,8 @@
         startInterestCalculation()
     }
 
-    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenMintAddress))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers 
-    const subMarket = subMarketsHashMap.map.get(props.tokenMintAddress + props.subMarketOwnerAddress + props.subMarketIndex)
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers 
+    const subMarket = subMarketsHashMap.map.get(props.tokenId + props.subMarketOwnerAddress + props.subMarketIndex)
     const option = 
     {
       subMarketFeeName: (subMarket.feeOnInterestEarnedRate).toString() + "% Fee Market",
@@ -487,7 +489,7 @@
 
   watch(lendingUserTabAccountsHashMap,() =>
   {
-    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
+    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenId +
     props.subMarketOwnerAddress +
     props.subMarketIndex.toString() +
     props.ownerAddress +
@@ -513,7 +515,7 @@
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
   {
-    lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(props.tokenMintAddress +
+    lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(props.tokenId +
     props.subMarketOwnerAddress +
     props.subMarketIndex.toString() +
     props.ownerAddress +
@@ -534,13 +536,13 @@
 
     var initialList
     if(props.isStableCoin)
-      initialList = lendingUserAvailableStableCoinYearsBySubMarketHashMap.map.get(props.tokenMintAddress +
+      initialList = lendingUserAvailableStableCoinYearsBySubMarketHashMap.map.get(props.tokenId +
       props.subMarketOwnerAddress +
       props.subMarketIndex +
       props.ownerAddress +
       props.accountIndex.toString())
     else
-      initialList = lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map.get(props.tokenMintAddress +
+      initialList = lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map.get(props.tokenId +
       props.subMarketOwnerAddress +
       props.subMarketIndex +
       props.ownerAddress +
@@ -724,7 +726,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyAddress(copyTokenMintAddressButtonText, props.tokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, tokenMintAddress)
   }
 
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)
@@ -789,7 +791,7 @@
 
     sevenDayCalculatedUserInterestEarned.value = (sevenDayInterestEarnedBeforeFee - (sevenDayInterestEarnedBeforeFee * props.subMarketFee / 100)).toFixed(decimalAmount)
 
-    const price = priceObjectMap.data[props.tokenMintAddress].usdPrice
+    const price = priceObjectMap.data[tokenMintAddress].usdPrice
     if(price)
     {
       balanceValueString.value = (userCalculatedBalance.value * Number(price)).toLocaleString('en-US', {
@@ -848,7 +850,7 @@
 
   function updateStoredSelectedSubMarketIndex()
   {
-    localStorage.setItem(props.tokenMintAddress + "selectedMainSubMarketIndex", props.subMarketIndex)
+    localStorage.setItem(props.tokenId.toString() + "selectedMainSubMarketIndex", props.subMarketIndex)
   }
 </script>
 

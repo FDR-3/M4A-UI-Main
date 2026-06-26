@@ -146,7 +146,7 @@
     SYSTEM_PROGRAM_ADDRESS_STRING,
     MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey, VersionedTransaction, TransactionMessage } from "@solana/web3.js"
+  import { PublicKey } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     copyFullAddressText,
@@ -156,8 +156,8 @@
   import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { getLendingUserLookUpTableAddressAndInstructions } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { subMarketOwnerHashMap, subMarketByTokenMintAddressAndOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { getLendingUserLookUpTableAddressAndInstructions, sendVersionedLendingProtocolTransaction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { subMarketOwnerHashMap, subMarketByTokenIdAndOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { trimAddress } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
@@ -184,6 +184,7 @@
   var collecting = ref(false)
   var depositSVG = ref()
   var subMarketTokenName = ref()
+  var selectedTokenId = 0
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var destinationSubMarketOwnerAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
@@ -225,7 +226,7 @@
       }
   })
 
-  watch(subMarketByTokenMintAddressAndOwnerHashMap,() =>
+  watch(subMarketByTokenIdAndOwnerHashMap,() =>
   {
     generateOwnersSelectList()
     generateSubMarketList()
@@ -274,12 +275,13 @@
   {
     window.addEventListener('click', handleClickOutside)
 
-    const tokenInfo = tokenReserveFontEndInfoHashMap.get(rowData.tokenMintAddress.toString())
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(rowData.tokenId)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     
     uncollectedAmount.value = rowData.uncollectedSubMarketFeesAmount
+    selectedTokenId = rowData.tokenId
     selectedTokenMintAddress = new PublicKey(rowData.tokenMintAddress.toString())
     destinationSubMarketOwnerAddress = new PublicKey(rowData.owner.toString())
     trimmedOwnerAddress.value = trimAddress(rowData.owner.toString())
@@ -453,10 +455,10 @@
 
   function generateSubMarketList()
   {
-    if(!subMarketByTokenMintAddressAndOwnerHashMap.map)
+    if(!subMarketByTokenIdAndOwnerHashMap.map)
       return
 
-    const ownerSubMarketListArray = subMarketByTokenMintAddressAndOwnerHashMap.map.get(selectedTokenMintAddress.toString() + destinationSubMarketOwnerAddress.toString())
+    const ownerSubMarketListArray = subMarketByTokenIdAndOwnerHashMap.map.get(selectedTokenId.toString() + destinationSubMarketOwnerAddress.toString())
     var tempSubMarketList = []
 
     if(!ownerSubMarketListArray || ownerSubMarketListArray.length == 0)
@@ -478,37 +480,39 @@
 
     try
     {
-      var lendingUserLookUpTableAddress: PublicKey
+      var lookUpTableAccounts = []
       var instructionsToSend: anchor.web3.TransactionInstruction[] = []
-
+      var creatingNewLookUpTable = false
+      var lendingUserLookUpTableAddress: PublicKey
+      
       if(initialSubMarketOwnerAddress.toString() == destinationSubMarketOwnerAddress.toString() && initialSubMarketIndex == destinationSubMarketSelect.value)
       {
-        [lendingUserLookUpTableAddress, instructionsToSend] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
+        [lendingUserLookUpTableAddress, instructionsToSend, creatingNewLookUpTable] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
         accountSelect.value,
         connectedWallet.lendingUserLookUpTableAccount,
-        selectedTokenMintAddress,
+        selectedTokenId,
         initialSubMarketOwnerAddress,
         initialSubMarketIndex)
 
         const claimSubMarketFeesInstruction = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFees
         (
-          selectedTokenMintAddress,
-          initialSubMarketOwnerAddress,
           initialSubMarketIndex,
           accountSelect.value,
-          accountName.value,
-          lendingUserLookUpTableAddress
-        ).instruction()
+          creatingNewLookUpTable ? accountName.value : null,
+          creatingNewLookUpTable ? lendingUserLookUpTableAddress : null
+        )
+        .accounts({ tokenMintAddress: selectedTokenMintAddress, subMarketOwner: initialSubMarketOwnerAddress })
+        .instruction()
 
         instructionsToSend.push(claimSubMarketFeesInstruction)
         functionCallName = "claim_sub_market_fees"
       }
       else
       {
-        [lendingUserLookUpTableAddress, instructionsToSend] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
+        [lendingUserLookUpTableAddress, instructionsToSend, creatingNewLookUpTable] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
         accountSelect.value,
         connectedWallet.lendingUserLookUpTableAccount,
-        selectedTokenMintAddress,
+        selectedTokenId,
         initialSubMarketOwnerAddress,
         initialSubMarketIndex,
         destinationSubMarketOwnerAddress,
@@ -516,54 +520,40 @@
         
         const claimSubMarketFeesAndDepositInDifferentSubMarketInstruction = await anchorPrograms.lending.lendingProgram.methods.claimSubMarketFeesAndDepositInDifferentSubMarket
         (
-          selectedTokenMintAddress,
-          initialSubMarketOwnerAddress,
           initialSubMarketIndex,
-          destinationSubMarketOwnerAddress,
           destinationSubMarketSelect.value,
           accountSelect.value,
-          accountName.value,
-          lendingUserLookUpTableAddress
-        ).instruction()
+          creatingNewLookUpTable ? accountName.value : null,
+          creatingNewLookUpTable ? lendingUserLookUpTableAddress : null
+        )
+        .accounts({ 
+          tokenMintAddress: selectedTokenMintAddress,
+          initialSubMarketOwner: initialSubMarketOwnerAddress,
+          destinationSubMarketOwner: destinationSubMarketOwnerAddress
+         })
+        .instruction()
 
         instructionsToSend.push(claimSubMarketFeesAndDepositInDifferentSubMarketInstruction)
         functionCallName = "claim_sub_market_fees_and_deposit_in_different_sub_market"
       }
 
-      const { blockhash } = await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()
-
-      //Get Look Up Table Accounts
-      var lookUpTableAccounts = []
-
       //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
+      //Only include look up table if there are 2 different submarkets by the same owner. Lookuptable account cost 35 bytes, single submarket account is 32 bytes
       //Get Sub Market Look Up Table Account By Owner
-      const subInitialMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(initialSubMarketOwnerAddress.toString())
-      lookUpTableAccounts.push(subInitialMarketOwnerLookUpTableAccount)
-      if(initialSubMarketOwnerAddress.toString() != destinationSubMarketOwnerAddress.toString())
+      if((initialSubMarketOwnerAddress.toString() == destinationSubMarketOwnerAddress.toString()) &&
+      (initialSubMarketIndex != destinationSubMarketSelect.value))
       {
-        const subDestinationMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(destinationSubMarketOwnerAddress.toString())
-        lookUpTableAccounts.push(subDestinationMarketOwnerLookUpTableAccount)
+        const subInitialMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(initialSubMarketOwnerAddress.toString())
+        lookUpTableAccounts.push(subInitialMarketOwnerLookUpTableAccount)
       }
 
       //Get Lending User Look Up Table Account
       if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available if first lending action
         lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
 
-      const messageV0 = new TransactionMessage({
-        payerKey: connectedWallet.publicKey,
-        recentBlockhash: blockhash,
-        instructions: instructionsToSend
-      }).compileToV0Message(lookUpTableAccounts)
-
-      //Create and sign the Versioned Transaction
-      const transaction = new VersionedTransaction(messageV0)
-
-      //const size = transaction.serialize().length
-      //console.log(`Current Transaction Size: ${size} bytes`)
-
-      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction)
+      const tx = await sendVersionedLendingProtocolTransaction(instructionsToSend, lookUpTableAccounts)
 
       await confirmLendingTransaction(tx, toast, functionCallName)
 

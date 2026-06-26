@@ -333,7 +333,7 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
+      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenId)
 
       //Set Wallet Amounts
       const tokenAmount = hodlTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
@@ -422,10 +422,10 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
+      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenId)
 
       //Set UnCollected Fee Amounts
-      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenId.toString() +
       adminAccounts.lendingCEOAddressString +
       adminAccounts.lendingMain3PercentSubMarketIndex.toString())
       if(subMarket)

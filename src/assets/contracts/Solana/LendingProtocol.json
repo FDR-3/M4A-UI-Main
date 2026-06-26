@@ -1,5 +1,5 @@
 {
-  "address": "AyjtTAkQUQyCBJAHntC97ZiVEmhCJTx3zH4TidivSEKZ",
+  "address": "2RYYqg5qpA5NWCn7gb9iobaDr6zmhn2XdLtTXdBGr4qh",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -192,15 +192,6 @@
           "type": "u8"
         },
         {
-          "name": "pyth_feed_id",
-          "type": {
-            "array": [
-              "u8",
-              32
-            ]
-          }
-        },
-        {
           "name": "fixed_borrow_apy",
           "type": "u16"
         },
@@ -231,6 +222,9 @@
         25
       ],
       "accounts": [
+        {
+          "name": "sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -278,6 +272,38 @@
                   97,
                   116,
                   115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_validator",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
                 ]
               }
             ]
@@ -333,11 +359,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -418,11 +445,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -488,11 +516,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -645,10 +674,6 @@
       ],
       "args": [
         {
-          "name": "sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "sub_market_index",
           "type": "u16"
         },
@@ -675,6 +700,12 @@
         219
       ],
       "accounts": [
+        {
+          "name": "token_mint_address"
+        },
+        {
+          "name": "sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -782,7 +813,7 @@
                 ]
               },
               {
-                "kind": "arg",
+                "kind": "account",
                 "path": "token_mint_address"
               }
             ]
@@ -808,12 +839,13 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -893,12 +925,13 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -963,12 +996,13 @@
                 "account": "LendingProtocol"
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -996,14 +1030,6 @@
         }
       ],
       "args": [
-        {
-          "name": "token_mint_address",
-          "type": "pubkey"
-        },
-        {
-          "name": "sub_market_owner_address",
-          "type": "pubkey"
-        },
         {
           "name": "sub_market_index",
           "type": "u16"
@@ -1039,6 +1065,9 @@
         88
       ],
       "accounts": [
+        {
+          "name": "sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -1221,11 +1250,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -1291,11 +1321,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -1448,10 +1479,6 @@
       ],
       "args": [
         {
-          "name": "sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "sub_market_index",
           "type": "u16"
         },
@@ -1486,6 +1513,12 @@
         101
       ],
       "accounts": [
+        {
+          "name": "token_mint_address"
+        },
+        {
+          "name": "sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -1561,7 +1594,7 @@
                 ]
               },
               {
-                "kind": "arg",
+                "kind": "account",
                 "path": "token_mint_address"
               }
             ]
@@ -1587,12 +1620,13 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -1672,12 +1706,13 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -1742,12 +1777,13 @@
                 "account": "LendingProtocol"
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -1775,14 +1811,6 @@
         }
       ],
       "args": [
-        {
-          "name": "token_mint_address",
-          "type": "pubkey"
-        },
-        {
-          "name": "sub_market_owner_address",
-          "type": "pubkey"
-        },
         {
           "name": "sub_market_index",
           "type": "u16"
@@ -1818,6 +1846,15 @@
         147
       ],
       "accounts": [
+        {
+          "name": "token_mint_address"
+        },
+        {
+          "name": "initial_sub_market_owner"
+        },
+        {
+          "name": "destination_sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -1893,7 +1930,7 @@
                 ]
               },
               {
-                "kind": "arg",
+                "kind": "account",
                 "path": "token_mint_address"
               }
             ]
@@ -1919,12 +1956,13 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "initial_sub_market_owner_address"
+                "kind": "account",
+                "path": "initial_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -1953,12 +1991,13 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "destination_sub_market_owner_address"
+                "kind": "account",
+                "path": "destination_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -2038,12 +2077,13 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "initial_sub_market_owner_address"
+                "kind": "account",
+                "path": "initial_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -2092,12 +2132,13 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "destination_sub_market_owner_address"
+                "kind": "account",
+                "path": "destination_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -2162,12 +2203,13 @@
                 "account": "LendingProtocol"
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "initial_sub_market_owner_address"
+                "kind": "account",
+                "path": "initial_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -2232,12 +2274,13 @@
                 "account": "LendingProtocol"
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "destination_sub_market_owner_address"
+                "kind": "account",
+                "path": "destination_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -2266,20 +2309,8 @@
       ],
       "args": [
         {
-          "name": "token_mint_address",
-          "type": "pubkey"
-        },
-        {
-          "name": "initial_sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "initial_sub_market_index",
           "type": "u16"
-        },
-        {
-          "name": "destination_sub_market_owner_address",
-          "type": "pubkey"
         },
         {
           "name": "destination_sub_market_index",
@@ -2316,6 +2347,12 @@
         93
       ],
       "accounts": [
+        {
+          "name": "sub_market_owner"
+        },
+        {
+          "name": "lending_user_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -2375,19 +2412,19 @@
               },
               {
                 "kind": "arg",
-                "path": "token_mint_address"
+                "path": "token_id"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
                 "path": "sub_market_index"
               },
               {
-                "kind": "arg",
-                "path": "user_account_owner_address"
+                "kind": "account",
+                "path": "lending_user_owner"
               },
               {
                 "kind": "arg",
@@ -2445,19 +2482,19 @@
               },
               {
                 "kind": "arg",
-                "path": "token_mint_address"
+                "path": "token_id"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
                 "path": "sub_market_index"
               },
               {
-                "kind": "arg",
-                "path": "user_account_owner_address"
+                "kind": "account",
+                "path": "lending_user_owner"
               },
               {
                 "kind": "arg",
@@ -2478,20 +2515,12 @@
       ],
       "args": [
         {
-          "name": "token_mint_address",
-          "type": "pubkey"
-        },
-        {
-          "name": "sub_market_owner_address",
-          "type": "pubkey"
+          "name": "token_id",
+          "type": "u8"
         },
         {
           "name": "sub_market_index",
           "type": "u16"
-        },
-        {
-          "name": "user_account_owner_address",
-          "type": "pubkey"
         },
         {
           "name": "user_account_index",
@@ -2512,6 +2541,12 @@
         8
       ],
       "accounts": [
+        {
+          "name": "token_mint_address"
+        },
+        {
+          "name": "fee_collector_address"
+        },
         {
           "name": "sub_market_stats",
           "writable": true,
@@ -2559,8 +2594,9 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "token_mint_address"
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
                 "kind": "account",
@@ -2637,7 +2673,7 @@
                 ]
               },
               {
-                "kind": "arg",
+                "kind": "account",
                 "path": "token_mint_address"
               }
             ]
@@ -2655,16 +2691,8 @@
       ],
       "args": [
         {
-          "name": "token_mint_address",
-          "type": "pubkey"
-        },
-        {
           "name": "sub_market_index",
           "type": "u16"
-        },
-        {
-          "name": "fee_collector_address",
-          "type": "pubkey"
         },
         {
           "name": "fee_on_interest_earned_rate",
@@ -2674,6 +2702,107 @@
           "name": "look_up_table_address",
           "type": {
             "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_temp_oracle_price_data",
+      "discriminator": [
+        191,
+        199,
+        220,
+        183,
+        153,
+        194,
+        22,
+        206
+      ],
+      "accounts": [
+        {
+          "name": "lending_user_address"
+        },
+        {
+          "name": "price_validator",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "temp_price_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  68,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "lending_user_address"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "payload",
+          "type": {
+            "defined": {
+              "name": "PriceDataPayload"
+            }
           }
         }
       ]
@@ -2691,6 +2820,9 @@
         150
       ],
       "accounts": [
+        {
+          "name": "sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -2793,11 +2925,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -2878,11 +3011,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -2948,11 +3082,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -3105,10 +3240,6 @@
       ],
       "args": [
         {
-          "name": "sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "sub_market_index",
           "type": "u16"
         },
@@ -3250,6 +3381,9 @@
       ],
       "accounts": [
         {
+          "name": "fee_collector_address"
+        },
+        {
           "name": "sub_market_stats",
           "writable": true,
           "pda": {
@@ -3297,7 +3431,7 @@
               },
               {
                 "kind": "arg",
-                "path": "token_mint_address"
+                "path": "token_id"
               },
               {
                 "kind": "account",
@@ -3322,16 +3456,12 @@
       ],
       "args": [
         {
-          "name": "_token_mint_address",
-          "type": "pubkey"
+          "name": "token_id",
+          "type": "u8"
         },
         {
           "name": "sub_market_index",
           "type": "u16"
-        },
-        {
-          "name": "fee_collector_address",
-          "type": "pubkey"
         },
         {
           "name": "fee_on_interest_earned_rate",
@@ -3352,6 +3482,9 @@
         125
       ],
       "accounts": [
+        {
+          "name": "look_up_table_address"
+        },
         {
           "name": "lending_protocol",
           "writable": true,
@@ -3468,6 +3601,39 @@
                   117,
                   114,
                   101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_validator",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
                   114
                 ]
               }
@@ -3603,10 +3769,6 @@
         {
           "name": "statement_year",
           "type": "u16"
-        },
-        {
-          "name": "look_up_table_address",
-          "type": "pubkey"
         }
       ]
     },
@@ -3623,6 +3785,15 @@
         18
       ],
       "accounts": [
+        {
+          "name": "liquidati_account_owner"
+        },
+        {
+          "name": "repayment_sub_market_owner"
+        },
+        {
+          "name": "liquidation_sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -3709,45 +3880,6 @@
           }
         },
         {
-          "name": "liquidati_lending_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  85,
-                  115,
-                  101,
-                  114,
-                  65,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "liquidati_account_owner_address"
-              },
-              {
-                "kind": "arg",
-                "path": "liquidati_account_index"
-              }
-            ]
-          }
-        },
-        {
           "name": "liquidator_lending_account",
           "writable": true,
           "pda": {
@@ -3819,11 +3951,12 @@
               },
               {
                 "kind": "account",
-                "path": "repayment_mint"
+                "path": "repayment_token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "repayment_sub_market_owner_address"
+                "kind": "account",
+                "path": "repayment_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -3873,11 +4006,12 @@
               },
               {
                 "kind": "account",
-                "path": "liquidation_mint"
+                "path": "liquidation_token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "liquidation_sub_market_owner_address"
+                "kind": "account",
+                "path": "liquidation_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -3943,11 +4077,12 @@
               },
               {
                 "kind": "account",
-                "path": "repayment_mint"
+                "path": "repayment_token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "repayment_sub_market_owner_address"
+                "kind": "account",
+                "path": "repayment_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -4013,11 +4148,12 @@
               },
               {
                 "kind": "account",
-                "path": "liquidation_mint"
+                "path": "liquidation_token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "liquidation_sub_market_owner_address"
+                "kind": "account",
+                "path": "liquidation_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -4149,120 +4285,6 @@
           }
         },
         {
-          "name": "repayment_token_reserve_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "repayment_token_reserve"
-              },
-              {
-                "kind": "account",
-                "path": "repayment_token_program"
-              },
-              {
-                "kind": "account",
-                "path": "repayment_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "liquidation_token_reserve_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "liquidation_token_reserve"
-              },
-              {
-                "kind": "account",
-                "path": "liquidation_token_program"
-              },
-              {
-                "kind": "account",
-                "path": "liquidation_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
           "name": "repayment_mint"
         },
         {
@@ -4290,24 +4312,12 @@
       ],
       "args": [
         {
-          "name": "repayment_sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "repayment_sub_market_index",
           "type": "u16"
         },
         {
-          "name": "liquidation_sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "liquidation_sub_market_index",
           "type": "u16"
-        },
-        {
-          "name": "liquidati_account_owner_address",
-          "type": "pubkey"
         },
         {
           "name": "liquidati_account_index",
@@ -4361,6 +4371,15 @@
       ],
       "accounts": [
         {
+          "name": "liquidati_account_owner"
+        },
+        {
+          "name": "repayment_sub_market_owner"
+        },
+        {
+          "name": "liquidation_sub_market_owner"
+        },
+        {
           "name": "lending_protocol",
           "pda": {
             "seeds": [
@@ -4382,6 +4401,38 @@
                   99,
                   111,
                   108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_validator",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
                 ]
               }
             ]
@@ -4445,8 +4496,8 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "liquidati_account_owner_address"
+                "kind": "account",
+                "path": "liquidati_account_owner"
               },
               {
                 "kind": "arg",
@@ -4527,11 +4578,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "repayment_sub_market_owner_address"
+                "kind": "account",
+                "path": "repayment_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -4581,11 +4633,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "liquidation_sub_market_owner_address"
+                "kind": "account",
+                "path": "liquidation_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -4651,11 +4704,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "repayment_sub_market_owner_address"
+                "kind": "account",
+                "path": "repayment_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -4721,11 +4775,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "liquidation_sub_market_owner_address"
+                "kind": "account",
+                "path": "liquidation_sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -4878,24 +4933,12 @@
       ],
       "args": [
         {
-          "name": "repayment_sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "repayment_sub_market_index",
           "type": "u16"
         },
         {
-          "name": "liquidation_sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "liquidation_sub_market_index",
           "type": "u16"
-        },
-        {
-          "name": "liquidati_account_owner_address",
-          "type": "pubkey"
         },
         {
           "name": "liquidati_account_index",
@@ -4949,6 +4992,9 @@
       ],
       "accounts": [
         {
+          "name": "new_ceo_address"
+        },
+        {
           "name": "ceo",
           "writable": true,
           "pda": {
@@ -4989,12 +5035,7 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "new_ceo_address",
-          "type": "pubkey"
-        }
-      ]
+      "args": []
     },
     {
       "name": "pass_on_liquidation_treasurer",
@@ -5009,6 +5050,9 @@
         251
       ],
       "accounts": [
+        {
+          "name": "new_treasurer_address"
+        },
         {
           "name": "liquidation_treasurer",
           "writable": true,
@@ -5052,12 +5096,7 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "new_treasurer_address",
-          "type": "pubkey"
-        }
-      ]
+      "args": []
     },
     {
       "name": "pass_on_solvency_treasurer",
@@ -5072,6 +5111,9 @@
         226
       ],
       "accounts": [
+        {
+          "name": "new_treasurer_address"
+        },
         {
           "name": "solvency_treasurer",
           "writable": true,
@@ -5112,12 +5154,7 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [
-        {
-          "name": "new_treasurer_address",
-          "type": "pubkey"
-        }
-      ]
+      "args": []
     },
     {
       "name": "refresh_user_health_chunk_and_token_reserves",
@@ -5132,6 +5169,9 @@
         182
       ],
       "accounts": [
+        {
+          "name": "lending_user_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -5154,6 +5194,38 @@
                   99,
                   111,
                   108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_validator",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
                 ]
               }
             ]
@@ -5188,8 +5260,8 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "user_account_owner_address"
+                "kind": "account",
+                "path": "lending_user_owner"
               },
               {
                 "kind": "arg",
@@ -5210,12 +5282,20 @@
       ],
       "args": [
         {
-          "name": "user_account_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "user_account_index",
           "type": "u8"
+        },
+        {
+          "name": "refresh_token_reserve_count",
+          "type": "u8"
+        },
+        {
+          "name": "set_count",
+          "type": "u8"
+        },
+        {
+          "name": "close_price_account",
+          "type": "bool"
         }
       ]
     },
@@ -5232,6 +5312,9 @@
         166
       ],
       "accounts": [
+        {
+          "name": "sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -5279,6 +5362,38 @@
                   97,
                   116,
                   115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_validator",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
                 ]
               }
             ]
@@ -5334,11 +5449,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -5419,11 +5535,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -5489,11 +5606,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -5646,10 +5764,6 @@
       ],
       "args": [
         {
-          "name": "sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "sub_market_index",
           "type": "u16"
         },
@@ -5666,6 +5780,97 @@
           "type": "bool"
         }
       ]
+    },
+    {
+      "name": "set_oracle_price_validator",
+      "discriminator": [
+        242,
+        104,
+        157,
+        103,
+        202,
+        132,
+        205,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "new_price_validator_address"
+        },
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_validator",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "update_current_statement_month_and_year",
@@ -5760,75 +5965,6 @@
       ]
     },
     {
-      "name": "update_lending_user_look_up_table_address",
-      "discriminator": [
-        175,
-        89,
-        161,
-        81,
-        199,
-        134,
-        68,
-        202
-      ],
-      "accounts": [
-        {
-          "name": "lending_user_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  85,
-                  115,
-                  101,
-                  114,
-                  65,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "signer"
-              },
-              {
-                "kind": "arg",
-                "path": "user_account_index"
-              }
-            ]
-          }
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "look_up_table_address",
-          "type": "pubkey"
-        }
-      ]
-    },
-    {
       "name": "update_token_reserve",
       "discriminator": [
         4,
@@ -5841,6 +5977,9 @@
         213
       ],
       "accounts": [
+        {
+          "name": "token_mint_address"
+        },
         {
           "name": "token_reserve_stats",
           "writable": true,
@@ -5924,7 +6063,7 @@
                 ]
               },
               {
-                "kind": "arg",
+                "kind": "account",
                 "path": "token_mint_address"
               }
             ]
@@ -5941,10 +6080,6 @@
         }
       ],
       "args": [
-        {
-          "name": "_token_mint_address",
-          "type": "pubkey"
-        },
         {
           "name": "fixed_borrow_apy",
           "type": "u16"
@@ -5976,6 +6111,9 @@
         170
       ],
       "accounts": [
+        {
+          "name": "sub_market_owner"
+        },
         {
           "name": "lending_protocol",
           "pda": {
@@ -6023,6 +6161,38 @@
                   97,
                   116,
                   115
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_validator",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
                 ]
               }
             ]
@@ -6078,11 +6248,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -6163,11 +6334,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -6233,11 +6405,12 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "token_reserve.token_id",
+                "account": "TokenReserve"
               },
               {
-                "kind": "arg",
-                "path": "sub_market_owner_address"
+                "kind": "account",
+                "path": "sub_market_owner"
               },
               {
                 "kind": "arg",
@@ -6390,15 +6563,11 @@
       ],
       "args": [
         {
-          "name": "sub_market_owner_address",
-          "type": "pubkey"
-        },
-        {
           "name": "sub_market_index",
           "type": "u16"
         },
         {
-          "name": "_user_account_index",
+          "name": "user_account_index",
           "type": "u8"
         },
         {
@@ -6518,6 +6687,19 @@
       ]
     },
     {
+      "name": "OraclePriceValidator",
+      "discriminator": [
+        133,
+        81,
+        225,
+        243,
+        107,
+        178,
+        162,
+        121
+      ]
+    },
+    {
       "name": "SolvencyTreasurer",
       "discriminator": [
         171,
@@ -6570,6 +6752,19 @@
       ]
     },
     {
+      "name": "TempOraclePriceAccount",
+      "discriminator": [
+        247,
+        88,
+        158,
+        105,
+        63,
+        26,
+        157,
+        193
+      ]
+    },
+    {
       "name": "TokenReserve",
       "discriminator": [
         21,
@@ -6619,143 +6814,178 @@
     },
     {
       "code": 6004,
+      "name": "NotPriceOracle",
+      "msg": "Only the Price Oracle can call this function"
+    },
+    {
+      "code": 6005,
+      "name": "PriceOracleKeyMisMatched",
+      "msg": "Price Oracle Public Key did not match"
+    },
+    {
+      "code": 6006,
+      "name": "MissingRemainingAccount",
+      "msg": "Expected remaining account missing"
+    },
+    {
+      "code": 6007,
       "name": "MissingSubMarketLookUpTable",
       "msg": "You must include a Look Up Table Address when a user creates their first Sub Market"
     },
     {
-      "code": 6005,
+      "code": 6008,
       "name": "InvalidSubMarketFeeRate",
       "msg": "The Sub Market fee on interest earned rate can't be greater than 100%"
     },
     {
-      "code": 6006,
+      "code": 6009,
       "name": "InvalidSolvencyInsuranceFeeRate",
       "msg": "The solvency insurance fee on interest earned rate can't be greater than 100%"
     },
     {
-      "code": 6007,
-      "name": "IncorrectNumberOfTabAccounts",
-      "msg": "You must provide all of the sub user's tab accounts"
-    },
-    {
-      "code": 6008,
+      "code": 6010,
       "name": "MissingLendingUserLookUpTable",
       "msg": "You must include a Look Up Table Address when a user initializes their Lending User Account"
     },
     {
-      "code": 6009,
+      "code": 6011,
       "name": "IncorrectOrderOfTabAccounts",
       "msg": "You must provide the sub user's tab accounts ordered by user_tab_account_index"
     },
     {
-      "code": 6010,
-      "name": "UnexpectedLendingStatsAccount",
-      "msg": "Unexpected Lending Stats PDA detected. Feed in only legitimate PDA's ordered by user_tab_account_index"
-    },
-    {
-      "code": 6011,
-      "name": "UnexpectedTabAccount",
-      "msg": "Unexpected Tab Account PDA detected. Feed in only legitimate PDA's ordered by user_tab_account_index"
-    },
-    {
       "code": 6012,
-      "name": "UnexpectedPythPriceUpdateAccount",
-      "msg": "Unexpected Pyth Price Update Account detected. Feed in only legitimate accounts :)"
+      "name": "OracleDataStale",
+      "msg": "Oracle price was stale"
     },
     {
       "code": 6013,
+      "name": "OraclePriceNotFound",
+      "msg": "Oracle price not found"
+    },
+    {
+      "code": 6014,
+      "name": "UnexpectedLendingStatsAccount",
+      "msg": "Unexpected Lending Stats PDA detected"
+    },
+    {
+      "code": 6015,
       "name": "UnexpectedTokenReserveAccount",
       "msg": "Unexpected Token Reserve Account PDA detected"
     },
     {
-      "code": 6014,
+      "code": 6016,
       "name": "UnexpectedSubMarketAccount",
       "msg": "Unexpected SubMarket Account PDA detected"
     },
     {
-      "code": 6015,
+      "code": 6017,
+      "name": "UnexpectedLendingUserAccount",
+      "msg": "Unexpected Lending User Account PDA detected"
+    },
+    {
+      "code": 6018,
+      "name": "UnexpectedTabAccount",
+      "msg": "Unexpected Tab Account PDA detected"
+    },
+    {
+      "code": 6019,
       "name": "UnexpectedMonthlyStatementAccount",
       "msg": "Unexpected Monthly Statement Account PDA detected"
     },
     {
-      "code": 6016,
+      "code": 6020,
+      "name": "UnexpectedOraclePriceValidatorAccount",
+      "msg": "Unexpected Oracle Price Validator PDA detected"
+    },
+    {
+      "code": 6021,
+      "name": "UnexpectedOraclePriceDataAccount",
+      "msg": "Unexpected Oracle Price Data PDA detected"
+    },
+    {
+      "code": 6022,
+      "name": "InvalidTokenAccount",
+      "msg": "Invalid Token Account"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidTokenAccountMint",
+      "msg": "Invalid Token Account Mint"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidTokenAccountOwner",
+      "msg": "Invalid Token Account Owner"
+    },
+    {
+      "code": 6025,
       "name": "LendingUserAccountNameTooLong",
       "msg": "Lending User Account name can't be longer than 25 characters"
     },
     {
-      "code": 6017,
+      "code": 6026,
       "name": "GlobalLimitExceeded",
       "msg": "You can't deposit more than the global limit"
     },
     {
-      "code": 6018,
+      "code": 6027,
       "name": "InsufficientFunds",
       "msg": "You can't withdraw more funds than you've deposited"
     },
     {
-      "code": 6019,
+      "code": 6028,
       "name": "InsufficientLiquidity",
       "msg": "Not enough liquidity in the Token Reserve for this withdraw or borrow"
     },
     {
-      "code": 6020,
+      "code": 6029,
       "name": "TooManyFunds",
       "msg": "You can't pay back more funds than you've borrowed"
     },
     {
-      "code": 6021,
-      "name": "StaleTokenReserve",
-      "msg": "The token reserve was stale"
+      "code": 6030,
+      "name": "MissingTokenReserveAccountForRefresh",
+      "msg": "Expected Token Reserve missing for user refresh"
     },
     {
-      "code": 6022,
+      "code": 6031,
       "name": "StaleTokenReserveOrLendingUser",
-      "msg": "The token reserve or lending user health data was stale"
+      "msg": "Token Reserve or lending user health data was stale"
     },
     {
-      "code": 6023,
-      "name": "StalePriceDataOrWrongFeedID",
-      "msg": "The price data was stale or the feed id was incorrect"
-    },
-    {
-      "code": 6024,
+      "code": 6032,
       "name": "GriefingRepayment",
       "msg": "You must repay atleast 10% of the borrow position if the account is in an unhealthy state. This prevents 'griefing'"
     },
     {
-      "code": 6025,
+      "code": 6033,
       "name": "LiquidationExposure",
       "msg": "You can't withdraw or borrow an amount that would cause your borrow liabilities to exceed 70% of deposited collateral"
     },
     {
-      "code": 6026,
+      "code": 6034,
       "name": "NotLiquidatable",
       "msg": "You can't liquidate an account whose borrow liabilities aren't 80% or more of their deposited collateral"
     },
     {
-      "code": 6027,
+      "code": 6035,
       "name": "OverLiquidation",
       "msg": "You can't repay more than 50% of a liquidati's debt position"
     },
     {
-      "code": 6028,
+      "code": 6036,
       "name": "NotInsolvent",
       "msg": "You can't zero out an account whose borrow liabilities aren't 100% or more of their deposited collateral"
     },
     {
-      "code": 6029,
+      "code": 6037,
       "name": "DuplicateSubMarket",
       "msg": "Duplicate SubMarket Detected"
     },
     {
-      "code": 6030,
-      "name": "NegativePriceDetected",
-      "msg": "Negative Price Detected"
-    },
-    {
-      "code": 6031,
-      "name": "OraclePriceTooUnstable",
-      "msg": "Oracle Price Too Unstable"
+      "code": 6038,
+      "name": "TooManyTabAccounts",
+      "msg": "Each Lending User Account can have no more than 5 Tab Accounts. Please make new account"
     }
   ],
   "types": [
@@ -6837,6 +7067,10 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
             "name": "owner",
             "type": "pubkey"
           },
@@ -6854,7 +7088,7 @@
           },
           {
             "name": "tab_account_count",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "total_deposited_usd_value",
@@ -6882,7 +7116,7 @@
           },
           {
             "name": "next_tab_index_to_refresh",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "look_up_table_address",
@@ -6901,8 +7135,8 @@
             "type": "u8"
           },
           {
-            "name": "token_mint_address",
-            "type": "pubkey"
+            "name": "token_id",
+            "type": "u8"
           },
           {
             "name": "sub_market_owner_address",
@@ -6937,51 +7171,7 @@
             "type": "u64"
           },
           {
-            "name": "snap_shot_interest_earned_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_sub_market_fees_generated_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_sub_market_fees_collected_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_solvency_insurance_fees_generated_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_solvency_insurance_fees_collected_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_liquidation_fees_generated_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_liquidation_fees_collected_amount",
-            "type": "u64"
-          },
-          {
             "name": "snap_shot_debt_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_interest_accrued_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_repaid_debt_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_liquidated_amount",
-            "type": "u64"
-          },
-          {
-            "name": "snap_shot_liquidator_amount",
             "type": "u64"
           },
           {
@@ -7077,11 +7267,7 @@
             "type": "u8"
           },
           {
-            "name": "token_mint_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "token_decimal_amount",
+            "name": "token_id",
             "type": "u8"
           },
           {
@@ -7102,7 +7288,7 @@
           },
           {
             "name": "user_tab_account_index",
-            "type": "u16"
+            "type": "u8"
           },
           {
             "name": "user_tab_account_added",
@@ -7188,6 +7374,44 @@
       }
     },
     {
+      "name": "OraclePriceValidator",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "address",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceDataPayload",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "data",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "VerifiedPriceData"
+                }
+              }
+            }
+          },
+          {
+            "name": "slot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "SolvencyTreasurer",
       "type": {
         "kind": "struct",
@@ -7217,8 +7441,8 @@
             "type": "pubkey"
           },
           {
-            "name": "token_mint_address",
-            "type": "pubkey"
+            "name": "token_id",
+            "type": "u8"
           },
           {
             "name": "sub_market_index",
@@ -7332,6 +7556,32 @@
       }
     },
     {
+      "name": "TempOraclePriceAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "data",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "VerifiedPriceData"
+                }
+              }
+            }
+          },
+          {
+            "name": "slot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "TokenReserve",
       "type": {
         "kind": "struct",
@@ -7341,8 +7591,8 @@
             "type": "u8"
           },
           {
-            "name": "token_reserve_protocol_index",
-            "type": "u32"
+            "name": "token_id",
+            "type": "u8"
           },
           {
             "name": "token_mint_address",
@@ -7351,15 +7601,6 @@
           {
             "name": "token_decimal_amount",
             "type": "u8"
-          },
-          {
-            "name": "pyth_feed_id",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
           },
           {
             "name": "supply_apy",
@@ -7467,10 +7708,26 @@
         "fields": [
           {
             "name": "token_reserve_count",
-            "type": "u32"
+            "type": "u8"
           },
           {
             "name": "token_reserves_updated_count",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerifiedPriceData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_id",
+            "type": "u8"
+          },
+          {
+            "name": "normalized_price_18_decimals",
             "type": "u128"
           }
         ]

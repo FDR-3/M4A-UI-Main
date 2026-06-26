@@ -306,10 +306,10 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
+      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenId)
 
       //Set Wallet Amounts
-      const tokenAmount = solvencyInsuranceTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      const tokenAmount = solvencyInsuranceTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenId)
       if(tokenAmount)
       {
         unprocessedTableData[i].wallet = Number(tokenAmount)
@@ -324,7 +324,7 @@
       }
 
       //Set UnCollected Fee Amounts
-      const tokenReserve = tokenReservesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      const tokenReserve = tokenReservesHashMap.map.get(unprocessedTableData[i].tokenId)
       if(tokenReserve)
       {
         unprocessedTableData[i].unCollectedFees = Number(tokenReserve.uncollectedSolvencyInsuranceFeesAmount)
@@ -372,10 +372,10 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
+      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenId)
 
       //Set Wallet Amounts
-      const tokenAmount = solvencyInsuranceTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      const tokenAmount = solvencyInsuranceTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenId)
       if(tokenAmount)
       {
         unprocessedTableData[i].wallet = Number(tokenAmount)

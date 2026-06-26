@@ -12,9 +12,9 @@
   getSubMarkets,
   getLendingUserMonthlyStatementsWrapper,
   setLendingUserAccountHashMap,
-  setLendingUserTabHashMaps,
+  setLendingUserTabHashMapsAndLendingLeaderBoard,
   setLendingUserPortfolioHashMaps,
-  setMonthlyStatementHashMapAndLendingLeaderBoard,
+  setMonthlyStatementHashMap,
   getLendingProtocolPDA,
   getLendingProtocolCEOAccountPDA,
   getTokenReserveStatsPDA,
@@ -65,7 +65,7 @@
     else
     {
       adminAccounts.isLendingCEOAccountReady = false
-      await listenForLendingCEOAccountInitialization()
+      listenForLendingCEOAccountInitialization()
     }
 
     //Token Reserves
@@ -81,10 +81,10 @@
 
     //Lending Users
     await setLendingUserAccountHashMap()
-    await setLendingUserTabHashMaps() //adminAccounts.lendingCEOAddressString needs to be set before this is called
+    await setLendingUserTabHashMapsAndLendingLeaderBoard() //adminAccounts.lendingCEOAddressString needs to be set before this is called
     lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
     await setLendingUserPortfolioHashMaps()
-    await setMonthlyStatementHashMapAndLendingLeaderBoard()
+    await setMonthlyStatementHashMap()
     await listenForLendingStatChanges()
     await listenForLendingUserStatChanges()
 
@@ -163,9 +163,9 @@
       lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
     
       await setLendingUserAccountHashMap()
-      await setLendingUserTabHashMaps()
+      await setLendingUserTabHashMapsAndLendingLeaderBoard()
       await setLendingUserPortfolioHashMaps()
-      await setMonthlyStatementHashMapAndLendingLeaderBoard()
+      await setMonthlyStatementHashMap()
     })
   }
 

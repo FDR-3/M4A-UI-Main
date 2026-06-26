@@ -7,9 +7,9 @@
   import WBTCSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
   import { LegacyTokenProgramID,
     TokenProgram2022ID,
-    tokenAddressStrings,
+    tokenIds,
     tokenReserveATAKeys,
-    pythFeedIds } from '/src/assets/constants/Addresses.ts'
+    tokenAddressKeys } from '/src/assets/constants/Addresses.ts'
   import { sourceDAI,
     sourceUSDC,
     sourceSOL,
@@ -33,61 +33,68 @@
     map: undefined
   })
 
+  //Key: Token Mint Id, Value: Token Mint Address
+  export const tokenIdHashMap = reactive(
+  {
+    map: undefined
+  })
+
   export const priceObjectMap = reactive(
   {
     data: undefined
   })
 
-  export const tokenReserveFontEndInfoHashMap: Map<string, tokenMapObject> = new Map(
+  export const tokenReserveFontEndInfoHashMap: Map<number, tokenMapObject> = new Map(
   [ 
     //Key: Token Mint Address, Value: Token SVG
-    [tokenAddressStrings.daiTokenMintAddress,
+    [tokenIds.daiTokenId,
     {
       name: "DAI-Dev",
+      publicKey: tokenAddressKeys.daiTokenMintAddress,
       decimalAmount: 8,
       svg: markRaw(DAISVG),
       source: () => {sourceDAI()},
       ata: tokenReserveATAKeys.daiATA,
-      pythFeedId: pythFeedIds.daiPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }],
-    [tokenAddressStrings.usdcTokenMintAddress,
+    [tokenIds.usdcTokenId,
     {
       name: "USDC-Dev",
+      publicKey: tokenAddressKeys.usdcTokenMintAddress,
       decimalAmount: 6,
       svg: markRaw(USDCSVG),
       source: () => {sourceUSDC()},
       ata: tokenReserveATAKeys.usdcATA,
-      pythFeedId: pythFeedIds.usdcPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }],
-    [tokenAddressStrings.solTokenMintAddress,
+    [tokenIds.solTokenId,
     {
-      name: "SOL-Dev", decimalAmount: 9,
+      name: "SOL-Dev",
+      publicKey: tokenAddressKeys.solTokenMintAddress,
+      decimalAmount: 9,
       svg: markRaw(SOLSVG),
       source: () => {sourceSOL()},
       ata: tokenReserveATAKeys.solATA,
-      pythFeedId: pythFeedIds.solPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }],
-    [tokenAddressStrings.wethTokenMintAddress,
+    [tokenIds.wethTokenId,
     {
       name: "WETH-Dev",
+      publicKey: tokenAddressKeys.wethTokenMintAddress,
       decimalAmount: 8,
       svg: markRaw(WETHSVG),
       source: () => {sourceWETH()},
       ata: tokenReserveATAKeys.wethATA,
-      pythFeedId: pythFeedIds.wethPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }],
-    [tokenAddressStrings.wbtcTokenMintAddress,
+    [tokenIds.wbtcTokenId,
     {
       name: "WBTC-Dev",
+      publicKey: tokenAddressKeys.wbtcTokenMintAddress,
       decimalAmount: 8,
       svg: markRaw(WBTCSVG),
       source: () => {sourceWBTC()},
       ata: tokenReserveATAKeys.wbtcATA,
-      pythFeedId: pythFeedIds.wbtcPythFeedId,
       tokenProgram: LegacyTokenProgramID
     }]
   ])

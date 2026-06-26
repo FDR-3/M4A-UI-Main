@@ -32,7 +32,7 @@
       optionValue="subMarketIndex" 
       placeholder="Select fdr-3 SubMarket"
       appendTo="self"
-      @change="updateStoredSelectedSubMarketIndex(selectedTokenMintAddress.toString(), subMarketSelect.toString())">
+      @change="updateStoredSelectedSubMarketIndex(selectedTokenId, subMarketSelect.toString())">
       </Select>
 
       <Select
@@ -73,7 +73,7 @@
       </button>
 
       <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="withdrawMax=false; withdrawHalf=true">
-        <ion-label color="dark">Half</ion-label>
+        <div style="margin-top: 2px"><ion-label color="dark" >Half</ion-label></div>
       </button>
     </div>
 
@@ -103,24 +103,25 @@
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { VersionedTransaction, TransactionMessage, PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
+  import { PublicKey } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     confirmLendingTransaction,
     parseProgramErrorCode,
-    doesKeyExistInLookUpTable,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { getLendingUserMonthlyStatementAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarketsHashMap, subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { sendVersionedLendingProtocolTransaction,
+    userSignsLendingTransactions,
+    bundleProtocolPriceTransactions,
+    getNeccessaryRefreshInstructionData,
+    getTokenReserveRemainingAccounts,
+    getTempRemainingPriceAccount } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
     lendingUserTabAccountsHashMap,
     lendingUserTabAccountListHashMap,
-    lendingUserMonthlyStatementsHashMap,
     lendingUserRemainingTabAccountListHashMap, } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { PythSolanaReceiver, InstructionWithEphemeralSigners } from "@pythnetwork/pyth-solana-receiver"
-  import { HermesClient } from "@pythnetwork/hermes-client"
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
@@ -152,6 +153,7 @@
   var availableInTokenReserveAmount = ref(0)
   var maxWithdrawAmount = 0
   var userHasDebt = false
+  var selectedTokenId = 0
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
@@ -181,7 +183,7 @@
 
   watch(tokenReservesHashMap, () =>
   {
-    const tokenReserve = tokenReservesHashMap.map.get(selectedTokenMintAddress.toString())
+    const tokenReserve = tokenReservesHashMap.map.get(selectedTokenId)
     if(tokenReserve)
       availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
   })
@@ -255,20 +257,20 @@
     }
   }
 
-  async function openWithdrawalModal(tokenMintAddress: string, subMarkets: any[])
+  async function openWithdrawalModal(tokenId:number, tokenMintAddress: string, subMarkets: any[])
   {
     window.addEventListener('click', handleClickOutside)
 
-    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(tokenMintAddress))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
-    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(tokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenId)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     tokenProgram = tokenInfo.tokenProgram
     availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
     subMarketList.value = subMarkets
-    subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
-    const subMarket = subMarketsHashMap.map.get(tokenMintAddress + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
+    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + "selectedMainSubMarketIndex")) || 0
+    const subMarket = subMarketsHashMap.map.get(tokenId.toString() + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
     subMarketFee = subMarket.feeOnInterestEarnedRate
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
@@ -281,6 +283,7 @@
 
     withdrawAmount.value = 0
     withdrawIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
+    selectedTokenId = tokenId
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
     
     tokenDecimalAmount = decimalAmount
@@ -320,7 +323,7 @@
 
   function setInitialBalance()
   {
-    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
     adminAccounts.lendingCEOAddressString +
     subMarketSelect.value.toString() +
     connectedWallet.addressString +
@@ -347,10 +350,11 @@
     if(userTabAccounts)
       for(var i=0; i<userTabAccounts.length; i++)
       {
-        const price = priceObjectMap.data[userTabAccounts[i].tokenMintAddress.toString()].usdPrice
-        const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenMintAddress.toString())
-        const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString())
-        const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString() +
+        const tokenMintAddressString = tokenIdHashMap.map.get(userTabAccounts[i].tokenId)
+        const price = priceObjectMap.data[tokenMintAddressString].usdPrice
+        const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenId)
+        const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenId)
+        const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenId.toString() +
         userTabAccounts[i].subMarketOwnerAddress.toString() +
         userTabAccounts[i].subMarketIndex.toString())
 
@@ -404,7 +408,11 @@
         if(withdrawHalf.value)
           withdrawAmount.value = availableWithdrawalBalance.value * 0.5
         else if(withdrawMax.value)
-          if(calculatedDebtValue === 0)
+        {
+          withdrawAmount.value = availableWithdrawalBalance.value
+          withdrawFullDepositedAmount = true
+        }
+          /*if(calculatedDebtValue === 0)
           {
             withdrawAmount.value = availableWithdrawalBalance.value
             withdrawFullDepositedAmount = true
@@ -413,10 +421,15 @@
           {
             const factor = 100_000;
             withdrawAmount.value = Math.floor(availableWithdrawalBalance.value * factor) / factor
-          }
+          }*/
 
       maxWithdrawAmount = withdrawAmount.value
     }
+    else
+      if(availableInTokenReserveAmount.value < availableWithdrawalBalance.value)
+        maxWithdrawAmount = availableInTokenReserveAmount.value
+      else
+        maxWithdrawAmount = availableWithdrawalBalance.value
 
     //Account for value that is about to be withdrawn
     //Check for less than zero values when doing complete withdrawals, do the price possibly being slighly off
@@ -522,250 +535,97 @@
 
   async function withdrawTokens()
   {
-    const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
-    var pythIdArray: string[] = []
-    var createMonthlyStatementInstructions: anchor.web3.TransactionInstruction[] = []
-    var withdrawalTokenPriceAccountIndex: number | null = null
-    const uniqueSubMarketOwnersAddressStrings = new Set<string>()
-
     try
     {
-      for(var i=0; i<remainingTabAccounts.length; i++)
-      {
-        const tokenInfo = tokenReserveFontEndInfoHashMap.get(remainingTabAccounts[i].tokenMintAddress)
-        uniqueSubMarketOwnersAddressStrings.add(remainingTabAccounts[i].subMarketOwnerAddress)
-        pythIdArray.push(tokenInfo.pythFeedId)
-
-        //Get index for the selected token to use later
-        if(remainingTabAccounts[i].tokenMintAddress == selectedTokenMintAddress.toString())
-          withdrawalTokenPriceAccountIndex = i  
-      }
-
-      if(withdrawalTokenPriceAccountIndex == null)
-        throw new Error("The selected token does not exist in the user's tab accounts. Can't withdraw a token you don't have")
-
-      const hermesClient = new HermesClient("https://hermes.pyth.network/")
-      const pythSolanaReceiver = new PythSolanaReceiver(
-      {
-        connection: anchorPrograms.lending.connection,
-        wallet: anchorPrograms.lending.wallet,
-      })
-
-      const priceUpdateData = await hermesClient.getLatestPriceUpdates(pythIdArray, { encoding: "base64" })
-      const transactionBuilder = pythSolanaReceiver.newTransactionBuilder({ closeUpdateAccounts: true })
-
-      await transactionBuilder.addPostPriceUpdates(priceUpdateData.binary.data)
-      await transactionBuilder.addPriceConsumerInstructions
-      (
-        async(
-          getPriceUpdateAccount: (priceFeedId: string) => PublicKey
-        ): Promise<InstructionWithEphemeralSigners[]> =>
-        {
-          var createNewMonthlyStatement = false
-          var remainingRefreshAccounts = []
-          var remainingWithdrawalTokenPriceUpdateAcccount = []
-
-          for(var i=0; i<pythIdArray.length; i++)
-          {
-            //Push Remaining Tab Account
-            remainingRefreshAccounts.push(remainingTabAccounts[i])
-
-            //Push Remaining Token Reserve Account
-            const tokenReserve = tokenReservesHashMap.map.get(remainingTabAccounts[i].tokenMintAddress)
-            const tokenReserveRemainingAccount =
-            {
-              pubkey: tokenReserve.pda,
-              isSigner: false,
-              isWritable: true
-            }
-            remainingRefreshAccounts.push(tokenReserveRemainingAccount)
-
-            //Push Remaining SubMarket Account
-            const subMarket = subMarketsHashMap.map.get(remainingTabAccounts[i].tokenMintAddress +
-            remainingTabAccounts[i].subMarketOwnerAddress +
-            remainingTabAccounts[i].subMarketIndex.toString())
-            const subMarketRemainingAccount =
-            {
-              pubkey: subMarket.pda,
-              isSigner: false,
-              isWritable: true
-            }
-            remainingRefreshAccounts.push(subMarketRemainingAccount)
-
-            //Push Remaining Monthly Statement Account
-            const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
-            anchorPrograms.currentStatementYear.toString() +
-            remainingTabAccounts[i].tokenMintAddress +
-            remainingTabAccounts[i].subMarketOwnerAddress +
-            remainingTabAccounts[i].subMarketIndex.toString() +
-            connectedWallet.addressString +
-            accountSelect.value.toString())
-
-            var monthlyStatementPDA: PublicKey
-
-            //Create monthly statement for the new month if it doesn't exist
-            if(!monthlyStatement)
-            {
-              createNewMonthlyStatement = true
-
-              const createNewMonthlyStatementInstruction = await anchorPrograms.lending.lendingProgram.methods.createNewMonthlyStatement
-              (
-                new PublicKey(remainingTabAccounts[i].tokenMintAddress),
-                new PublicKey(remainingTabAccounts[i].subMarketOwnerAddress),
-                remainingTabAccounts[i].subMarketIndex,
-                connectedWallet.publicKey,
-                accountSelect.value
-              )
-              .instruction()
-
-              createMonthlyStatementInstructions.push(createNewMonthlyStatementInstruction)
-
-              //Determine PDA for new MonthlyStatementAccount that will be created
-              monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
-              anchorPrograms.currentStatementYear,
-              new PublicKey(remainingTabAccounts[i].tokenMintAddress),
-              new PublicKey(remainingTabAccounts[i].subMarketOwnerAddress),
-              remainingTabAccounts[i].subMarketIndex,
-              connectedWallet.publicKey,
-              accountSelect.value)
-
-              if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
-              {
-                const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-                {
-                  authority: connectedWallet.publicKey,
-                  payer: connectedWallet.publicKey,
-                  lookupTable: connectedWallet.lendingUserLookUpTableAddress,
-                  addresses: [monthlyStatementPDA]
-                })
-
-                createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
-              }
-            }
-            else
-              monthlyStatementPDA = monthlyStatement.pda
-
-            const monthlyStatementRemainingAccount =
-            {
-              pubkey: monthlyStatementPDA,
-              isSigner: false,
-              isWritable: true
-            }
-            remainingRefreshAccounts.push(monthlyStatementRemainingAccount)
-
-            //Push Remaining Pyth Account For Account Refresh
-            const ephemeralPythKey = getPriceUpdateAccount(pythIdArray[i])
-            const ephemeralPythPriceUpdateRemainingAccount = 
-            {
-              pubkey: ephemeralPythKey,
-              isSigner: false,
-              isWritable: true
-            }
-            remainingRefreshAccounts.push(ephemeralPythPriceUpdateRemainingAccount)
-
-            //Push Remaining Pyth Account for withdrawToken Instruction(If the user has debt, the protocol will need to check the value of the target withdrawal token to check the user's new health factor)
-            //Pass in an empty array otherwise to save on transaction costs if the user has no borrows.
-            if(withdrawalTokenPriceAccountIndex == i)
-              if(userHasDebt)
-                remainingWithdrawalTokenPriceUpdateAcccount.push(ephemeralPythPriceUpdateRemainingAccount)
-          }
-
-          const refreshUserHealthAndTokenReservesInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshUserHealthChunkAndTokenReserves(connectedWallet.publicKey, accountSelect.value)
-          .remainingAccounts(remainingRefreshAccounts)
-          .instruction()
-
-          const withdrawInstruction = await anchorPrograms.lending.lendingProgram.methods.withdrawTokens
-          (
-            adminAccounts.lendingCEOAddressKey,
-            subMarketSelect.value,
-            accountSelect.value,
-            new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount)), //convert to fixedpoint notation
-            withdrawFullDepositedAmount
-          )
-          .accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
-          .remainingAccounts(remainingWithdrawalTokenPriceUpdateAcccount)
-          .instruction()
-
-          const setComputeLimitInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 })
-
-          return[
-            { instruction: refreshUserHealthAndTokenReservesInstruction, signers: [] },
-            { instruction: setComputeLimitInstruction, signers: [] },
-            { instruction: withdrawInstruction, signers: [] },
-          ]
-        }
-      )
-
-      var lookUpTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
-
-      //Get Protocol Look Up Table
+      const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+      var instructionsToSend = []
+      var lookUpTableAccounts = []
+      var refreshingUserRemainingAccounts = []
+      
+      //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
-      //Get SubMarket Look Up Table By Owner
-      var subMarketLookTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
-      uniqueSubMarketOwnersAddressStrings.forEach((subMarketOwnersAddressString) =>
-      {
-        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(subMarketOwnersAddressString)
-        if(subMarketLookTableAccount)
-          subMarketLookTableAccounts.push(subMarketLookTableAccount)
-      })
-      lookUpTableAccounts.push(...subMarketLookTableAccounts)
+      //Not worth getting Submarket look up table for just 1 subMarket, 1 submarket account is 32 bytes, lookuptable account is 35 bytes minimum.
 
       //Get Lending User Look Up Table Account
-      lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
+        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
 
-      const transactionsToSend = []
-
-      if(createMonthlyStatementInstructions.length > 0)
+      if(totalDebtValue.value != 0)
       {
-        const { blockhash } = await anchorPrograms.lending.connection.getLatestBlockhash()
+        const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts] =
+        await getNeccessaryRefreshInstructionData(remainingTabAccounts, connectedWallet.publicKey, accountSelect.value)
 
-        const messageV0 = new TransactionMessage({
-          payerKey: connectedWallet.publicKey,
-          recentBlockhash: blockhash,
-          instructions: createMonthlyStatementInstructions,
-        }).compileToV0Message(lookUpTableAccounts)
+        const uniqueTokenReserveRemainingAccounts = getTokenReserveRemainingAccounts(uniqueTokenIds)
+        const tempPriceRemainingAccount = getTempRemainingPriceAccount()
 
-        const initTx = new VersionedTransaction(messageV0)
-        transactionsToSend.push({ tx: initTx, signers: [] })
-      }
+        refreshingUserRemainingAccounts.push(tempPriceRemainingAccount)
+        refreshingUserRemainingAccounts.push(...uniqueTokenReserveRemainingAccounts)
+        refreshingUserRemainingAccounts.push(...lendingTabSubMarketAndMonthlyStatementRemainingAccounts)
 
-      const pythTxs = await transactionBuilder.buildVersionedTransactions({ computeUnitPriceMicroLamports: 50000 })
-      const fullyCompressedTxs = pythTxs.map((pythTxWrapper: { tx: { message: any; }; signers: any; }) =>
-      {
-        //Extract the original message directly from the internal tx object
-        const message = pythTxWrapper.tx.message;
+        const refreshUserHealthAndTokenReservesInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshUserHealthChunkAndTokenReserves(accountSelect.value,
+          uniqueTokenReserveRemainingAccounts.length,
+          lendingTabSubMarketAndMonthlyStatementRemainingAccounts.length / 3,
+          false
+        )
+        .accounts({ lendingUserOwner: connectedWallet.publicKey })
+        .remainingAccounts(refreshingUserRemainingAccounts)
+        .instruction()
+        
+        const withdrawInstruction = await anchorPrograms.lending.lendingProgram.methods.withdrawTokens(
+        subMarketSelect.value,
+        accountSelect.value,
+        new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount)), //convert to fixedpoint notation
+        withdrawFullDepositedAmount
+        )
+        .accounts({
+          subMarketOwner: adminAccounts.lendingCEOAddressKey,
+          tokenMint: selectedTokenMintAddress,
+          tokenProgram: tokenProgram })
+        .remainingAccounts([tempPriceRemainingAccount, adminAccounts.priceOracleRemainingAccount])
+        .instruction()
 
-        //Compile a new V0 message with your custom lookup tables added
-        const updatedMessageV0 = anchor.web3.TransactionMessage.decompile(message, {
-          //If Pyth used any lookup tables internally, they would be passed here, otherwise empty
-          addressLookupTableAccounts: lookUpTableAccounts 
-        }).compileToV0Message(lookUpTableAccounts); 
+        instructionsToSend.push(...createMonthlyStatementInstructions)
+        instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
+        instructionsToSend.push(withdrawInstruction)
 
-        //Return a fresh VersionedTransaction containing the compressed message
-        const newTx = new anchor.web3.VersionedTransaction(updatedMessageV0);
+        const signedTransactions = await userSignsLendingTransactions(instructionsToSend, lookUpTableAccounts)
 
-        //CRITICAL: Pass Pyth's generated signers (like ephemeral price update accounts) 
-        //along with your newly compressed versioned transaction.
-        return { 
-          tx: newTx, 
-          signers: pythTxWrapper.signers 
+        for(var i=0; i<signedTransactions.length; i++)
+        {
+          const size = signedTransactions[i].serialize().length
+          console.log(`Signed Transaction Size: ${size} bytes`)
         }
-      })
-      
-      transactionsToSend.push(...fullyCompressedTxs)
 
-      const tx = await pythSolanaReceiver.provider.sendAll
-      (
-        transactionsToSend, { skipPreflight: false }
-      )
-    
-      if(tx.length)
-        for(var i=0; i<tx.length; i++)
-          await confirmLendingTransaction(tx[i], toast, "withdraw_tokens")
+        const response = await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
+        const userTxs = response.userTxs
+
+        if(userTxs.length)
+          for(var i=0; i<userTxs.length; i++)
+            await confirmLendingTransaction(userTxs[i], toast, "withdraw_tokens")
+        else
+          await confirmLendingTransaction(userTxs, toast, "withdraw_tokens") 
+      }
       else
-        await confirmLendingTransaction(tx, toast, "withdraw_tokens")
+      {
+        const withdrawInstruction = await anchorPrograms.lending.lendingProgram.methods.withdrawTokens(
+        subMarketSelect.value,
+        accountSelect.value,
+        new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount)), //convert to fixedpoint notation
+        withdrawFullDepositedAmount
+        )
+        .accounts({
+          tokenMint: selectedTokenMintAddress,
+          subMarketOwner: adminAccounts.lendingCEOAddressKey,
+          tokenProgram: tokenProgram })
+        .instruction()
 
+        instructionsToSend.push(withdrawInstruction)
+
+        const tx = await sendVersionedLendingProtocolTransaction(instructionsToSend, lookUpTableAccounts)
+        await confirmLendingTransaction(tx, toast, "withdraw_tokens")
+      }
+      
       stopInterestCalculation()
       stopHealthFactorCalculation()
       withdrawing.value = false
@@ -778,11 +638,11 @@
     }
   }
 
-  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, subMarketIndex: string)
+  function updateStoredSelectedSubMarketIndex(tokenId: number, subMarketIndex: string)
   {
     withdrawAmount.value = 0
-    localStorage.setItem(selectedTokenMintAddress.toString() + "selectedMainSubMarketIndex", subMarketIndex)
-    const subMarket = subMarketsHashMap.map.get(tokenMintAddress + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
+    localStorage.setItem(selectedTokenId.toString() + "selectedMainSubMarketIndex", subMarketIndex)
+    const subMarket = subMarketsHashMap.map.get(tokenId.toString() + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
     subMarketFee = subMarket.feeOnInterestEarnedRate
 
     setInitialBalance()

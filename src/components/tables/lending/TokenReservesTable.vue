@@ -36,7 +36,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight" >
             <ion-button style="margin-left: -11px; margin-right: -5px" fill="clear" @click="openTokenReserveATAPopover($event, slotProps.data)">
-              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStrings.solTokenMintAddress" style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+              <img v-if="slotProps.data.tokenId==tokenIds.solTokenId" style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
               <component v-else :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.name }}</ion-label>
             </ion-button>
@@ -68,15 +68,16 @@
           <div class="flexCenterRow">
             <ion-button id="openCreateSubMarketModalButton"
             color="dark"
-            @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress;
+            @click="selectedTokenId=slotProps.data.tokenId;
             $emit('createSubMarketModal', 
+              slotProps.data.tokenId,
               slotProps.data.tokenMintAddress,
               slotProps.data.svg,
               slotProps.data.name)"
             >
               Create SubMarket
             </ion-button>
-            <ion-button v-if="slotProps.data.subMarketCount" color="dark" @click="selectedTokenMintAddress=slotProps.data.tokenMintAddress; showTokenReserveSubMarkets()">
+            <ion-button v-if="slotProps.data.subMarketCount" color="dark" @click="selectedTokenId=slotProps.data.tokenId; showTokenReserveSubMarkets()">
               View Markets
             </ion-button>
           </div>
@@ -106,7 +107,7 @@
         <div>
 
           <div class="flexCenterRow">
-            <img v-if="selectedTokenMintAddress.toString()==tokenAddressStrings.solTokenMintAddress" style="width: 70px; margin-left: -22px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+            <img v-if="selectedTokenId==tokenIds.solTokenId" style="width: 70px; margin-left: -22px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
             <component v-else :is="subMarketTokenSVG" style="width: 40px; height: 40px; margin-right: 10px"></component>
             <h2>{{subMarketTokenName}} SubMarkets</h2>
           </div>
@@ -264,7 +265,7 @@
   import { tokenReserves,
     tokenReserveFontEndInfoHashMap, 
     priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenIds } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveSubMarketListHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -283,7 +284,7 @@
   import cloneDeep from 'lodash/cloneDeep'
   import InfoButton from '/src/components/help/InfoButton.vue'
 
-  var emits = defineEmits(['createSubMarketModal', 'updateReserveTableSizing', 'collectSubMarketFeesModal'])
+  var emits = defineEmits(['createSubMarketModal', 'collectSubMarketFeesModal'])
 
   var toast = inject('toast')
   var colorHexValue = inject('colorHexValue') as string
@@ -298,7 +299,7 @@
   var actionsPopoverOpen = ref(false)
   var event = ref()
 
-  var selectedTokenMintAddress: PublicKey
+  var selectedTokenId: number
   var publicKeyCheckColor = ref("#6fff7b")
   var isInvalidPublicKey = ref(false)
   var savedEditedRow: any 
@@ -325,7 +326,6 @@
     if(tokenReserveSubMarketListHashMap.map)
     {
       processTokenReserveTableData()
-      emitReserveTableSizing()
 
       isLoading.value = false
     }
@@ -348,8 +348,6 @@
     //Update inner table if it's already opened
     if(showTokenSubMarkets.value)
       processNewSubMarketData()
-
-    emitReserveTableSizing()
   })
 
   watch(customUserNameHashMap, () =>
@@ -477,8 +475,9 @@
     {
       processedTableData.push(newTableData.data[i])
 
+      const tokenId = processedTableData[i].tokenId
       const tokenMintAddressString = processedTableData[i].tokenMintAddress.toString()
-      const tokenReserveFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddressString)//These are static and don't need to be reactive
+      const tokenReserveFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenId)//These are static and don't need to be reactive
       processedTableData[i].tokenMintAddressString = tokenMintAddressString
       processedTableData[i].name = tokenReserveFrontEndProperties.name
       processedTableData[i].svg = tokenReserveFrontEndProperties.svg
@@ -511,7 +510,7 @@
 
       if(tokenReserveSubMarketListHashMap.map)
       {
-        var unProcessedTokenSubMarketList = tokenReserveSubMarketListHashMap.map.get(tokenMintAddressString)//These are reactive
+        var unProcessedTokenSubMarketList = tokenReserveSubMarketListHashMap.map.get(tokenId)//These are reactive
         if(unProcessedTokenSubMarketList)
         {
           unProcessedTokenSubMarketList = unProcessedTokenSubMarketList.sort((a: any, b: any) => a.id - b.id)
@@ -552,12 +551,12 @@
   function processNewSubMarketData()
   {
     if(isEditing)//Save new table data until after SubMarket Owner is done typing
-      newTableData = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
-    else if(unfilteredTableData != undefined) //Set new data into the unfiltered table if currently filtering table
+      newTableData = tokenReserveSubMarketListHashMap.map.get(selectedTokenId) 
+    else if(unfilteredTableData != undefined)//Set new data into the unfiltered table if currently filtering table
     {
       if(savedEditedRow != undefined)//Combine saved row data with new table data
       {
-        var tempTable = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
+        var tempTable = tokenReserveSubMarketListHashMap.map.get(selectedTokenId) 
 
         for(var i=0; i<tempTable.length; i++)
           if(tempTable[i].id == savedEditedRow.id)
@@ -572,13 +571,13 @@
       }
       else
       {
-        unfilteredTableData = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
+        unfilteredTableData = tokenReserveSubMarketListHashMap.map.get(selectedTokenId) 
         tokenMarketTableData.value = customFilter(searchInput.value)
       }
     }
     else if(savedEditedRow != undefined)//Combine saved row data with new table data
     {
-      var tempTable = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
+      var tempTable = tokenReserveSubMarketListHashMap.map.get(selectedTokenId) 
 
       for(var i=0; i<tempTable.length; i++)
         if(tempTable[i].id == savedEditedRow.id)
@@ -591,33 +590,22 @@
       tokenMarketTableData.value = tempTable
     }
     else //Update current table like normal
-      tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
+      tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenId) 
   }
 
   function showTokenReserveSubMarkets()
   {
-    tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenMintAddress.toString()) 
+    tokenMarketTableData.value = tokenReserveSubMarketListHashMap.map.get(selectedTokenId) 
     showTokenSubMarkets.value = true
 
-    const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(selectedTokenMintAddress.toString())
+    const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(selectedTokenId)
     subMarketTokenSVG.value = tokenFrontEndProperties.svg
     subMarketTokenName.value = tokenFrontEndProperties.name
-
-    emitReserveTableSizing()
   }
 
   function unShowSubMarkets()
   {
     showTokenSubMarkets.value = false
-    emitReserveTableSizing()
-  }
-
-  function emitReserveTableSizing()
-  {
-    if(!tokenMarketTableData.value)
-      tokenMarketTableData.value = []
-
-    emits('updateReserveTableSizing', tokenReserveTableData.value.length, tokenMarketTableData.value.length, showTokenSubMarkets.value)
   }
 
   function checkAddress(address: string)
@@ -689,7 +677,7 @@
 
     const subMarket = subMarketsHashMap.map.get
     (
-      tokenMarketTableData.value[index].tokenMintAddress.toBase58() +
+      tokenMarketTableData.value[index].tokenId.toString() +
       tokenMarketTableData.value[index].owner.toString() +
       tokenMarketTableData.value[index].subMarketIndex.toString()
     )
@@ -750,11 +738,13 @@
     {
       const tx = await anchorPrograms.lending.lendingProgram.methods.editSubMarket
       (
-        new PublicKey(event.value.rowData.tokenMintAddress),
+        selectedTokenId,
         event.value.rowData.subMarketIndex,
-        new PublicKey(event.value.rowData.feeCollectorAddress),
         event.value.rowData.feeOnInterestEarnedRate * 100//convert to fixedpoint notation
-      ).rpc()
+      )
+      .accounts({ feeCollectorAddress: new PublicKey(event.value.rowData.feeCollectorAddress) })
+      .rpc()
+
       await confirmLendingTransaction(tx, toast, "edit_sub_market")
 
       tokenMarketTableData.value[event.value.rowIndex].isRowDataEdited = false

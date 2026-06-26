@@ -80,10 +80,17 @@
     confirmChatTransaction,
     confirmLendingTransaction,
     confirmAlertTransaction,
-    doesKeyExistInLookUpTable,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { Transaction, AddressLookupTableProgram } from '@solana/web3.js'
-  import { getLendingProtocolPDA, getLendingStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { getLendingProtocolPDA, 
+    getLendingProtocolCEOAccountPDA,
+    getSolvencyTreasurerPDA,
+    getLiquidationTreasurerPDA,
+    getOraclePriceValidatorPDA,
+    getLendingStatsPDA,
+    getUserLendingStatsPDA,
+    getTokenReserveStatsPDA,
+    getSubMarketStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
 
   const toast = inject('toast')
   const colorName = inject('colorName') as string
@@ -132,7 +139,7 @@
     {
       const transaction = new Transaction()
       
-      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot("finalized")
+      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
       const [createLookUpTableInstruction, lookUpTableAddress] = 
       AddressLookupTableProgram.createLookupTable({
         authority: connectedWallet.publicKey,
@@ -142,21 +149,36 @@
       transaction.add(createLookUpTableInstruction)
 
       const lendingProtocolPDA = getLendingProtocolPDA()
+      const lendingProtocolCEOAccountPDA = getLendingProtocolCEOAccountPDA()
+      const solvencyTreasurerPDA = getSolvencyTreasurerPDA()
+      const liquidationTreasurerPDA = getLiquidationTreasurerPDA()
+      const oraclePriceValidatorPDA = getOraclePriceValidatorPDA()
       const lendingStatsPDA = getLendingStatsPDA()
+      const userLendingStatsPDA = getUserLendingStatsPDA()
+      const tokenReserveStatsPDA = getTokenReserveStatsPDA()
+      const subMarketStatsPDA = getSubMarketStatsPDA()
 
-      if(!doesKeyExistInLookUpTable(anchorPrograms.lendingProtocolLookUpTableAccount, lendingProtocolPDA) && !doesKeyExistInLookUpTable(anchorPrograms.lendingProtocolLookUpTableAccount, lendingStatsPDA))
+      const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
       {
-        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-        {
-          authority: connectedWallet.publicKey,
-          payer: connectedWallet.publicKey,
-          lookupTable: lookUpTableAddress,
-          addresses: [lendingProtocolPDA, lendingStatsPDA]
-        })
-        transaction.add(extendLookUpTableInstruction)
-      }
+        authority: connectedWallet.publicKey,
+        payer: connectedWallet.publicKey,
+        lookupTable: lookUpTableAddress,
+        addresses: [lendingProtocolPDA,
+        lendingProtocolCEOAccountPDA,
+        solvencyTreasurerPDA,
+        liquidationTreasurerPDA,
+        oraclePriceValidatorPDA,
+        adminAccounts.priceOracleRemainingAccount.pubkey,
+        lendingStatsPDA,
+        userLendingStatsPDA,
+        tokenReserveStatsPDA,
+        subMarketStatsPDA]
+      })
+      transaction.add(extendLookUpTableInstruction)
     
-      const initializeLendingProtocolInstruction = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol(monthSelect.value, Number(statementYearInput.value), lookUpTableAddress).instruction()
+      const initializeLendingProtocolInstruction = await anchorPrograms.lending.lendingProgram.methods.initializeLendingProtocol(monthSelect.value, Number(statementYearInput.value))
+      .accounts({ lookUpTableAddress: lookUpTableAddress })
+      .instruction()
       transaction.add(initializeLendingProtocolInstruction)
 
       const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction, [])

@@ -41,7 +41,6 @@ import 'primeicons/primeicons.css'                           //icons
  * https://ionicframework.com/docs/theming/dark-mode
  */
 
-/*@import '@ionic/vue/css/palettes/dark.always.css' */
 import 'vidstack/player/styles/base.css'
 import 'vidstack/player/styles/plyr/theme.css'
 import 'vidstack/player'
@@ -50,10 +49,7 @@ import 'vidstack/player/ui'
 import 'media-captions/styles/captions.css'
 import 'media-captions/styles/regions.css'
 import '@ionic/vue/css/palettes/dark.class.css'
-//import '@ionic/vue/css/palettes/dark.system.css'
 import PrimeVue from "primevue/config"
-//import ConfirmationService from 'primevue/confirmationservice'
-//import DialogService from 'primevue/dialogservice'
 import ToastService from 'primevue/toastservice'
 import { Noir } from '/src/assets/styling/AuraNoir.vue'
 import "solana-wallets-vue/styles.css"
@@ -66,8 +62,6 @@ import { initChatWorkspace, useChatWorkspace } from '/src/assets/contracts/Solan
 import { initLendingWorkspace, useLendingWorkspace } from '/src/assets/contracts/Solana/AnchorLendingWorkSpace.vue'
 import { initAlertWorkspace, useAlertWorkspace } from '/src/assets/contracts/Solana/AnchorAlertWorkSpace.vue'
 import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-import { Program } from "@coral-xyz/anchor"
-import { type LendingProtocol } from "./lending.ts"
 
 const walletOptions = 
 {

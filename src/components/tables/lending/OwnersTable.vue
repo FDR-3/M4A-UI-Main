@@ -117,7 +117,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button style="margin-left: -11px; margin-right: -11px" fill="clear" @click="openTokenPopover($event, slotProps.data)">
-              <img v-if="slotProps.data.tokenMintAddress==tokenAddressStrings.solTokenMintAddress"  style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
+              <img v-if="slotProps.data.tokenId==tokenIds.solTokenId"  style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
               <component v-else :is="slotProps.data.tokenSVG" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.tokenName }}</ion-label>
             </ion-button>
@@ -251,10 +251,10 @@
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
-  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenIds } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
 
-  const emits = defineEmits(['updateOwnerTableSizing', 'collectSubMarketFeesModal'])
+  const emits = defineEmits(['collectSubMarketFeesModal'])
 
   var toast = inject('toast')
   var colorHexValue = inject('colorHexValue') as string
@@ -305,7 +305,6 @@
     if(subMarketOwnerHashMap.map)
     {
       processOwnersTable()
-      emitReserveTableSizing()
       
       isLoading.value = false
     }
@@ -325,8 +324,6 @@
     //Update inner table if it's already opened
     if(showOwnerSubMarkets.value)
       processNewSubMarketData()
-
-    emitReserveTableSizing()
   })
 
   watch(customUserNameHashMap, () =>
@@ -392,15 +389,11 @@
     subMarketOwnerDisplayName.value = subMarketOwner.displayName
 
     showOwnerSubMarkets.value = true
-
-    emitReserveTableSizing()
   }
 
   function closeOwnerSubMarkets()
   {
-    showOwnerSubMarkets.value = false
-    emitReserveTableSizing()
-  }
+    showOwnerSubMarkets.value = false  }
 
   function openActionsPopover(e: Event, rowData: any, rowIndex: number)
   {
@@ -408,14 +401,6 @@
     event.value.rowData = rowData
     event.value.rowIndex = rowIndex
     actionsPopoverOpen.value = true
-  }
-
-  function emitReserveTableSizing()
-  {
-    if(!subMarketsOwnedByUser.value)
-      subMarketsOwnedByUser.value = 0
-
-    emits('updateOwnerTableSizing', ownerTableData.value.length, subMarketsOwnedByUser.value, showOwnerSubMarkets.value)
   }
 
   function passByRefWrapperCopyAddress()
@@ -459,7 +444,7 @@
       //This has to be done here as opposed to in the LendingProtocol.vue file since it has to be after it's deep cloned
       for(var j=0; j<unprocessedData[i].ownerData.ownerSubMarketList.length; j++)
       {
-        const tokenReserveFrontEndProperties = tokenReserveFontEndInfoHashMap.get(unprocessedData[i].ownerData.ownerSubMarketList[j].tokenMintAddress.toString())
+        const tokenReserveFrontEndProperties = tokenReserveFontEndInfoHashMap.get(unprocessedData[i].ownerData.ownerSubMarketList[j].tokenId)
         unprocessedData[i].ownerData.ownerSubMarketList[j].tokenSVG = tokenReserveFrontEndProperties.svg
       }
     }
@@ -603,7 +588,7 @@
 
     const subMarket = subMarketsHashMap.map.get
     (
-      ownerSubMarketTableData.value[index].tokenMintAddress.toBase58() +
+      ownerSubMarketTableData.value[index].tokenId.toString() +
       ownerSubMarketTableData.value[index].owner.toString() +
       ownerSubMarketTableData.value[index].subMarketIndex.toString()
     )
@@ -665,11 +650,12 @@
     {
       const tx = await anchorPrograms.lending.lendingProgram.methods.editSubMarket
       (
-        new PublicKey(event.value.rowData.tokenMintAddress),
+        event.value.rowData.tokenId,
         event.value.rowData.subMarketIndex,
-        new PublicKey(event.value.rowData.feeCollectorAddress),
         event.value.rowData.feeOnInterestEarnedRate * 100//convert to fixedpoint notation
-      ).rpc()
+      )
+      .accounts({ feeCollectorAddress: new PublicKey(event.value.rowData.feeCollectorAddress) })
+      .rpc()
       await confirmLendingTransaction(tx, toast, "edit_sub_market")
 
       ownerSubMarketTableData.value[event.value.rowIndex].isRowDataEdited = false

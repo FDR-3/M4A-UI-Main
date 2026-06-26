@@ -4,6 +4,7 @@
   import { Connection, PublicKey } from "@solana/web3.js"
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token"
 
   export const VOTE_COST = 0.04
   export const TOAST_TIME_LEN_SECONDS = 11
@@ -101,7 +102,7 @@
       {
         toast.add({ severity: 'success',
         summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
-        detail: `TX_ID: ${transaction}\n\nThe UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        detail: `TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`,
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
@@ -130,7 +131,7 @@
       {
         toast.add({ severity: 'success',
         summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
-        detail: `TX_ID: ${transaction}\n\nThe UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        detail: `TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`,
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
@@ -147,7 +148,7 @@
     try
     {
       const confirmation = await anchorPrograms.lending.lendingProgram.provider.connection.confirmTransaction(transaction, 'processed')//'confirmed' for higher confirmation level, but seems to sometimes give error that transaction already was processed
-  
+
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
@@ -159,7 +160,7 @@
       {
         toast.add({ severity: 'success',
         summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
-        detail: `TX_ID: ${transaction}\n\nThe UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        detail: `TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`,
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
@@ -188,7 +189,7 @@
       {
         toast.add({ severity: 'success',
         summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
-        detail: `TX_ID: ${transaction}\n\nThe UI will update after enough block confirmations, please wait for that before attempting to call the "${contractFunctionName}" contract function again. Feel free to call a different function in the mean time`,
+        detail: `TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`,
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
@@ -313,7 +314,7 @@
   }
 
   export function parseProgramErrorCode(error: any, program: any)
-  {console.log(error.message)
+  {
     var errorMessage = ""
     var idlError = null
 
@@ -336,6 +337,7 @@
     else
       errorMessage = error.message
 
+    console.log(errorMessage)
     return errorMessage
   }
 
@@ -357,6 +359,18 @@
     }
 
     return addressesAlreadyExists
+  }
+
+  export async function deriveATA(walletPublicKey: PublicKey, tokenMintAddress: PublicKey, tokenProgram: PublicKey,  pdaAccount: boolean = false)
+  {
+    return await Token.getAssociatedTokenAddress
+    (
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+      tokenProgram,
+      tokenMintAddress,
+      walletPublicKey,
+      pdaAccount
+    )
   }
 
   export default toastPreTransactionError

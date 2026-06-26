@@ -31,8 +31,7 @@
         'deniedAppealCount',
         'maxDeniedClaimCount',
         'undeniedClaimCount',
-        'revokedApprovalCount',
-        'accountListWithLastestMonthlyStatement.accountName'
+        'revokedApprovalCount'
       ]"
     >
       <template #header>

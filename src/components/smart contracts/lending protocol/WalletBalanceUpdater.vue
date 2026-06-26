@@ -1,7 +1,7 @@
 <template></template>
 <script setup lang="ts">
   import { onMounted, onUnmounted, watch, computed } from 'vue'
-  import { tokenAddressStrings, tokenAddressKeys, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenIds, tokenAddressStrings, tokenAddressKeys, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { hodlTreasuryWalletATAHashMap,
     hodlTreasuryWalletBalancesHashMap,
     solvencyInsuranceTreasuryWalletATAHashMap,
@@ -131,7 +131,7 @@
     {
       //Get HODL DAI Balance
       const hodlDAIAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryDAIWalletATA)
-      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStrings.daiTokenMintAddress)
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.daiTokenId)
       hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.daiTokenMintAddress, hodlDAIAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForHODLTreasuryDAIWalletChanges()
     }
@@ -152,8 +152,8 @@
     {
       //Get Solvency DAI Balance
       const solvencyDAIAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryDAIWalletATA)
-      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStrings.daiTokenMintAddress)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.daiTokenMintAddress, solvencyDAIAccount.value.uiAmount.toFixed(decimalAmount))
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.daiTokenId)
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.daiTokenId, solvencyDAIAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSolvencyTreasuryDAIWalletChanges()
     }
     catch
@@ -175,7 +175,7 @@
     {
       //Get HODL USDC Balance
       const hodlUDSCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCWalletATA)
-      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStrings.usdcTokenMintAddress)
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
       hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdcTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForHODLTreasuryUSDCWalletChanges()
     }
@@ -196,8 +196,8 @@
     {
       //Get Solvency USDC Balance
       const solvencyUDSCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryUSDCWalletATA)
-      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStrings.usdcTokenMintAddress)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdcTokenMintAddress, solvencyUDSCAccount.value.uiAmount.toFixed(decimalAmount))
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, solvencyUDSCAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSolvencyTreasuryUSDCWalletChanges()
     }
     catch
@@ -219,8 +219,8 @@
     {
       //Get Solvency SOL Balance
       const solvencySOLBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(adminAccounts.solvencyTreasuryAddress)
-      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStrings.solTokenMintAddress)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.solTokenMintAddress, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
       await listenForSolvencyTreasurySOLWalletChanges()
     }
     catch
@@ -242,8 +242,8 @@
     {
       //Get Solvency WEth Balance
       const solvencyWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryWEthWalletATA)
-      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStrings.wethTokenMintAddress)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.wethTokenMintAddress, solvencyWEthAccount.value.uiAmount.toFixed(decimalAmount))
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.wethTokenId)
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, solvencyWEthAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSolvencyTreasuryWEthWalletChanges()
     }
     catch
@@ -265,8 +265,8 @@
     {
       //Get Solvency WBtc Balance
       const solvencyWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryWBtcWalletATA)
-      const decimalAmount = tokenDecimalHashMap.get(tokenAddressStrings.wbtcTokenMintAddress)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.wbtcTokenMintAddress, solvencyWBtcAccount.value.uiAmount.toFixed(decimalAmount))
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.wbtcTokenId)
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, solvencyWBtcAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSolvencyTreasuryWBtcWalletChanges()
     }
     catch
@@ -531,7 +531,7 @@
       {
         //Handle account change...
         const solvencyDAIAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryDAIWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.daiTokenMintAddress, solvencyDAIAccount.value.uiAmount.toFixed(2))
+        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.daiTokenId, solvencyDAIAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)
@@ -549,7 +549,7 @@
       {
         //Handle account change...
         const solvencyUDSCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryUSDCWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdcTokenMintAddress, solvencyUDSCAccount.value.uiAmount.toFixed(2))
+        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, solvencyUDSCAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)
@@ -567,8 +567,8 @@
       {
         //Handle account change...
         const solvencySOLBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(adminAccounts.solvencyTreasuryAddress)
-        const decimalAmount = tokenDecimalHashMap.get(tokenAddressStrings.solTokenMintAddress)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.solTokenMintAddress, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+        const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
+        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
       })
     }
     catch(error)
@@ -586,7 +586,7 @@
       {
         //Handle account change...
         const solvencyWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryWEthWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.wethTokenMintAddress, solvencyWEthAccount.value.uiAmount.toFixed(2))
+        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, solvencyWEthAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)
@@ -604,7 +604,7 @@
       {
         //Handle account change...
         const solvencyWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryWBtcWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.wbtcTokenMintAddress, solvencyWBtcAccount.value.uiAmount.toFixed(2))
+        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, solvencyWBtcAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)

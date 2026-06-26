@@ -10,7 +10,7 @@
     sourceSOL,
     sourceWETH,
     sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
-  import { tokenAddressStrings, hodlWalletATAStrings, solvencyWalletATAStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings, tokenIds, hodlWalletATAStrings, solvencyWalletATAStrings } from '/src/assets/constants/Addresses.ts'
   import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
 
   var usdcName = ""
@@ -28,6 +28,7 @@
   [
     {
       tokenMintAddressString: tokenAddressStrings.daiTokenMintAddress,
+      tokenId: tokenIds.daiTokenId,
       decimalAmount: 8,
       hodlATA: hodlWalletATAStrings.daiATA,
       solvencyATA: solvencyWalletATAStrings.daiATA,
@@ -50,6 +51,7 @@
     },
     {
       tokenMintAddressString: tokenAddressStrings.usdcTokenMintAddress,
+      tokenId: tokenIds.usdcTokenId,
       decimalAmount: 6,
       hodlATA: hodlWalletATAStrings.usdcATA,
       solvencyATA: solvencyWalletATAStrings.usdcATA,
@@ -76,6 +78,7 @@
   [
     {
       tokenMintAddressString: tokenAddressStrings.solTokenMintAddress,
+      tokenId: tokenIds.solTokenId,
       decimalAmount: 9,
       solvencyATA: solvencyWalletATAStrings.solATA,
       asset: 
@@ -97,6 +100,7 @@
     },
     {
       tokenMintAddressString: tokenAddressStrings.wethTokenMintAddress,
+      tokenId: tokenIds.wethTokenId,
       decimalAmount: 8,
       solvencyATA: solvencyWalletATAStrings.wethATA,
       asset: 
@@ -118,6 +122,7 @@
     },
     {
       tokenMintAddressString: tokenAddressStrings.wbtcTokenMintAddress,
+      tokenId: tokenIds.wbtcTokenId,
       decimalAmount: 8,
       solvencyATA: solvencyWalletATAStrings.wbtcATA,
       asset: 

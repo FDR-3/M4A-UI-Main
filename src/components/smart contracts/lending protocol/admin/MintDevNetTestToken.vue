@@ -1,61 +1,63 @@
 <template>
-  <div class="thickBorder smallMarginTop flexCenterColumn">
-    <h2 class="smallMarginTop">Mint DevNet Test Token</h2>
-    <div class="spaceRowEvenly mediumMarginBottom" style="width: 100%">
-      <div class="smallMarginTop flexCenterColumn">
-        
-        <ion-input
-        v-model="newTokenDecimalAmount"
-        fill="outline"
-        type="number"
-        step="1"
-        min="1"
-        max="9"
-        placeholder="Enter Token Decimal">
-      </ion-input>
-        <ion-button :color="colorName" @click="createTestToken()">Create Test Token</ion-button>
-
-        <div v-if="newTokenMintAddress != ''" class="largeMarginTop flexCenterColumn">
-          <ion-text>New Token Address:</ion-text>
-          <ion-text>{{ newTokenMintAddress }}</ion-text>
-          <ion-button :color="colorName" @click="passByRefWrapperCopyAddress()">
-            <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
-          </ion-button>
-        </div>
-      </div>
-      <div class="smallMarginTop flexCenterColumn">
-        <div class="spaceRowEvenly  mediumMarginBottom" style="width: 100%">
-            <ion-input
-              v-model="destinationWalletAddress"
-              fill="outline"
-              type="text"
-              placeholder="Destination Address">
-          </ion-input>
-          <ion-input
-            v-model="tokenMintAddressToMintTo"
-            fill="outline"
-            type="text"
-            placeholder="Mint Address">
-          </ion-input>
+  <div class="thickBorder smallMarginTop widthOverFlow">
+    <div class="minWidth">
+      <h2 class="smallMarginTop">Mint DevNet Test Token</h2>
+      <div class="spaceRowEvenly mediumMarginBottom" style="width: 100%">
+        <div class="smallMarginTop flexCenterColumn">
           
           <ion-input
-            v-model="tokenToMintDecimalAmount"
-            fill="outline"
-            type="number"
-            step="1"
-            min="1"
-            max="9"
-            placeholder="Enter Token Decimal">
-          </ion-input>
-          <ion-input
-            v-model="tokenToMintAmount"
-            fill="outline"
-            type="number"
-            min="0"
-            placeholder="Amount To Mint">
-          </ion-input>
+          v-model="newTokenDecimalAmount"
+          fill="outline"
+          type="number"
+          step="1"
+          min="1"
+          max="9"
+          placeholder="Enter Token Decimal">
+        </ion-input>
+          <ion-button :color="colorName" @click="createTestToken()">Create Test Token</ion-button>
+
+          <div v-if="newTokenMintAddress != ''" class="largeMarginTop flexCenterColumn">
+            <ion-text>New Token Address:</ion-text>
+            <ion-text>{{ newTokenMintAddress }}</ion-text>
+            <ion-button :color="colorName" @click="passByRefWrapperCopyAddress()">
+              <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
+            </ion-button>
+          </div>
         </div>
-        <ion-button :color="colorName" @click="mintTokenToWallet()">Mint Tokens To Wallet</ion-button>
+        <div class="smallMarginTop flexCenterColumn">
+          <div class="spaceRowEvenly  mediumMarginBottom" style="width: 100%">
+              <ion-input
+                v-model="destinationWalletAddress"
+                fill="outline"
+                type="text"
+                placeholder="Destination Address">
+            </ion-input>
+            <ion-input
+              v-model="tokenMintAddressToMintTo"
+              fill="outline"
+              type="text"
+              placeholder="Mint Address">
+            </ion-input>
+            
+            <ion-input
+              v-model="tokenToMintDecimalAmount"
+              fill="outline"
+              type="number"
+              step="1"
+              min="1"
+              max="9"
+              placeholder="Enter Token Decimal">
+            </ion-input>
+            <ion-input
+              v-model="tokenToMintAmount"
+              fill="outline"
+              type="number"
+              min="0"
+              placeholder="Amount To Mint">
+            </ion-input>
+          </div>
+          <ion-button :color="colorName" @click="mintTokenToWallet()">Mint Tokens To Wallet</ion-button>
+        </div>
       </div>
     </div>
   </div>
@@ -220,5 +222,10 @@
     flex-direction: row;
     justify-content: space-evenly;
     width: 100%;
+  }
+
+  .minWidth
+  {
+    min-width: 1200px
   }
 </style>

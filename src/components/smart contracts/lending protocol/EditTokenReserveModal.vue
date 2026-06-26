@@ -95,6 +95,7 @@
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { sendVersionedLendingProtocolTransaction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import * as anchor from "@coral-xyz/anchor"
 
   const toast = inject('toast')
@@ -121,6 +122,7 @@
     }
   ]
 
+  var selectedTokenId: number
   var selectedTokenMintAddress: PublicKey
   var selectedTokenMintAddressString: string
 
@@ -158,7 +160,8 @@
     }
   }
 
-  function openEditTokenReserveModal(tokenMintAddress: PublicKey,
+  function openEditTokenReserveModal(tokenId: number,
+  tokenMintAddress: PublicKey,
   tokenSVG: Component,
   tokenName:string,
   solvencyInsuranceFeeRate: number,
@@ -166,6 +169,7 @@
   useFixedBorrowApy: boolean,
   globalLimit: number)
   {
+    selectedTokenId = tokenId
     selectedTokenMintAddress = tokenMintAddress
     selectedTokenMintAddressString = tokenMintAddress.toString()
     editTokenReserveSVG.value = tokenSVG
@@ -196,17 +200,27 @@
 
   async function editTokenReserve()
   {
-    const decimalAmount = tokenDecimalHashMap.get(selectedTokenMintAddressString)
     try
     {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.updateTokenReserve
+      var instructionsToSend = []
+      var lookUpTableAccounts = []
+      const decimalAmount = tokenDecimalHashMap.get(selectedTokenId)
+
+      const updateTokenReserveInstruction = await anchorPrograms.lending.lendingProgram.methods.updateTokenReserve
       (
-        selectedTokenMintAddress,
         fixedBorrowAPYPercentage.value * 100,//convert to fixedpoint notation
         useFixedBorrowAPYSelect.value,
         new anchor.BN(globalLimitInput.value * Math.pow(10, decimalAmount)),//convert to fixedpoint notation
         solvencyInsuranceFeeRatePercentage.value * 100,//convert to fixedpoint notation
-      ).rpc()
+      )
+      .accounts({ tokenMintAddress: selectedTokenMintAddress })
+      .instruction()
+      instructionsToSend.push(updateTokenReserveInstruction)
+
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      const tx = await sendVersionedLendingProtocolTransaction(instructionsToSend, lookUpTableAccounts)
       await confirmLendingTransaction(tx, toast, "update_token_reserve")
       editingTokenReserve.value = false
     }

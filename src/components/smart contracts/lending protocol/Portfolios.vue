@@ -1,13 +1,10 @@
 <template>
   <div v-if="isBrowsingAllUsers">
-    <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false); emitPortfolioRelatedTableHeight()">
+    <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false)">
       <ion-label color="green">Return</ion-label>
     </ion-button>
     <LendingLeaderBoardTable
     @viewPortfolio="viewPortfolio"
-    @totalLeaderBoardLendingUsers="emitTotalLeaderBoardLendingUsers"
-    @adjustLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowAdjustment"
-    @setLeaderBoardSubTableAndSubRowCount="emitLeaderBoardSubTableAndSubRowSet"
     @openLiquidationModal="emitOpenLiquidationModal"/>
   </div>
 
@@ -36,7 +33,7 @@
         Check New Address
       </ion-button>
 
-      <ion-button color="green" @click="setIsBrowsingAllLendingUsers(true); emitLeaderBoardSubTableAndSubRowSet(0,0)">
+      <ion-button color="green" @click="setIsBrowsingAllLendingUsers(true)">
         Browse All Users
       </ion-button>
     </div>
@@ -135,7 +132,7 @@
         :key="chartReRenderKey"
         :isStableCoin="true"
         :depositedAssetAmount="depositedAssetAmount"
-        :tokenMintAddress="subMarketTab.tokenMintAddress"
+        :tokenId="subMarketTab.tokenId"
         :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
         :subMarketOwnerAddressTrimmed="subMarketTab.subMarketOwnerAddressTrimmed"
         :subMarketIndex="subMarketTab.subMarketIndex"
@@ -143,13 +140,13 @@
         :accountIndex="accountSelect"
         :subMarketFee="subMarketTab.subMarketFee"
         :userTabIndex="userTabIndex"
-        :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
-        :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :chartData="getChartData(subMarketTab.tokenId, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenId, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
-        @openDepositModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenMintAddress, subMarketOption)"
-        @openWithdrawalModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenMintAddress, subMarketOption)"
-        @openBorrowModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenMintAddress, subMarketOption)"
-        @openRepayModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenMintAddress, subMarketOption)"
+        @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
+        @openWithdrawalModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketOption)"
+        @openBorrowModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketOption)"
+        @openRepayModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenId, tokenMintAddress, subMarketOption)"
         @interestEarned="updateStableCoinRealTimeValues"/>
       </div>
     </div>
@@ -193,7 +190,7 @@
         :key="chartReRenderKey"
         :isStableCoin="false"
         :depositedAssetAmount="depositedAssetAmount"
-        :tokenMintAddress="subMarketTab.tokenMintAddress"
+        :tokenId="subMarketTab.tokenId"
         :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
         :subMarketOwnerAddressTrimmed="subMarketTab.subMarketOwnerAddressTrimmed"
         :subMarketIndex="subMarketTab.subMarketIndex"
@@ -201,13 +198,13 @@
         :accountIndex="accountSelect"
         :subMarketFee="subMarketTab.subMarketFee"
         :userTabIndex="userTabIndex"
-        :chartData="getChartData(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
-        :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenMintAddress, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :chartData="getChartData(subMarketTab.tokenId, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenId, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
-        @openDepositModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenMintAddress, subMarketOption)"
-        @openWithdrawalModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenMintAddress, subMarketOption)"
-        @openBorrowModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenMintAddress, subMarketOption)"
-        @openRepayModal="(tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenMintAddress, subMarketOption)"
+        @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
+        @openWithdrawalModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketOption)"
+        @openBorrowModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketOption)"
+        @openRepayModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenId, tokenMintAddress, subMarketOption)"
         @interestEarned="updateCryptoRealTimeValues"/>
       </div>
     </div>
@@ -247,11 +244,7 @@
     'openWithdrawalModal',
     'openBorrowModal',
     'openRepayModal',
-    'openLiquidationModal',
-    'portfolioHeightChange',
-    'totalLeaderBoardLendingUsers',
-    'leaderBoardSubTableAndSubRowAdjust',
-    'leaderBoardSubTableAndSubRowSet'
+    'openLiquidationModal'
   ])
 
   var displayName = ref()
@@ -467,8 +460,6 @@
       setChartData()
       startGradientAnimation()
     }
-
-    emitPortfolioRelatedTableHeight()
   })
 
   onUnmounted(() =>
@@ -525,7 +516,6 @@
 
     setLendingUserAccountList()
     checkForLendingUserAssets()
-    emitPortfolioRelatedTableHeight()
 
     chartReRenderKey.value += 1
   })
@@ -557,7 +547,6 @@
     }
 
     setChartData()
-    emitPortfolioRelatedTableHeight()
 
     stopGradientAnimation()
     startGradientAnimation()
@@ -648,7 +637,7 @@
     {
       for(var i=0; i<subMarketArray.length; i++)
       {
-        selectedYearHashMap.set(subMarketArray[i].tokenMintAddress + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex, currentYear)
+        selectedYearHashMap.set(subMarketArray[i].tokenId.toString() + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex, currentYear)
       }
     }
   }
@@ -670,7 +659,7 @@
     if(userTabStableCoinSubMarketList.value)
       for(var i=0; i<userTabStableCoinSubMarketList.value.length; i++)
       {
-        const tokenMintAddress = userTabStableCoinSubMarketList.value[i].tokenMintAddress
+        const tokenId = userTabStableCoinSubMarketList.value[i].tokenId
         const subMarketOwnerAddress = userTabStableCoinSubMarketList.value[i].subMarketOwnerAddress
         const subMarketIndex = userTabStableCoinSubMarketList.value[i].subMarketIndex
 
@@ -680,7 +669,7 @@
         var previousBalance = 0
         var previousDebt = 0
 
-        const userAvailableYearsByTokenMintAddressList = lendingUserAvailableStableCoinYearsBySubMarketHashMap.map.get(tokenMintAddress +
+        const userAvailableYearsByTokenMintAddressList = lendingUserAvailableStableCoinYearsBySubMarketHashMap.map.get(tokenId.toString() +
         subMarketOwnerAddress +
         subMarketIndex.toString() +
         searchAddress.value +
@@ -714,7 +703,7 @@
 
               const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
               year.toString() +
-              tokenMintAddress +
+              tokenId.toString() +
               subMarketOwnerAddress +
               subMarketIndex.toString() +
               searchAddress.value +
@@ -722,7 +711,7 @@
 
               if(userMonthlyStatement)
               {
-                const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+                const decimalAmount = tokenDecimalHashMap.get(tokenId)
                 lastKnownActionType = userMonthlyStatement.lastLendingActivityType
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
@@ -790,7 +779,7 @@
               tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
             }
 
-            tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
+            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
           else
           {
@@ -800,7 +789,7 @@
 
               const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
               year.toString() +
-              tokenMintAddress +
+              tokenId.toString() +
               subMarketOwnerAddress +
               subMarketIndex.toString() +
               searchAddress.value +
@@ -808,7 +797,7 @@
 
               if(userMonthlyStatement)
               {
-                const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+                const decimalAmount = tokenDecimalHashMap.get(tokenId)
                 lastKnownActionType = userMonthlyStatement.lastLendingActivityType
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
@@ -876,7 +865,7 @@
               tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
             }
 
-            tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
+            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
         }
       }
@@ -885,7 +874,7 @@
     if(userTabCryptoCurrencySubMarketList.value)
       for(var i=0; i<userTabCryptoCurrencySubMarketList.value.length; i++)
       {
-        const tokenMintAddress = userTabCryptoCurrencySubMarketList.value[i].tokenMintAddress
+        const tokenId = userTabCryptoCurrencySubMarketList.value[i].tokenId
         const subMarketOwnerAddress = userTabCryptoCurrencySubMarketList.value[i].subMarketOwnerAddress
         const subMarketIndex = userTabCryptoCurrencySubMarketList.value[i].subMarketIndex
 
@@ -895,7 +884,7 @@
         var previousBalance = 0
         var previousDebt = 0
 
-        const userAvailableYearsByTokenMintAddressList = lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map.get(tokenMintAddress +
+        const userAvailableYearsByTokenMintAddressList = lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map.get(tokenId.toString() +
         subMarketOwnerAddress +
         subMarketIndex.toString() +
         searchAddress.value +
@@ -928,7 +917,7 @@
 
               const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
               year.toString() +
-              tokenMintAddress +
+              tokenId.toString() +
               subMarketOwnerAddress +
               subMarketIndex.toString() +
               searchAddress.value +
@@ -936,7 +925,7 @@
 
               if(userMonthlyStatement)
               {
-                const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+                const decimalAmount = tokenDecimalHashMap.get(tokenId)
                 lastKnownActionType = userMonthlyStatement.lastLendingActivityType
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
@@ -1004,7 +993,7 @@
               tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
             }
 
-            tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
+            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
           else
           {
@@ -1014,7 +1003,7 @@
 
               const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
               year.toString() +
-              tokenMintAddress +
+              tokenId.toString() +
               subMarketOwnerAddress +
               subMarketIndex.toString() +
               searchAddress.value +
@@ -1022,7 +1011,7 @@
 
               if(userMonthlyStatement)
               {
-                const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
+                const decimalAmount = tokenDecimalHashMap.get(tokenId)
                 lastKnownActionType = userMonthlyStatement.lastLendingActivityType
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
@@ -1090,7 +1079,7 @@
               tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
             }
             
-            tempHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
+            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
         }
       }
@@ -1098,14 +1087,14 @@
     selectedUserChartDataHashMap.value = tempHashMap
   }
 
-  function getChartData(tokenMintAddress: string, subMarketOwnerAddress: string, subMarketIndex: number)
+  function getChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
   {
-    return selectedUserChartDataHashMap.value.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString() + selectedYearHashMap.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString()))
+    return selectedUserChartDataHashMap.value.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + selectedYearHashMap.get(tokenId + subMarketOwnerAddress + subMarketIndex.toString()))
   }
 
-  function getSelectedYearForOnMounted(tokenMintAddress: string, subMarketOwnerAddress: string, subMarketIndex: number)
+  function getSelectedYearForOnMounted(tokenId: string, subMarketOwnerAddress: string, subMarketIndex: number)
   {
-    return selectedYearHashMap.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString())
+    return selectedYearHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString())
   }
 
   const gradientOffset = ref(0)
@@ -1154,8 +1143,6 @@
       checkForLendingUserAssets()
       setChartData()
     }
-
-    emitPortfolioRelatedTableHeight()
   }
 
   function updateStoredSelectedAccount()
@@ -1181,7 +1168,6 @@
 
     resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
     resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
-    emitPortfolioRelatedTableHeight()
     checkForLendingUserAssets()
     setChartData()
   }
@@ -1201,20 +1187,6 @@
         hasAtleast1Account.value = false
       }
     }
-  }
-
-  function emitPortfolioRelatedTableHeight()
-  {
-    var stableCoinChartCount = 0
-    var cryptoCurrencyChartCount = 0
-
-    if(userTabStableCoinSubMarketList.value)
-      stableCoinChartCount = userTabStableCoinSubMarketList.value.length
-
-    if(userTabCryptoCurrencySubMarketList.value)
-      cryptoCurrencyChartCount = userTabCryptoCurrencySubMarketList.value.length
-
-    emits("portfolioHeightChange", searchAddress.value, stableCoinChartCount, cryptoCurrencyChartCount, isBrowsingAllUsers.value)
   }
 
   function viewPortfolio(owner: string, accountIndex: number)
@@ -1239,21 +1211,6 @@
     cryptoLifeTimeInterestEarnedValue.value = 0
 
     document.getElementById("protfolioHeader")?.scrollIntoView() 
-  }
-
-  function emitTotalLeaderBoardLendingUsers(userCount: number)
-  {
-    emits('totalLeaderBoardLendingUsers', userCount)
-  }
-
-  function emitLeaderBoardSubTableAndSubRowAdjustment(subTableCountAdjustment: number, subTableRowCountAdjustment: number)
-  {
-    emits('leaderBoardSubTableAndSubRowAdjust', subTableCountAdjustment, subTableRowCountAdjustment)
-  }
-
-  function emitLeaderBoardSubTableAndSubRowSet(subTableCountSet: number, subTableRowCountSet: number)
-  {
-    emits('leaderBoardSubTableAndSubRowSet', subTableCountSet, subTableRowCountSet)
   }
 
   function emitOpenLiquidationModal(accountOwner: string, accountIndex: number)
@@ -1321,7 +1278,7 @@
 
     for(var i=0; i<userTabStableCoinSubMarketList.value.length; i++)
     {
-      const decimalAmount = tokenDecimalHashMap.get(userTabStableCoinSubMarketList.value[i].tokenMintAddress)
+      const decimalAmount = tokenDecimalHashMap.get(userTabStableCoinSubMarketList.value[i].tokenId)
       if(decimalAmount>highestTokenDecimalAmount)
         highestTokenDecimalAmount = decimalAmount
 
@@ -1367,7 +1324,7 @@
 
     for(var i=0; i<userTabCryptoCurrencySubMarketList.value.length; i++)
     {
-      const decimalAmount = tokenDecimalHashMap.get(userTabCryptoCurrencySubMarketList.value[i].tokenMintAddress)
+      const decimalAmount = tokenDecimalHashMap.get(userTabCryptoCurrencySubMarketList.value[i].tokenId)
       if(decimalAmount>highestTokenDecimalAmount)
         highestTokenDecimalAmount = decimalAmount
 

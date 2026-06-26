@@ -70,12 +70,6 @@ else
   TOKEN_RESERVE_WBTC_ATA = SYSTEM_PROGRAM_ADDRESS_STRING
 }
 
-const PYTH_HEX_ID_DAI = "0xb0948a5e5313200c632b51bb5ca32f6de0d36e9950a942d19751e833f70dabfd"
-const PYTH_HEX_ID_USDC= "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
-const PYTH_HEX_ID_SOL = "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d"
-const PYTH_HEX_ID_WETH = "0x9d4294bbcd1174d6f2003ec365831e64cc31d9f6f15a2b85399db8d5000960f6"
-const PYTH_HEX_ID_WBTC = "0xc9d8b075a5c69303365ae23633d4e085199bf5c520a3b90fed1322a0342ffc33"
-
 //Currently on @solana/spl-token version 1.8 as updating introduces npm vunlerabilities
 //The official Token-2022 Program ID
 export const TokenProgram2022ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb")
@@ -83,91 +77,118 @@ export const LegacyTokenProgramID = TOKEN_PROGRAM_ID
 
 export const jupiterPriceUpdateMainnetTokenAddressStrings = 
 {
-    daiTokenMintAddress: DAI_MAINNET_TOKEN_MINT_ADDRESS,
-    usdcTokenMintAddress: USDC_MAINNET_TOKEN_MINT_ADDRESS,
-    solTokenMintAddress: SOL_MAINNET_TOKEN_MINT_ADDRESS,
-    wethTokenMintAddress: WETH_MAINNET_TOKEN_MINT_ADDRESS,
-    wbtcTokenMintAddress: WBTC_MAINNET_TOKEN_MINT_ADDRESS
+  daiTokenMintAddress: DAI_MAINNET_TOKEN_MINT_ADDRESS,
+  usdcTokenMintAddress: USDC_MAINNET_TOKEN_MINT_ADDRESS,
+  solTokenMintAddress: SOL_MAINNET_TOKEN_MINT_ADDRESS,
+  wethTokenMintAddress: WETH_MAINNET_TOKEN_MINT_ADDRESS,
+  wbtcTokenMintAddress: WBTC_MAINNET_TOKEN_MINT_ADDRESS
 }
 
 export const tokenAddressStrings = 
 {
-    daiTokenMintAddress: DAI_TOKEN_MINT_ADDRESS,
-    usdcTokenMintAddress: USDC_TOKEN_MINT_ADDRESS,
-    solTokenMintAddress: SOL_TOKEN_MINT_ADDRESS,
-    wethTokenMintAddress: WETH_TOKEN_MINT_ADDRESS,
-    wbtcTokenMintAddress: WBTC_TOKEN_MINT_ADDRESS
+  daiTokenMintAddress: DAI_TOKEN_MINT_ADDRESS,
+  usdcTokenMintAddress: USDC_TOKEN_MINT_ADDRESS,
+  solTokenMintAddress: SOL_TOKEN_MINT_ADDRESS,
+  wethTokenMintAddress: WETH_TOKEN_MINT_ADDRESS,
+  wbtcTokenMintAddress: WBTC_TOKEN_MINT_ADDRESS
 }
+
+export const tokenIds = 
+{
+  solTokenId: 1,
+  usdcTokenId: 2,
+  daiTokenId: 3,
+  wethTokenId: 4,
+  wbtcTokenId: 5
+}
+
 export const tokenAddressKeys = 
 {
-    daiTokenMintAddress: new PublicKey(DAI_TOKEN_MINT_ADDRESS),
-    usdcTokenMintAddress: new PublicKey(USDC_TOKEN_MINT_ADDRESS),
-    solTokenMintAddress: new PublicKey(SOL_TOKEN_MINT_ADDRESS),
-    wethTokenMintAddress: new PublicKey(WETH_TOKEN_MINT_ADDRESS),
-    wbtcTokenMintAddress: new PublicKey(WBTC_TOKEN_MINT_ADDRESS)
+  daiTokenMintAddress: new PublicKey(DAI_TOKEN_MINT_ADDRESS),
+  usdcTokenMintAddress: new PublicKey(USDC_TOKEN_MINT_ADDRESS),
+  solTokenMintAddress: new PublicKey(SOL_TOKEN_MINT_ADDRESS),
+  wethTokenMintAddress: new PublicKey(WETH_TOKEN_MINT_ADDRESS),
+  wbtcTokenMintAddress: new PublicKey(WBTC_TOKEN_MINT_ADDRESS)
 }
 
 //These are for the Chat and M4A fees
 export const hodlWalletATAStrings = 
 {
-    daiATA: HODL_DAI_WALLET_ATA,
-    usdcATA: HODL_USDC_WALLET_ATA
+  daiATA: HODL_DAI_WALLET_ATA,
+  usdcATA: HODL_USDC_WALLET_ATA
 }
 export const hodlWalletATAKeys = 
 {
-    daiATA: new PublicKey(HODL_DAI_WALLET_ATA),
-    usdcATA: new PublicKey(HODL_USDC_WALLET_ATA)
+  daiATA: new PublicKey(HODL_DAI_WALLET_ATA),
+  usdcATA: new PublicKey(HODL_USDC_WALLET_ATA)
 }
 
 export const solvencyWalletATAStrings = 
 {
-    daiATA: SOLVENCY_DAI_WALLET_ATA,
-    usdcATA: SOLVENCY_USDC_WALLET_ATA,
-    solATA: SOLVENCY_SOL_WALLET_ATA,
-    wethATA: SOLVENCY_WETH_WALLET_ATA,
-    wbtcATA: SOLVENCY_WBTC_WALLET_ATA
+  daiATA: SOLVENCY_DAI_WALLET_ATA,
+  usdcATA: SOLVENCY_USDC_WALLET_ATA,
+  solATA: SOLVENCY_SOL_WALLET_ATA,
+  wethATA: SOLVENCY_WETH_WALLET_ATA,
+  wbtcATA: SOLVENCY_WBTC_WALLET_ATA
 }
 export const solvencyWalletATAKeys = 
 {
-    daiATA: new PublicKey(SOLVENCY_DAI_WALLET_ATA),
-    usdcATA: new PublicKey(SOLVENCY_USDC_WALLET_ATA),
-    solATA: new PublicKey(SOLVENCY_SOL_WALLET_ATA),
-    wethATA: new PublicKey(SOLVENCY_WETH_WALLET_ATA),
-    wbtcATA: new PublicKey(SOLVENCY_WBTC_WALLET_ATA)
+  daiATA: new PublicKey(SOLVENCY_DAI_WALLET_ATA),
+  usdcATA: new PublicKey(SOLVENCY_USDC_WALLET_ATA),
+  solATA: new PublicKey(SOLVENCY_SOL_WALLET_ATA),
+  wethATA: new PublicKey(SOLVENCY_WETH_WALLET_ATA),
+  wbtcATA: new PublicKey(SOLVENCY_WBTC_WALLET_ATA)
 }
  
 export const tokenReserveATAStrings = 
 {
-    daiATA: TOKEN_RESERVE_DAI_ATA,
-    usdcATA: TOKEN_RESERVE_USDC_ATA,
-    solATA: TOKEN_RESERVE_SOL_ATA,
-    wethATA: TOKEN_RESERVE_WETH_ATA,
-    wbtcATA: TOKEN_RESERVE_WBTC_ATA
+  daiATA: TOKEN_RESERVE_DAI_ATA,
+  usdcATA: TOKEN_RESERVE_USDC_ATA,
+  solATA: TOKEN_RESERVE_SOL_ATA,
+  wethATA: TOKEN_RESERVE_WETH_ATA,
+  wbtcATA: TOKEN_RESERVE_WBTC_ATA
 }
 export const tokenReserveATAKeys = 
 {
-    daiATA: new PublicKey(TOKEN_RESERVE_DAI_ATA),
-    usdcATA: new PublicKey(TOKEN_RESERVE_USDC_ATA),
-    solATA: new PublicKey(TOKEN_RESERVE_SOL_ATA),
-    wethATA: new PublicKey(TOKEN_RESERVE_WETH_ATA),
-    wbtcATA: new PublicKey(TOKEN_RESERVE_WBTC_ATA)
+  daiATA: new PublicKey(TOKEN_RESERVE_DAI_ATA),
+  usdcATA: new PublicKey(TOKEN_RESERVE_USDC_ATA),
+  solATA: new PublicKey(TOKEN_RESERVE_SOL_ATA),
+  wethATA: new PublicKey(TOKEN_RESERVE_WETH_ATA),
+  wbtcATA: new PublicKey(TOKEN_RESERVE_WBTC_ATA)
 }
 
-export const tokenDecimalHashMap: Map<string, number> = new Map(
+export const tokenDecimalHashMap: Map<number, number> = new Map(
 [
-    //Key: Token Mint Address, Value: Token Decimal Amount
-    [tokenAddressStrings.daiTokenMintAddress, 8],
-    [tokenAddressStrings.usdcTokenMintAddress,6],
-    [tokenAddressStrings.solTokenMintAddress, 9],
-    [tokenAddressStrings.wethTokenMintAddress,8],
-    [tokenAddressStrings.wbtcTokenMintAddress,8]
+  //Key: Token Mint Address, Value: Token Decimal Amount
+  [tokenIds.daiTokenId, 8],
+  [tokenIds.usdcTokenId,6],
+  [tokenIds.solTokenId, 9],
+  [tokenIds.wethTokenId,8],
+  [tokenIds.wbtcTokenId,8]
 ])
 
-export const pythFeedIds =
+export function getMainnetTokenAddresses(devnetTokenAddresses: string[])
 {
-    daiPythFeedId: PYTH_HEX_ID_DAI,
-    usdcPythFeedId: PYTH_HEX_ID_USDC,
-    solPythFeedId: PYTH_HEX_ID_SOL,
-    wethPythFeedId: PYTH_HEX_ID_WETH,
-    wbtcPythFeedId: PYTH_HEX_ID_WBTC
+  var mainnetTokenAddress = []
+
+  for(var i=0; i<devnetTokenAddresses.length; i++)
+  {
+    //Check for Dev DAI Address
+    if(devnetTokenAddresses[i] == "5V413iK9J5wcLVrgj4TN93zTuNczGcsMbDVWewWWHpvA")
+      mainnetTokenAddress.push(jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress)
+    //Check for Dev USDC Address
+    else if(devnetTokenAddresses[i] == "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU")
+      mainnetTokenAddress.push(jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress)
+    //Check for Dev WEth Address
+    else if(devnetTokenAddresses[i] == "49omHmMjcWSy6b2yFb1RTaAN5zraDLpvx2LNCWX2opkZ")
+      mainnetTokenAddress.push(jupiterPriceUpdateMainnetTokenAddressStrings.wethTokenMintAddress)
+    //Check for Dev WBtc Address
+    else if(devnetTokenAddresses[i] == "EcNB579EvvgaGkqhZ6RHhryuivgJWUvqvYzr1c5KT9cV")
+      mainnetTokenAddress.push(jupiterPriceUpdateMainnetTokenAddressStrings.wbtcTokenMintAddress)
+    //SOL Address is same on Dev and Mainnet
+    else
+      mainnetTokenAddress.push(devnetTokenAddresses[i])
+  }
+
+  return mainnetTokenAddress
 }

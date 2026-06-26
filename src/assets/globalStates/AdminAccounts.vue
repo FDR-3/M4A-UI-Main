@@ -31,7 +31,13 @@
     isChatCEOAccountReady: false,
     isLendingCEOAccountReady: false,
     isAlertCEOAccountReady: false,
-    ceoIsDead: false
+    ceoIsDead: false,
+    priceOracleRemainingAccount: 
+    {
+      pubkey: new PublicKey("3jYmEG7Y8fU2696Gqukt95TSNzpkgkYHQsJpypdGW3WE"),
+      isSigner: false,
+      isWritable: true
+    }
   })
 
   //These are for the Chat and M4A fees that go directly to HODL Wallet

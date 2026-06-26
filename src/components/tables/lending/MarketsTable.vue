@@ -11,6 +11,7 @@
       :value="StableCoins"
       :globalFilterFields="
       [
+        'tokenId',
         'tokenMintAddressString',
         'asset.name',
         'chain.name',
@@ -169,7 +170,7 @@
               v-if="depositedAssetAmount==0"
               class="lendingActionButton"
               color="dark"
-              @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
+              @click="$emit('openDepositModal', slotProps.data.tokenId, slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
                 Deposit
               </ion-button>
               
@@ -187,16 +188,16 @@
               side="top" 
               alignment="center"
               >
-                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
                 </ion-button>
-                <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
                 </ion-button>
-                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
                 </ion-button>
-                <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Repay</ion-label>
                 </ion-button>
               </ion-popover>
@@ -214,6 +215,7 @@
       :value="CryptoCurrency"
       :globalFilterFields="
       [
+        'tokenId',
         'tokenMintAddressString',
         'asset.name',
         'chain.name',
@@ -304,7 +306,7 @@
               v-if="depositedAssetAmount==0"
               class="lendingActionButton"
               color="dark"
-              @click="$emit('openDepositModal', slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
+              @click="$emit('openDepositModal', slotProps.data.tokenId, slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
                 Deposit
               </ion-button>
               
@@ -322,16 +324,16 @@
               side="top" 
               alignment="center"
               >
-                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
                 </ion-button>
-                <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
                 </ion-button>
-                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
                 </ion-button>
-                <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Repay</ion-label>
                 </ion-button>
               </ion-popover>
@@ -362,7 +364,7 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { StableCoins, CryptoCurrency } from '/src/components/tables/lending/Assets.vue'
   import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarketByTokenMintAddressAndOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { subMarketByTokenIdAndOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
@@ -398,7 +400,7 @@
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value 
   })
 
-  watch(subMarketByTokenMintAddressAndOwnerHashMap,() =>
+  watch(subMarketByTokenIdAndOwnerHashMap,() =>
   {
     checkForMainSubMarkets()
   })
@@ -483,7 +485,7 @@
     {
       if(tokenReservesHashMap.map)
       {
-        const tokenReserve = tokenReservesHashMap.map.get(StableCoins[i].tokenMintAddressString)
+        const tokenReserve = tokenReservesHashMap.map.get(StableCoins[i].tokenId)
         if(tokenReserve)
         {
           StableCoins[i].supplyAPY = tokenReserve.supplyApy / 100 //Convert to decimal from fixed point notation
@@ -534,7 +536,7 @@
     {
       if(tokenReservesHashMap.map)
       {
-        const tokenReserve = tokenReservesHashMap.map.get(CryptoCurrency[i].tokenMintAddressString)
+        const tokenReserve = tokenReservesHashMap.map.get(CryptoCurrency[i].tokenId)
         if(tokenReserve)
         {
           CryptoCurrency[i].supplyAPY  = tokenReserve.supplyApy / 100 //Convert to decimal from fixed point notation
@@ -588,10 +590,10 @@
     {
       StableCoins[i].subMarketList = []
 
-      if(subMarketByTokenMintAddressAndOwnerHashMap.map)
+      if(subMarketByTokenIdAndOwnerHashMap.map)
       {
         //Only M4A Protocol Submarkets can be use in the M4A UI (Developers have to make their own UI for their own SubMarkets)
-        const subMarketEntries = subMarketByTokenMintAddressAndOwnerHashMap.map.get(StableCoins[i].tokenMintAddressString +
+        const subMarketEntries = subMarketByTokenIdAndOwnerHashMap.map.get(StableCoins[i].tokenId.toString() +
         adminAccounts.lendingCEOAddressKey)
 
         if(subMarketEntries)
@@ -614,9 +616,9 @@
     {
       CryptoCurrency[i].subMarketList = []
 
-      if(subMarketByTokenMintAddressAndOwnerHashMap.map)
+      if(subMarketByTokenIdAndOwnerHashMap.map)
       {
-        const subMarketEntries = subMarketByTokenMintAddressAndOwnerHashMap.map.get(CryptoCurrency[i].tokenMintAddressString +
+        const subMarketEntries = subMarketByTokenIdAndOwnerHashMap.map.get(CryptoCurrency[i].tokenId.toString() +
         adminAccounts.lendingCEOAddressKey)
 
         if(subMarketEntries)
@@ -657,7 +659,7 @@
 
     depositedAssetAmount.value = assetAmount
     
-    if(!subMarketByTokenMintAddressAndOwnerHashMap.map || subMarketByTokenMintAddressAndOwnerHashMap?.map.size == 0)
+    if(!subMarketByTokenIdAndOwnerHashMap.map || subMarketByTokenIdAndOwnerHashMap?.map.size == 0)
       return
 
     //Check for deposited amounts for Withdrawals and borrowed amounts for Repayments
@@ -669,8 +671,8 @@
       {
         for(var j=0; j<StableCoins[i].subMarketList.length; j++)
         {
-          const decimalAmount = tokenDecimalHashMap.get(StableCoins[i].tokenMintAddressString)
-          const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(StableCoins[i].tokenMintAddressString +
+          const decimalAmount = tokenDecimalHashMap.get(StableCoins[i].tokenId)
+          const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(StableCoins[i].tokenId.toString() +
           adminAccounts.lendingCEOAddressKey +
           StableCoins[i].subMarketList[j].subMarketIndex.toString() +
           connectedWallet.addressString +
@@ -698,8 +700,8 @@
       {
         for(var j=0; j<CryptoCurrency[i].subMarketList.length; j++)
         {
-          const decimalAmount = tokenDecimalHashMap.get(CryptoCurrency[i].tokenMintAddressString)
-          const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(CryptoCurrency[i].tokenMintAddressString +
+          const decimalAmount = tokenDecimalHashMap.get(CryptoCurrency[i].tokenId)
+          const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(CryptoCurrency[i].tokenId.toString() +
           adminAccounts.lendingCEOAddressKey +
           CryptoCurrency[i].subMarketList[j].subMarketIndex.toString() +
           connectedWallet.addressString +
@@ -784,6 +786,7 @@
   function openActionsPopover(e: Event, rowData: any) 
   {
     event.value = e
+    event.value.tokenId = rowData.tokenId
     event.value.tokenMintAddressString = rowData.tokenMintAddressString
     event.value.subMarketList = rowData.subMarketList
     event.value.depositBalance = rowData.depositBalance

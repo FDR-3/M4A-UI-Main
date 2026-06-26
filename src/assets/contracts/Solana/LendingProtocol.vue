@@ -1,11 +1,11 @@
 <script lang="ts">
   import * as anchor from "@coral-xyz/anchor"
-  import { tokenReserves, tokenReserveFontEndInfoHashMap, tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReserves, tokenReserveFontEndInfoHashMap, tokenReservesHashMap, tokenIdHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets,
     subMarketsHashMap,
     subMarketOwnerHashMap,
     subMarketLookUpTableByOwnerHashMap,
-    subMarketByTokenMintAddressAndOwnerHashMap,
+    subMarketByTokenIdAndOwnerHashMap,
     tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import type { SubMarketOwner } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserHashMap,
@@ -26,7 +26,12 @@
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
-  import { PublicKey, AddressLookupTableProgram, AddressLookupTableAccount } from "@solana/web3.js"
+  import { PublicKey,
+    AddressLookupTableProgram,
+    AddressLookupTableAccount,
+    VersionedTransaction,
+    TransactionMessage } from "@solana/web3.js"
+  import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   export async function getLendingProtocol()
@@ -94,7 +99,7 @@
       tokenReserve.pda = tokenReserves[i].publicKey
 
       //Convert Deposit Amount To Decimal from Fixed Point
-      const decimalAmount = tokenDecimalHashMap.get(tokenReserve.tokenMintAddress.toBase58())
+      const decimalAmount = tokenDecimalHashMap.get(tokenReserve.tokenId)
       tokenReserve.depositedAmount = (Number(tokenReserve.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
       tokenReserve.borrowedAmount = (Number(tokenReserve.borrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
 
@@ -132,12 +137,13 @@
   {
     console.log("Updating Token Reserve Hash Map")
     
-    var hashmap = new Map<string, any>()
+    var tokenReserveTempHashmap = new Map<string, any>()
+    var tokenIdTempHashMap = new Map<string, number>()
 
     for(var i=0; i<tokenReserves.data.length; i++)
     {
       const tokenReserve = tokenReserves.data[i]
-      const decimalAmount = tokenDecimalHashMap.get(tokenReserve.tokenMintAddress.toBase58())
+      const decimalAmount = tokenDecimalHashMap.get(tokenReserve.tokenId)
 
       //Convert Uncollected Solvency Fee Amounts To Decimal from Fixed Point
       tokenReserve.uncollectedSolvencyInsuranceFeesAmount = (Number(tokenReserve.uncollectedSolvencyInsuranceFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
@@ -148,10 +154,12 @@
       //Convert Fee Rate To Decimal from Fixed Point
       tokenReserve.solvencyInsuranceFeeRate = (tokenReserve.solvencyInsuranceFeeRate / 100)
 
-      hashmap.set(tokenReserves.data[i].tokenMintAddress.toBase58(), tokenReserve)
+      tokenReserveTempHashmap.set(tokenReserve.tokenId, tokenReserve)
+      tokenIdTempHashMap.set(tokenReserve.tokenId, tokenReserve.tokenMintAddress.toBase58())
     }
 
-    tokenReservesHashMap.map = hashmap
+    tokenReservesHashMap.map = tokenReserveTempHashmap
+    tokenIdHashMap.map = tokenIdTempHashMap
   }
 
   export async function getSubMarkets()
@@ -161,7 +169,7 @@
     var subMarketsList: any = []
     var subMarketsMap = new Map<string, any>()
     var subMarketOwnerMap = new Map<string, any>()
-    var subMarketOwnerByTokenMintAddressMap = new Map<string, any>()
+    var subMarketOwnerByTokenIdMap = new Map<string, any>()
     var tokenReserveMap = new Map<string, any>()
 
     const allSubMarkets = await getSubMarketsWrapper()
@@ -176,7 +184,8 @@
       var ownerTokenReserveList: any = []
 
       //Convert Deposit, Fees Generated, and Uncollected Fee Amounts To Decimal from Fixed Point
-      const decimalAmount = tokenDecimalHashMap.get(subMarket.tokenMintAddress.toBase58())
+      const decimalAmount = tokenDecimalHashMap.get(subMarket.tokenId)
+      subMarket.tokenMintAddress = tokenIdHashMap.map.get(subMarket.tokenId)
       subMarket.depositedAmount = (Number(subMarket.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
       subMarket.subMarketFeesGeneratedAmount = (Number(subMarket.subMarketFeesGeneratedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
       subMarket.uncollectedSubMarketFeesAmount = (Number(subMarket.uncollectedSubMarketFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
@@ -184,13 +193,13 @@
       //Convert Fee Rate To Decimal from Fixed Point
       subMarket.feeOnInterestEarnedRate = (subMarket.feeOnInterestEarnedRate / 100)
 
-      const previousTokenReserveList = tokenReserveMap.get(subMarket.tokenMintAddress.toBase58())
+      const previousTokenReserveList = tokenReserveMap.get(subMarket.tokenId)
       if(previousTokenReserveList)
         ownerTokenReserveList = previousTokenReserveList
 
       ownerTokenReserveList.push(subMarket)
 
-      tokenReserveMap.set(subMarket.tokenMintAddress.toBase58(), ownerTokenReserveList)
+      tokenReserveMap.set(subMarket.tokenId, ownerTokenReserveList)
 
       //Populate SubMarket Owner hash map
       var subMarketOwner: SubMarketOwner = 
@@ -207,7 +216,7 @@
 
       let newIndex = subMarketOwner.ownerSubMarketList.length - 1
 
-      const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(subMarketOwner.ownerSubMarketList[newIndex].tokenMintAddress.toBase58())
+      const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(subMarketOwner.ownerSubMarketList[newIndex].tokenId)
 
       subMarketOwner.ownerSubMarketList[newIndex].feeCollectorAddress = subMarketOwner.ownerSubMarketList[newIndex].feeCollectorAddress.toBase58()
       //subMarketOwner.ownerSubMarketList[newIndex].tokenSVG = tokenFrontEndProperties.svg//This has to be marked raw in the Owners Table since it is cloned at the end of this fuction. The cloning is for allowing users to edit the table without updating the original hashmap. It was originally marked Raw in the TokenReserves.vue file
@@ -220,18 +229,18 @@
       //Populate SubMarket Owner by TokenMintAddress hash map
       var list = []
 
-      const previousSubMarketOwnerByTokenMintAddressData = subMarketOwnerByTokenMintAddressMap.get(subMarket.tokenMintAddress.toBase58() + subMarket.owner.toBase58())
+      const previousSubMarketOwnerByTokenMintAddressData = subMarketOwnerByTokenIdMap.get(subMarket.tokenId.toString() + subMarket.owner.toBase58())
       if(previousSubMarketOwnerByTokenMintAddressData)
         list = previousSubMarketOwnerByTokenMintAddressData
       
       list.push(subMarket)
       list = list.sort((a: any, b: any) => a.subMarketIndex - b.subMarketIndex) 
-      subMarketOwnerByTokenMintAddressMap.set(subMarket.tokenMintAddress.toBase58() + subMarket.owner.toBase58(), list)
+      subMarketOwnerByTokenIdMap.set(subMarket.tokenId.toString() + subMarket.owner.toBase58(), list)
 
       //Populate SubMarket hash map
       subMarketsMap.set
       (
-        subMarket.tokenMintAddress.toBase58() +
+        subMarket.tokenId.toString() +
         subMarket.owner.toBase58() +
         subMarket.subMarketIndex.toString(), 
         subMarket
@@ -246,7 +255,7 @@
     tokenReserveSubMarketListHashMap.map = cloneDeep(tokenReserveMap)
     subMarketsHashMap.map = cloneDeep(subMarketsMap)
     subMarketOwnerHashMap.map = cloneDeep(subMarketOwnerMap)
-    subMarketByTokenMintAddressAndOwnerHashMap.map = cloneDeep(subMarketOwnerByTokenMintAddressMap) 
+    subMarketByTokenIdAndOwnerHashMap.map = cloneDeep(subMarketOwnerByTokenIdMap) 
     
     subMarkets.ownerCount = subMarketOwnerHashMap.map.size
 
@@ -295,7 +304,7 @@
 
       subMarketLookUpTableMap.set(nativeProgramSubMarketOwnerLookUpTableAccount.owner.toString(), addressLookupTableProgramSubMarketOwnerLookUpTableAccount)  
     }
-
+   
     subMarketLookUpTableByOwnerHashMap.map = cloneDeep(subMarketLookUpTableMap)
   }
 
@@ -348,9 +357,9 @@
     }
   }
 
-  export function getUserNextSubMarketIndex(tokenMintAddress: string, subMarketOwnerAddress: string)
+  export function getUserNextSubMarketIndex(tokenId: number, subMarketOwnerAddress: string)
   {
-    const userSubMarketListByTokenMintAddress = subMarketByTokenMintAddressAndOwnerHashMap.map.get(tokenMintAddress + subMarketOwnerAddress)
+    const userSubMarketListByTokenMintAddress = subMarketByTokenIdAndOwnerHashMap.map.get(tokenId.toString() + subMarketOwnerAddress)
 
     if(userSubMarketListByTokenMintAddress)
       return userSubMarketListByTokenMintAddress.length
@@ -415,13 +424,14 @@
     }
   }
 
-  export async function setLendingUserTabHashMaps()
+  export async function setLendingUserTabHashMapsAndLendingLeaderBoard()
   {
-    console.log("Setting Lending User Tab Hashmaps")
+    console.log("Setting Lending User Tab Hashmaps and Lending Leader Board Data")
 
     var userTabAccountsHashMap = new Map<string, any>()
     var userTabListHashMap = new Map<string, any>()
     var userRemainingAccountsTabListHashMap = new Map<string, any>()
+    var leaderBoardData: any[] = []
     
     const lendingUserTabs = await getLendingUserTabsWrapper()
     
@@ -431,17 +441,22 @@
       {
         const lendingUserTabAccount = lendingUserTabs[i].account
         const lendingUserTabAccountPDA = lendingUserTabs[i].publicKey
+        const tokenId = lendingUserTabAccount.tokenId
+        const subMarketOwnerAddress = lendingUserTabAccount.subMarketOwnerAddress.toBase58()
+        const subMarketIndex = lendingUserTabAccount.subMarketIndex
+        const lendingUserOwnerAddress = lendingUserTabAccount.owner.toBase58()
+        const lendingUserAccountIndex = lendingUserTabAccount.userAccountIndex
 
         //Set user tab hash map
-        userTabAccountsHashMap.set(lendingUserTabAccount.tokenMintAddress.toBase58() +
-        lendingUserTabAccount.subMarketOwnerAddress.toBase58() +
-        lendingUserTabAccount.subMarketIndex.toString() +
-        lendingUserTabAccount.owner.toBase58() +
-        lendingUserTabAccount.userAccountIndex.toString(), lendingUserTabAccount)
+        userTabAccountsHashMap.set(tokenId.toString() +
+        subMarketOwnerAddress +
+        subMarketIndex.toString() +
+        lendingUserOwnerAddress +
+        lendingUserAccountIndex.toString(), lendingUserTabAccount)
 
         //Set user tab account list hash map
         var list = []
-        const previousLendingUserTabList = userTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
+        const previousLendingUserTabList = userTabListHashMap.get(lendingUserOwnerAddress + lendingUserAccountIndex.toString())
 
         if(previousLendingUserTabList)
           list = previousLendingUserTabList
@@ -449,11 +464,11 @@
         list.push(lendingUserTabAccount)
         list = list.sort((a: any, b: any) => a.userTabAccountIndex - b.userTabAccountIndex) 
 
-        userTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
+        userTabListHashMap.set(lendingUserOwnerAddress + lendingUserAccountIndex.toString(), list)
 
         //Set user remaining tab account list hash map
         var list = []
-        const previousLendingUserRemainingTabList = userRemainingAccountsTabListHashMap.get(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString())
+        const previousLendingUserRemainingTabList = userRemainingAccountsTabListHashMap.get(lendingUserOwnerAddress + lendingUserAccountIndex.toString())
 
         if(previousLendingUserRemainingTabList)
           list = previousLendingUserRemainingTabList
@@ -462,9 +477,9 @@
         {
           pubkey: lendingUserTabAccountPDA,
           userTabAccountIndex: lendingUserTabAccount.userTabAccountIndex,
-          tokenMintAddress: lendingUserTabAccount.tokenMintAddress.toString(),
-          subMarketOwnerAddress: lendingUserTabAccount.subMarketOwnerAddress.toString(),
-          subMarketIndex: lendingUserTabAccount.subMarketIndex,
+          tokenId: tokenId,
+          subMarketOwnerAddress: subMarketOwnerAddress,
+          subMarketIndex: subMarketIndex,
           isSigner: false,
           isWritable: true
         }
@@ -472,7 +487,148 @@
         list.push(lendingUserTabRemainingAccount)
         list = list.sort((a: any, b: any) => a.userTabAccountIndex - b.userTabAccountIndex) 
 
-        userRemainingAccountsTabListHashMap.set(lendingUserTabAccount.owner.toBase58() + lendingUserTabAccount.userAccountIndex.toString(), list)
+        userRemainingAccountsTabListHashMap.set(lendingUserOwnerAddress + lendingUserAccountIndex.toString(), list)
+
+        //Populate Lending Leader Board
+
+        //Set leader board data
+        var existingOwner = undefined
+        var existingOwnerIndex = 0
+
+        //Check if there is an existing monthly statement for the current account index being checked and save the entry for year and month comparison
+        for(var j=0; j<leaderBoardData.length; j++)
+        {
+          if(leaderBoardData[j].owner == lendingUserOwnerAddress)
+          {
+            existingOwner = leaderBoardData[j].owner
+            existingOwnerIndex = j
+          }
+        }
+
+        if(existingOwner)
+        {
+          //Add New Sub Account for Existing User to Lending Leader Board
+          const lendingUserAccount = lendingUserHashMap.map.get(lendingUserOwnerAddress + lendingUserAccountIndex.toString())
+          const decimalAmount = tokenDecimalHashMap.get(tokenId)
+          const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenId)
+
+          var newAccountEntry =
+          {
+            owner: lendingUserOwnerAddress,
+            accountIndex: lendingUserAccountIndex,
+            accountName: lendingUserAccount.accountName,
+            tokenId: tokenId,
+            subMarketOwnerAddress: subMarketOwnerAddress,
+            subMarketIndex: subMarketIndex,
+            trimmedSubMarketOwnerAddress: trimAddress(subMarketOwnerAddress),
+            tokenSVG: tokenFrontEndProperties.svg,
+            tokenName: tokenFrontEndProperties.name,
+            interestEarnedAmount: Number(lendingUserTabAccount.interestEarnedAmount) / Math.pow(10, decimalAmount),
+            interestEarnedAmountString: (Number(lendingUserTabAccount.interestEarnedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            interestEarnedValue: 0,
+            interestEarnedValueString: "$0.00",
+            interestAccruedAmount: Number(lendingUserTabAccount.interestAccruedAmount) / Math.pow(10, decimalAmount),
+            interestAccruedAmountString: (Number(lendingUserTabAccount.interestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            interestAccruedValue: 0,
+            interestAccruedValueString: "$0.00",
+            depositedAmount: Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount),
+            depositedAmountString: (Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            depositedValue: 0,
+            depositedValueString: "$0.00",
+            borrowedAmount: Number(lendingUserTabAccount.borrowedAmount) / Math.pow(10, decimalAmount),
+            borrowedAmountString: (Number(lendingUserTabAccount.borrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            borrowedValue: 0,
+            borrowedValueString: "$0.00",
+            repaidAmount: Number(lendingUserTabAccount.repaidDebtAmount) / Math.pow(10, decimalAmount),
+            repaidAmountString: (Number(lendingUserTabAccount.repaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            repaidValue: 0,
+            repaidValueString: "$0.00",
+            liquidatorAmount: Number(lendingUserTabAccount.liquidatorAmount) / Math.pow(10, decimalAmount),
+            liquidatorAmountString: (Number(lendingUserTabAccount.liquidatorAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            liquidatorValue: 0,
+            liquidatorValueString: "$0.00",
+            liquidatedAmount: Number(lendingUserTabAccount.liquidatedAmount) / Math.pow(10, decimalAmount),
+            liquidatedAmountString: (Number(lendingUserTabAccount.liquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            liquidatedValue: 0,
+            liquidatedValueString: "$0.00"
+          }
+
+          leaderBoardData[existingOwnerIndex].accountList.push(newAccountEntry)
+          leaderBoardData[existingOwnerIndex].accountList = leaderBoardData[existingOwnerIndex].accountList.sort((a: any, b: any) => a.accountIndex - b.accountIndex)
+        }
+        else
+        {
+          //Add New User and their Sub Account to Lending Leader Board
+          const lendingUserAccount = lendingUserHashMap.map.get(lendingUserOwnerAddress + lendingUserAccountIndex.toString())
+          const decimalAmount = tokenDecimalHashMap.get(tokenId)
+          const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenId)
+
+          var newAccountEntry =
+          {
+            owner: lendingUserOwnerAddress,
+            accountIndex: lendingUserAccountIndex,
+            accountName: lendingUserAccount.accountName,
+            tokenId: tokenId,
+            subMarketOwnerAddress: subMarketOwnerAddress,
+            subMarketIndex: lendingUserTabAccount.subMarketIndex,
+            trimmedSubMarketOwnerAddress: trimAddress(subMarketOwnerAddress),
+            tokenSVG: tokenFrontEndProperties.svg,
+            tokenName: tokenFrontEndProperties.name,
+            interestEarnedAmount: Number(lendingUserTabAccount.interestEarnedAmount) / Math.pow(10, decimalAmount),
+            interestEarnedAmountString: (Number(lendingUserTabAccount.interestEarnedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            interestEarnedValue: 0,
+            interestEarnedValueString: "$0.00",
+            interestAccruedAmount: Number(lendingUserTabAccount.interestAccruedAmount) / Math.pow(10, decimalAmount),
+            interestAccruedAmountString: (Number(lendingUserTabAccount.interestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            interestAccruedValue: 0,
+            interestAccruedValueString: "$0.00",
+            depositedAmount: Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount),
+            depositedAmountString: (Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            depositedValue: 0,
+            depositedValueString: "$0.00",
+            borrowedAmount: Number(lendingUserTabAccount.borrowedAmount) / Math.pow(10, decimalAmount),
+            borrowedAmountString: (Number(lendingUserTabAccount.borrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            borrowedValue: 0,
+            borrowedValueString: "$0.00",
+            repaidAmount: Number(lendingUserTabAccount.repaidDebtAmount) / Math.pow(10, decimalAmount),
+            repaidAmountString: (Number(lendingUserTabAccount.repaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            repaidValue: 0,
+            repaidValueString: "$0.00",
+            liquidatorAmount: Number(lendingUserTabAccount.liquidatorAmount) / Math.pow(10, decimalAmount),
+            liquidatorAmountString: (Number(lendingUserTabAccount.liquidatorAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            liquidatorValue: 0,
+            liquidatorValueString: "$0.00",
+            liquidatedAmount: Number(lendingUserTabAccount.liquidatedAmount) / Math.pow(10, decimalAmount),
+            liquidatedAmountString: (Number(lendingUserTabAccount.liquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            liquidatedValue: 0,
+            liquidatedValueString: "$0.00"
+          }
+
+          var displayName = getCustomOrTrimmedUserDisplayName(lendingUserOwnerAddress)
+
+          var newOwnerEntry = 
+          {
+            id: leaderBoardData.length + 1,
+            owner: lendingUserOwnerAddress,
+            displayName: displayName,
+            interestEarnedValue: 0,
+            interestEarnedValueString: "$0.00",
+            interestAccruedValue: 0,
+            interestAccruedValueString: "$0.00",
+            depositedValue: 0,
+            depositedValueString: "$0.00",
+            borrowedValue: 0,
+            borrowedValueString: "$0.00",
+            repaidValue: 0,
+            repaidValueString: "$0.00",
+            liquidatedValue: 0,
+            liquidatedValueString: "$0.00",
+            liquidatable: false,
+            accountList: [newAccountEntry]
+          }
+
+          leaderBoardData.push(newOwnerEntry)
+        }
       }
 
       lendingUserTabAccountsHashMap.map = userTabAccountsHashMap
@@ -482,6 +638,7 @@
 
     lendingUserTabAccountListHashMap.map = userTabListHashMap
     lendingUserRemainingTabAccountListHashMap.map = userRemainingAccountsTabListHashMap
+    lendingLeaderBoardTable.data = leaderBoardData
   }
 
   async function getLendingUserTabsWrapper()
@@ -520,7 +677,7 @@
     var availableCryptoCurrencyStatementsBySubMarketsHashMap = new Map<string, any>()
     var availableCryptoCurrencyYearStatementsBySubMarketHashMap = new Map<string, any>()
 
-    //stable Coins
+    //Stable Coins
     //These loops are done this way to keep the portfolio charts in a certain order
     //Stable Coins listed, Than Crypto Currency listed
     for(var i=0; i<StableCoins.length; i++)
@@ -528,21 +685,21 @@
       for(var j=0; j<lendingUserMonthlyStatements.data.length; j++)
       {
         const lendingUserMonthlyStatementAccount = lendingUserMonthlyStatements.data[j].account
-        const tokenMintAddress = lendingUserMonthlyStatementAccount.tokenMintAddress.toString()
+        const tokenId = lendingUserMonthlyStatementAccount.tokenId
 
-        if(StableCoins[i].tokenMintAddressString != tokenMintAddress)
+        if(StableCoins[i].tokenId != tokenId)
           continue
 
         const subMarketOwnerAddress = lendingUserMonthlyStatementAccount.subMarketOwnerAddress.toString()
         const subMarketIndex = lendingUserMonthlyStatementAccount.subMarketIndex
         const owner = lendingUserMonthlyStatementAccount.owner.toString()
         const userAccountIndex = lendingUserMonthlyStatementAccount.userAccountIndex.toString()
-        const subMarket= subMarketsHashMap.map.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString())
+        const subMarket= subMarketsHashMap.map.get(tokenId + subMarketOwnerAddress + subMarketIndex.toString())
 
         //Set User Available SubMarket Hash Map
         var availableStatementsBySubMarketData = 
         {
-          tokenMintAddress: tokenMintAddress,
+          tokenId: tokenId,
           subMarketOwnerAddress: subMarketOwnerAddress,
           subMarketOwnerAddressTrimmed: trimAddress(subMarketOwnerAddress),
           subMarketIndex: subMarketIndex,
@@ -560,7 +717,7 @@
           var previousEntryFound = false
 
           for(var k=0; k<previousLendingUserAvailableSubMarketList.length; k++)
-            if(previousLendingUserAvailableSubMarketList[k].tokenMintAddress == availableStatementsBySubMarketData.tokenMintAddress &&
+            if(previousLendingUserAvailableSubMarketList[k].tokenId == availableStatementsBySubMarketData.tokenId &&
             previousLendingUserAvailableSubMarketList[k].subMarketOwnerAddress == availableStatementsBySubMarketData.subMarketOwnerAddress &&
             previousLendingUserAvailableSubMarketList[k].subMarketIndex == availableStatementsBySubMarketData.subMarketIndex)
               previousEntryFound = true
@@ -578,7 +735,7 @@
 
         //Set User Available Statement Year by Sub Market Hash Map
         var list = []
-        const previousLendingUserAvailableYearByTokenMintAddressList = availableStableCoinYearStatementsBySubMarketHashMap.get(tokenMintAddress +
+        const previousLendingUserAvailableYearByTokenMintAddressList = availableStableCoinYearStatementsBySubMarketHashMap.get(tokenId +
         subMarketOwnerAddress +
         subMarketIndex +
         owner +
@@ -600,7 +757,7 @@
           {
             list.push(availableYearBySubMarketObject)
             list = list.sort((a: any, b: any) => a.yearAvailable - b.yearAvailable)
-            availableStableCoinYearStatementsBySubMarketHashMap.set(tokenMintAddress +
+            availableStableCoinYearStatementsBySubMarketHashMap.set(tokenId +
             subMarketOwnerAddress +
             subMarketIndex +
             owner +
@@ -608,7 +765,7 @@
           }
         }
         else
-          availableStableCoinYearStatementsBySubMarketHashMap.set(tokenMintAddress +
+          availableStableCoinYearStatementsBySubMarketHashMap.set(tokenId +
           subMarketOwnerAddress +
           subMarketIndex +
           owner +
@@ -624,21 +781,21 @@
       for(var j=0; j<lendingUserMonthlyStatements.data.length; j++)
       {
         const lendingUserMonthlyStatementAccount = lendingUserMonthlyStatements.data[j].account
-        const tokenMintAddress = lendingUserMonthlyStatementAccount.tokenMintAddress.toString()
+        const tokenId = lendingUserMonthlyStatementAccount.tokenId
 
-        if(CryptoCurrency[i].tokenMintAddressString != tokenMintAddress)
+        if(CryptoCurrency[i].tokenId != tokenId)
           continue
 
         const subMarketOwnerAddress = lendingUserMonthlyStatementAccount.subMarketOwnerAddress.toString()
         const subMarketIndex = lendingUserMonthlyStatementAccount.subMarketIndex
         const owner = lendingUserMonthlyStatementAccount.owner.toString()
         const userAccountIndex = lendingUserMonthlyStatementAccount.userAccountIndex.toString()
-        const subMarket= subMarketsHashMap.map.get(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString())
+        const subMarket= subMarketsHashMap.map.get(tokenId + subMarketOwnerAddress + subMarketIndex.toString())
 
         //Set User Available SubMarket Hash Map
         var availableStatementsBySubMarketData = 
         {
-          tokenMintAddress: tokenMintAddress,
+          tokenId: tokenId,
           subMarketOwnerAddress: subMarketOwnerAddress,
           subMarketOwnerAddressTrimmed: trimAddress(subMarketOwnerAddress),
           subMarketIndex: subMarketIndex,
@@ -656,7 +813,7 @@
           var previousEntryFound = false
 
           for(var k=0; k<previousLendingUserAvailableSubMarketList.length; k++)
-            if(previousLendingUserAvailableSubMarketList[k].tokenMintAddress == availableStatementsBySubMarketData.tokenMintAddress &&
+            if(previousLendingUserAvailableSubMarketList[k].tokenId == availableStatementsBySubMarketData.tokenId &&
             previousLendingUserAvailableSubMarketList[k].subMarketOwnerAddress == availableStatementsBySubMarketData.subMarketOwnerAddress &&
             previousLendingUserAvailableSubMarketList[k].subMarketIndex == availableStatementsBySubMarketData.subMarketIndex)
               previousEntryFound = true
@@ -674,7 +831,7 @@
 
         //Set User Available Statement Year by Sub Market Hash Map
         var list = []
-        const previousLendingUserAvailableYearByTokenMintAddressList = availableCryptoCurrencyYearStatementsBySubMarketHashMap.get(tokenMintAddress +
+        const previousLendingUserAvailableYearByTokenMintAddressList = availableCryptoCurrencyYearStatementsBySubMarketHashMap.get(tokenId +
         subMarketOwnerAddress +
         subMarketIndex +
         owner +
@@ -696,7 +853,7 @@
           {
             list.push(availableYearBySubMarketObject)
             list = list.sort((a: any, b: any) => a.yearAvailable - b.yearAvailable)
-            availableCryptoCurrencyYearStatementsBySubMarketHashMap.set(tokenMintAddress +
+            availableCryptoCurrencyYearStatementsBySubMarketHashMap.set(tokenId +
             subMarketOwnerAddress +
             subMarketIndex +
             owner +
@@ -704,7 +861,7 @@
           }
         }
         else
-          availableCryptoCurrencyYearStatementsBySubMarketHashMap.set(tokenMintAddress +
+          availableCryptoCurrencyYearStatementsBySubMarketHashMap.set(tokenId +
           subMarketOwnerAddress +
           subMarketIndex +
           owner +
@@ -718,22 +875,21 @@
     lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map = availableCryptoCurrencyYearStatementsBySubMarketHashMap
   }
 
-  export async function setMonthlyStatementHashMapAndLendingLeaderBoard()
+  export async function setMonthlyStatementHashMap()
   {
     if(!lendingUserMonthlyStatements.data) //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Monthly Statement Accounts for some weird error.
       return
 
-    console.log("Setting Monthly Statement HashMap and Lending Leader Board Data")
+    console.log("Setting Monthly Statement HashMap")
 
     var monthlyStatementsHashMap = new Map<string, any>()
-    var leaderBoardData: any[] = []
 
     for(var i=0; i<lendingUserMonthlyStatements.data.length; i++)
     {
       const lendingUserMonthlyStatementAccount = lendingUserMonthlyStatements.data[i].account
       lendingUserMonthlyStatementAccount.pda = lendingUserMonthlyStatements.data[i].publicKey
 
-      const tokenMintAddress = lendingUserMonthlyStatementAccount.tokenMintAddress.toString()
+      const tokenId = lendingUserMonthlyStatementAccount.tokenId.toString()
       const subMarketOwnerAddress = lendingUserMonthlyStatementAccount.subMarketOwnerAddress.toString()
       const subMarketIndex = lendingUserMonthlyStatementAccount.subMarketIndex.toString()
       const owner = lendingUserMonthlyStatementAccount.owner.toString()
@@ -744,231 +900,14 @@
       //Set User Monthly Statements hash map
       monthlyStatementsHashMap.set(statementMonth +
       statementYear +
-      tokenMintAddress +
+      tokenId +
       subMarketOwnerAddress +
       subMarketIndex +
       owner +
       userAccountIndex, lendingUserMonthlyStatementAccount)
-
-      //Set leader board data
-      var existingOwner = undefined
-      var existingOwnerIndex = 0
-      var existingAccountEntry = undefined
-      var existingAccountEntryIndex = 0
-
-      //Check if there is an existing monthly statement for the current account index being checked and save the entry for year and month comparison
-      for(var j=0; j<leaderBoardData.length; j++)
-      {
-        if(leaderBoardData[j].owner == lendingUserMonthlyStatementAccount.owner.toString())
-        {
-          existingOwner = leaderBoardData[j].owner
-          existingOwnerIndex = j
-          
-          for(var k=0; k<leaderBoardData[j].accountListWithLastestMonthlyStatement.length; k++)
-          {
-            if(leaderBoardData[j].accountListWithLastestMonthlyStatement[k].tokenMintAddress == tokenMintAddress &&
-            leaderBoardData[j].accountListWithLastestMonthlyStatement[k].subMarketOwnerAddress == subMarketOwnerAddress &&
-            leaderBoardData[j].accountListWithLastestMonthlyStatement[k].subMarketIndex == subMarketIndex &&
-            leaderBoardData[j].accountListWithLastestMonthlyStatement[k].accountIndex == lendingUserMonthlyStatementAccount.userAccountIndex)
-            {
-              existingAccountEntry = leaderBoardData[j].accountListWithLastestMonthlyStatement[k]
-              existingAccountEntryIndex = k
-            } 
-          }
-        }
-      }
-
-      if(existingOwner)
-      {
-        if(existingAccountEntry)
-        {
-          //Replace Sub Account TokenMintAddres Monthly Statement with more recent one if found
-          if(lendingUserMonthlyStatementAccount.statementYear > existingAccountEntry.statementYear ||
-          (lendingUserMonthlyStatementAccount.statementYear == existingAccountEntry.statementYear && lendingUserMonthlyStatementAccount.statementMonth > existingAccountEntry.statementMonth))
-          {
-            const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
-            const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-            const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
-      
-            var moreRecentAccountEntry =
-            {
-              owner: lendingUserMonthlyStatementAccount.owner.toString(),
-              accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
-              accountName: lendingUserAccount.accountName,
-              tokenMintAddress: tokenMintAddress,
-              subMarketOwnerAddress: subMarketOwnerAddress,
-              subMarketIndex: subMarketIndex,
-              trimmedSubMarketOwnerAddress: trimAddress(subMarketOwnerAddress),
-              tokenSVG: tokenFrontEndProperties.svg,
-              tokenName: tokenFrontEndProperties.name,
-              statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
-              statementYear: lendingUserMonthlyStatementAccount.statementYear,
-              interestEarnedAmount: Number(lendingUserMonthlyStatementAccount.snapShotInterestEarnedAmount) / Math.pow(10, decimalAmount),
-              interestEarnedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotInterestEarnedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-              interestEarnedValue: 0,
-              interestEarnedValueString: "$0.00",
-              interestAccruedAmount: Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount),
-              interestAccruedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-              interestAccruedValue: 0,
-              interestAccruedValueString: "$0.00",
-              depositedAmount: Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount),
-              depositedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-              depositedValue: 0,
-              depositedValueString: "$0.00",
-              borrowedAmount: Number(lendingUserMonthlyStatementAccount.snapShotDebtAmount) / Math.pow(10, decimalAmount),
-              borrowedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-              borrowedValue: 0,
-              borrowedValueString: "$0.00",
-              repaidAmount: Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount),
-              repaidAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-              repaidValue: 0,
-              repaidValueString: "$0.00",
-              liquidatorAmount: Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount),
-              liquidatorAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-              liquidatorValue: 0,
-              liquidatorValueString: "$0.00",
-              liquidatedAmount: Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount),
-              liquidatedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-              liquidatedValue: 0,
-              liquidatedValueString: "$0.00"
-            }
-
-            leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatement[existingAccountEntryIndex] = moreRecentAccountEntry
-          }
-        }
-        else
-        {
-          //Add New Sub Account for Existing User to Lending Leader Board
-          const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
-          const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-          const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
-
-          var newAccountEntry =
-          {
-            owner: lendingUserMonthlyStatementAccount.owner.toString(),
-            accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
-            accountName: lendingUserAccount.accountName,
-            tokenMintAddress: tokenMintAddress,
-            subMarketOwnerAddress: subMarketOwnerAddress,
-            subMarketIndex: subMarketIndex,
-            trimmedSubMarketOwnerAddress: trimAddress(subMarketOwnerAddress),
-            tokenSVG: tokenFrontEndProperties.svg,
-            tokenName: tokenFrontEndProperties.name,
-            statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
-            statementYear: lendingUserMonthlyStatementAccount.statementYear,
-            interestEarnedAmount: Number(lendingUserMonthlyStatementAccount.snapShotInterestEarnedAmount) / Math.pow(10, decimalAmount),
-            interestEarnedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotInterestEarnedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-            interestEarnedValue: 0,
-            interestEarnedValueString: "$0.00",
-            interestAccruedAmount: Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount),
-            interestAccruedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-            interestAccruedValue: 0,
-            interestAccruedValueString: "$0.00",
-            depositedAmount: Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount),
-            depositedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-            depositedValue: 0,
-            depositedValueString: "$0.00",
-            borrowedAmount: Number(lendingUserMonthlyStatementAccount.snapShotDebtAmount) / Math.pow(10, decimalAmount),
-            borrowedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-            borrowedValue: 0,
-            borrowedValueString: "$0.00",
-            repaidAmount: Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount),
-            repaidAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-            repaidValue: 0,
-            repaidValueString: "$0.00",
-            liquidatorAmount: Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount),
-            liquidatorAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-            liquidatorValue: 0,
-            liquidatorValueString: "$0.00",
-            liquidatedAmount: Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount),
-            liquidatedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-            liquidatedValue: 0,
-            liquidatedValueString: "$0.00"
-          }
-
-          leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatement.push(newAccountEntry)
-          leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatement =  leaderBoardData[existingOwnerIndex].accountListWithLastestMonthlyStatement.sort((a: any, b: any) => a.accountIndex - b.accountIndex)
-        }
-      }
-      else
-      {
-        //Add New User and their Sub Account to Lending Leader Board
-        const lendingUserAccount = lendingUserHashMap.map.get(lendingUserMonthlyStatementAccount.owner.toString() + lendingUserMonthlyStatementAccount.userAccountIndex.toString())
-        const decimalAmount = tokenDecimalHashMap.get(tokenMintAddress)
-        const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
-
-        var newAccountEntry =
-        {
-          owner: lendingUserMonthlyStatementAccount.owner.toString(),
-          accountIndex: lendingUserMonthlyStatementAccount.userAccountIndex,
-          accountName: lendingUserAccount.accountName,
-          tokenMintAddress: tokenMintAddress,
-          subMarketOwnerAddress: subMarketOwnerAddress,
-          subMarketIndex: subMarketIndex,
-          trimmedSubMarketOwnerAddress: trimAddress(subMarketOwnerAddress),
-          tokenSVG: tokenFrontEndProperties.svg,
-          tokenName: tokenFrontEndProperties.name,
-          statementMonth: lendingUserMonthlyStatementAccount.statementMonth,
-          statementYear: lendingUserMonthlyStatementAccount.statementYear,
-          interestEarnedAmount: Number(lendingUserMonthlyStatementAccount.snapShotInterestEarnedAmount) / Math.pow(10, decimalAmount),
-          interestEarnedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotInterestEarnedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-          interestEarnedValue: 0,
-          interestEarnedValueString: "$0.00",
-          interestAccruedAmount: Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount),
-          interestAccruedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotInterestAccruedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-          interestAccruedValue: 0,
-          interestAccruedValueString: "$0.00",
-          depositedAmount: Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount),
-          depositedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotBalanceAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-          depositedValue: 0,
-          depositedValueString: "$0.00",
-          borrowedAmount: Number(lendingUserMonthlyStatementAccount.snapShotDebtAmount) / Math.pow(10, decimalAmount),
-          borrowedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-          borrowedValue: 0,
-          borrowedValueString: "$0.00",
-          repaidAmount: Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount),
-          repaidAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotRepaidDebtAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-          repaidValue: 0,
-          repaidValueString: "$0.00",
-          liquidatorAmount: Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount),
-          liquidatorAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatorAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-          liquidatorValue: 0,
-          liquidatorValueString: "$0.00",
-          liquidatedAmount: Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount),
-          liquidatedAmountString: (Number(lendingUserMonthlyStatementAccount.snapShotLiquidatedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
-          liquidatedValue: 0,
-          liquidatedValueString: "$0.00"
-        }
-
-        var displayName = getCustomOrTrimmedUserDisplayName(lendingUserMonthlyStatementAccount.owner.toString())
-
-        var newOwnerEntry = 
-        {
-          id: leaderBoardData.length + 1,
-          owner: lendingUserMonthlyStatementAccount.owner.toString(),
-          displayName: displayName,
-          interestEarnedValue: 0,
-          interestEarnedValueString: "$0.00",
-          interestAccruedValue: 0,
-          interestAccruedValueString: "$0.00",
-          depositedValue: 0,
-          depositedValueString: "$0.00",
-          borrowedValue: 0,
-          borrowedValueString: "$0.00",
-          repaidValue: 0,
-          repaidValueString: "$0.00",
-          liquidatedValue: 0,
-          liquidatedValueString: "$0.00",
-          liquidatable: false,
-          accountListWithLastestMonthlyStatement: [newAccountEntry]
-        }
-
-        leaderBoardData.push(newOwnerEntry)
-      }
     }
 
     lendingUserMonthlyStatementsHashMap.map = monthlyStatementsHashMap
-    lendingLeaderBoardTable.data = leaderBoardData
   }
 
   export async function getLendingUserMonthlyStatementsWrapper()
@@ -1005,6 +944,55 @@
       anchorPrograms.lending.lendingProgram.programId
     )
     return lendingProtocolCEOPDA
+  }
+
+  export function getSolvencyTreasurerPDA()
+  {
+    const [solvencyTreasurerPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("solvencyTreasurer")
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return solvencyTreasurerPDA
+  }
+
+  export function getLiquidationTreasurerPDA()
+  {
+    const [liquidationTreasurerPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("liquidationTreasurer")
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return liquidationTreasurerPDA
+  }
+
+  export function getOraclePriceValidatorPDA()
+  {
+    const [oraclePriceValidatorPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("oraclePriceValidator")
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return oraclePriceValidatorPDA
+  }
+
+  export function getPriceAccountPDA(userCallingPriceFunctions: PublicKey)
+  {
+    const [oraclePriceAccountPDA] = anchor.web3.PublicKey.findProgramAddressSync
+    (
+      [
+        new TextEncoder().encode("oraclePriceData"),
+        userCallingPriceFunctions.toBuffer()
+      ],
+      anchorPrograms.lending.lendingProgram.programId
+    )
+    return oraclePriceAccountPDA
   }
 
   export function getLendingProtocolPDA()
@@ -1056,13 +1044,13 @@
     return submarketStatsPDA
   }
 
-  export function getSubMarketPDA(tokenMintAddress: PublicKey, subMarketOwner: PublicKey, subMarketIndex: number)
+  export function getSubMarketPDA(tokenId: number, subMarketOwner: PublicKey, subMarketIndex: number)
   {
     const [subMarketPDA] = anchor.web3.PublicKey.findProgramAddressSync
     (
       [
         new TextEncoder().encode("subMarket"),
-        tokenMintAddress.toBuffer(),
+        new anchor.BN(tokenId).toArrayLike(Uint8Array, "le", 1),
         subMarketOwner.toBuffer(),
         new anchor.BN(subMarketIndex).toArrayLike(Uint8Array, "le", 2)
       ],
@@ -1123,7 +1111,7 @@
   }
 
   export function getLendingUserTabAccountPDA(
-    tokenMintAddress: PublicKey,
+    tokenId: number,
     subMarketOwnerAddress: PublicKey,
     subMarketIndex: number,
     lendingUserAddress: PublicKey,
@@ -1133,7 +1121,7 @@
     (
       [
         new TextEncoder().encode("lendingUserTabAccount"),
-        tokenMintAddress.toBuffer(),
+        new anchor.BN(tokenId).toArrayLike(Uint8Array, "le", 1),
         subMarketOwnerAddress.toBuffer(),
         new anchor.BN(subMarketIndex).toArrayLike(Uint8Array, "le", 2),
         lendingUserAddress.toBuffer(),
@@ -1147,7 +1135,7 @@
   export function getLendingUserMonthlyStatementAccountPDA(
     currentStatementMonth: number,
     currentStatementYear: number,
-    tokenMintAddress: PublicKey,
+    tokenId: number,
     subMarketOwnerAddress: PublicKey,
     subMarketIndex: number,
     lendingUserAddress: PublicKey,
@@ -1159,7 +1147,7 @@
         new TextEncoder().encode("userMonthlyStatementAccount"),
         new anchor.BN(currentStatementMonth).toArrayLike(Uint8Array, "le", 1),
         new anchor.BN(currentStatementYear).toArrayLike(Uint8Array, "le", 2),
-        tokenMintAddress.toBuffer(),
+        new anchor.BN(tokenId).toArrayLike(Uint8Array, "le", 1),
         subMarketOwnerAddress.toBuffer(),
         new anchor.BN(subMarketIndex).toArrayLike(Uint8Array, "le", 2),
         lendingUserAddress.toBuffer(),
@@ -1174,12 +1162,13 @@
   export async function getLendingUserLookUpTableAddressAndInstructions(lendingUserAddress: PublicKey,
   lendingUserAccountIndex: number,
   lendingUserLookUpTableAccount: AddressLookupTableAccount,
-  selectedTokenMintAddress: PublicKey,
+  selectedTokenId: number,
   destinationSubMarketOwnerAddress: PublicKey,
   destinationSubMarketSelect: number,
   initialSubMarketOwnerAddress: PublicKey | undefined = undefined,
   initialSubMarketSelect: number | undefined = undefined)
   {
+    var creatingNewLookUpTable = false
     var lendingUserLookUpTableInstructionsToSend = []
     var lendingUserLookUpTableAddress = null
     var createLookUpTableInstruction: anchor.web3.TransactionInstruction
@@ -1201,7 +1190,7 @@
 
     if(!lendingUserAccount)
     {
-      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot("finalized"); //Need a semi colon before a tuple reassignment.
+      const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot(); //Need a semi colon before a tuple reassignment.
 
       [createLookUpTableInstruction, lendingUserLookUpTableAddress] = 
       AddressLookupTableProgram.createLookupTable({
@@ -1211,6 +1200,7 @@
       })
 
       lendingUserLookUpTableInstructionsToSend.push(createLookUpTableInstruction)
+      creatingNewLookUpTable = true
 
       //Determine PDA for new Lending User Account that will be created
       const lendingUserAccountPDA = getLendingUserAccountPDA(lendingUserAddress, lendingUserAccountIndex)
@@ -1232,7 +1222,7 @@
       lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
 
     //Check if Lending User Tab Account has been initialized
-    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
     destinationSubMarketOwnerAddress.toString() +
     destinationSubMarketSelect.toString() +
     lendingUserAddress.toString() +
@@ -1242,7 +1232,7 @@
     if(!lendingUserTabAccount)
     {
       //Determine PDA for new LendingUserTabAccount that will be created
-      const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenMintAddress,
+      const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenId,
       destinationSubMarketOwnerAddress,
       destinationSubMarketSelect,
       lendingUserAddress,
@@ -1265,19 +1255,20 @@
     //Check if Monthly Statement Account has been initialized
     const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
     anchorPrograms.currentStatementYear.toString() +
-    selectedTokenMintAddress.toString() +
+    selectedTokenId.toString() +
     destinationSubMarketOwnerAddress.toString() +
     destinationSubMarketSelect.toString() +
     lendingUserAddress.toString() +
     lendingUserAccountIndex.toString())
 
+    //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
     //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
-    if(!monthlyStatement)
+    /*if(!monthlyStatement)
     {
       //Determine PDA for new MonthlyStatementAccount that will be created
       const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
       anchorPrograms.currentStatementYear,
-      selectedTokenMintAddress,
+      selectedTokenId,
       destinationSubMarketOwnerAddress,
       destinationSubMarketSelect,
       lendingUserAddress,
@@ -1295,7 +1286,7 @@
 
         lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
       }
-    }
+    }*/
 
     //This is for the claimSubMarketFeesAndDepositInDifferentSubMarket function
     if((initialSubMarketOwnerAddress && initialSubMarketSelect) &&
@@ -1303,7 +1294,7 @@
     destinationSubMarketSelect != initialSubMarketSelect))
     {
       //Check if Lending User Tab Account has been initialized
-      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenMintAddress.toString() +
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
       initialSubMarketOwnerAddress.toString() +
       initialSubMarketSelect.toString() +
       lendingUserAddress.toString() +
@@ -1313,7 +1304,7 @@
       if(!lendingUserTabAccount)
       {
         //Determine PDA for new LendingUserTabAccount that will be created
-        const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenMintAddress,
+        const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenId,
         initialSubMarketOwnerAddress,
         initialSubMarketSelect,
         lendingUserAddress,
@@ -1336,14 +1327,15 @@
       //Check if Monthly Statement Account has been initialized
       const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
       anchorPrograms.currentStatementYear.toString() +
-      selectedTokenMintAddress.toString() +
+      selectedTokenId.toString() +
       initialSubMarketOwnerAddress.toString() +
       initialSubMarketSelect.toString() +
       lendingUserAddress.toString() +
       lendingUserAccountIndex.toString())
 
+      //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
       //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
-      if(!monthlyStatement)
+      /*if(!monthlyStatement)
       {
         //Determine PDA for new MonthlyStatementAccount that will be created
         const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
@@ -1366,11 +1358,311 @@
 
           lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
         }
-      }
+      }*/
     }
     //console.log("Lending User Look Up Table Address: " + lendingUserLookUpTableAddress?.toString())
     //console.log("Lending User Look Up Table Instructions to Send: " + lendingUserLookUpTableInstructionsToSend.length)
-    return[lendingUserLookUpTableAddress, lendingUserLookUpTableInstructionsToSend]
+    return[lendingUserLookUpTableAddress, lendingUserLookUpTableInstructionsToSend, creatingNewLookUpTable]
+  }
+
+  export async function sendVersionedLendingProtocolTransaction(instructionsToSend: anchor.web3.TransactionInstruction[], lookUpTableAccounts: AddressLookupTableAccount[])
+  {
+    try
+    {
+      const { blockhash } = await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()
+      console.log("before message")
+      const messageV0 = new TransactionMessage({
+        payerKey: connectedWallet.publicKey,
+        recentBlockhash: blockhash,
+        instructions: instructionsToSend
+      }).compileToV0Message(lookUpTableAccounts)
+      console.log("after message")
+      const transaction = new VersionedTransaction(messageV0)
+
+      const size = transaction.serialize().length
+      console.log(`Transaction Size: ${size} bytes`)
+
+      return await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction)
+    }
+    catch(error)
+    {
+      throw error
+    }
+  }
+
+export async function userSignsLendingTransactions(
+  instructionsToSend: anchor.web3.TransactionInstruction[], 
+  lookUpTableAccounts: AddressLookupTableAccount[]
+  ): Promise<VersionedTransaction[]>
+  {
+    try
+    {
+      const unsignedTransactions: VersionedTransaction[] = [];
+      const connection = anchorPrograms.lending.lendingProgram.provider.connection;
+      const { blockhash } = await connection.getLatestBlockhash();
+      const payerKey = connectedWallet.publicKey;
+
+      // Hard Solana MTU limit is 1232 bytes.
+      // We reserve a 64-byte buffer for the user's signature applied later.
+      const MAX_UNSIGNED_SIZE = 1232 - 64; 
+
+      var currentBatch: anchor.web3.TransactionInstruction[] = []
+
+      for(var i=0; i<instructionsToSend.length; i++)
+      {
+        const nextInstruction = instructionsToSend[i]
+        
+        //Test compilation adding the next instruction to our active batch
+        const testInstructions = [...currentBatch, nextInstruction]
+        const testMessage = new TransactionMessage(
+        {
+          payerKey,
+          recentBlockhash: blockhash,
+          instructions: testInstructions
+        }).compileToV0Message(lookUpTableAccounts)
+
+        const testTx = new VersionedTransaction(testMessage)
+        const testSize = testTx.serialize().length
+
+        if(testSize <= MAX_UNSIGNED_SIZE)
+          //It fits! Append the instruction to the current transaction batch
+          currentBatch.push(nextInstruction)
+        else
+        {
+          //It doesn't fit. If we have a pending batch, serialize it first
+          if(currentBatch.length > 0)
+          {
+            const finalMessage = new TransactionMessage(
+            {
+              payerKey,
+              recentBlockhash: blockhash,
+              instructions: currentBatch
+            }).compileToV0Message(lookUpTableAccounts)
+            
+            unsignedTransactions.push(new VersionedTransaction(finalMessage))
+          }
+          
+          //Start a brand new transaction batch with the instruction that overflowed
+          currentBatch = [nextInstruction]
+          
+          //Safety check: verify a single instruction doesn't break the bank on its own
+          const singleTxMessage = new TransactionMessage(
+          {
+            payerKey,
+            recentBlockhash: blockhash,
+            instructions: currentBatch
+          }).compileToV0Message(lookUpTableAccounts)
+          
+          if(new VersionedTransaction(singleTxMessage).serialize().length > MAX_UNSIGNED_SIZE)
+            throw new Error(`Instruction at index ${i} is too large to fit in a single transaction on its own!`)
+        }
+      }
+
+      //Don't leave the trailing final batch behind
+      if(currentBatch.length > 0)
+      {
+        const finalMessage = new TransactionMessage({
+          payerKey,
+          recentBlockhash: blockhash,
+          instructions: currentBatch
+        }).compileToV0Message(lookUpTableAccounts)
+        
+        unsignedTransactions.push(new VersionedTransaction(finalMessage))
+      }
+
+      console.log(`User Instructions Packed into ${unsignedTransactions.length} transaction(s).`)
+
+      //Send the optimized transactions to the wallet for a single-prompt batch sign
+      const signedTransactions = await anchorPrograms.lending.lendingProgram.provider.wallet.signAllTransactions(unsignedTransactions)
+
+      return signedTransactions
+    }
+    catch(error)
+    {
+      throw error
+    }
+  }
+
+  export async function bundleProtocolPriceTransactions(tokenIds: number[], txs: VersionedTransaction[])
+  {
+    //1. Serialize all transactions to raw Uint8Arrays
+    const serializedTxs = txs.map(tx => tx.serialize())
+
+    //2. Calculate the exact total byte size needed for the buffer
+    let totalSize = 4 //4 bytes to store the number of token IDs
+    totalSize += tokenIds.length * 1 //1 bytes per Token ID u8
+    
+    totalSize += 4 //4 bytes to store the number of transactions
+    for(const txBytes of serializedTxs)
+    {
+      totalSize += 4 //4 bytes for the transaction length prefix
+      totalSize += txBytes.length //The transaction bytes themselves
+    }
+
+    //3. Allocate the precise buffer
+    const buffer = new ArrayBuffer(totalSize)
+    const view = new DataView(buffer)
+    const uint8Array = new Uint8Array(buffer)
+
+    let offset = 0
+
+    //4. Write Token IDs
+    view.setUint32(offset, tokenIds.length, true) //Little-endian
+    offset += 4
+    for(const id of tokenIds)
+    {
+      view.setUint8(offset, id) //u8
+      offset += 1
+    }
+
+    //5. Write Transactions
+    view.setUint32(offset, serializedTxs.length, true)
+    offset += 4
+    for(const txBytes of serializedTxs)
+    {
+      view.setUint32(offset, txBytes.length, true) //Prefix with tx length
+      offset += 4
+      uint8Array.set(txBytes, offset) //Copy raw transaction bytes
+      offset += txBytes.length
+    }
+    console.log("FRONTEND: totalSize allocated =", totalSize)
+    console.log("FRONTEND: actual uint8Array byteLength =", uint8Array.byteLength)
+    //6. Send the raw binary stream directly over the wire
+    const oracleResponse = await fetch(`http://localhost:8787/api/bundleProtocolPriceTransactions`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/octet-stream' },
+      body: uint8Array //Completely skips JSON.stringify stringification overhead!
+    })
+
+    if(!oracleResponse.ok)
+    {
+      const { error } = await oracleResponse.json()
+      throw new Error(error)
+    }
+
+    const data = await oracleResponse.json()
+    return data
+  }
+
+  export async function getNeccessaryRefreshInstructionData(userRemainingTabAccounts: any[], userAddress: PublicKey, userAccountIndex: number)
+  {
+    var uniqueTokenIds = new Set<number>()
+    var lendingTabSubMarketAndMonthlyStatementRemainingAccounts = []
+    var createMonthlyStatementInstructions: anchor.web3.TransactionInstruction[] = []
+
+    for(var i=0; i<userRemainingTabAccounts.length; i++)
+    {
+      //Get unique Token Ids
+      uniqueTokenIds.add(userRemainingTabAccounts[i].tokenId)
+
+      //Push Remaining Tab Account
+      lendingTabSubMarketAndMonthlyStatementRemainingAccounts.push(userRemainingTabAccounts[i])
+
+      //Push Remaining SubMarket Account
+      const subMarket = subMarketsHashMap.map.get(userRemainingTabAccounts[i].tokenId.toString() +
+      userRemainingTabAccounts[i].subMarketOwnerAddress +
+      userRemainingTabAccounts[i].subMarketIndex.toString())
+      const subMarketRemainingAccount =
+      {
+        pubkey: subMarket.pda,
+        isSigner: false,
+        isWritable: true
+      }
+      lendingTabSubMarketAndMonthlyStatementRemainingAccounts.push(subMarketRemainingAccount)
+
+      //Push Remaining Monthly Statement Account
+      const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+      anchorPrograms.currentStatementYear.toString() +
+      userRemainingTabAccounts[i].tokenId.toString() +
+      userRemainingTabAccounts[i].subMarketOwnerAddress +
+      userRemainingTabAccounts[i].subMarketIndex.toString() +
+      userAddress.toString() +
+      userAccountIndex.toString())
+
+      var monthlyStatementPDA: PublicKey
+
+      //Create monthly statement for the new month if it doesn't exist
+      if(!monthlyStatement)
+      {
+        const createNewMonthlyStatementInstruction = await anchorPrograms.lending.lendingProgram.methods.createNewMonthlyStatement
+        (
+          userRemainingTabAccounts[i].tokenId,
+          userRemainingTabAccounts[i].subMarketIndex,
+          userAccountIndex
+        )
+        .accounts({ subMarketOwner: new PublicKey(userRemainingTabAccounts[i].subMarketOwnerAddress), lendingUserOwner: userAddress })
+        .instruction()
+
+        createMonthlyStatementInstructions.push(createNewMonthlyStatementInstruction)
+
+        //Determine PDA for new MonthlyStatementAccount that will be created
+        monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
+        anchorPrograms.currentStatementYear,
+        userRemainingTabAccounts[i].tokenId,
+        new PublicKey(userRemainingTabAccounts[i].subMarketOwnerAddress),
+        userRemainingTabAccounts[i].subMarketIndex,
+        userAddress,
+        userAccountIndex)
+
+        //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
+        //This would need to be reconsidered for the liquidate function, can't used connectedWallet, has to be Liquidati
+        /*if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, monthlyStatementPDA))
+        {
+          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+          {
+            authority: connectedWallet.publicKey,
+            payer: connectedWallet.publicKey,
+            lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+            addresses: [monthlyStatementPDA]
+          })
+
+          createMonthlyStatementInstructions.push(extendLookUpTableInstruction)
+        }*/
+      }
+      else
+        monthlyStatementPDA = monthlyStatement.pda
+
+      const monthlyStatementRemainingAccount =
+      {
+        pubkey: monthlyStatementPDA,
+        isSigner: false,
+        isWritable: true
+      }
+      lendingTabSubMarketAndMonthlyStatementRemainingAccounts.push(monthlyStatementRemainingAccount)
+    }
+
+    return [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts]
+  }
+
+  export function getTokenReserveRemainingAccounts(tokenIds: number[])
+  {
+    var tokenReserveRemainingAccounts = []
+
+    for(const tokenId of tokenIds)
+    {
+      //Push Remaining Token Reserve Account
+      const tokenReserve = tokenReservesHashMap.map.get(tokenId)
+      const tokenReserveRemainingAccount =
+      {
+        pubkey: tokenReserve.pda,
+        isSigner: false,
+        isWritable: true
+      }
+      tokenReserveRemainingAccounts.push(tokenReserveRemainingAccount)
+    }
+
+    return tokenReserveRemainingAccounts
+  }
+
+  export function getTempRemainingPriceAccount()
+  {
+    const tempPriceAccountPDA = getPriceAccountPDA(connectedWallet.publicKey)
+    return {
+      pubkey: tempPriceAccountPDA,
+      isSigner: false,
+      isWritable: true
+    }
   }
 
   export default getLendingProtocolCEOAccount

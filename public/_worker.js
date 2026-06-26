@@ -12,8 +12,9 @@ export default
       {
         const origin = request.headers.get("origin")
 
+        //This only stops request from web browsers. A person running a script could set the origin in the request
         if(origin != ORIGIN)
-          return new Response(`Origin: ${origin}\nOnly requests from m4a.io can use this end point.`, { status: 500 })
+          return new Response(`Origin: ${origin}\nOnly requests from https://m4a.io can use this end point.`, { status: 400 })
 
         var RPC_BASE_URL = ""
         var API_KEY = ""

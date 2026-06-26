@@ -33,7 +33,7 @@
     optionValue="subMarketIndex" 
     placeholder="Select fdr-3 SubMarket"
     appendTo="self"
-    @change="updateStoredSelectedSubMarketIndex(selectedTokenMintAddress.toString(), subMarketSelect.toString())">
+    @change="updateStoredSelectedSubMarketIndex(selectedTokenId, subMarketSelect.toString())">
     </Select>
     </div>
 
@@ -108,15 +108,17 @@
     >
       Connect wallet to deposit
     </ion-text>
-    <ion-button
-      v-else-if="anchorPrograms.isLendingProtocolReady"
-      color="dark"
-      @click="depositTokens()"
-      class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="depositAmount == 0 || overByteSizeLimit"
-    >
-      Deposit
-    </ion-button>
+    <div v-else-if="anchorPrograms.isLendingProtocolReady" class="mediumSmallMarginTop nTinyMarginBottom nMediumLargeMarginLeft">
+      <InfoButton :infoMessage="depositInfoMSG" :openSide="'top'"/>
+      <ion-button
+        color="dark"
+        class="nMediumSmallMarginLeft"
+        @click="depositTokens()"
+        :disabled="depositAmount == 0 || overByteSizeLimit"
+      >
+        Deposit
+      </ion-button>
+    </div>
     <ion-text v-else>Loading</ion-text>
   </div>
 </template>
@@ -133,17 +135,17 @@
     MAX_ACCOUNT_NAME_LENGTH } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey, VersionedTransaction, TransactionMessage } from "@solana/web3.js"
+  import { PublicKey } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     confirmLendingTransaction,
     parseProgramErrorCode,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { getLendingUserLookUpTableAddressAndInstructions } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { getLendingUserLookUpTableAddressAndInstructions, sendVersionedLendingProtocolTransaction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import InfoButton from '/src/components/help/InfoButton.vue'
   import { getDynamicPriorityFeePrice } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
 
@@ -165,6 +167,7 @@
   var depositSVG = ref()
   var subMarketTokenName = ref()
   var userBalance = ref()
+  var selectedTokenId = 0
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
@@ -176,6 +179,8 @@
   var savedEmojiCursorPosition: any
   var overByteSizeLimit = ref()
   var modalRef = ref()
+
+  const depositInfoMSG = "\nThe initial transaction fees for\ndepositing a new Token for the first\ntime are more expensive than normal to\ninitialize your account data. You need\ndifferent account data for each\ndifferent Token you deposit into.\nYou also need new account data when a\nnew month comes for your monthly\nstatement accounts. A new monthly\nstatement account is only generated\nwhen you're executing a transaction\nduring a new month.\n\nAn initial deposit transaction fee\nmight be around 0.009326 SOL and\n0.00008 SOL when no new data is needed."
 
   var depositValue = computed(() =>
   {
@@ -271,18 +276,18 @@
     }
   }
 
-  function openDepositModal(tokenMintAddress: string, subMarkets: any[])
+  function openDepositModal(tokenId: number, tokenMintAddress: string, subMarkets: any[])
   {
     window.addEventListener('click', handleClickOutside)
 
-    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenMintAddress)
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenId)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     tokenProgram = tokenInfo.tokenProgram
 
     subMarketList.value = subMarkets
-    subMarketSelect.value = Number(localStorage.getItem(tokenMintAddress + "selectedMainSubMarketIndex")) || 0
+    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + "selectedMainSubMarketIndex")) || 0
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     
     if(lendingUserAccountsHashMap.map)
@@ -321,6 +326,7 @@
 
     depositAmount.value = 0
     depositIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
+    selectedTokenId = tokenId
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
     tokenDecimalAmount = decimalAmount
     depositSVG.value = tokenSVG
@@ -411,60 +417,38 @@
   {
     try
     {
-      var [lendingUserLookUpTableAddress, instructionsToSend] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
+      var lookUpTableAccounts = []
+
+      var [lendingUserLookUpTableAddress, instructionsToSend, creatingNewLookUpTable] = await getLendingUserLookUpTableAddressAndInstructions(connectedWallet.publicKey,
       accountSelect.value,
       connectedWallet.lendingUserLookUpTableAccount,
-      selectedTokenMintAddress,
+      selectedTokenId,
       adminAccounts.lendingCEOAddressKey,
       subMarketSelect.value)
 
       const depositTokensInstruction = await anchorPrograms.lending.lendingProgram.methods.depositTokens
       (
-        adminAccounts.lendingCEOAddressKey,
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(depositAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
-        accountName.value,
-        lendingUserLookUpTableAddress,
-      ).accounts({ tokenMint: selectedTokenMintAddress, tokenProgram: tokenProgram })
+        creatingNewLookUpTable ? accountName.value : null,
+        creatingNewLookUpTable ? lendingUserLookUpTableAddress : null
+      ).accounts({ tokenMint: selectedTokenMintAddress, subMarketOwner: adminAccounts.lendingCEOAddressKey, tokenProgram: tokenProgram })
       .instruction()
 
       instructionsToSend.push(depositTokensInstruction)
 
-      const { blockhash } = await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()
-
-      //Get Look Up Table Accounts
-      var lookUpTableAccounts = []
-
       //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
-      //Get Sub Market Look Up Table Account By Owner
-      const subMarketOwnerLookUpTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
-      lookUpTableAccounts.push(subMarketOwnerLookUpTableAccount)
+      //Not worth getting Submarket look up table for just 1 subMarket, 1 submarket account is 32 bytes, lookuptable account is 35 bytes minimum.
 
       //Get Lending User Look Up Table Account
       if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
         lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
 
-      const messageV0 = new TransactionMessage({
-        payerKey: connectedWallet.publicKey,
-        recentBlockhash: blockhash,
-        instructions: instructionsToSend
-      }).compileToV0Message(lookUpTableAccounts)
-
-      //Create and sign the Versioned Transaction
-      const transaction = new VersionedTransaction(messageV0)
-
-      //const size = transaction.serialize().length
-      //console.log(`Current Transaction Size: ${size} bytes`)
-
-      const tx = await anchorPrograms.lending.lendingProgram.provider.sendAndConfirm(transaction)
-
-      /*const simulation = await anchorPrograms.lending.lendingProgram.provider.connection.simulateTransaction(transaction)
-      const unitsConsumed = simulation.value.unitsConsumed
-      const modifyComputeUnits = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: unitsConsumed * 1.1 })//Increase units by 10% for safety */
-
+      const tx = await sendVersionedLendingProtocolTransaction(instructionsToSend, lookUpTableAccounts)
+      console.log(tx)
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
 
       depositing.value = false
@@ -477,9 +461,9 @@
     }
   }
 
-  function updateStoredSelectedSubMarketIndex(tokenMintAddress: string, mainSubMarketIndex: string)
+  function updateStoredSelectedSubMarketIndex(tokenId: number, mainSubMarketIndex: string)
   {
-    localStorage.setItem(tokenMintAddress + "selectedMainSubMarketIndex", mainSubMarketIndex)
+    localStorage.setItem(tokenId.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(

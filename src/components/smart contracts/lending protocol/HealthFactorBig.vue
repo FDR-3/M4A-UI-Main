@@ -29,7 +29,7 @@
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted } from 'vue'
   import { IonText } from '@ionic/vue'
-  import { tokenReservesHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
@@ -68,10 +68,11 @@
 
     for(var i=0; i<userTabAccounts.length; i++)
     {
-      const price = priceObjectMap.data[userTabAccounts[i].tokenMintAddress.toString()].usdPrice
-      const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenMintAddress.toString())
-      const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString())
-      const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenMintAddress.toString() +
+      const tokenMintAddressString = tokenIdHashMap.map.get(userTabAccounts[i].tokenId)
+      const price = priceObjectMap.data[tokenMintAddressString].usdPrice
+      const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenId)
+      const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenId)
+      const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenId.toString() +
       userTabAccounts[i].subMarketOwnerAddress.toString() +
       userTabAccounts[i].subMarketIndex.toString())
 

@@ -30,6 +30,11 @@
     font-weight: bold
 }
 
+.widthOverFlow
+{
+  overflow-x: auto;
+}
+
 .copyAddressButton:hover
 {
   text-decoration: underline;

@@ -32,7 +32,7 @@
   async function fetchPrices()
   {
     console.log("Updating Prices")
-
+    
     const price = await(await fetch
     (
       "https://lite-api.jup.ag/price/v3?ids=" +

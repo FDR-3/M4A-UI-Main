@@ -294,10 +294,10 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
+      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenId)
 
       //Set UnCollected Fee Amounts
-      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenId.toString() +
       adminAccounts.lendingCEOAddressString +
       adminAccounts.lendingMain100PercentSubMarketIndex.toString())
       if(subMarket)
@@ -314,7 +314,7 @@
       }
 
       //Set Deposit Amounts
-      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenId.toString() +
       adminAccounts.lendingCEOAddressString +
       adminAccounts.lendingMain100PercentSubMarketIndex.toString() +
       adminAccounts.singlePayerTreasuryAddress.toString() +
@@ -368,10 +368,10 @@
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
-      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenMintAddressString)
+      const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenId)
 
       //Set UnCollected Fee Amounts
-      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      const subMarket = subMarketsHashMap.map.get(unprocessedTableData[i].tokenId.toString() +
       adminAccounts.lendingCEOAddressString +
       adminAccounts.lendingMain100PercentSubMarketIndex.toString())
       if(subMarket)
