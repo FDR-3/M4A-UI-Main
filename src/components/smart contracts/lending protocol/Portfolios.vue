@@ -44,7 +44,7 @@
   
       <div class="flexCenterRow" style="justify-content:space-around !important">
         <div>
-          <h2 class="underLine">7 Day Projection Rate</h2>
+          <h2 class="underLine yellow">7 Day Projection Rate</h2>
           <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toFixed(2) }}</span> A Week</h3>
         </div>
 
@@ -61,7 +61,7 @@
         </Select>
 
         <div>
-          <h2 class="underLine">Life Time Interest Earned</h2>
+          <h2 class="underLine yellow">Life Time Interest Earned</h2>
           <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toFixed(2) }}</span></h3>
         </div>
       </div>
@@ -83,12 +83,12 @@
       </Select>
 
       <div>
-        <h2 class="underLine">7 Day Projection Rate</h2>
+        <h2 class="underLine yellow">7 Day Projection Rate</h2>
         <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toFixed(2) }}</span> A Week</h3>
       </div>
 
       <div>
-        <h2 class="underLine nSmallMarginTop">Life Time Interest Earned</h2>
+        <h2 class="underLine nSmallMarginTop yellow">Life Time Interest Earned</h2>
         <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toFixed(2) }}</span></h3>
       </div>   
 
@@ -100,13 +100,13 @@
     <!--Stable Coin Charts-->
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
       <div>
-        <h4 class="underLine" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
+        <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div>
-        <h4 class="underLine" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
+        <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
       </div>  
@@ -114,13 +114,13 @@
 
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay">
       <div>
-        <h4 class="underLine" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
+        <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div class="nMediumMarginTop">
-        <h4 class="underLine" style="line-height: 27px">Life Time Interest Earned</h4>
+        <h4 class="underLine green" style="line-height: 27px">Life Time Interest Earned</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
@@ -155,13 +155,13 @@
     <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay" :class="userTabStableCoinSubMarketList?.length > 0 ? 'thinBorderTop' : ''"
       :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '14px' : '0px'}">
       <div>
-        <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
+        <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div>
-        <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
+        <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
@@ -171,13 +171,13 @@
       :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '4px' : '0px'}">
       
       <div>
-        <h4 class="underLine" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
+        <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div class="nMediumMarginTop">
-        <h4 class="underLine" style="line-height: 27px">Life Time Interest Earned</h4>
+        <h4 class="underLine green" style="line-height: 27px">Life Time Interest Earned</h4>
         <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
@@ -772,7 +772,9 @@
             tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees 
             tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
             tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
-            if(searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() && searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
+            if(searchAddress.value != adminAccounts.singlePayerTreasuryAddress.toString() &&
+            searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() &&
+            searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
             {
               tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
               tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
@@ -858,7 +860,9 @@
             tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
             tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
             tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
-            if(searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() && searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
+            if(searchAddress.value != adminAccounts.singlePayerTreasuryAddress.toString() &&
+            searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() &&
+            searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
             {
               tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
               tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
@@ -986,7 +990,9 @@
             tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
             tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
             tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
-            if(searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() && searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
+            if(searchAddress.value != adminAccounts.singlePayerTreasuryAddress.toString() &&
+            searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() &&
+            searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
             {
               tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
               tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
@@ -1072,7 +1078,9 @@
             tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
             tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
             tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
-            if(searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() && searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
+            if(searchAddress.value != adminAccounts.singlePayerTreasuryAddress.toString() &&
+            searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() &&
+            searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
             {
               tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
               tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
@@ -1084,7 +1092,7 @@
         }
       }
 
-    selectedUserChartDataHashMap.value = tempHashMap
+      selectedUserChartDataHashMap.value = tempHashMap
   }
 
   function getChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)

@@ -77,7 +77,7 @@
 
   var portfolioReRenderHelper = ref(0)
 
-  const portfolioChartInfoMSG = "\nInterest earned and\naccrued is updated in the\ncharts after a user updates\ntheir snap shots or does\nany lending activity, IE:\ndepositing, repaying, etc."
+  const portfolioChartInfoMSG = "\nInterest earned and accrued is updated\nin the charts after a user does any\nlending activity, IE: depositing,\nrepaying, etc."
   
   const activeContainerHeight = ref('auto')
   const frontTableRef = ref<HTMLElement | null>(null)

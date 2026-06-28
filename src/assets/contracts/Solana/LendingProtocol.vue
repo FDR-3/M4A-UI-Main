@@ -1370,13 +1370,13 @@
     try
     {
       const { blockhash } = await anchorPrograms.lending.lendingProgram.provider.connection.getLatestBlockhash()
-      console.log("before message")
+
       const messageV0 = new TransactionMessage({
         payerKey: connectedWallet.publicKey,
         recentBlockhash: blockhash,
         instructions: instructionsToSend
       }).compileToV0Message(lookUpTableAccounts)
-      console.log("after message")
+
       const transaction = new VersionedTransaction(messageV0)
 
       const size = transaction.serialize().length

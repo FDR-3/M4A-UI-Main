@@ -19,6 +19,11 @@
 }
 
 /*Used for h1 elements on About-Stats page*/
+.green
+{
+  color: var(--ion-color-green)
+}
+
 .yellow
 {
   color: var(--ion-color-yellow)

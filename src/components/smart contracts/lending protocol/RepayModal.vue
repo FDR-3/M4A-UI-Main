@@ -358,6 +358,8 @@
 
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)
   {
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(selectedTokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
+    
     if(!tokenReserve)
       return
 
@@ -371,6 +373,8 @@
 
   function calculateUserInterest()
   {
+    setInitialDebtBalance()
+
     if(!lendingUserTabAccount)
       return
 

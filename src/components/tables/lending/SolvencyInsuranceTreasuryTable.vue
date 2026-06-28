@@ -187,7 +187,7 @@
   import { solvencyInsuranceTreasuryWalletBalancesHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
   import { subMarketsHashMap, tokenReserveSubMarketListHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { tokenReservesHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
   import { copyAddress, copyTreasuryATAText } from '/src/assets/contracts/WalletHelper.vue'
@@ -218,8 +218,8 @@
   {
     if(solvencyInsuranceTreasuryWalletBalancesHashMap.map && lendingUserTabAccountsHashMap.map)
     {
-      processHODLStableCoinTableData()
-      processHODLCryptoCurrencyTableData()
+      processSolvencyStableCoinTableData()
+      processSolvencyCryptoCurrencyTableData()
       tvl.solvencyTVL = stableValue.value + cryptoValue.value
 
       isLoading.value = false
@@ -237,8 +237,8 @@
 
   watch(solvencyInsuranceTreasuryWalletBalancesHashMap, () => 
   {
-    processHODLStableCoinTableData()
-    processHODLCryptoCurrencyTableData()
+    processSolvencyStableCoinTableData()
+    processSolvencyCryptoCurrencyTableData()
     tvl.solvencyTVL = stableValue.value + cryptoValue.value
 
     if(isLoading.value && lendingUserTabAccountsHashMap.map)
@@ -247,23 +247,18 @@
 
   watch(lendingUserTabAccountsHashMap, () => 
   {
-    processHODLStableCoinTableData()
-    processHODLCryptoCurrencyTableData()
+    processSolvencyStableCoinTableData()
+    processSolvencyCryptoCurrencyTableData()
     tvl.solvencyTVL = stableValue.value + cryptoValue.value
 
     if(isLoading.value && solvencyInsuranceTreasuryWalletBalancesHashMap.map)
       isLoading.value = false
   })
 
-  watch(StableCoins, () => 
+  watch(priceObjectMap, () => 
   {
-    processHODLStableCoinTableData()
-    tvl.solvencyTVL = stableValue.value + cryptoValue.value
-  })
-
-  watch(CryptoCurrency, () => 
-  {
-    processHODLCryptoCurrencyTableData()
+    processSolvencyStableCoinTableData()
+    processSolvencyCryptoCurrencyTableData()
     tvl.solvencyTVL = stableValue.value + cryptoValue.value
   })
 
@@ -292,7 +287,7 @@
     copyAddress(copyTreasuryATAButtonText, event.value.solvencyATA)
   }
 
-  function processHODLStableCoinTableData()
+  function processSolvencyStableCoinTableData()
   {
     if(!solvencyInsuranceTreasuryWalletBalancesHashMap.map || !lendingUserTabAccountsHashMap.map)
       return
@@ -342,7 +337,8 @@
 
       var calculatedValue = 0
 
-      const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
+      const tokenMintAddress = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
+      const priceData = priceObjectMap.data[tokenMintAddress]
       if(priceData)
         calculatedValue = (totalAmount * priceData.usdPrice)
 
@@ -358,7 +354,7 @@
     stableCoinTableData.value = unprocessedTableData
   }
 
-  function processHODLCryptoCurrencyTableData()
+  function processSolvencyCryptoCurrencyTableData()
   {
     if(!lendingUserTabAccountsHashMap.map)
       return
@@ -390,7 +386,7 @@
       }
 
       //Set UnCollected Fee Amounts
-      const tokenReserve = tokenReservesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      const tokenReserve = tokenReservesHashMap.map.get(unprocessedTableData[i].tokenId)
       if(tokenReserve)
       {
         unprocessedTableData[i].unCollectedFees = Number(tokenReserve.uncollectedSolvencyInsuranceFeesAmount)
@@ -408,7 +404,8 @@
 
       var calculatedValue = 0
 
-      const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
+      const tokenMintAddress = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
+      const priceData = priceObjectMap.data[tokenMintAddress]
       if(priceData)
         calculatedValue = (totalAmount * priceData.usdPrice)
 
@@ -439,11 +436,11 @@
     return Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * sevenDayChangeInTime / SECONDS_IN_A_YEAR)
   }
 
-  function calculateSubMarketSevenDayFeeAccrued(tokenMintAddress: string, tokenReserveSevenDaySupplyInterestChangeIndex: number)
+  function calculateSubMarketSevenDayFeeAccrued(tokenId: number, tokenReserveSevenDaySupplyInterestChangeIndex: number)
   {
-    const tokenReserve = tokenReservesHashMap.map.get(tokenMintAddress)
-    const tokenReserveSubMarketList = tokenReserveSubMarketListHashMap.map.get(tokenMintAddress)
-    
+    const tokenReserve = tokenReservesHashMap.map.get(tokenId)
+    const tokenReserveSubMarketList = tokenReserveSubMarketListHashMap.map.get(tokenId)
+
     if(!tokenReserve || !tokenReserveSubMarketList)
       return 0
 
@@ -461,10 +458,11 @@
       const sevenDayInterestEarnedBeforeFee = sevenDaySubMarketBalanceBeforeFee - Number(tokenReserveSubMarketList[i].depositedAmount)
       totalSolvencyInsuranceFeesGenerated += (sevenDayInterestEarnedBeforeFee * tokenReserve.solvencyInsuranceFeeRate / 100)
     }
-    
-    const price = priceObjectMap.data[tokenMintAddress].usdPrice
-    if(price)
-      return totalSolvencyInsuranceFeesGenerated * Number(price)
+
+    const tokenMintAddress = tokenIdHashMap.map.get(tokenId)
+    const usdPrice = priceObjectMap.data[tokenMintAddress].usdPrice
+    if(usdPrice)
+      return totalSolvencyInsuranceFeesGenerated * Number(usdPrice)
     else
       return 0
   }
@@ -479,7 +477,7 @@
       var sevenDayStableCoinProjectionValue = 0
       for(var i=0; i<stableCoinFeeArray.length; i++)
       {
-        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, stableCoinFeeArray[i].tokenMintAddressString)
+        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, stableCoinFeeArray[i].tokenId)
         if(stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
           sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenMintAddressString, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
@@ -487,9 +485,9 @@
       var sevenDayCryptoCurrencyProjectionValue = 0
       for(var i=0; i<cryptoCurrencyFeeArray.length; i++)
       {
-        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, cryptoCurrencyFeeArray[i].tokenMintAddressString)
+        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, cryptoCurrencyFeeArray[i].tokenId)
         if(cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
-          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenMintAddressString, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenId, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
 
       sevenDayProjectionRate.value = (sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue).toLocaleString('en-US', {

@@ -58,7 +58,9 @@
           </ion-button>
         </div>
       </template>
+      <template #empty> No records found. </template>
       <template #loading> Loading Lending Leader Board. Please Wait. </template>
+      
       <Column expander style="width: 0%"/>
       <Column field="ranking" header="Ranking" style="width: 0%"></Column>
       <Column field="displayName" header="User" style="width: 0%" sortable>

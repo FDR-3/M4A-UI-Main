@@ -81,12 +81,13 @@
       </ion-input>
     </div>
 
+    <ion-label class="alignSelfLeft">Wallet: {{ userWalletBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <ion-label class="alignSelfLeft">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <InputNumber
       v-model="depositAmount"
       :inputStyle="{'text-align': 'center'}"
       :minFractionDigits="tokenDecimalAmount" :maxFractionDigits="tokenDecimalAmount"
-      :max="userBalance"
+      :max="userWalletBalance"
       :min="0"
       :step="depositIncrementAmount"
       showButtons
@@ -94,8 +95,8 @@
       @input="(event: { value: any }) => depositAmount = event.value"
     />
     <div class="alignSelfLeft">
-      <!--If it's the SOL Token, leave some SOL when hitting the Max button for transactions-->
-      <button style="background-color: transparent" @click="selectedTokenMintAddress?.toString()!=tokenAddressStrings.solTokenMintAddress ? depositAmount=userBalance : depositAmount=userBalance-0.1">
+      <!--If it's the SOL Token, leave some SOL when hitting the Max button for transaction fees-->
+      <button style="background-color: transparent" @click="selectedTokenMintAddress?.toString()!=tokenAddressStrings.solTokenMintAddress ? depositAmount=userWalletBalance : depositAmount=userWalletBalance-0.1">
         <ion-label color="dark">Max</ion-label>
       </button>
     </div>
@@ -141,17 +142,23 @@
     confirmLendingTransaction,
     parseProgramErrorCode,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { getLendingUserLookUpTableAddressAndInstructions, sendVersionedLendingProtocolTransaction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import { getDynamicPriorityFeePrice } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
+  import cloneDeep from 'lodash/cloneDeep'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
+  var tokenReserve: any
+  var lendingUserTabAccount: any
   var subMarketSelect = ref()
   var subMarketList = ref()
   var accountName = ref()
@@ -166,11 +173,14 @@
   var depositing = ref(false)
   var depositSVG = ref()
   var subMarketTokenName = ref()
+  var userWalletBalance = ref()
   var userBalance = ref()
+  var userOriginalBalance = 0
   var selectedTokenId = 0
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
+  var interestEarnedIntervalId: any
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -216,11 +226,16 @@
 
     const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
     if(balance)
-      userBalance.value = Number(balance)
+      userWalletBalance.value = Number(balance)
     else
-      userBalance.value = 0
+      userWalletBalance.value = 0
 
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+    depositAmount.value = 0
+
+    setInitialBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
   })
 
   //Move cursor back after emoji insert
@@ -268,6 +283,7 @@
         depositing.value = false
         if(addingAdditionalLendingAccount.value)
         {
+          stopInterestCalculation()
           cancelAddingAdditionalLendingAccount()
           addingAdditionalLendingAccount.value = false
         }
@@ -320,9 +336,9 @@
 
     const balance = connectedWallet.tokenBalanceMap.get(tokenMintAddress)
     if(balance)
-      userBalance.value = Number(balance)
+      userWalletBalance.value = Number(balance)
     else
-      userBalance.value = 0
+      userWalletBalance.value = 0
 
     depositAmount.value = 0
     depositIncrementAmount.value = 1 / Math.pow(10, decimalAmount)
@@ -332,6 +348,10 @@
     depositSVG.value = tokenSVG
     subMarketTokenName.value = tokenName
     depositing.value = true
+
+    setInitialBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
   }
 
   function openTokenPopover(e: Event) 
@@ -411,6 +431,103 @@
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+  }
+
+  function setInitialBalance()
+  {
+    if(!lendingUserTabAccountsHashMap.map)
+      return
+
+    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
+    adminAccounts.lendingCEOAddressString +
+    subMarketSelect.value.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    if(lendingUserTabAccount)
+      userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, tokenDecimalAmount))//Convert from fixed point notation to decimal
+    else
+      userBalance.value = 0
+
+    userOriginalBalance = userBalance.value
+  }
+
+  function startInterestCalculation()
+  {
+    if(blockChainData.timeStamp == 0)
+      return
+
+    interestEarnedIntervalId = setInterval(() =>
+    {
+      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
+      calculateUserInterest()
+    }, 55)
+  }
+
+  function stopInterestCalculation()
+  {
+    if(interestEarnedIntervalId != undefined)
+    {
+      clearInterval(interestEarnedIntervalId)
+      interestEarnedIntervalId = undefined
+    }
+  }
+
+  function calculateTokenReserveInterestChangeIndex(timeStamp: number)
+  {
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(selectedTokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
+
+    if(!tokenReserve)
+      return
+
+    //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
+    const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
+    const changeInTime = timeStamp - oldTime
+    const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
+
+    tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * changeInTime / SECONDS_IN_A_YEAR)
+  }
+
+  function calculateUserInterest()
+  {
+    setInitialBalance()
+
+    if(!lendingUserTabAccount)
+      return
+
+    //For tab accounts initialized with no deposits, keeps from dividing by zero
+    //For example, can happen when claiming submarket fees in different destination submarket on new initial tab account
+    if(Number(lendingUserTabAccount.supplyInterestChangeIndex) == 0)
+      lendingUserTabAccount.supplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex
+
+    //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
+    //Interest Earned Before Fee = New Balance Before Fee - Old Balance
+    
+    const newBalanceBeforeFee = (userOriginalBalance * tokenReserve.newSupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
+    const interestEarnedBeforeFees = newBalanceBeforeFee - userOriginalBalance
+
+    const subMarket = subMarketsHashMap.map.get(selectedTokenId.toString() + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
+    const subMarketFee = subMarket.feeOnInterestEarnedRate
+    var formulaSubMarketFee
+    var solvencyInsuranceFee
+    if(subMarketFee + tokenReserve.solvencyInsuranceFeeRate <= 100)
+    {
+      formulaSubMarketFee = subMarketFee
+      solvencyInsuranceFee = tokenReserve.solvencyInsuranceFeeRate
+    }
+    else
+    {
+      solvencyInsuranceFee = tokenReserve.solvencyInsuranceFeeRate
+      formulaSubMarketFee = 100 - tokenReserve.solvencyInsuranceFeeRate
+    }
+
+    //Interest Earned After Fee = Interest Earned Before Fee - (Interest Earned Before Fee * SubMarket Fee Rate) - (Interest Earned Before Fee * Solvency Insurance Fee Rate)
+    //User New Balance After Fee = Old Balance + Interest Earned After Fee
+    var interestEarnedAfterFees = interestEarnedBeforeFees - (interestEarnedBeforeFees * formulaSubMarketFee / 100) - (interestEarnedBeforeFees * solvencyInsuranceFee / 100)
+    interestEarnedAfterFees = Number(interestEarnedAfterFees.toFixed(tokenDecimalAmount))
+
+    //Add interest earned to original balance
+    userBalance.value = userOriginalBalance + interestEarnedAfterFees
   }
 
   async function depositTokens()

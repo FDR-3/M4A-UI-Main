@@ -31,7 +31,9 @@
           <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
         </ion-input><br>
       </template>
+      <template #empty> No records found. </template>
       <template #loading> Loading Reserves. Please wait. </template>
+
       <Column field="name" header="Token Reserve" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight" >
@@ -126,7 +128,9 @@
           <br>
         </div>
       </template>
+      <template #empty> No records found. </template>
       <template #loading> Loading Reserves. Please wait. </template>
+      
       <Column field="id" header="Id" style="width: 0%" sortable></Column>
       <Column field="owner" header="Owner" style="width: 0%" sortable>
         <template #body="slotProps">

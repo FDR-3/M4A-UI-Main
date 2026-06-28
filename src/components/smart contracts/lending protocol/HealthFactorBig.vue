@@ -1,6 +1,6 @@
 <template>
   <div class="horizontalValues">
-    <h3 class="nTinyMarginBottom" style="margin-top: 0">Health Factor</h3>
+    <h3 class="nTinyMarginBottom yellow" style="margin-top: 0">Health Factor</h3>
     <div>
       <ion-text>Asset Value: {{ assetValue }}</ion-text>
       <ion-text> Debt Value: {{ debtValue }}</ion-text>
@@ -9,7 +9,7 @@
   </div>
 
   <div class="verticalValues">
-    <h3 class="nTinyMarginBottom" style="margin-top: 0">Health Factor</h3>
+    <h3 class="nTinyMarginBottom yellow" style="margin-top: 0">Health Factor</h3>
     <ion-text>Asset Value: {{ assetValue }}</ion-text><br>
     <ion-text>Debt Value: {{ debtValue }}</ion-text><br>
     <ion-text>Overall Value: {{ overallValue }}</ion-text>

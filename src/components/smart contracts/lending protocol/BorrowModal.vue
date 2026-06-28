@@ -247,7 +247,7 @@
   {
     window.addEventListener('click', handleClickOutside)
     
-    const tokenReserve = tokenReservesHashMap.map.get(tokenId)
+    const tokenReserve = tokenReservesHashMap.map.get(tokenId)//Borrow Modal doesn't update anything on tokenReserve, so no cloneDeep needed
     const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenId)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
@@ -340,7 +340,8 @@
         calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
       }
     
-    const availableValueBeforeBorrow = calculatedAssetValue * 0.7 - calculatedDebtValue
+    var availableValueBeforeBorrow = calculatedAssetValue * 0.7 - calculatedDebtValue
+    availableValueBeforeBorrow = availableValueBeforeBorrow < 0 ? 0 : availableValueBeforeBorrow
     availableToBorrowValue.value = '$' + availableValueBeforeBorrow.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
@@ -353,14 +354,15 @@
 
     if(borrowHalf.value || borrowMax.value)
     {
+      const amount = availableToBorrowAmount.value < 0 ? 0 : availableToBorrowAmount.value
       const targetBorrowAmount = borrowHalf.value 
-        ? availableToBorrowAmount.value * 0.5 
-        : availableToBorrowAmount.value
+        ? amount * 0.5 
+        : amount
 
       if(availableInTokenReserveAmount.value < 0)
         borrowAmount.value = 0
       else if(availableInTokenReserveAmount.value < targetBorrowAmount)
-        borrowAmount.value = availableInTokenReserveAmount.value * 0.999
+        borrowAmount.value = availableInTokenReserveAmount.value
       else
         borrowAmount.value = targetBorrowAmount
 
@@ -370,7 +372,7 @@
       if(availableInTokenReserveAmount.value < availableToBorrowAmount.value)
         maxBorrowAmount = availableInTokenReserveAmount.value
       else
-        maxBorrowAmount = availableToBorrowAmount.value
+        maxBorrowAmount = availableToBorrowAmount.value < 0 ? 0 : availableToBorrowAmount.value
 
     totalAssetValue.value = calculatedAssetValue
     totalDebtValue.value = calculatedDebtValue
@@ -432,6 +434,7 @@
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(borrowAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
+        borrowMax.value
       )
       .accounts({
       subMarketOwner: adminAccounts.lendingCEOAddressKey,

@@ -188,18 +188,20 @@
               side="top" 
               alignment="center"
               >
-                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                  <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
-                </ion-button>
-                <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                  <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
-                </ion-button>
-                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                  <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
-                </ion-button>
-                <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                  <ion-label class="noClickEvent" color="dark">Repay</ion-label>
-                </ion-button>
+                <div class=" flexCenterColumn popoverContainer">
+                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                    <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
+                  </ion-button>
+                  <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                    <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
+                  </ion-button>
+                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                    <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
+                  </ion-button>
+                  <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                    <ion-label class="noClickEvent" color="dark">Repay</ion-label>
+                  </ion-button>
+                </div>
               </ion-popover>
             </div>
           </div>
@@ -324,18 +326,20 @@
               side="top" 
               alignment="center"
               >
-                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                  <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
-                </ion-button>
-                <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                  <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
-                </ion-button>
-                <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                  <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
-                </ion-button>
-                <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                  <ion-label class="noClickEvent" color="dark">Repay</ion-label>
-                </ion-button>
+                <div class=" flexCenterColumn popoverContainer">
+                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                    <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
+                  </ion-button>
+                  <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                    <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
+                  </ion-button>
+                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                    <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
+                  </ion-button>
+                  <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                    <ion-label class="noClickEvent" color="dark">Repay</ion-label>
+                  </ion-button>
+                </div>
               </ion-popover>
             </div>
           </div>
@@ -833,9 +837,32 @@
 </script>
 
 <style scoped>
+
+ion-input
+  {
+    --highlight-color: var(--ion-color-green)
+  }
+
+  ion-icon
+  {
+    width: 25px;
+    height: 25px
+  }
+
+  ion-popover 
+  {
+    --width: min(94vw, 144px)
+  }
+
   .container
   {
     margin-bottom: 77px
+  }
+
+  .popoverContainer
+  {
+    border: thin solid var(--ion-color-dark);
+    border-radius: 4px
   }
 
   #tableTitle
@@ -867,16 +894,5 @@
     height: 32px;
     min-height: 22px;
     --highlight-color: v-bind(colorHexValue) !important
-  }
-
-  ion-input
-  {
-    --highlight-color: var(--ion-color-green)
-  }
-
-  ion-icon
-  {
-    width: 25px;
-    height: 25px
   }
 </style>

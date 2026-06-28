@@ -690,6 +690,10 @@ export type LendingProtocol = {
         {
           "name": "amount",
           "type": "u64"
+        },
+        {
+          "name": "borrowMax",
+          "type": "bool"
         }
       ]
     },
@@ -2339,6 +2343,128 @@ export type LendingProtocol = {
           }
         }
       ]
+    },
+    {
+      "name": "closeTempOraclePriceData",
+      "discriminator": [
+        123,
+        125,
+        79,
+        245,
+        245,
+        212,
+        185,
+        159
+      ],
+      "accounts": [
+        {
+          "name": "lendingUserAddress"
+        },
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "priceValidator",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "tempPriceAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  68,
+                  97,
+                  116,
+                  97
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "lendingUserAddress"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "createNewMonthlyStatement",
@@ -4323,6 +4449,494 @@ export type LendingProtocol = {
         },
         {
           "name": "liquidationSubMarketIndex",
+          "type": "u16"
+        },
+        {
+          "name": "liquidatiAccountIndex",
+          "type": "u8"
+        },
+        {
+          "name": "liquidatorAccountIndex",
+          "type": "u8"
+        },
+        {
+          "name": "amountToRepay",
+          "type": "u64"
+        },
+        {
+          "name": "repayMax",
+          "type": "bool"
+        },
+        {
+          "name": "payingOffInsolventAccount",
+          "type": "bool"
+        },
+        {
+          "name": "sendRewardToWallet",
+          "type": "bool"
+        },
+        {
+          "name": "accountName",
+          "type": {
+            "option": "string"
+          }
+        },
+        {
+          "name": "lookUpTableAddress",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "liquidateAccountSameSubMarket",
+      "discriminator": [
+        46,
+        225,
+        111,
+        124,
+        169,
+        184,
+        47,
+        196
+      ],
+      "accounts": [
+        {
+          "name": "liquidatiAccountOwner"
+        },
+        {
+          "name": "subMarketOwner"
+        },
+        {
+          "name": "lendingProtocol",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "priceValidator",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101,
+                  80,
+                  114,
+                  105,
+                  99,
+                  101,
+                  86,
+                  97,
+                  108,
+                  105,
+                  100,
+                  97,
+                  116,
+                  111,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "tokenReserve",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  111,
+                  107,
+                  101,
+                  110,
+                  82,
+                  101,
+                  115,
+                  101,
+                  114,
+                  118,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "tokenMint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "liquidatiLendingAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "liquidatiAccountOwner"
+              },
+              {
+                "kind": "arg",
+                "path": "liquidatiAccountIndex"
+              }
+            ]
+          }
+        },
+        {
+          "name": "liquidatorLendingAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "liquidatorAccountIndex"
+              }
+            ]
+          }
+        },
+        {
+          "name": "liquidatorTabAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  85,
+                  115,
+                  101,
+                  114,
+                  84,
+                  97,
+                  98,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "tokenReserve"
+              },
+              {
+                "kind": "account",
+                "path": "subMarketOwner"
+              },
+              {
+                "kind": "arg",
+                "path": "subMarketIndex"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "liquidatiAccountIndex"
+              }
+            ]
+          }
+        },
+        {
+          "name": "liquidatorMonthlyStatementAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114,
+                  77,
+                  111,
+                  110,
+                  116,
+                  104,
+                  108,
+                  121,
+                  83,
+                  116,
+                  97,
+                  116,
+                  101,
+                  109,
+                  101,
+                  110,
+                  116,
+                  65,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_month",
+                "account": "lendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "lending_protocol.current_statement_year",
+                "account": "lendingProtocol"
+              },
+              {
+                "kind": "account",
+                "path": "token_reserve.token_id",
+                "account": "tokenReserve"
+              },
+              {
+                "kind": "account",
+                "path": "subMarketOwner"
+              },
+              {
+                "kind": "arg",
+                "path": "subMarketIndex"
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "arg",
+                "path": "liquidatorAccountIndex"
+              }
+            ]
+          }
+        },
+        {
+          "name": "liquidatorAta",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "account",
+                "path": "tokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "tokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "tokenReserveAta",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "tokenReserve"
+              },
+              {
+                "kind": "account",
+                "path": "tokenProgram"
+              },
+              {
+                "kind": "account",
+                "path": "tokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "tokenMint"
+        },
+        {
+          "name": "tokenProgram"
+        },
+        {
+          "name": "associatedTokenProgram",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "subMarketIndex",
           "type": "u16"
         },
         {
@@ -7740,4 +8354,4 @@ export type LendingProtocol = {
       }
     }
   ]
-}
+};

@@ -184,7 +184,7 @@
   import Column from 'primevue/column'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { tokenReservesHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { search } from 'ionicons/icons'
   import { copyAddress, copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
@@ -243,14 +243,9 @@
       isLoading.value = false
   })
 
-  watch(StableCoins, () => 
+  watch(priceObjectMap, () => 
   {
     processSinglePayerStableCoinTableData()
-    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
-  })
-
-  watch(CryptoCurrency, () => 
-  {
     processSinglePayerCryptoCurrencyTableData()
     tvl.singlePayerTVL = stableValue.value + cryptoValue.value
   })
@@ -337,8 +332,9 @@
       const totalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
 
       var calculatedValue = 0
-
-      const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
+      
+      const tokenMintAddress = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
+      const priceData = priceObjectMap.data[tokenMintAddress]
       if(priceData)
         calculatedValue = (totalAmount * priceData.usdPrice)
 
@@ -388,7 +384,7 @@
       }
 
       //Set Deposit Amounts
-      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenMintAddressString +
+      const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(unprocessedTableData[i].tokenId.toString() +
       adminAccounts.lendingCEOAddressString +
       adminAccounts.lendingMain100PercentSubMarketIndex.toString() +
       adminAccounts.singlePayerTreasuryAddress.toString() +
@@ -412,7 +408,8 @@
 
       var calculatedValue = 0
 
-      const priceData = priceObjectMap.data[unprocessedTableData[i].tokenMintAddressString]
+      const tokenMintAddress = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
+      const priceData = priceObjectMap.data[tokenMintAddress]
       if(priceData)
         calculatedValue = (totalAmount * priceData.usdPrice)
 
@@ -428,9 +425,9 @@
     CryptoCurrencyTableData.value = unprocessedTableData
   }
 
-  function calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp: number, tokenMintAddress: string)
+  function calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp: number, tokenId: number)
   {
-    const tokenReserve = tokenReservesHashMap.map.get(tokenMintAddress)
+    const tokenReserve = tokenReservesHashMap.map.get(tokenId)
 
     if(!tokenReserve)
       return
@@ -443,10 +440,10 @@
     return Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * sevenDayChangeInTime / SECONDS_IN_A_YEAR)
   }
 
-  function calculateSubMarketSevenDayFeeAccrued(tokenMintAddress: string, tokenReserveSevenDaySupplyInterestChangeIndex: number)
+  function calculateSubMarketSevenDayFeeAccrued(tokenId: number, tokenReserveSevenDaySupplyInterestChangeIndex: number)
   {
-    const tokenReserve = tokenReservesHashMap.map.get(tokenMintAddress)
-    const subMarket = subMarketsHashMap.map.get(tokenMintAddress +
+    const tokenReserve = tokenReservesHashMap.map.get(tokenId)
+    const subMarket = subMarketsHashMap.map.get(tokenId +
     adminAccounts.lendingCEOAddressString +
     adminAccounts.lendingMain100PercentSubMarketIndex.toString())
 
@@ -463,11 +460,15 @@
     const sevenDayInterestEarnedBeforeFee = sevenDaySubMarketBalanceBeforeFee - subMarket.depositedAmount
     const sevenDaySubMarketFeeGenerated = (sevenDayInterestEarnedBeforeFee * subMarket.feeOnInterestEarnedRate / 100)
 
-    const price = priceObjectMap.data[tokenMintAddress].usdPrice
-    if(price)
-      return sevenDaySubMarketFeeGenerated * Number(price)
+    const tokenMintAddress = tokenIdHashMap.map.get(tokenId)
+    const usdPrice = priceObjectMap.data[tokenMintAddress].usdPrice
+    if(usdPrice)
+      return sevenDaySubMarketFeeGenerated * Number(usdPrice)
     else
       return 0
+
+    //No need to check Single Payer interest earned as a lending user
+    //100% of interest earned from deposits into the 100% fee submarket go to SubMarket and Solvency fees
   }
 
   function startFeeCalculation()
@@ -480,17 +481,17 @@
       var sevenDayStableCoinProjectionValue = 0
       for(var i=0; i<stableCoinFeeArray.length; i++)
       {
-        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, stableCoinFeeArray[i].tokenMintAddressString)
+        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, stableCoinFeeArray[i].tokenId)
         if(stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
-          sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenMintAddressString, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+          sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenId, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
 
       var sevenDayCryptoCurrencyProjectionValue = 0
       for(var i=0; i<cryptoCurrencyFeeArray.length; i++)
       {
-        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, cryptoCurrencyFeeArray[i].tokenMintAddressString)
+        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, cryptoCurrencyFeeArray[i].tokenId)
         if(cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
-          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenMintAddressString, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenId, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
 
       sevenDayProjectionRate.value = (sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue).toLocaleString('en-US', {

@@ -24,7 +24,9 @@
           <br>
         </div>
       </template>
+      <template #empty> No records found. </template>
       <template #loading>Loading Owners. Please wait.</template>
+
       <Column field="owner" header="Owner" style="width: 0%" sortable>
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
@@ -111,7 +113,9 @@
           <br>
         </div>
       </template>
+      <template #empty> No records found. </template>
       <template #loading>Loading Owners. Please wait.</template>
+      
       <Column field="id" header="Id" style="width: 0%" sortable></Column>
       <Column field="tokenName" header="Token" style="width: 0%" sortable>
         <template #body="slotProps">

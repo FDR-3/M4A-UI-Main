@@ -136,7 +136,6 @@
   var lendingUserTabAccount: any
   var subMarketSelect = ref(0)
   var subMarketList = ref()
-  var subMarketFee = 0
   var accountSelect = ref(0)
   var accountList = ref()
   var withdrawAmount = ref()
@@ -145,7 +144,6 @@
   var withdrawSVG = ref()
   var withdrawMax = ref(false)
   var withdrawHalf = ref(false)
-  var withdrawFullDepositedAmount = false
   var subMarketTokenName = ref()
   var userBalance = ref()
   var userOriginalBalance = 0
@@ -270,8 +268,6 @@
     availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
     subMarketList.value = subMarkets
     subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + "selectedMainSubMarketIndex")) || 0
-    const subMarket = subMarketsHashMap.map.get(tokenId.toString() + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
-    subMarketFee = subMarket.feeOnInterestEarnedRate
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
     if(lendingUserAccountsHashMap.map)
@@ -396,32 +392,20 @@
       userHasDebt = true
     }
 
-    withdrawFullDepositedAmount = false;
-
     if(withdrawHalf.value || withdrawMax.value)
     {
       if(availableInTokenReserveAmount.value < 0)
         withdrawAmount.value = 0
       else if(availableInTokenReserveAmount.value < availableWithdrawalBalance.value)
-        withdrawAmount.value = availableInTokenReserveAmount.value * 0.999
+        withdrawAmount.value = availableInTokenReserveAmount.value
       else
         if(withdrawHalf.value)
-          withdrawAmount.value = availableWithdrawalBalance.value * 0.5
-        else if(withdrawMax.value)
-        {
-          withdrawAmount.value = availableWithdrawalBalance.value
-          withdrawFullDepositedAmount = true
-        }
-          /*if(calculatedDebtValue === 0)
-          {
-            withdrawAmount.value = availableWithdrawalBalance.value
-            withdrawFullDepositedAmount = true
-          }
+          if(availableWithdrawalBalance.value < 0)
+            withdrawAmount.value = 0
           else
-          {
-            const factor = 100_000;
-            withdrawAmount.value = Math.floor(availableWithdrawalBalance.value * factor) / factor
-          }*/
+            withdrawAmount.value = availableWithdrawalBalance.value * 0.5
+        else if(withdrawMax.value)
+          withdrawAmount.value = availableWithdrawalBalance.value < 0 ? 0 : availableWithdrawalBalance.value
 
       maxWithdrawAmount = withdrawAmount.value
     }
@@ -429,10 +413,10 @@
       if(availableInTokenReserveAmount.value < availableWithdrawalBalance.value)
         maxWithdrawAmount = availableInTokenReserveAmount.value
       else
-        maxWithdrawAmount = availableWithdrawalBalance.value
+        maxWithdrawAmount = availableWithdrawalBalance.value < 0 ? 0 : availableWithdrawalBalance.value
 
     //Account for value that is about to be withdrawn
-    //Check for less than zero values when doing complete withdrawals, do the price possibly being slighly off
+    //Check for less than zero values when doing complete withdrawals, due to the price possibly being slighly off
     calculatedAssetValue -= withdrawAmount.value * Number(priceOfSelectedToken)
     if(calculatedAssetValue < 0)
       calculatedAssetValue = 0
@@ -484,6 +468,8 @@
   
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)
   {
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(selectedTokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
+
     if(!tokenReserve)
       return
 
@@ -497,6 +483,8 @@
 
   function calculateUserInterest()
   {
+    setInitialBalance()
+
     if(!lendingUserTabAccount)
       return
 
@@ -511,6 +499,8 @@
     const newBalanceBeforeFee = (userOriginalBalance * tokenReserve.newSupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
     const interestEarnedBeforeFees = newBalanceBeforeFee - userOriginalBalance
 
+    const subMarket = subMarketsHashMap.map.get(selectedTokenId.toString() + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
+    const subMarketFee = subMarket.feeOnInterestEarnedRate
     var formulaSubMarketFee
     var solvencyInsuranceFee
     if(subMarketFee + tokenReserve.solvencyInsuranceFeeRate <= 100)
@@ -571,12 +561,12 @@
         .accounts({ lendingUserOwner: connectedWallet.publicKey })
         .remainingAccounts(refreshingUserRemainingAccounts)
         .instruction()
-        
+
         const withdrawInstruction = await anchorPrograms.lending.lendingProgram.methods.withdrawTokens(
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount)), //convert to fixedpoint notation
-        withdrawFullDepositedAmount
+        withdrawMax.value
         )
         .accounts({
           subMarketOwner: adminAccounts.lendingCEOAddressKey,

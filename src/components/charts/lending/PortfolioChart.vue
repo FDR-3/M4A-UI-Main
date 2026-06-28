@@ -55,9 +55,9 @@
           </Select>
 
           <div v-if="ownerAddress==connectedWallet.addressString">
-            <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+            <ion-button v-if="depositedAssetAmount==0" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
             $emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption)">
-              <ion-label color="dark">Deposit</ion-label>
+              <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
             </ion-button>
             <ion-button v-else fill="clear" @click="openHActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
             <ion-popover
@@ -67,22 +67,24 @@
             side="top" 
             alignment="center"
             >
-              <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-              $emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
-                <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
-              </ion-button>
-              <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-              $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
-                <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
-              </ion-button>
-              <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-              $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
-                <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
-              </ion-button>
-              <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-              $emit('openRepayModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
-                <ion-label class="noClickEvent" color="dark">Repay</ion-label>
-              </ion-button>
+              <div class=" flexCenterColumn popoverContainer">
+                <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+                $emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                  <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
+                </ion-button>
+                <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+                $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                  <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
+                </ion-button>
+                <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+                $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                  <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
+                </ion-button>
+                <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+                $emit('openRepayModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                  <ion-label class="noClickEvent" color="dark">Repay</ion-label>
+                </ion-button>
+              </div>
             </ion-popover>
           </div>
         </div>
@@ -158,7 +160,9 @@
         @change="$emit('changeYear', tokenMintAddress, subMarketOwnerAddress, subMarketIndex, yearSelect)">
         </Select>
         <div v-if="ownerAddress==connectedWallet.addressString" class="nSmallMarginTop">
-          <ion-button v-if="depositedAssetAmount==0" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption)"><ion-label color="dark">Deposit</ion-label></ion-button>
+          <ion-button v-if="depositedAssetAmount==0" class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption)">
+            <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
+          </ion-button>
           <ion-button v-else fill="clear" @click="openVActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
           <ion-popover
           :is-open="vActionsPopoverOpen" 
@@ -167,18 +171,20 @@
           side="top" 
           alignment="center"
           >
-            <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
-              <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
-            </ion-button>
-            <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
-              <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
-            </ion-button>
-            <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
-              <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
-            </ion-button>
-            <ion-button v-if="userOriginalDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
-              <ion-label class="noClickEvent" color="dark">Repay</ion-label>
-            </ion-button>
+            <div class=" flexCenterColumn popoverContainer">
+              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+                <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
+              </ion-button>
+              <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+                <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
+              </ion-button>
+              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+                <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
+              </ion-button>
+              <ion-button v-if="userOriginalDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+                <ion-label class="noClickEvent" color="dark">Repay</ion-label>
+              </ion-button>
+            </div>
           </ion-popover>
         </div>
       </div>
@@ -448,15 +454,7 @@
       tokenName.value = tokenInfo.name
       tokenSVG.value = tokenInfo.svg
 
-      lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenId +
-      props.subMarketOwnerAddress +
-      props.subMarketIndex.toString() +
-      props.ownerAddress +
-      props.accountIndex.toString())
-
-      userOriginalBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
-      userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
-      userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, tokenInfo.decimalAmount))//Convert from fixed point notation to decimal
+      setInitialBalance()
 
       yearList.value = getYearList()
 
@@ -464,7 +462,7 @@
         startInterestCalculation()
     }
 
-    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers 
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
     const subMarket = subMarketsHashMap.map.get(props.tokenId + props.subMarketOwnerAddress + props.subMarketIndex)
     const option = 
     {
@@ -489,15 +487,7 @@
 
   watch(lendingUserTabAccountsHashMap,() =>
   {
-    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenId +
-    props.subMarketOwnerAddress +
-    props.subMarketIndex.toString() +
-    props.ownerAddress +
-    props.accountIndex.toString())
-
-    userOriginalBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-    userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-    userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+    setInitialBalance()
 
     yearList.value = getYearList()
     yearSelect.value = props.selectedYear
@@ -568,6 +558,22 @@
     return processedList
   }
 
+  function setInitialBalance()
+  {
+    if(!lendingUserTabAccountsHashMap.map)
+      return
+
+    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenId +
+    props.subMarketOwnerAddress +
+    props.subMarketIndex.toString() +
+    props.ownerAddress +
+    props.accountIndex.toString())
+
+    userOriginalBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+    userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+    userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+  }
+
   function startGradientAnimation()
   {
     animationIntervalId = setInterval(() =>
@@ -628,6 +634,26 @@
         legend:
         {
           display: false
+        },
+        // Fixes the hover popup truncation
+        tooltip:
+        {
+          callbacks:
+          {
+            label: function(context: any)
+            {
+              let label = context.dataset.label || ''
+              if(label)
+                label += ': '
+  
+              if (context.parsed.y !== null)
+              {
+                const value = context.parsed.y
+                label += value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 9 })
+              }
+              return label;
+            }
+          }
         }
       },
       scales:
@@ -731,6 +757,8 @@
 
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)
   {
+    tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
+
     //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
     const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
     const changeInTime = timeStamp - oldTime
@@ -746,12 +774,12 @@
 
   function calculateUserInterest()
   {
+    setInitialBalance()
+    
     //For tab accounts initialized with no deposits, keeps from dividing by zero
     //For example, can happen to when claiming submarket fees in different destination submarket on new initial tab account
     if(Number(lendingUserTabAccount.supplyInterestChangeIndex) == 0)
       lendingUserTabAccount.supplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex
-    if(Number(lendingUserTabAccount.borrowInterestChangeIndex) == 0)
-      lendingUserTabAccount.borrowInterestChangeIndex = tokenReserve.newBorrowInterestChangeIndex
 
     //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
     //Interest Earned Before Fee = New Balance Before Fee - Old Balance
@@ -789,7 +817,8 @@
     const sevenDayUserCalculatedBalanceBeforeFee = (userOriginalBalance * tokenReserve.sevenDaySupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
     const sevenDayInterestEarnedBeforeFee = sevenDayUserCalculatedBalanceBeforeFee - userOriginalBalance
 
-    sevenDayCalculatedUserInterestEarned.value = (sevenDayInterestEarnedBeforeFee - (sevenDayInterestEarnedBeforeFee * props.subMarketFee / 100)).toFixed(decimalAmount)
+    sevenDayCalculatedUserInterestEarned.value = sevenDayInterestEarnedBeforeFee - (sevenDayInterestEarnedBeforeFee * props.subMarketFee / 100)
+    sevenDayCalculatedUserInterestEarned.value = sevenDayCalculatedUserInterestEarned.value < 0 ? (0).toFixed(decimalAmount) : sevenDayCalculatedUserInterestEarned.value.toFixed(decimalAmount)
 
     const price = priceObjectMap.data[tokenMintAddress].usdPrice
     if(price)
@@ -855,6 +884,11 @@
 </script>
 
 <style scoped>
+  ion-popover 
+  {
+    --width: min(70vw, 144px)
+  }
+
   h4
   {
     font-size: min(4.5vw, 26px)
@@ -863,6 +897,12 @@
   h5
   {
     font-size: min(4vw, 25px)
+  }
+
+  .popoverContainer
+  {
+    border: thin solid var(--ion-color-dark);
+    border-radius: 4px
   }
   
   .yearSelect
