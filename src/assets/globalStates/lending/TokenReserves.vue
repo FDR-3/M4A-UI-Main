@@ -1,6 +1,6 @@
 <script lang="ts">
   import { reactive, Component, markRaw } from 'vue'
-  import DAISVG from '/src/assets/cryptoIcons/dai-svg.vue'
+  import USDSSVG from '/src/assets/cryptoIcons/usds-svg.vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
   import WETHSVG from '/src/assets/cryptoIcons/weth-svg.vue'
@@ -9,8 +9,9 @@
     TokenProgram2022ID,
     tokenIds,
     tokenReserveATAKeys,
+    tokenDecimalHashMap,
     tokenAddressKeys } from '/src/assets/constants/Addresses.ts'
-  import { sourceDAI,
+  import { sourceUSDS,
     sourceUSDC,
     sourceSOL,
     sourceWETH,
@@ -47,21 +48,21 @@
   export const tokenReserveFontEndInfoHashMap: Map<number, tokenMapObject> = new Map(
   [ 
     //Key: Token Mint Address, Value: Token SVG
-    [tokenIds.daiTokenId,
+    [tokenIds.usdsTokenId,
     {
-      name: "DAI-Dev",
-      publicKey: tokenAddressKeys.daiTokenMintAddress,
-      decimalAmount: 8,
-      svg: markRaw(DAISVG),
-      source: () => {sourceDAI()},
-      ata: tokenReserveATAKeys.daiATA,
+      name: "USDS-Dev",
+      publicKey: tokenAddressKeys.usdsTokenMintAddress,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.usdsTokenId),
+      svg: markRaw(USDSSVG),
+      source: () => {sourceUSDS()},
+      ata: tokenReserveATAKeys.usdsATA,
       tokenProgram: LegacyTokenProgramID
     }],
     [tokenIds.usdcTokenId,
     {
       name: "USDC-Dev",
       publicKey: tokenAddressKeys.usdcTokenMintAddress,
-      decimalAmount: 6,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.usdcTokenId),
       svg: markRaw(USDCSVG),
       source: () => {sourceUSDC()},
       ata: tokenReserveATAKeys.usdcATA,
@@ -71,7 +72,7 @@
     {
       name: "SOL-Dev",
       publicKey: tokenAddressKeys.solTokenMintAddress,
-      decimalAmount: 9,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.solTokenId),
       svg: markRaw(SOLSVG),
       source: () => {sourceSOL()},
       ata: tokenReserveATAKeys.solATA,
@@ -81,7 +82,7 @@
     {
       name: "WETH-Dev",
       publicKey: tokenAddressKeys.wethTokenMintAddress,
-      decimalAmount: 8,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.wethTokenId),
       svg: markRaw(WETHSVG),
       source: () => {sourceWETH()},
       ata: tokenReserveATAKeys.wethATA,
@@ -91,7 +92,7 @@
     {
       name: "WBTC-Dev",
       publicKey: tokenAddressKeys.wbtcTokenMintAddress,
-      decimalAmount: 8,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.wbtcTokenId),
       svg: markRaw(WBTCSVG),
       source: () => {sourceWBTC()},
       ata: tokenReserveATAKeys.wbtcATA,

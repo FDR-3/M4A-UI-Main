@@ -1528,7 +1528,7 @@ export async function userSignsLendingTransactions(
     console.log("FRONTEND: totalSize allocated =", totalSize)
     console.log("FRONTEND: actual uint8Array byteLength =", uint8Array.byteLength)
     //6. Send the raw binary stream directly over the wire
-    const oracleResponse = await fetch(`http://localhost:8787/api/bundleProtocolPriceTransactions`,
+    const oracleResponse = await fetch(`https://m4a.io/Api/bundleProtocolPriceTransactions`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/octet-stream' },

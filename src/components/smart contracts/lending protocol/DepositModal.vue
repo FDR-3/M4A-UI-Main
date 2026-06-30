@@ -190,7 +190,7 @@
   var overByteSizeLimit = ref()
   var modalRef = ref()
 
-  const depositInfoMSG = "\nThe initial transaction fees for\ndepositing a new Token for the first\ntime are more expensive than normal to\ninitialize your account data. You need\ndifferent account data for each\ndifferent Token you deposit into.\nYou also need new account data when a\nnew month comes for your monthly\nstatement accounts. A new monthly\nstatement account is only generated\nwhen you're executing a transaction\nduring a new month.\n\nAn initial deposit transaction fee\nmight be around 0.009326 SOL and\n0.00008 SOL when no new data is needed."
+  const depositInfoMSG = "\nThe initial transaction fees for\ndepositing a new Token for the first\ntime are more expensive than normal to\ninitialize your account data. You need\ndifferent account data for each\ndifferent Token you deposit into.\nYou also need new account data when a\nnew month comes for your monthly\nstatement accounts. A new monthly\nstatement account is only generated\nwhen you're executing a transaction\nduring a new month.\n\nAn initial deposit transaction fee\nmight be around 0.008881 SOL and\n0.00008 SOL when no new data is needed."
 
   var depositValue = computed(() =>
   {
@@ -565,7 +565,7 @@
         lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
 
       const tx = await sendVersionedLendingProtocolTransaction(instructionsToSend, lookUpTableAccounts)
-      console.log(tx)
+
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
 
       depositing.value = false

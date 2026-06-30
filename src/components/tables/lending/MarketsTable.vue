@@ -19,6 +19,7 @@
         'percentChange24h',
         'supplyAPYString',
         'borrowAPYString',
+        'useFixedBorrowAPYString',
         'utilizationRateString',
         'depositsString',
         'borrowsString',
@@ -140,6 +141,11 @@
           {{slotProps.data.borrowAPYString }}
         </template>
       </Column>
+      <Column field="useFixedBorrowApy" header="Fixed Borrow APY" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <ion-text :color="slotProps.data.useFixedBorrowApy ? 'green' : 'red'">{{slotProps.data.useFixedBorrowAPYString }}</ion-text>
+        </template>
+      </Column>
       <Column field="utilizationRate" header="Utilization Rate%" style="width: 0%" sortable>
         <template #body="slotProps">
           {{slotProps.data.utilizationRateString }}
@@ -225,6 +231,7 @@
         'percentChange24h',
         'supplyAPYString',
         'borrowAPYString',
+        'useFixedBorrowAPYString',
         'utilizationRateString',
         'depositsString',
         'borrowsString',
@@ -276,6 +283,11 @@
       <Column field="borrowAPY" header="Borrow APY%" style="width: 0%" sortable>
         <template #body="slotProps">
           {{slotProps.data.borrowAPYString }}
+        </template>
+      </Column>
+      <Column field="useFixedBorrowApy" header="Fixed Borrow APY" style="width: 0%" sortable>
+        <template #body="slotProps">
+          <ion-text :color="slotProps.data.useFixedBorrowApy ? 'green' : 'red'">{{slotProps.data.useFixedBorrowAPYString }}</ion-text>
         </template>
       </Column>
       <Column field="utilizationRate" header="Utilization Rate%" style="width: 0%" sortable>
@@ -500,6 +512,8 @@
           StableCoins[i].borrowAPYString = StableCoins[i].borrowAPY.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 }) + '%'
+          StableCoins[i].useFixedBorrowApy = tokenReserve.useFixedBorrowApy
+          StableCoins[i].useFixedBorrowAPYString = tokenReserve.useFixedBorrowApy.toString()
           StableCoins[i].utilizationRate = tokenReserve.utilizationRate / 100 //Convert to decimal from fixed point notation 
           StableCoins[i].utilizationRateString = StableCoins[i].utilizationRate.toLocaleString('en-US', {
           minimumFractionDigits: 2,
@@ -551,6 +565,8 @@
           CryptoCurrency[i].borrowAPYString = CryptoCurrency[i].borrowAPY.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 }) + '%'
+          CryptoCurrency[i].useFixedBorrowApy = tokenReserve.useFixedBorrowApy
+          CryptoCurrency[i].useFixedBorrowAPYString = tokenReserve.useFixedBorrowApy.toString()
           CryptoCurrency[i].utilizationRate = tokenReserve.utilizationRate / 100
           CryptoCurrency[i].utilizationRateString = CryptoCurrency[i].utilizationRate.toLocaleString('en-US', {
           minimumFractionDigits: 2,

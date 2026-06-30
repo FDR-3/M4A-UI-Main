@@ -1,16 +1,20 @@
 <script lang="ts">
   import { reactive } from 'vue'
-  import DAISVG from '/src/assets/cryptoIcons/dai-svg.vue'
+  import USDSSVG from '/src/assets/cryptoIcons/usds-svg.vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
   import WETHSVG from '/src/assets/cryptoIcons/weth-svg.vue'
   import WBTCSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
-  import { sourceDAI,
+  import { sourceUSDS,
     sourceUSDC,
     sourceSOL,
     sourceWETH,
     sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
-  import { tokenAddressStrings, tokenIds, hodlWalletATAStrings, solvencyWalletATAStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings,
+    tokenIds,
+    hodlWalletATAStrings,
+    solvencyWalletATAStrings,
+    tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
 
   var usdcName = ""
@@ -27,16 +31,16 @@
   export const StableCoins = reactive(
   [
     {
-      tokenMintAddressString: tokenAddressStrings.daiTokenMintAddress,
-      tokenId: tokenIds.daiTokenId,
-      decimalAmount: 8,
-      hodlATA: hodlWalletATAStrings.daiATA,
-      solvencyATA: solvencyWalletATAStrings.daiATA,
+      tokenMintAddressString: tokenAddressStrings.usdsTokenMintAddress,
+      tokenId: tokenIds.usdsTokenId,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.usdsTokenId),
+      hodlATA: hodlWalletATAStrings.usdsATA,
+      solvencyATA: solvencyWalletATAStrings.usdsATA,
       asset: 
       {
-        name: "DAI",
-        svg: DAISVG,
-        source: () => {sourceDAI()}
+        name: "USDS",
+        svg: USDSSVG,
+        source: () => {sourceUSDS()}
       },
       price: '-',
       percentChange24h: '-',
@@ -52,7 +56,7 @@
     {
       tokenMintAddressString: tokenAddressStrings.usdcTokenMintAddress,
       tokenId: tokenIds.usdcTokenId,
-      decimalAmount: 6,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.usdcTokenId),
       hodlATA: hodlWalletATAStrings.usdcATA,
       solvencyATA: solvencyWalletATAStrings.usdcATA,
       asset: 
@@ -79,7 +83,7 @@
     {
       tokenMintAddressString: tokenAddressStrings.solTokenMintAddress,
       tokenId: tokenIds.solTokenId,
-      decimalAmount: 9,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.solTokenId),
       solvencyATA: solvencyWalletATAStrings.solATA,
       asset: 
       {
@@ -101,7 +105,7 @@
     {
       tokenMintAddressString: tokenAddressStrings.wethTokenMintAddress,
       tokenId: tokenIds.wethTokenId,
-      decimalAmount: 8,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.wethTokenId),
       solvencyATA: solvencyWalletATAStrings.wethATA,
       asset: 
       {
@@ -123,7 +127,7 @@
     {
       tokenMintAddressString: tokenAddressStrings.wbtcTokenMintAddress,
       tokenId: tokenIds.wbtcTokenId,
-      decimalAmount: 8,
+      decimalAmount: tokenDecimalHashMap.get(tokenIds.wbtcTokenId),
       solvencyATA: solvencyWalletATAStrings.wbtcATA,
       asset: 
       {

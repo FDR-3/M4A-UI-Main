@@ -23,6 +23,11 @@ export function sourceDAI()
   window.open("https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNIP0QAj6hX6oDb3lTs4OzcP0kKieMHpjavxfE", "_blank")
 }
 
+export function sourceUSDS()
+{
+  window.open("https://basescan.org/token/images/skyusds_32.svg", "_blank")
+}
+
 export function sourceUSDC()
 {
   window.open("https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNennCnoHYvGazNyBXWLJ8f2QUITcrVm6e9CiF", "_blank")

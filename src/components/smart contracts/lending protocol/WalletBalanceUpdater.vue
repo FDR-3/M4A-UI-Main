@@ -14,34 +14,34 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
 
   //These are for the Chat and M4A fees
-  const hodlTreasuryDAIWalletATA = hodlTreasuryWalletATAHashMap.get(tokenAddressStrings.daiTokenMintAddress)
+  const hodlTreasuryUSDSWalletATA = hodlTreasuryWalletATAHashMap.get(tokenAddressStrings.usdsTokenMintAddress)
   const hodlTreasuryUSDCWalletATA = hodlTreasuryWalletATAHashMap.get(tokenAddressStrings.usdcTokenMintAddress)
 
   //These are for Lending Protocol Solvency fees
-  const solvencyTreasuryDAIWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.daiTokenMintAddress)
+  const solvencyTreasuryUSDSWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.usdsTokenMintAddress)
   const solvencyTreasuryUSDCWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.usdcTokenMintAddress)
   const solvencyTreasurySOLWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.solTokenMintAddress)
   const solvencyTreasuryWEthWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.wethTokenMintAddress)
   const solvencyTreasuryWBtcWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.wbtcTokenMintAddress)
   
   //The ATA addresses can be harded coded in once you know the addresses
-  /*var hodlTreasuryDAIWalletATA: any
+  /*var hodlTreasuryUSDSWalletATA: any
   var hodlTreasuryUSDCWalletATA: any
-  var solvencyTreasuryDAIWalletATA: any
+  var solvencyTreasuryUSDSWalletATA: any
   var solvencyTreasuryUSDCWalletATA: any
   var solvencyTreasurySOLWalletATA: any
   var solvencyTreasuryWEthWalletATA: any
   var solvencyTreasuryWBtcWalletATA: any*/
   
-  var hodlDAIWalletATAWatcherId: any
+  var hodlUSDSWalletATAWatcherId: any
   var hodlUSDCWalletATAWatcherId: any
-  var solvencyDAIWalletATAWatcherId: any
+  var solvencyUSDSWalletATAWatcherId: any
   var solvencyUSDCWalletATAWatcherId: any
   var solvencySOLWalletWatcherId: any
   var solvencyWEthWalletATAWatcherId: any
   var solvencyWBtcWalletATAWatcherId: any
 
-  var userDAIWalletATAWatcherId: any
+  var userUSDSWalletATAWatcherId: any
   var userUSDCWalletATAWatcherId: any
   var userSOLWalletATAWatcherId: any
   var userWEthWalletATAWatcherId: any
@@ -50,18 +50,18 @@
   onMounted(async() =>
   {
     /*//The ATA address can be harded coded in once you know the address
-    //Token Reserve DAI ATA
-    let tokenReserveDAIPDA = getTokenReservePDA(tokenAddressKeys.daiTokenMintAddress)
-    //console.log(tokenReserveDAIPDA.toString())
-    let tokenReserveDAIWalletATA = await Token.getAssociatedTokenAddress
+    //Token Reserve USDS ATA
+    let tokenReserveUSDSPDA = getTokenReservePDA(tokenAddressKeys.usdsTokenMintAddress)
+    //console.log(tokenReserveUSDSPDA.toString())
+    let tokenReserveUSDSWalletATA = await Token.getAssociatedTokenAddress
     (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      tokenAddressKeys.daiTokenMintAddress, //Token Mint Address
-      tokenReserveDAIPDA, //Token Reserve PDA
+      tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
+      tokenReserveUSDSPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveDAIWalletATA.toString())
+    console.log(tokenReserveUSDSWalletATA.toString())
     
     //Token Reserve USDC ATA
     let tokenReserveUSDCPDA = getTokenReservePDA(tokenAddressKeys.usdcTokenMintAddress)
@@ -118,47 +118,47 @@
     console.log(tokenReserveWBtcATA.toString())*/
 
     //The ATA address can be harded coded in once you know the address
-    //Hodl DAI Wallet Account
-    /*let hodlTreasuryDAIWalletATA = await Token.getAssociatedTokenAddress
+    //Hodl USDS Wallet Account
+    /*let hodlTreasuryUSDSWalletATA = await Token.getAssociatedTokenAddress
     (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      tokenAddressKeys.daiTokenMintAddress, //Token Mint Address
+      tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
       adminAccounts.hodlTreasuryAddress //Wallet Public Key
     )
-    console.log(hodlTreasuryDAIWalletATA.toString())*/
+    console.log(hodlTreasuryUSDSWalletATA.toString())*/
     try
     {
-      //Get HODL DAI Balance
-      const hodlDAIAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryDAIWalletATA)
-      const decimalAmount = tokenDecimalHashMap.get(tokenIds.daiTokenId)
-      hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.daiTokenMintAddress, hodlDAIAccount.value.uiAmount.toFixed(decimalAmount))
-      await listenForHODLTreasuryDAIWalletChanges()
+      //Get HODL USDS Balance
+      const hodlUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDSWalletATA)
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
+      hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdsTokenMintAddress, hodlUSDSAccount.value.uiAmount.toFixed(decimalAmount))
+      await listenForHODLTreasuryUSDSWalletChanges()
     }
     catch
     {
-      console.log("HODL DAI Wallet ATA Not Found")
+      console.log("HODL USDS Wallet ATA Not Found")
     }
-    //Solvency DAI Wallet Account
-    /*let solvencyTreasuryDAIWalletATA = await Token.getAssociatedTokenAddress
+    //Solvency USDS Wallet Account
+    /*let solvencyTreasuryUSDSWalletATA = await Token.getAssociatedTokenAddress
     (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      tokenAddressKeys.daiTokenMintAddress, //Token Mint Address
+      tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
       adminAccounts.solvencyTreasuryAddress //Wallet Public Key
     )
-    console.log(solvencyTreasuryDAIWalletATA.toString())*/
+    console.log(solvencyTreasuryUSDSWalletATA.toString())*/
     try
     {
-      //Get Solvency DAI Balance
-      const solvencyDAIAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryDAIWalletATA)
-      const decimalAmount = tokenDecimalHashMap.get(tokenIds.daiTokenId)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.daiTokenId, solvencyDAIAccount.value.uiAmount.toFixed(decimalAmount))
-      await listenForSolvencyTreasuryDAIWalletChanges()
+      //Get Solvency USDS Balance
+      const solvencyUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryUSDSWalletATA)
+      const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, solvencyUSDSAccount.value.uiAmount.toFixed(decimalAmount))
+      await listenForSolvencyTreasuryUSDSWalletChanges()
     }
     catch
     {
-      console.log("Solvency DAI Wallet ATA Not Found")
+      console.log("Solvency USDS Wallet ATA Not Found")
     }
 
     //The ATA address can be harded coded in once you know the address
@@ -280,20 +280,20 @@
 
   onUnmounted(() => 
   {
-    if(hodlDAIWalletATAWatcherId != undefined)
+    if(hodlUSDSWalletATAWatcherId != undefined)
     {
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(hodlDAIWalletATAWatcherId)
-      hodlDAIWalletATAWatcherId = undefined
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(hodlUSDSWalletATAWatcherId)
+      hodlUSDSWalletATAWatcherId = undefined
     }
     if(hodlUSDCWalletATAWatcherId != undefined)
     {
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(hodlUSDCWalletATAWatcherId)
       hodlUSDCWalletATAWatcherId = undefined
     }
-    if(solvencyDAIWalletATAWatcherId != undefined)
+    if(solvencyUSDSWalletATAWatcherId != undefined)
     {
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(solvencyDAIWalletATAWatcherId)
-      solvencyDAIWalletATAWatcherId = undefined
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(solvencyUSDSWalletATAWatcherId)
+      solvencyUSDSWalletATAWatcherId = undefined
     }
     if(solvencyUSDCWalletATAWatcherId != undefined)
     {
@@ -315,10 +315,10 @@
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(solvencyWBtcWalletATAWatcherId)
       solvencyWBtcWalletATAWatcherId = undefined
     }
-    if(userDAIWalletATAWatcherId != undefined)
+    if(userUSDSWalletATAWatcherId != undefined)
     {
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(userDAIWalletATAWatcherId)
-      userDAIWalletATAWatcherId = undefined
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(userUSDSWalletATAWatcherId)
+      userUSDSWalletATAWatcherId = undefined
     }
     if(userUSDCWalletATAWatcherId != undefined)
     {
@@ -362,10 +362,10 @@
       return
     }
 
-    if(userDAIWalletATAWatcherId != undefined)
+    if(userUSDSWalletATAWatcherId != undefined)
     {
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(userDAIWalletATAWatcherId)
-      userDAIWalletATAWatcherId = undefined
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(userUSDSWalletATAWatcherId)
+      userUSDSWalletATAWatcherId = undefined
     }
     if(userUSDCWalletATAWatcherId != undefined)
     {
@@ -393,24 +393,24 @@
 
   async function getUserWalletBalancesAndWatchForChanges()
   {
-    //User DAI Wallet Account
-    const userDaiWalletATA = await Token.getAssociatedTokenAddress
+    //User USDS Wallet Account
+    const userUSDSWalletATA = await Token.getAssociatedTokenAddress
     (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      tokenAddressKeys.daiTokenMintAddress, //Token Mint Address
+      tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
       connectedWallet.publicKey //Wallet Public Key
     )
     try
     {
-      //Get User DAI Wallet Balance
-      const userDaiWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userDaiWalletATA)
-      connectedWallet.tokenBalanceMap.set(tokenAddressStrings.daiTokenMintAddress, userDaiWalletAccount.value.uiAmount)
-      await listenForUserDAIWalletChanges()
+      //Get User USDS Wallet Balance
+      const userUSDSWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUSDSWalletATA)
+      connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdsTokenMintAddress, userUSDSWalletAccount.value.uiAmount)
+      await listenForUserUSDSWalletChanges()
     }
     catch
     {
-      console.log("User DAI Wallet ATA Not Found")
+      console.log("User USDS Wallet ATA Not Found")
     }
 
     //User USDC Wallet Account
@@ -486,16 +486,16 @@
     }
   }
 
-  async function listenForHODLTreasuryDAIWalletChanges()
+  async function listenForHODLTreasuryUSDSWalletChanges()
   {
     try
     {
       //Subscribe to account changes
-      hodlDAIWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryDAIWalletATA, async() => 
+      hodlUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDSWalletATA, async() => 
       {
         //Handle account change...
-        const hodlDAIAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryDAIWalletATA)
-        hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.daiTokenMintAddress, hodlDAIAccount.value.uiAmount.toFixed(2))
+        const hodlUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDSWalletATA)
+        hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdsTokenMintAddress, hodlUSDSAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)
@@ -522,16 +522,16 @@
     }
   }
 
-  async function listenForSolvencyTreasuryDAIWalletChanges()
+  async function listenForSolvencyTreasuryUSDSWalletChanges()
   {
     try
     {
       //Subscribe to account changes
-      solvencyDAIWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryDAIWalletATA, async() => 
+      solvencyUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDSWalletATA, async() => 
       {
         //Handle account change...
-        const solvencyDAIAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryDAIWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.daiTokenId, solvencyDAIAccount.value.uiAmount.toFixed(2))
+        const solvencyUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryUSDSWalletATA)
+        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, solvencyUSDSAccount.value.uiAmount.toFixed(2))
       })
     }
     catch(error)
@@ -613,23 +613,23 @@
     }
   }
 
-  async function listenForUserDAIWalletChanges()
+  async function listenForUserUSDSWalletChanges()
   {
-    const userDaiATA = await Token.getAssociatedTokenAddress
+    const userUSDSATA = await Token.getAssociatedTokenAddress
     (
       ASSOCIATED_TOKEN_PROGRAM_ID,
       TOKEN_PROGRAM_ID,
-      tokenAddressKeys.daiTokenMintAddress, //Token Mint Address
+      tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
       connectedWallet.publicKey //Wallet Public Key
     )
     try
     {
       //Subscribe to account changes
-      userDAIWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userDaiATA, async() => 
+      userUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUSDSATA, async() => 
       {
         //Handle account change...
-        const userDaiAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userDaiATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStrings.daiTokenMintAddress, userDaiAccount.value.uiAmount)
+        const userUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUSDSATA)
+        connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdsTokenMintAddress, userUSDSAccount.value.uiAmount)
       })
     }
     catch(error)

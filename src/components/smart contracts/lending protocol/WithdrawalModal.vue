@@ -602,7 +602,7 @@
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(withdrawAmount.value * Math.pow(10, tokenDecimalAmount)), //convert to fixedpoint notation
-        withdrawFullDepositedAmount
+        withdrawMax.value
         )
         .accounts({
           tokenMint: selectedTokenMintAddress,

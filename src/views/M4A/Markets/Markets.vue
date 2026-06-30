@@ -38,11 +38,7 @@
   <RepayModal ref="repayModal"/>
   <LiquidationModal ref="liquidationModal"/>
 
-  <!--<KingobamaMobileM1Market :style="{display: display1stTable}"/>
-  <div :style="{display: display2ndTable}">
-    <KingobamaMobileM4LeaderBoard v-if="onLeaderBoard=='onLeaderBoard'"/>
-    <KingobamaMobileM3Portfolio v-else/>
-  </div>-->
+  <KingobamaMobile class="Kingobama"/>
 </template>
 
 <script setup lang="ts">
@@ -55,10 +51,7 @@
   import BorrowModal from '/src/components/smart contracts/lending protocol/BorrowModal.vue'
   import RepayModal from '/src/components/smart contracts/lending protocol/RepayModal.vue'
   import LiquidationModal from '/src/components/smart contracts/lending protocol/LiquidationModal.vue'
-  import KingobamaMobileM1Market from '/src/components/fancy/poly/KingobamaMobileM1Market.vue'
-  import KingobamaMobileM2NoRecords from '/src/components/fancy/poly/KingobamaMobileM2NoRecords.vue'
-  import KingobamaMobileM3Portfolio from '/src/components/fancy/poly/KingobamaMobileM3Portfolio.vue'
-  import KingobamaMobileM4LeaderBoard from '/src/components/fancy/poly/KingobamaMobileM4LeaderBoard.vue'
+  import KingobamaMobile from '/src/components/fancy/poly/KingobamaMobile.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   

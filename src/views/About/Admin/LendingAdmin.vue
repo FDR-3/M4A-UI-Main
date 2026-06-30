@@ -42,9 +42,9 @@
     <div class="smallMarginTop">
       <h2>Add Lending Token Reserve Account</h2>
       <div class="nMediumMarginTop smallMarginBottom">
-        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenIds.daiTokenId)">
-          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.daiTokenId).svg"></component>
-          Init DAI Token Reserve
+        <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenIds.usdsTokenId)">
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.usdsTokenId).svg"></component>
+          Init USDS Token Reserve
         </ion-button>
         <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenIds.usdcTokenId)">
           <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.usdcTokenId).svg"></component>
@@ -148,7 +148,7 @@
   globalLimit: number) =>
   editTokenReserveModal.openEditTokenReserveModal(tokenId, tokenMintAddress, tokenSVG, tokenName, solvencyInsuranceFeeRate, fixedBorrowAPY, useFixedBorrowApy, globalLimit)"/>
   <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString && anchorPrograms.isLendingProtocolInitialized">
-    <MintDevNetTestToken/>
+    <MintTestToken/>
     <CloseTempPriceAccount/>
   </div>
 
@@ -171,7 +171,7 @@
   import InputNumber from 'primevue/inputnumber'
   import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
   import AdminTokenReservesTable from '/src/components/tables/lending/admin/AdminTokenReservesTable.vue'
-  import MintDevNetTestToken from '/src/components/smart contracts/lending protocol/admin/MintDevNetTestToken.vue'
+  import MintTestToken from '/src/components/smart contracts/lending protocol/admin/MintTestToken.vue'
   import CloseTempPriceAccount from '/src/components/smart contracts/lending protocol/admin/CloseTempPriceAccount.vue'
   import EditTokenReserveModal from '/src/components/smart contracts/lending protocol/EditTokenReserveModal.vue'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'

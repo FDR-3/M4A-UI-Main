@@ -36,7 +36,7 @@
     const price = await(await fetch
     (
       "https://lite-api.jup.ag/price/v3?ids=" +
-      `${jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress},` +
+      `${jupiterPriceUpdateMainnetTokenAddressStrings.usdsTokenMintAddress},` +
       `${jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress},` +
       `${jupiterPriceUpdateMainnetTokenAddressStrings.solTokenMintAddress},` +
       `${jupiterPriceUpdateMainnetTokenAddressStrings.wethTokenMintAddress},` +
@@ -47,15 +47,15 @@
     {
       if(DEV_MODE)
       {
-        //Update Price for Dev DAI
-        if(StableCoins[i].tokenMintAddressString == tokenAddressStrings.daiTokenMintAddress)
+        //Update Price for Dev USDS
+        if(StableCoins[i].tokenMintAddressString == tokenAddressStrings.usdsTokenMintAddress)
         {
-          StableCoins[i].price = price[jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress].usdPrice
-          StableCoins[i].priceString = '$' + price[jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress].usdPrice.toLocaleString('en-US', {
+          StableCoins[i].price = price[jupiterPriceUpdateMainnetTokenAddressStrings.usdsTokenMintAddress].usdPrice
+          StableCoins[i].priceString = '$' + price[jupiterPriceUpdateMainnetTokenAddressStrings.usdsTokenMintAddress].usdPrice.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
-          StableCoins[i].percentChange24h = price[jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress].priceChange24h.toFixed(2)
-          price[tokenAddressStrings.daiTokenMintAddress] = price[jupiterPriceUpdateMainnetTokenAddressStrings.daiTokenMintAddress]
+          StableCoins[i].percentChange24h = price[jupiterPriceUpdateMainnetTokenAddressStrings.usdsTokenMintAddress].priceChange24h.toFixed(2)
+          price[tokenAddressStrings.usdsTokenMintAddress] = price[jupiterPriceUpdateMainnetTokenAddressStrings.usdsTokenMintAddress]
           continue
         }
 

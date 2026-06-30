@@ -1,5 +1,5 @@
 <template>
-  <div class="flexCenterRow mobileSpaceFiller">
+  <div class="flexCenterRow nSmallMarginBottom">
     <div class="overlayContainer">
       <img src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNl7yVwaQI8q5NK7Szk01wJgXYZuyrWDbmcx3v" class="KingobamasCrown"/>
       <ion-button fill="clear" @click="sourceKingobamaCrown()">
@@ -178,113 +178,6 @@
     .KingobamasCrown
     {
       width: 0vw
-    }
-  }
-
-  /*Mobile Space Filler*/
-  @media screen and (min-width: 670.1px)
-  {
-    .mobileSpaceFiller
-    {
-      display: none !important
-    }
-  }
-  @media screen and (min-width: 525.1px) and (max-width: 670px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: 4vw
-    }
-  }
-  @media screen and (min-width: 483.1px) and (max-width: 525px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -3vw
-    }
-  }
-  @media screen and (min-width: 454.1px) and (max-width: 483px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -13vw
-    }
-  }
-  @media screen and (min-width: 414.1px) and (max-width: 454px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -16vw
-    }
-  }
-  @media screen and (min-width: 379.1px) and (max-width: 414px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -21vw
-    }
-  }
-  @media screen and (min-width: 360.1px) and (max-width: 379px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -27vw
-    }
-  }
-  @media screen and (min-width: 344.1px) and (max-width: 360px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -33vw
-    }
-  }
-  @media screen and (min-width: 325.1px) and (max-width: 344px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -37vw
-    }
-  }
-  @media screen and (min-width: 301.1px) and (max-width: 325px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -44vw
-    }
-  }
-  @media screen and (min-width: 292.1px) and (max-width: 301px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -51vw
-    }
-  }
-  @media screen and (min-width: 260.1px) and (max-width: 292px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -59vw
-    }
-  }
-  @media screen and (min-width: 235.1px) and (max-width: 260px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -75vw
-    }
-  }
-  @media screen and (min-width: 207.1px) and (max-width: 235px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -97vw
-    }
-  }
-  @media screen and (min-width: 100.1px) and (max-width: 207px)
-  {
-    .mobileSpaceFiller
-    {
-      margin-top: -112vw
     }
   }
 </style>

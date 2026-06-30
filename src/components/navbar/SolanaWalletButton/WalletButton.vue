@@ -145,6 +145,7 @@
         {
           connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
           connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+          connectedWallet.hasGoodEnding = true
           await listenForLendingUserLookUpTableChanges()
         }
         else
@@ -168,6 +169,7 @@
           chatAccount.postVoteCastedCount.gt(new anchor.BN(0)) ||
           chatAccount.pollVoteCount.gt(new anchor.BN(0)) ||
           chatAccount.hasGoodEnding ||
+          connectedWallet.lendingUserLookUpTableAccount ||
           //These can be initialized before the user has a chat account (plus M4AProtocol is a different program), so need extra checks
           (anchorPrograms.m4aProtocolInitiatorAddress == connectedWallet.addressString) ||
           (anchorPrograms.chatProtocolInitiatorAddress == connectedWallet.addressString) ||
@@ -180,6 +182,7 @@
         connectedWallet.isChatAccountReady = false
         connectedWallet.hasHadCustomName = false
         connectedWallet.hasGoodEnding = 
+          connectedWallet.lendingUserLookUpTableAccount ||
           //These can be initialized before the user has a chat account (plus M4AProtocol is a different program), so need extra checks
           (anchorPrograms.m4aProtocolInitiatorAddress == connectedWallet.addressString) ||
           (anchorPrograms.chatProtocolInitiatorAddress == connectedWallet.addressString) ||
@@ -246,6 +249,7 @@
         {
           connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
           connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+          connectedWallet.hasGoodEnding = true
           await listenForLendingUserLookUpTableChanges()
         }
         else
@@ -269,6 +273,7 @@
           chatAccount.postVoteCastedCount.gt(new anchor.BN(0)) ||
           chatAccount.pollVoteCount.gt(new anchor.BN(0)) ||
           chatAccount.hasGoodEnding ||
+          connectedWallet.lendingUserLookUpTableAccount ||
           //These can be initialized before the user has a chat account (plus M4AProtocol is a different program), so need extra checks
           (anchorPrograms.m4aProtocolInitiatorAddress == connectedWallet.addressString) ||
           (anchorPrograms.chatProtocolInitiatorAddress == connectedWallet.addressString) ||
@@ -280,7 +285,8 @@
       {
         connectedWallet.isChatAccountReady = false
         connectedWallet.hasHadCustomName = false
-        connectedWallet.hasGoodEnding = 
+        connectedWallet.hasGoodEnding =
+          connectedWallet.lendingUserLookUpTableAccount ||
           //These can be initialized before the user has a chat account (plus M4AProtocol is a different program), so need extra checks
           (anchorPrograms.m4aProtocolInitiatorAddress == connectedWallet.addressString) ||
           (anchorPrograms.chatProtocolInitiatorAddress == connectedWallet.addressString) ||
@@ -363,6 +369,7 @@
         chatAccount.postVoteCastedCount.gt(new anchor.BN(0)) ||
         chatAccount.pollVoteCount.gt(new anchor.BN(0)) ||
         chatAccount.hasGoodEnding ||
+        connectedWallet.lendingUserLookUpTableAccount ||
         //These can be initialized before the user has a chat account (plus M4AProtocol is a different program), so need extra checks
         (anchorPrograms.m4aProtocolInitiatorAddress == connectedWallet.addressString) ||
         (anchorPrograms.chatProtocolInitiatorAddress == connectedWallet.addressString) ||
@@ -374,7 +381,8 @@
     {
       connectedWallet.isChatAccountReady = false
       connectedWallet.hasHadCustomName = false
-      connectedWallet.hasGoodEnding = 
+      connectedWallet.hasGoodEnding =
+        connectedWallet.lendingUserLookUpTableAccount ||
         //These can be initialized before the user has a chat account (plus M4AProtocol is a different program), so need extra checks
         (anchorPrograms.m4aProtocolInitiatorAddress == connectedWallet.addressString) ||
         (anchorPrograms.chatProtocolInitiatorAddress == connectedWallet.addressString) ||
@@ -445,6 +453,7 @@
       {
         connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
         connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+        connectedWallet.hasGoodEnding = true
         await listenForLendingUserLookUpTableChanges()
       }
       else

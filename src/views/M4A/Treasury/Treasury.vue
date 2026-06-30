@@ -35,8 +35,7 @@
   <CreateSubMarketModal ref="createSubMarketModal"/>
   <CollectSubMarketFeesModal ref="collectSubMarketFeesModal"/>
 
-  <!--<KingobamaMobileT1 :style="{display: display1stTable}"/>
-  <KingobamaMobileT2 :style="{display: display2ndTable}"/>-->
+  <KingobamaMobile class="Kingobama"/>
 </template>
 
 
@@ -57,8 +56,7 @@
   import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'
-  import KingobamaMobileT1 from '/src/components/fancy/poly/KingobamaMobileT1.vue'
-  import KingobamaMobileT2 from '/src/components/fancy/poly/KingobamaMobileT2.vue'
+  import KingobamaMobile from '/src/components/fancy/poly/KingobamaMobile.vue'
   import M4AProtocolTVLLongHTMLText from './M4AProtocolTVLLongHTMLText.vue'
   import M4AProtocolTVLShortHTMLText from './M4AProtocolTVLShortHTMLText.vue'
 

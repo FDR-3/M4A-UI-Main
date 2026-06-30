@@ -1,7 +1,7 @@
 <template>
   <div class="thickBorder smallMarginTop widthOverFlow">
     <div class="minWidth">
-      <h2 class="smallMarginTop">Mint DevNet Test Token</h2>
+      <h2 class="smallMarginTop">Mint Legacy Token Program Test Token</h2>
       <div class="spaceRowEvenly mediumMarginBottom" style="width: 100%">
         <div class="smallMarginTop flexCenterColumn">
           

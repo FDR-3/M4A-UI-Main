@@ -217,4 +217,19 @@
     /* Avoid transforms if possible */
     max-width: 90vw
   }
+
+  @media screen and (min-width: 628px) 
+  { 
+    .Kingobama
+    {
+      display: none
+    }
+  }
+  @media screen and (max-width: 627.9px) 
+  { 
+    .Kingobama
+    {
+      display: block
+    }
+  }
 </style>

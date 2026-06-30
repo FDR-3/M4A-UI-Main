@@ -34,7 +34,7 @@
     ceoIsDead: false,
     priceOracleRemainingAccount: 
     {
-      pubkey: new PublicKey("3jYmEG7Y8fU2696Gqukt95TSNzpkgkYHQsJpypdGW3WE"),
+      pubkey: new PublicKey("6zpT3Fr3Hw95L23AVgx2D1wFkig8kESXB62dGZHxW2tS"),
       isSigner: false,
       isWritable: true
     }
@@ -44,7 +44,7 @@
   export const hodlTreasuryWalletATAHashMap: Map<string, PublicKey> = new Map(
   [
     //Key: Token Mint Address, Value: Assocated Token Address
-    [tokenAddressStrings.daiTokenMintAddress, hodlWalletATAKeys.daiATA],
+    [tokenAddressStrings.usdsTokenMintAddress, hodlWalletATAKeys.usdsATA],
     [tokenAddressStrings.usdcTokenMintAddress, hodlWalletATAKeys.usdcATA]
   ])
 
@@ -52,7 +52,7 @@
   export const solvencyInsuranceTreasuryWalletATAHashMap: Map<string, PublicKey> = new Map(
   [
     //Key: Token Mint Address, Value: Assocated Token Address
-    [tokenAddressStrings.daiTokenMintAddress, solvencyWalletATAKeys.daiATA],
+    [tokenAddressStrings.usdsTokenMintAddress, solvencyWalletATAKeys.usdsATA],
     [tokenAddressStrings.usdcTokenMintAddress, solvencyWalletATAKeys.usdcATA],
     [tokenAddressStrings.solTokenMintAddress, solvencyWalletATAKeys.solATA],
     [tokenAddressStrings.wethTokenMintAddress, solvencyWalletATAKeys.wethATA],

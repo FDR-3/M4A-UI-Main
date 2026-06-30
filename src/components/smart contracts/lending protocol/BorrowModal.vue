@@ -415,7 +415,7 @@
 
       const uniqueTokenReserveRemainingAccounts = getTokenReserveRemainingAccounts(uniqueTokenIds)
       const tempPriceRemainingAccount = getTempRemainingPriceAccount()
-      
+
       refreshingUserRemainingAccounts.push(tempPriceRemainingAccount)
       refreshingUserRemainingAccounts.push(...uniqueTokenReserveRemainingAccounts)
       refreshingUserRemainingAccounts.push(...lendingTabSubMarketAndMonthlyStatementRemainingAccounts)
