@@ -19,15 +19,15 @@
   export const initAlertWorkspace = () =>
   { 
     const wallet = useAnchorWallet()
-    connection = new Connection(clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment)
+    //connection = new Connection(clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment)
     //connection = new Connection("https://api.devnet.solana.com"/*Interchangeable with "clusterApiUrl("devnet")"*/, preflightCommitment)
     
     //It isn't neccessary to run the alert protocol against mainnet. This saves on requests just using devnet and no RPC provider since this contract is just for triggering alerts.
-    //if(isProduction())
-      //connection = new Connection("https://m4a.io/proxyCORS", preflightCommitment)
-    //else
-      //connection = DEV_MODE ? new Connection(clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
-      //connection = DEV_MODE ? new Connection("https://api.devnet.solana.com"/*Interchangeable with "clusterApiUrl("devnet")"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
+    if(isProduction())
+      connection = new Connection("https://m4a.io/Proxy", preflightCommitment)
+    else
+      connection = DEV_MODE ? new Connection(clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
+      connection = DEV_MODE ? new Connection("https://api.devnet.solana.com"/*Interchangeable with "clusterApiUrl("devnet")"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
     
     const provider = computed
     (

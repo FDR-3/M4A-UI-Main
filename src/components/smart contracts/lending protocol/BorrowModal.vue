@@ -117,7 +117,8 @@
     bundleProtocolPriceTransactions,
     getNeccessaryRefreshInstructionData,
     getTokenReserveRemainingAccounts,
-    getTempRemainingPriceAccount } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    getTempRemainingPriceAccount,
+    createJitoTipInstruction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { lendingUserAccountsHashMap,
@@ -128,6 +129,7 @@
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
+  import { bs58 } from 'bs58'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
@@ -443,9 +445,12 @@
       .remainingAccounts([tempPriceRemainingAccount, adminAccounts.priceOracleRemainingAccount])
       .instruction()
 
+      const jitoTipInstruction = createJitoTipInstruction()
+
       instructionsToSend.push(...createMonthlyStatementInstructions)
       instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
       instructionsToSend.push(borrowInstruction)
+      instructionsToSend.push(jitoTipInstruction)
 
       //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
@@ -465,13 +470,28 @@
       }
 
       const response = await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
-      const userTxs = response.userTxs
+      const resp = response.resp
 
-      if(userTxs.length)
-        for(var i=0; i<userTxs.length; i++)
-          await confirmLendingTransaction(userTxs[i], toast, "borrow_tokens")
+      console.log(resp)
+
+      var userSignatures = []
+      console.log(signedTransactions)
+      for(var i=0; i<signedTransactions.length; i++)
+      userSignatures.push(bs58.encode(signedTransactions[i].signatures[0]))
+
+        //userSignatures.push(signedTransactions[i].signatures[0].signature?.toString('base58'))
+      //signedTransactions.map((tx: { signatures: { signature: { toString: (arg0: string) => any } }[] }) => tx.signatures[0].signature?.toString('base58'));
+      console.log("User Signatures:", userSignatures);
+      /*if(resp.result)
+        await confirmLendingTransaction(resp.result, toast, "borrow_tokens")
       else
-        await confirmLendingTransaction(userTxs, toast, "borrow_tokens")
+        toastPreTransactionError(resp.error.message, toast, "borrow_tokens")*/
+      
+      if(userSignatures.length)
+        for(var i=0; i<userSignatures.length; i++)
+          await confirmLendingTransaction(userSignatures[i], toast, "borrow_tokens")
+      else
+        await confirmLendingTransaction(userSignatures, toast, "borrow_tokens")
 
       stopHealthFactorCalculation()
       borrowing.value = false

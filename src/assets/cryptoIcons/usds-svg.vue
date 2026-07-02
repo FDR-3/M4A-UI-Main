@@ -8,7 +8,7 @@
     viewBox="0 0 1000 1000"
   >
     <defs>
-      <linearGradient id="usds-linear-gradient" x1="50%" y1="0%" x2="50%" y2="100%">
+      <linearGradient :id="uniqueId" x1="50%" y1="0%" x2="50%" y2="100%">
         <stop offset="0%" stop-color="#ff6d6d"/>
         <stop offset="100%" stop-color="#ffd232"/>
       </linearGradient>
@@ -16,7 +16,7 @@
     <g id="USDS-Coin-2">
       <circle 
         id="Element" 
-        fill="url(#usds-linear-gradient)" 
+        :fill="`url(#${uniqueId})`" 
         stroke-width="0px" 
         cx="500" 
         cy="500" 
@@ -31,3 +31,8 @@
     </g>
   </svg>
 </template>
+
+<script setup lang="ts">
+  //Generate a unique ID for this specific instance
+  const uniqueId = `usds-grad-${Math.random().toString(36).substring(2, 9)}`;
+</script>

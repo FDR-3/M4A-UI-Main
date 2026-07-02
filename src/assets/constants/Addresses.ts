@@ -200,3 +200,29 @@ export function getMainnetTokenAddresses(devnetTokenAddresses: string[])
 
   return mainnetTokenAddress
 }
+
+//Mainnet
+/*export const JITO_TIP_ACCOUNTS =
+[
+  "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
+  "HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe",
+  "Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY",
+  "ADaUMid9yfUytqMBgopwjb2DTLSokTSzL1zt6iGPaS49",
+  "DfXygSm4jCyNCybVYYK6DwvWqjKee8pbDmJGcLWNDXjh",
+  "ADuUkR4vqLUMWXxW9gh6D6L8pMSawimctcNZ5pGwDcEt",
+  "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL",
+  "3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT"
+]*/
+
+//Testnet
+export const JITO_TIP_ACCOUNTS =
+[
+  "F7ThiQUBYiEcyaxpmMuUeACdoiSLKg4SZZ8JSfpFNwAf",
+  "AzfhMPcx3qjbvCK3UUy868qmc5L451W341cpFqdL3EBe",
+  "4uRnem4BfVpZBv7kShVxUYtcipscgZMSHi3B9CSL6gAA",
+  "CwWZzvRgmxj9WLLhdoWUVrHZ1J8db3w2iptKuAitHqoC",
+  "84DrGKhycCUGfLzw8hXsUYX9SnWdh2wW3ozsTPrC5xyg",
+  "BkMx5bRzQeP6tUZgzEs3xeDWJfQiLYvNDqSgmGZKYJDq",
+  "7aewvu8fMf1DK4fKoMXKfs3h3wpAQ7r7D8T1C71LmMF",
+  "G2d63CEgKBdgtpYT2BuheYQ9HFuFCenuHLNyKVpqAuSD"
+]

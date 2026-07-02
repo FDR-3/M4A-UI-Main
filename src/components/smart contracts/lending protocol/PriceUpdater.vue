@@ -35,7 +35,7 @@
     
     const price = await(await fetch
     (
-      "https://lite-api.jup.ag/price/v3?ids=" +
+      "https://api.jup.ag/price/v3?ids=" +
       `${jupiterPriceUpdateMainnetTokenAddressStrings.usdsTokenMintAddress},` +
       `${jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress},` +
       `${jupiterPriceUpdateMainnetTokenAddressStrings.solTokenMintAddress},` +

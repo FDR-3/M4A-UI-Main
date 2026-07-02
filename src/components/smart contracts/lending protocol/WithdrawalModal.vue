@@ -114,7 +114,8 @@
     bundleProtocolPriceTransactions,
     getNeccessaryRefreshInstructionData,
     getTokenReserveRemainingAccounts,
-    getTempRemainingPriceAccount } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    getTempRemainingPriceAccount,
+    createJitoTipInstruction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,

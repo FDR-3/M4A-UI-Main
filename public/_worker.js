@@ -1,4 +1,5 @@
-const PROXY_URL = "https://m4a.io/proxyCORS"
+const PROXY_URL = "https://m4a.io/Proxy"
+const TEST_NET_PROXY_URL = "https://m4a.io/TestNetProxy"
 const ORIGIN = "https://m4a.io"
 
 //Function to handle all requests
@@ -8,7 +9,7 @@ export default
   {
     try
     {
-      if(request.url == PROXY_URL)
+      if(request.url == PROXY_URL || request.url == TEST_NET_PROXY_URL)
       {
         const origin = request.headers.get("origin")
 
@@ -19,10 +20,10 @@ export default
         var RPC_BASE_URL = ""
         var API_KEY = ""
 
-        if(env.USE_HELIUS == "TRUE")
+        if(request.url == PROXY_URL)
         {
           if(!env.HELIUS_API_KEY)
-				    return new Response("HELIUS API key is missing.", { status: 500 })
+            return new Response("HELIUS API key is missing.", { status: 500 })
 
           if(env.DEV_MODE == "TRUE")
             RPC_BASE_URL = "https://devnet.helius-rpc.com/?api-key="
@@ -31,25 +32,21 @@ export default
 
           API_KEY = env.HELIUS_API_KEY
         }
-        else
+        else if(request.url == TEST_NET_PROXY_URL)
         {
-          if(!env.EXTRNODE_API_KEY)
-				    return new Response("EXTRNODE API key is missing.", { status: 500 })
+          if(!env.QUICK_NODE_TEST_URL)
+            return new Response("QUICK_NODE_TEST_URL is missing.", { status: 500 })
 
-          if(env.DEV_MODE == "TRUE")
-            RPC_BASE_URL = "https://solana-devnet.rpc.extrnode.com/"
-          else
-            RPC_BASE_URL = "https://solana-mainnet.rpc.extrnode.com/"
-
-          API_KEY = env.EXTRNODE_API_KEY
+          RPC_BASE_URL = ""
+          API_KEY = env.QUICK_NODE_TEST_URL
         }
-        
+
         const RPC_Request_URL = RPC_BASE_URL + API_KEY
 	
         const method = request.method
 
         const corsHeaders =
-		    {
+        {
           "Access-Control-Allow-Origin": '*',
           "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
           "Access-Control-Allow-Headers": "Content-Type, solana-client"
@@ -68,7 +65,7 @@ export default
           )
         }
 
-        //🐛 Create new headers and add the Referer header from the original request for extrnode request
+        //🐛 Create new headers and add the Referer header from the original request for extrnode request. extrnode website seems to always be stuck spinning now a days 6/30/2026 for me anyway
         const newHeaders = new Headers(request.headers)
         newHeaders.set("referer", "m4a.io")
 
@@ -84,7 +81,7 @@ export default
         const newResponse = new Response(response.body, response)
         newResponse.headers.set("Access-Control-Allow-Origin", '*') //Set CORS header on the final response
 
-        return newResponse
+        return response
       }
       else
       {

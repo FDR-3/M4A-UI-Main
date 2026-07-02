@@ -23,14 +23,15 @@
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { trimAddress, doesKeyExistInLookUpTable } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenDecimalHashMap, JITO_TIP_ACCOUNTS } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import { PublicKey,
     AddressLookupTableProgram,
     AddressLookupTableAccount,
     VersionedTransaction,
-    TransactionMessage } from "@solana/web3.js"
+    TransactionMessage,
+    SystemProgram } from "@solana/web3.js"
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
@@ -1663,6 +1664,21 @@ export async function userSignsLendingTransactions(
       isSigner: false,
       isWritable: true
     }
+  }
+
+  export  function createJitoTipInstruction()
+  {
+    const randomTipAccount = new PublicKey(JITO_TIP_ACCOUNTS[Math.floor(Math.random() * JITO_TIP_ACCOUNTS.length)])
+
+    const tipAmount = 10000 //10,000 lamports is the minimum Jito Tip
+    const jitoTipInstruction = SystemProgram.transfer(
+    {
+      fromPubkey: connectedWallet.publicKey,
+      toPubkey: randomTipAccount,
+      lamports: tipAmount,
+    })
+
+    return jitoTipInstruction
   }
 
   export default getLendingProtocolCEOAccount

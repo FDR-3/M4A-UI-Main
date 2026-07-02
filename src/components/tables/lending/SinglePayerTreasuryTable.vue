@@ -120,8 +120,8 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)" style="margin-left: -8px">
-              <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 40px; height: 32px; margin-left: -8px; margin-right: -4px"/>
-              <component v-else :is="slotProps.data.asset.svg" style="width: 24px; height: 32px; margin-right: 5px"/>
+              <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 44px; height: 32px; margin-left: -8px; margin-right: -4px"/>
+              <component v-else :is="slotProps.data.asset.svg" style="width: 28px; height: 32px; margin-right: 5px"/>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
             <ion-popover 

@@ -55,20 +55,20 @@ var blockChainTimeStampEstimationIntervalId: any
 
 export async function updateBlockChainTimeStamp()
 {
-  const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
-  blockChainData.timeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
+  const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
+  blockChainData.timeStamp = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
 }
 
 export async function startBlockChainTimeStampRefresh()
 {
-  const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
-  blockChainData.timeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
+  const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
+  blockChainData.timeStamp = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
 
   blockChainTimeStampRefreshIntervalId = setInterval(async() =>
   {
     console.log("Refreshing Block Chain Time Stamp")
-    const slot = await anchorPrograms.alert.alertProgram.provider.connection.getSlot()
-    blockChainData.timeStamp = await anchorPrograms.alert.alertProgram.provider.connection.getBlockTime(slot)
+    const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
+    blockChainData.timeStamp = await anchorPrograms.lending.lendingProgram.provider.connection.getBlockTime(slot)
   }, 60000) 
 }
 

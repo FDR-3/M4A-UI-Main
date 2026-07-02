@@ -50,7 +50,7 @@
     //Key: Token Mint Address, Value: Token SVG
     [tokenIds.usdsTokenId,
     {
-      name: "USDS-Dev",
+      name: "USDS",
       publicKey: tokenAddressKeys.usdsTokenMintAddress,
       decimalAmount: tokenDecimalHashMap.get(tokenIds.usdsTokenId),
       svg: markRaw(USDSSVG),
@@ -60,7 +60,7 @@
     }],
     [tokenIds.usdcTokenId,
     {
-      name: "USDC-Dev",
+      name: "USDC",
       publicKey: tokenAddressKeys.usdcTokenMintAddress,
       decimalAmount: tokenDecimalHashMap.get(tokenIds.usdcTokenId),
       svg: markRaw(USDCSVG),
@@ -70,7 +70,7 @@
     }],
     [tokenIds.solTokenId,
     {
-      name: "SOL-Dev",
+      name: "SOL",
       publicKey: tokenAddressKeys.solTokenMintAddress,
       decimalAmount: tokenDecimalHashMap.get(tokenIds.solTokenId),
       svg: markRaw(SOLSVG),
@@ -80,7 +80,7 @@
     }],
     [tokenIds.wethTokenId,
     {
-      name: "WETH-Dev",
+      name: "WETH",
       publicKey: tokenAddressKeys.wethTokenMintAddress,
       decimalAmount: tokenDecimalHashMap.get(tokenIds.wethTokenId),
       svg: markRaw(WETHSVG),
@@ -90,7 +90,7 @@
     }],
     [tokenIds.wbtcTokenId,
     {
-      name: "WBTC-Dev",
+      name: "WBTC",
       publicKey: tokenAddressKeys.wbtcTokenMintAddress,
       decimalAmount: tokenDecimalHashMap.get(tokenIds.wbtcTokenId),
       svg: markRaw(WBTCSVG),

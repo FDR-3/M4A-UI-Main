@@ -61,7 +61,7 @@
       solvencyATA: solvencyWalletATAStrings.usdcATA,
       asset: 
       {
-        name: usdcName,
+        name: "USDC",
         svg: USDCSVG,
         source: () => {sourceUSDC()}
       },
