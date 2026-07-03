@@ -94,12 +94,14 @@
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
+        console.log("confirmation error: ", confirmation.value.err)
         toast.add({ severity: 'error',
         summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
         detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
+        console.log(`TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`)
         toast.add({ severity: 'success',
         summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
         detail: `TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`,
@@ -124,12 +126,14 @@
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
+        console.log("confirmation error: ", confirmation.value.err)
         toast.add({ severity: 'error',
         summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
         detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
+        console.log(`TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`)
         toast.add({ severity: 'success',
         summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
         detail: `TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`,
@@ -154,12 +158,14 @@
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
+        console.log("confirmation error: ", confirmation.value.err)
         toast.add({ severity: 'error',
         summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
         detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
+        console.log(`TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`)
         toast.add({ severity: 'success',
         summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
         detail: `TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`,
@@ -184,12 +190,14 @@
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
+        console.log("confirmation error: ", confirmation.value.err)
         toast.add({ severity: 'error',
         summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
         detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
+        console.log(`TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`)
         toast.add({ severity: 'success',
         summary: `"${contractFunctionName}" Smart Contract Transaction Successful!`,
         detail: `TX_ID: ${transaction}\n\nThe "${contractFunctionName}" contract function has been executed`,

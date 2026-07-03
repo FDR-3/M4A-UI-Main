@@ -1,5 +1,8 @@
 <template>
   <slot v-bind="scope">
+    <ion-button id="closeConnectButton" class="icon-only-button" fill="clear" color="white" @click="disconnect()">
+      <ion-icon id="closeConnectButtonIcon" :src="closeOutline" color="dark"></ion-icon>
+    </ion-button>
     <ion-button class="connectButton"
       :color="colorName"
       :disabled="disabled || !wallet || connecting || connected"
@@ -13,6 +16,7 @@
 
 <script setup lang="ts">
   import { IonButton } from '@ionic/vue'
+  import { closeOutline } from 'ionicons/icons'
   import { computed, toRefs } from "vue"
   import { useWallet } from 'solana-wallets-vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
@@ -22,7 +26,7 @@
   const emits = defineEmits(['click'])
 
   const { disabled } = toRefs(props)
-  const { wallet, connect, connecting, connected } = useWallet()
+  const { wallet, connect, connecting, connected, disconnect } = useWallet()
 
   const content = computed(() => {
     if(connecting.value) return "Connecting ..."
@@ -52,5 +56,14 @@
   .connectButton
   {
     white-space: nowrap
+  }
+
+  #closeConnectButton
+  {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    margin: 0;
   }
 </style>
