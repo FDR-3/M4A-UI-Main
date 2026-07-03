@@ -108,6 +108,7 @@
     }
     catch(error)
     {
+      console.log("confirmation error: ", error)
       toast.add({ severity: 'error',
       summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
       detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
@@ -137,6 +138,7 @@
     }
     catch(error)
     {
+      console.log("confirmation error: ", error)
       toast.add({ severity: 'error',
       summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
       detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
@@ -166,6 +168,7 @@
     }
     catch(error)
     {
+      console.log("confirmation error: ", error)
       toast.add({ severity: 'error',
       summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
       detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
@@ -195,6 +198,7 @@
     }
     catch(error)
     {
+      console.log("confirmation error: ", error)
       toast.add({ severity: 'error',
       summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
       detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })

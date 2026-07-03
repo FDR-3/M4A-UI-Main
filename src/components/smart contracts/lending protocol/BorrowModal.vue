@@ -129,7 +129,7 @@
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
-  import { bs58 } from 'bs58'
+  import * as bs58 from 'bs58'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
@@ -475,13 +475,10 @@
       console.log(resp)
 
       var userSignatures = []
-      console.log(signedTransactions)
-      for(var i=0; i<signedTransactions.length; i++)
-      userSignatures.push(bs58.encode(signedTransactions[i].signatures[0]))
 
-        //userSignatures.push(signedTransactions[i].signatures[0].signature?.toString('base58'))
-      //signedTransactions.map((tx: { signatures: { signature: { toString: (arg0: string) => any } }[] }) => tx.signatures[0].signature?.toString('base58'));
-      console.log("User Signatures:", userSignatures);
+      for(var i=0; i<signedTransactions.length; i++)
+        userSignatures.push(bs58.encode(signedTransactions[i].signatures[0]))
+
       /*if(resp.result)
         await confirmLendingTransaction(resp.result, toast, "borrow_tokens")
       else

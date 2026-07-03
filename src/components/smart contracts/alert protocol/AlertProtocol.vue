@@ -24,6 +24,7 @@
   {
     //Dead Man's Break
     const deadMansBreak = await getDeadMansBreak()
+
     await listenForChatQualityOfLifeAccountsChanges()
     if(deadMansBreak)
     {
