@@ -55,8 +55,7 @@ import { Noir } from '/src/assets/styling/AuraNoir.vue'
 import "solana-wallets-vue/styles.css"
 import { initWallet } from "solana-wallets-vue"
 import SolanaWallets from "solana-wallets-vue"
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base"
-import { PhantomWalletAdapter, SolflareWalletAdapter,  TrezorWalletAdapter, CloverWalletAdapter, Coin98WalletAdapter, CoinbaseWalletAdapter, KeystoneWalletAdapter } from "@solana/wallet-adapter-wallets"
+import { PhantomWalletAdapter, SolflareWalletAdapter,  /*TrezorWalletAdapter,*/ CloverWalletAdapter, Coin98WalletAdapter, CoinbaseWalletAdapter, KeystoneWalletAdapter } from "@solana/wallet-adapter-wallets"
 import { initM4AWorkspace, useM4AWorkspace } from '/src/assets/contracts/Solana/AnchorM4AWorkSpace.vue'
 import { initChatWorkspace, useChatWorkspace } from '/src/assets/contracts/Solana/AnchorChatWorkSpace.vue'
 import { initLendingWorkspace, useLendingWorkspace } from '/src/assets/contracts/Solana/AnchorLendingWorkSpace.vue'
@@ -67,13 +66,13 @@ const walletOptions =
 {
   wallets: 
   [
-    new TrezorWalletAdapter(),
-    new KeystoneWalletAdapter({ network: WalletAdapterNetwork.Devnet }),
-    new Coin98WalletAdapter({ network: WalletAdapterNetwork.Devnet }),
-    new CloverWalletAdapter({ network: WalletAdapterNetwork.Devnet }),
-    new CoinbaseWalletAdapter({ network: WalletAdapterNetwork.Devnet }),
-    new PhantomWalletAdapter({ network: WalletAdapterNetwork.Devnet }),
-    new SolflareWalletAdapter({ network: WalletAdapterNetwork.Devnet })
+    //new TrezorWalletAdapter(),
+    new KeystoneWalletAdapter(),
+    new Coin98WalletAdapter(),
+    new CloverWalletAdapter(),
+    new CoinbaseWalletAdapter(),
+    new PhantomWalletAdapter(),
+    new SolflareWalletAdapter()
   ],
   autoConnect: true
 }
