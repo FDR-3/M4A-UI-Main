@@ -42,7 +42,7 @@
     "primevue": "^4.0.5",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "serve-static": "^1.15.0",
-    "solana-wallets-vue": "^0.4.5",
+    "solana-wallets-vue": "^0.7.1",
     "vidstack": "^1.11.30",
     "vue": "^3.5.6",
     "vue-router": "^4.4.3",
