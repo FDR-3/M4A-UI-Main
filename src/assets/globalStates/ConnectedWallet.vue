@@ -20,7 +20,8 @@
     depositedTokenMap: new Map<string, string>(), //Balances that the user has deposited into the lending protocol
     selectedLendingUserAccountIndex: 0,
     lendingUserLookUpTableAddress: undefined,
-    lendingUserLookUpTableAccount: undefined
+    lendingUserLookUpTableAccount: undefined,
+    isTempPriceAccountAlive: false
   })
 
   export default connectedWallet

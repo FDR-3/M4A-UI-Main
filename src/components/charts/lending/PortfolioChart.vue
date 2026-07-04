@@ -10,7 +10,7 @@
       <div class="flexCenterColumn">
         <div class="flexCenterRow">
           <ion-button fill="clear" @click="openTokenPopover($event)">
-            <img v-if="tokenMintAddress==tokenAddressStrings.solTokenMintAddress" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; height: 35px; ; max-height: 40px; margin-right: -7px"/>
+            <img v-if="tokenMintAddressString==tokenAddressStrings.solTokenMintAddress" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; height: 35px; ; max-height: 40px; margin-right: -7px"/>
             <component v-else :is="tokenSVG"style="width: 44px; height: 35px; max-height: 40px"></component>
             <ion-text color="dark">{{ tokenName }}</ion-text>
           </ion-button>
@@ -51,12 +51,12 @@
           optionLabel="yearAvailable" 
           optionValue="yearAvailable" 
           placeholder="Select Year"
-          @change="$emit('changeYear', tokenMintAddress, subMarketOwnerAddress, subMarketIndex, yearSelect)">
+          @change="$emit('changeYear', tokenMintAddressString, subMarketOwnerAddress, subMarketIndex, yearSelect)">
           </Select>
 
           <div v-if="ownerAddress==connectedWallet.addressString">
             <ion-button v-if="depositedAssetAmount==0" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-            $emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption)">
+            $emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption)">
               <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
             </ion-button>
             <ion-button v-else fill="clear" @click="openHActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
@@ -69,19 +69,19 @@
             >
               <div class=" flexCenterColumn popoverContainer">
                 <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-                $emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                $emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption); hActionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
                 </ion-button>
                 <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-                $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                $emit('openWithdrawalModal', tokenId, tokenMintAddressString, subMarketSelectOption); hActionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
                 </ion-button>
                 <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-                $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                $emit('openBorrowModal', tokenId, tokenMintAddressString, subMarketSelectOption); hActionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
                 </ion-button>
                 <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-                $emit('openRepayModal', tokenId, tokenMintAddress, subMarketSelectOption); hActionsPopoverOpen=false">
+                $emit('openRepayModal', tokenId, tokenMintAddressString, subMarketSelectOption); hActionsPopoverOpen=false">
                   <ion-label class="noClickEvent" color="dark">Repay</ion-label>
                 </ion-button>
               </div>
@@ -99,7 +99,7 @@
 
     <div class="vChartLayout">
       <ion-button fill="clear" @click="openTokenPopover($event)">
-        <img v-if="tokenMintAddress==tokenAddressStrings.solTokenMintAddress"src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; height: 35px; ; max-height: 40px; margin-right: -7px"/>
+        <img v-if="tokenMintAddressString==tokenAddressStrings.solTokenMintAddress"src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; height: 35px; ; max-height: 40px; margin-right: -7px"/>
         <component v-else :is="tokenSVG" style="width: 44px; height: 35px; max-height: 40px"></component>
         <ion-text color="dark">{{ tokenName }}</ion-text>
       </ion-button>
@@ -157,10 +157,10 @@
         optionLabel="yearAvailable" 
         optionValue="yearAvailable" 
         placeholder="Select Year"
-        @change="$emit('changeYear', tokenMintAddress, subMarketOwnerAddress, subMarketIndex, yearSelect)">
+        @change="$emit('changeYear', tokenMintAddressString, subMarketOwnerAddress, subMarketIndex, yearSelect)">
         </Select>
         <div v-if="ownerAddress==connectedWallet.addressString" class="nSmallMarginTop">
-          <ion-button v-if="depositedAssetAmount==0" class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption)">
+          <ion-button v-if="depositedAssetAmount==0" class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption)">
             <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
           </ion-button>
           <ion-button v-else fill="clear" @click="openVActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
@@ -172,16 +172,16 @@
           alignment="center"
           >
             <div class=" flexCenterColumn popoverContainer">
-              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption); vActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
               </ion-button>
-              <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+              <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', tokenId, tokenMintAddressString, subMarketSelectOption); vActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
               </ion-button>
-              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+              <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', tokenId, tokenMintAddressString, subMarketSelectOption); vActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
               </ion-button>
-              <ion-button v-if="userOriginalDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenId, tokenMintAddress, subMarketSelectOption); vActionsPopoverOpen=false">
+              <ion-button v-if="userOriginalDebt" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', tokenId, tokenMintAddressString, subMarketSelectOption); vActionsPopoverOpen=false">
                 <ion-label class="noClickEvent" color="dark">Repay</ion-label>
               </ion-button>
             </div>
@@ -416,7 +416,7 @@
   var subMarketSelectOption: any[] = []
 
   var tokenReserve: any
-  var tokenMintAddress: string
+  var tokenMintAddressString: string
   var decimalAmount: number
   var lendingUserTabAccount: any
   var userOriginalBalance = 0
@@ -445,7 +445,7 @@
 
   onMounted(() =>
   {
-    tokenMintAddress = tokenIdHashMap.map.get(props.tokenId)
+    tokenMintAddressString = tokenIdHashMap.map.get(props.tokenId)
     decimalAmount = tokenDecimalHashMap.get(props.tokenId)
 
     if(lendingUserTabAccountsHashMap.map && props.tokenId && (props.accountIndex != undefined))
@@ -476,7 +476,8 @@
     chartOptions.value = setChartOptions()
     startGradientAnimation()
     
-    legenHiddenArray.value = props.chartData.datasets.map((dataset: any) => dataset.hidden)
+    if(props.chartData && props.chartData.datasets)
+      legenHiddenArray.value = props.chartData.datasets.map((dataset: any) => dataset.hidden)
   })
 
   onUnmounted(() =>
@@ -752,7 +753,7 @@
 
   function passByRefWrapperCopyAddress()
   {
-    copyAddress(copyTokenMintAddressButtonText, tokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, tokenMintAddressString)
   }
 
   function calculateTokenReserveInterestChangeIndex(timeStamp: number)
@@ -820,7 +821,7 @@
     sevenDayCalculatedUserInterestEarned.value = sevenDayInterestEarnedBeforeFee - (sevenDayInterestEarnedBeforeFee * props.subMarketFee / 100)
     sevenDayCalculatedUserInterestEarned.value = sevenDayCalculatedUserInterestEarned.value < 0 ? (0).toFixed(decimalAmount) : sevenDayCalculatedUserInterestEarned.value.toFixed(decimalAmount)
 
-    const price = priceObjectMap.data[tokenMintAddress].usdPrice
+    const price = priceObjectMap.data[tokenMintAddressString].usdPrice
     if(price)
     {
       balanceValueString.value = (userCalculatedBalance.value * Number(price)).toLocaleString('en-US', {
@@ -879,7 +880,10 @@
 
   function updateStoredSelectedSubMarketIndex()
   {
-    localStorage.setItem(props.tokenId.toString() + "selectedMainSubMarketIndex", props.subMarketIndex)
+    localStorage.setItem(props.tokenId.toString() + 
+    connectedWallet.addressString +
+    connectedWallet.selectedLendingUserAccountIndex.toString() +
+    "selectedMainSubMarketIndex", props.subMarketIndex)
   }
 </script>
 

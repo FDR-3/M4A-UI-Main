@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { inject } from 'vue'
   import * as anchor from "@coral-xyz/anchor"
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenReserves, tokenReserveFontEndInfoHashMap, tokenReservesHashMap, tokenIdHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarkets,
     subMarketsHashMap,
@@ -22,7 +24,11 @@
     lendingLeaderBoardTable } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
-  import { trimAddress, doesKeyExistInLookUpTable } from '/src/assets/contracts/WalletHelper.vue'
+  import { trimAddress,
+    doesKeyExistInLookUpTable,
+    parseProgramErrorCode,
+    confirmLendingTransaction,
+    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { tokenDecimalHashMap, JITO_TIP_ACCOUNTS } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
@@ -33,6 +39,7 @@
     TransactionMessage,
     SystemProgram } from "@solana/web3.js"
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
+  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import cloneDeep from 'lodash/cloneDeep'
 
   export async function getLendingProtocol()
@@ -665,6 +672,32 @@
       }
     }
   }
+
+  export async function isTempPriceAccountAlive(userCallingPriceFunctions: PublicKey)
+  {
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
+    {
+      try
+      {
+        await anchorPrograms.lending.lendingProgram.account.tempOraclePriceAccount.fetch(getPriceAccountPDA(userCallingPriceFunctions))
+        return true
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          return false
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
+  }
+
+  
 
   export async function setLendingUserPortfolioHashMaps()
   {
@@ -1391,16 +1424,16 @@
     }
   }
 
-export async function userSignsLendingTransactions(
+  export async function userSignsLendingTransactions(
   instructionsToSend: anchor.web3.TransactionInstruction[], 
   lookUpTableAccounts: AddressLookupTableAccount[]
   ): Promise<VersionedTransaction[]>
   {
     try
     {
-      const unsignedTransactions: VersionedTransaction[] = [];
-      const connection = anchorPrograms.lending.lendingProgram.provider.connection;
-      const { blockhash } = await connection.getLatestBlockhash();
+      const unsignedTransactions: VersionedTransaction[] = []
+      const connection = anchorPrograms.lending.lendingProgram.provider.connection
+      const { blockhash } = await connection.getLatestBlockhash()
       const payerKey = connectedWallet.publicKey;
 
       // Hard Solana MTU limit is 1232 bytes.
@@ -1484,6 +1517,137 @@ export async function userSignsLendingTransactions(
     }
   }
 
+  /*export async function userSignsLendingTransactions(
+    instructionsToSend: anchor.web3.TransactionInstruction[], 
+    lookUpTableAccounts: AddressLookupTableAccount[]
+  ): Promise<VersionedTransaction[]>
+  {
+    try
+    {
+      const unsignedTransactions: VersionedTransaction[] = []
+      const connection = anchorPrograms.lending.lendingProgram.provider.connection
+      const { blockhash } = await connection.getLatestBlockhash()
+      const payerKey = connectedWallet.publicKey
+
+      //Hard Solana MTU limit is 1232 bytes minus a 64-byte signature buffer.
+      const MAX_UNSIGNED_SIZE = 1232 - 64
+
+      //Max cap placeholder used strictly for accurate serialization size testing
+      const placeholderLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
+
+      
+      //Helper function to simulate a complete batch, extract real CU data,
+      //and conditionally add the compute budget instruction only if it exceeds the default.
+      async function finalizeBatch(batch: anchor.web3.TransactionInstruction[]): Promise<VersionedTransaction>
+      {
+        //Always simulate with a high placeholder so it doesn't fail the simulation phase
+        const simMessage = new TransactionMessage(
+        {
+          payerKey,
+          recentBlockhash: blockhash,
+          instructions: [placeholderLimitIx, ...batch]
+        }).compileToV0Message(lookUpTableAccounts)
+
+        const simTx = new VersionedTransaction(simMessage)
+        const simulation = await connection.simulateTransaction(simTx)
+
+        if(simulation.value.err)
+        {
+          throw new Error(`Transaction simulation failed: ${JSON.stringify(simulation.value.logs)}`)
+        }
+
+        const unitsConsumed = simulation.value.unitsConsumed
+        if(unitsConsumed === undefined || unitsConsumed === null)
+          throw new Error("Simulation succeeded but failed to return unitsConsumed.")
+
+        //Add a 15% safety buffer
+        const optimalLimit = Math.ceil(unitsConsumed * 1.15)
+        
+        let finalInstructions: anchor.web3.TransactionInstruction[] = []
+
+        //Solana default transaction limit is 200,000 CUs. 
+        //Only inject the instruction if our optimal budget exceeds this threshold.
+        if(optimalLimit > 200_000)
+        {
+          console.log(`Compute budget (${optimalLimit}) exceeds default. Injecting custom limit instruction.`)
+          const optimizedLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: optimalLimit })
+          finalInstructions = [optimizedLimitIx, ...batch]
+        }
+        else
+        {
+          console.log(`Compute budget (${optimalLimit}) is within standard limits. Omitting budget instruction.`)
+          finalInstructions = [...batch]
+        }
+
+        const finalMessage = new TransactionMessage({
+          payerKey,
+          recentBlockhash: blockhash,
+          instructions: finalInstructions
+        }).compileToV0Message(lookUpTableAccounts)
+
+        return new VersionedTransaction(finalMessage)
+      }
+
+      let currentBatch: anchor.web3.TransactionInstruction[] = []
+
+      for(let i=0; i<instructionsToSend.length; i++)
+      {
+        const nextInstruction = instructionsToSend[i]
+        
+        const testInstructions = [placeholderLimitIx, ...currentBatch, nextInstruction]
+        const testMessage = new TransactionMessage(
+        {
+          payerKey,
+          recentBlockhash: blockhash,
+          instructions: testInstructions
+        }).compileToV0Message(lookUpTableAccounts)
+
+        const testTx = new VersionedTransaction(testMessage)
+        const testSize = testTx.serialize().length
+
+        if(testSize <= MAX_UNSIGNED_SIZE)
+          currentBatch.push(nextInstruction)
+        else
+        {
+          if(currentBatch.length > 0)
+          {
+            const finalizedTx = await finalizeBatch(currentBatch)
+            unsignedTransactions.push(finalizedTx)
+          }
+          
+          currentBatch = [nextInstruction]
+          
+          //Safety check for an oversized single instruction
+          const singleTxMessage = new TransactionMessage(
+          {
+            payerKey,
+            recentBlockhash: blockhash,
+            instructions: [placeholderLimitIx, ...currentBatch]
+          }).compileToV0Message(lookUpTableAccounts)
+          
+          if(new VersionedTransaction(singleTxMessage).serialize().length > MAX_UNSIGNED_SIZE)
+            throw new Error(`Instruction at index ${i} is too large to fit in an isolated transaction chunk!`)
+        }
+      }
+
+      //Finalize the trailing batch, if any
+      if(currentBatch.length > 0)
+      {
+        const finalizedTx = await finalizeBatch(currentBatch)
+        unsignedTransactions.push(finalizedTx)
+      }
+
+      console.log(`Simulated and Packed ${unsignedTransactions.length} transaction(s).`)
+
+      const signedTransactions = await anchorPrograms.lending.lendingProgram.provider.wallet.signAllTransactions(unsignedTransactions)
+      return signedTransactions
+    }
+    catch(error)
+    {
+      throw error
+    }
+  }*/
+
   export async function bundleProtocolPriceTransactions(tokenIds: number[], txs: VersionedTransaction[])
   {
     //1. Serialize all transactions to raw Uint8Arrays
@@ -1528,8 +1692,16 @@ export async function userSignsLendingTransactions(
     }
     console.log("FRONTEND: totalSize allocated =", totalSize)
     console.log("FRONTEND: actual uint8Array byteLength =", uint8Array.byteLength)
+
+    var baseURL = ""
+
+    if(LOCAL_PRICE_ORACLE)
+      baseURL = "http://127.0.0.1:8787"
+    else
+      baseURL = "https://m4a.io"
+
     //6. Send the raw binary stream directly over the wire
-    const oracleResponse = await fetch(`https://m4a.io/Api/bundleProtocolPriceTransactions`,
+    const oracleResponse = await fetch(`${baseURL}/Api/bundleProtocolPriceTransactions`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/octet-stream' },
@@ -1679,6 +1851,23 @@ export async function userSignsLendingTransactions(
     })
 
     return jitoTipInstruction
+  }
+
+  export async function closeTempOraclePriceData(toast: any)
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.closeTempOraclePriceData()
+        .remainingAccounts([adminAccounts.priceOracleRemainingAccount])
+        .rpc()
+
+      await confirmLendingTransaction(tx, toast, "close_temp_oracle_price_data")
+    }
+    catch(error)
+    {
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, "close_temp_oracle_price_data")  
+    }
   }
 
   export default getLendingProtocolCEOAccount

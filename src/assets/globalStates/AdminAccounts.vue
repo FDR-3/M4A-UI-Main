@@ -5,6 +5,8 @@
       solvencyWalletATAKeys,
       solvencyTreasuryWalletPublicKeyString  } from '/src/assets/constants/Addresses.ts'
   import { PublicKey } from "@solana/web3.js"
+  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
+  import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   export const adminAccounts = reactive(
   {
@@ -32,13 +34,28 @@
     isLendingCEOAccountReady: false,
     isAlertCEOAccountReady: false,
     ceoIsDead: false,
-    priceOracleRemainingAccount: 
+    priceOracleRemainingAccount:
+    {
+      pubkey: new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING),
+      isSigner: false,
+      isWritable: true
+    }
+  })
+
+  if(LOCAL_PRICE_ORACLE)
+    adminAccounts.priceOracleRemainingAccount =
+    {
+      pubkey: new PublicKey("3jYmEG7Y8fU2696Gqukt95TSNzpkgkYHQsJpypdGW3WE"),
+      isSigner: false,
+      isWritable: true
+    }
+  else
+    adminAccounts.priceOracleRemainingAccount =
     {
       pubkey: new PublicKey("6zpT3Fr3Hw95L23AVgx2D1wFkig8kESXB62dGZHxW2tS"),
       isSigner: false,
       isWritable: true
     }
-  })
 
   //These are for the Chat and M4A fees that go directly to HODL Wallet
   export const hodlTreasuryWalletATAHashMap: Map<string, PublicKey> = new Map(

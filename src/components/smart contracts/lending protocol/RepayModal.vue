@@ -75,8 +75,15 @@
       <ion-text>Value: ${{ repayValue }}</ion-text>
     </div>
 
+    <div v-if="connectedWallet.isTempPriceAccountAlive" class="flexCenterColumn">
+      <br>
+      <ion-text>Your temp price data account is alive. You must close it before you can call the repay function.</ion-text>
+      <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
+        Close Temp Price Account
+      </ion-button>
+    </div>
     <ion-button
-      v-if="anchorPrograms.isLendingProtocolReady"
+      v-else-if="anchorPrograms.isLendingProtocolReady"
       id="repayButton"
       color="dark"
       @click="repayTokens()"
@@ -108,9 +115,10 @@
     getNeccessaryRefreshInstructionData,
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
-    createJitoTipInstruction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    createJitoTipInstruction,
+    closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarketsHashMap, subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
     lendingUserTabAccountsHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
@@ -119,8 +127,11 @@
   import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
+  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
+  import * as bs58 from 'bs58'
 
   const toast = inject('toast')
+  const colorName = inject('colorName')
   const colorHexValue = inject('colorHexValue')
 
   var tokenReserve: any
@@ -200,9 +211,9 @@
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
-  const handleClickOutside = function(event: any) 
+  const handleClickOutside = (event: any) => 
   {
-    if(repaying.value)
+    if(repaying.value && modalRef.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
       
@@ -230,10 +241,15 @@
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
+
     tokenProgram = tokenInfo.tokenProgram
-    
     subMarketList.value = subMarkets
-    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + "selectedMainSubMarketIndex")) || 0
+    
+    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() +
+    connectedWallet.addressString +
+    connectedWallet.selectedLendingUserAccountIndex.toString() +
+    "selectedMainSubMarketIndex")) || 0
+
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
     if(lendingUserAccountsHashMap.map)
@@ -330,7 +346,10 @@
     userOriginalDebt = userDebt.value
     repayAmount.value = 0
 
-    localStorage.setItem(tokenId.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
+    localStorage.setItem(tokenId.toString() +
+    connectedWallet.addressString +
+    connectedWallet.selectedLendingUserAccountIndex.toString() +
+    "selectedMainSubMarketIndex", mainSubMarketIndex)
 
     stopInterestCalculation()
     startInterestCalculation()
@@ -436,14 +455,24 @@
       .remainingAccounts([tempPriceRemainingAccount, adminAccounts.priceOracleRemainingAccount])
       .instruction()
 
+      const computeUnitIncreaseInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
+      instructionsToSend.push(computeUnitIncreaseInstruction)
       instructionsToSend.push(...createMonthlyStatementInstructions)
       instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
       instructionsToSend.push(repayInstruction)
+      if(!LOCAL_PRICE_ORACLE)
+        instructionsToSend.push(createJitoTipInstruction())
 
       //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
-      //Not worth getting Submarket look up table for just 1 subMarket, 1 submarket account is 32 bytes, lookuptable account is 35 bytes minimum.
+      //Get SubMarket Look Up Table
+      //Only worth if there are 2 or more submarkets. (This assumes they are different submarkets that belong to adminAccounts.lendingCEOAddressString)
+      if(remainingTabAccounts.length >= 2)
+      {
+        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
+        lookUpTableAccounts.push(subMarketLookTableAccount)
+      }
 
       //Get Lending User Look Up Table Account
       if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
@@ -458,13 +487,17 @@
       }
 
       const response = await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
-      const userTxs = response.userTxs
+
+      var userTxs = []
+  
+      for(var i=0; i<signedTransactions.length; i++)
+        userTxs.push(bs58.default.encode(signedTransactions[i].signatures[0]))
 
       if(userTxs.length)
         for(var i=0; i<userTxs.length; i++)
-          await confirmLendingTransaction(userTxs[i], toast, "borrow_tokens")
+          await confirmLendingTransaction(userTxs[i], toast, "repay_tokens")
       else
-        await confirmLendingTransaction(userTxs, toast, "borrow_tokens")
+        await confirmLendingTransaction(userTxs, toast, "repay_tokens")
 
       stopInterestCalculation()
       repaying.value = false

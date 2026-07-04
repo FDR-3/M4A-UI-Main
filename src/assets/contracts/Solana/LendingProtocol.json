@@ -1,5 +1,5 @@
 {
-  "address": "3znBMZEVoRv2pjByoinxVjnuPduCvgvmkupuSRyA1fo9",
+  "address": "2RYYqg5qpA5NWCn7gb9iobaDr6zmhn2XdLtTXdBGr4qh",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -2352,39 +2352,6 @@
       ],
       "accounts": [
         {
-          "name": "lending_user_address"
-        },
-        {
-          "name": "ceo",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  80,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  67,
-                  69,
-                  79
-                ]
-              }
-            ]
-          }
-        },
-        {
           "name": "price_validator",
           "pda": {
             "seeds": [
@@ -2443,7 +2410,7 @@
               },
               {
                 "kind": "account",
-                "path": "lending_user_address"
+                "path": "signer"
               }
             ]
           }

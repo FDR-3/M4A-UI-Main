@@ -337,8 +337,8 @@
 
       var calculatedValue = 0
 
-      const tokenMintAddress = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
-      const priceData = priceObjectMap.data[tokenMintAddress]
+      const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
+      const priceData = priceObjectMap.data[tokenMintAddressString]
       if(priceData)
         calculatedValue = (totalAmount * priceData.usdPrice)
 
@@ -404,8 +404,8 @@
 
       var calculatedValue = 0
 
-      const tokenMintAddress = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
-      const priceData = priceObjectMap.data[tokenMintAddress]
+      const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
+      const priceData = priceObjectMap.data[tokenMintAddressString]
       if(priceData)
         calculatedValue = (totalAmount * priceData.usdPrice)
 
@@ -459,8 +459,8 @@
       totalSolvencyInsuranceFeesGenerated += (sevenDayInterestEarnedBeforeFee * tokenReserve.solvencyInsuranceFeeRate / 100)
     }
 
-    const tokenMintAddress = tokenIdHashMap.map.get(tokenId)
-    const usdPrice = priceObjectMap.data[tokenMintAddress].usdPrice
+    const tokenMintAddressString = tokenIdHashMap.map.get(tokenId)
+    const usdPrice = priceObjectMap.data[tokenMintAddressString].usdPrice
     if(usdPrice)
       return totalSolvencyInsuranceFeesGenerated * Number(usdPrice)
     else

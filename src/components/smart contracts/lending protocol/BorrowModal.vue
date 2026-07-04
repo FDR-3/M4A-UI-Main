@@ -85,8 +85,15 @@
       <ion-text>Value: ${{ borrowValue }}</ion-text>
     </div>
 
+    <div v-if="connectedWallet.isTempPriceAccountAlive" class="flexCenterColumn">
+      <br>
+      <ion-text>Your temp price data account is alive. You must close it before you can call the repay function.</ion-text>
+      <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
+        Close Temp Price Account
+      </ion-button>
+    </div>
     <ion-button
-      v-if="anchorPrograms.isLendingProtocolReady"
+      v-else-if="anchorPrograms.isLendingProtocolReady"
       id="borrowModalButton"
       color="dark"
       @click="borrowTokens()"
@@ -118,9 +125,11 @@
     getNeccessaryRefreshInstructionData,
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
-    createJitoTipInstruction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    createJitoTipInstruction,
+    closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
     lendingUserTabAccountListHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
@@ -129,9 +138,11 @@
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
+  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import * as bs58 from 'bs58'
 
   const toast = inject('toast')
+  const colorName = inject('colorName')
   const colorHexValue = inject('colorHexValue')
 
   var subMarketSelect = ref()
@@ -180,7 +191,10 @@
   {
     const tokenReserve = tokenReservesHashMap.map.get(selectedTokenMintAddress.toString())
     if(tokenReserve)
-      availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
+    {
+      const temp = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
+      availableInTokenReserveAmount.value = temp < 0 ? 0 : temp
+    }
   })
 
   watch(lendingUserTabAccountListHashMap, async() =>
@@ -221,9 +235,9 @@
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
-  const handleClickOutside = function(event: any) 
+  const handleClickOutside = (event: any) => 
   {
-    if(borrowing.value)
+    if(borrowing.value && modalRef.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
 
@@ -254,10 +268,17 @@
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
+
     tokenProgram = tokenInfo.tokenProgram
-    availableInTokenReserveAmount.value = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
+    const temp = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
+    availableInTokenReserveAmount.value = temp < 0 ? 0 : temp
     subMarketList.value = subMarkets
-    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + "selectedMainSubMarketIndex")) || 0
+
+    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + 
+    connectedWallet.addressString +
+    connectedWallet.selectedLendingUserAccountIndex.toString() +
+    "selectedMainSubMarketIndex")) || 0
+
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
     if(lendingUserAccountsHashMap.map)
@@ -445,17 +466,24 @@
       .remainingAccounts([tempPriceRemainingAccount, adminAccounts.priceOracleRemainingAccount])
       .instruction()
 
-      const jitoTipInstruction = createJitoTipInstruction()
-
+      const computeUnitIncreaseInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
+      instructionsToSend.push(computeUnitIncreaseInstruction)
       instructionsToSend.push(...createMonthlyStatementInstructions)
       instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
       instructionsToSend.push(borrowInstruction)
-      instructionsToSend.push(jitoTipInstruction)
+      if(!LOCAL_PRICE_ORACLE)
+        instructionsToSend.push(createJitoTipInstruction())
 
       //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
-      //Not worth getting Submarket look up table for just 1 subMarket, 1 submarket account is 32 bytes, lookuptable account is 35 bytes minimum.
+      //Get SubMarket Look Up Table
+      //Only worth if there are 2 or more submarkets. (This assumes they are different submarkets that belong to adminAccounts.lendingCEOAddressString)
+      if(remainingTabAccounts.length >= 2)
+      {
+        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
+        lookUpTableAccounts.push(subMarketLookTableAccount)
+      }
 
       //Get Lending User Look Up Table Account
       if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
@@ -470,25 +498,17 @@
       }
 
       const response = await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
-      const resp = response.resp
 
-      console.log(resp)
-
-      var userSignatures = []
-
+      var userTxs = []
+  
       for(var i=0; i<signedTransactions.length; i++)
-        userSignatures.push(bs58.encode(signedTransactions[i].signatures[0]))
+        userTxs.push(bs58.default.encode(signedTransactions[i].signatures[0]))
 
-      /*if(resp.result)
-        await confirmLendingTransaction(resp.result, toast, "borrow_tokens")
+      if(userTxs.length)
+        for(var i=0; i<userTxs.length; i++)
+          await confirmLendingTransaction(userTxs[i], toast, "borrow_tokens")
       else
-        toastPreTransactionError(resp.error.message, toast, "borrow_tokens")*/
-      
-      if(userSignatures.length)
-        for(var i=0; i<userSignatures.length; i++)
-          await confirmLendingTransaction(userSignatures[i], toast, "borrow_tokens")
-      else
-        await confirmLendingTransaction(userSignatures, toast, "borrow_tokens")
+        await confirmLendingTransaction(userTxs, toast, "borrow_tokens")
 
       stopHealthFactorCalculation()
       borrowing.value = false
@@ -503,7 +523,11 @@
   function updateStoredSelectedSubMarketIndex(tokenId: number, mainSubMarketIndex: string)
   {
     borrowAmount.value = 0
-    localStorage.setItem(tokenId.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
+
+    localStorage.setItem(tokenId.toString() +
+    connectedWallet.addressString +
+    connectedWallet.selectedLendingUserAccountIndex.toString() +
+    "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(

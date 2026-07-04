@@ -1,4 +1,5 @@
 export const DEV_MODE = true
+export const LOCAL_PRICE_ORACLE = true
 export const MAINTENANCE_MODE = false
 export const APPROVED_TESTERS = 
 [

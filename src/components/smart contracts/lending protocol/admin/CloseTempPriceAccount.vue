@@ -1,16 +1,29 @@
 <template>
   <div class="thickBorder smallMarginTop widthOverFlow">
     <div class="minWidth">
-      <h2 class="smallMarginTop">Close Temp Price Account</h2>
+      <h2 class="smallMarginTop">Price Oracle</h2>
       <div class="spaceRowEvenly mediumMarginBottom" style="width: 100%">
-        <div class="smallMarginTop flexCenterColumn">
+        <div class="smallMarginTop flexCenterRow" style="gap: 10px">
           
-          <ion-input
-            v-model="userAddress"
-            fill="outline"
-            placeholder="Enter User Address">
-          </ion-input>
-          <ion-button :color="colorName" @click="closePriceAccount()">Close Price Account</ion-button>
+          <div class="flexCenterColumn">
+            <ion-text>Close Temp Price Account</ion-text>
+            <ion-input
+              v-model="userAddress"
+              fill="outline"
+              placeholder="Enter User Address">
+            </ion-input>
+            <ion-button :color="colorName" @click="closePriceAccount()">Close Price Account</ion-button>
+          </div>
+
+          <div class="flexCenterColumn">
+            <ion-text>Set New Price Oracle</ion-text>
+            <ion-input
+              v-model="oracleAddress"
+              fill="outline"
+              placeholder="Enter New Price Oracle Address">
+            </ion-input>
+            <ion-button :color="colorName" @click="setNewPriceOracle()">Set New Price Oracle</ion-button>
+          </div>
 
         </div>
       </div>
@@ -33,6 +46,7 @@
   const colorName = inject('colorName') as string
 
   var userAddress = ref("")
+  var oracleAddress = ref("")
 
   async function closePriceAccount()
   {
@@ -48,6 +62,22 @@
     catch(error)
     {
       toastPreTransactionError(error, toast, "close_temp_oracle_price_data")
+    }
+  }
+
+  async function setNewPriceOracle()
+  {
+    try
+    {
+      const tx = await anchorPrograms.lending.lendingProgram.methods.setOraclePriceValidator()
+      .accounts({ newPriceValidatorAddress: new PublicKey(oracleAddress.value) })
+      .rpc()
+    
+      await confirmLendingTransaction(tx, toast, "set_oracle_price_validator")
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "set_oracle_price_validator")
     }
   }
 </script>

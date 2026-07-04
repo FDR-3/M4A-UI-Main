@@ -889,7 +889,7 @@
   function openTokenPopover(e: Event, rowData: any) 
   {
     event.value = e
-    event.value.tokenMintAddress = tokenIdHashMap.map.get(rowData.tokenId)
+    event.value.tokenMintAddressString = tokenIdHashMap.map.get(rowData.tokenId)
     event.value.trimmedSubMarketOwnerAddress = rowData.trimmedSubMarketOwnerAddress
     event.value.subMarketIndex = rowData.subMarketIndex
 
@@ -904,7 +904,7 @@
 
   function passByRefWrapperCopyTokenMintAddress()
   {
-    copyAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddress)
+    copyAddress(copyTokenMintAddressButtonText, event.value.tokenMintAddressString)
   }
 
   function openViewPortfolioPopover(e: Event, rowData: any) 

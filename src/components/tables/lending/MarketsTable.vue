@@ -5,8 +5,6 @@
       class="tableMinWidth"
       v-model:filters="filters" 
       show-gridlines 
-      sortField="supplyAPY" 
-      :sortOrder="-1" 
       size="small"
       :value="StableCoins"
       :globalFilterFields="
@@ -466,6 +464,8 @@
     }
     else
       setLendingUserAccountList()
+
+    checkForMainSubMarkets()
   })
 
   function setLendingUserAccountList()
@@ -620,6 +620,11 @@
         {
           for(var j=0; j<subMarketEntries.length; j++)
           {
+            if((connectedWallet.addressString == adminAccounts.hodlTreasuryAddress.toString() ||
+            connectedWallet.addressString == adminAccounts.singlePayerTreasuryAddress.toString()) &&
+            subMarketEntries[j].subMarketIndex == 0)
+              continue
+
             const option = 
             {
               subMarketFeeName: (subMarketEntries[j].feeOnInterestEarnedRate).toString() + "% Fee Market",
@@ -645,6 +650,11 @@
         {
           for(var j=0; j<subMarketEntries.length; j++)
           {
+            if((connectedWallet.addressString == adminAccounts.hodlTreasuryAddress.toString() ||
+            connectedWallet.addressString == adminAccounts.singlePayerTreasuryAddress.toString()) &&
+            subMarketEntries[j].subMarketIndex == 0)
+              continue
+              
             const option = 
             {
               subMarketFeeName: (subMarketEntries[j].feeOnInterestEarnedRate).toString() + "% Fee Market",
@@ -888,14 +898,7 @@ ion-input
 
   .tableMinWidth
   {
-    min-width: 1375px
-  }
-  @-moz-document url-prefix()
-  {
-    .tableMinWidth
-    {
-      min-width: 1500px
-    }
+    min-width: 1395px
   }
 
   #accountSelect

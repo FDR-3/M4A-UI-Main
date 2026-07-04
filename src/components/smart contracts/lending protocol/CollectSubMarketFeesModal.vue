@@ -233,9 +233,9 @@
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
-  const handleClickOutside = function(event: any) 
+  const handleClickOutside = (event: any) => 
   {
-    if(collecting.value)
+    if(collecting.value && modalRef.value)
     {
       //const emojiButton = 
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')

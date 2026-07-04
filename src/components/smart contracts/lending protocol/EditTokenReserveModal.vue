@@ -3,6 +3,7 @@
     id="editTokenReserveModal"
     class="thickBorder"
     ref="modalRef"
+    slot="fixed"
   >
     <div class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
       <ion-button fill="clear" @click="openTokenPopover($event)">
@@ -144,7 +145,7 @@
   //When the user clicks anywhere outside of the edit token reserve modal, close it, not when closing toast alert though
   const handleClickOutside = (event: any) =>
   {
-    if(editingTokenReserve.value)
+    if(editingTokenReserve.value && modalRef.value)
     {
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
 

@@ -4,7 +4,13 @@
     class="thickBorder"
     ref="modalRef"
   >
-    <div v-if="exactSameLiquidatorAsLiquidati">
+    <div v-if="connectedWallet.isTempPriceAccountAlive" class="flexCenterColumn">
+      <ion-text>Your temp price data account is alive. You must close it before you can call the liquidate function.</ion-text>
+      <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
+        Close Temp Price Account
+      </ion-button>
+    </div>
+    <div v-else-if="exactSameLiquidatorAsLiquidati">
       You can't liquidate yourself from the same account. Change your account below, or connect a different wallet.
     </div>
     <div v-else>
@@ -112,55 +118,57 @@
       </div>
     </div>
  
-    <div class="mediumMarginTop nMediumMarginBottom">
-      <ion-text>Account To Credit:</ion-text>
+    <div v-if="!connectedWallet.isTempPriceAccountAlive">
+      <div class="mediumMarginTop nMediumMarginBottom">
+        <ion-text>Account To Credit:</ion-text>
+      </div>
+      <div class="flexCenterRow">
+        <ion-button v-if="addingAdditionalLendingAccount" id="closeAccountNameEditButton" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
+          <ion-icon :src="close" color="dark" class="noClickEvent"></ion-icon>
+        </ion-button>
+
+        <Select
+        v-if="hasAtleast1Account && !addingAdditionalLendingAccount"
+        id="accountSelect"
+        class="standardFontSize mediumMarginTop mediumMarginBottom"
+        v-model="accountSelect" 
+        :options="accountList" 
+        optionLabel="accountName" 
+        optionValue="userAccountIndex" 
+        placeholder="Select Account"
+        appendTo="self"
+        @change="updateStoredSelectedAccount()">
+          <template #footer>
+            <div class="flexCenterRow">
+              <ion-button id="newAccountButton" @click="setNewAccountDefaultName()" color="dark">
+                <ion-label class="noClickEvent" color="light">New</ion-label>
+              </ion-button>
+            </div>
+          </template>
+        </Select>
+
+        <ion-input
+        v-else
+        v-model="accountName"
+        ref="accountNameEditInputRef"
+        id="accountNameEditInput"
+        class="mediumMarginTop smallMarginBottom"
+        :class="{ 'invalid': overByteSizeLimit }"
+        style="width: min(290px, 70vw)"
+        fill="outline"
+        :counter="true"
+        :counter-formatter="customFormatter"
+        :maxlength=MAX_ACCOUNT_NAME_LENGTH>
+          <EmojiButton
+          :marginTop="'4px'"
+          :colorHexValue="colorHexValue"
+          :openSide="'right'"
+          @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
+        </ion-input>
+      </div>
     </div>
-    <div class="flexCenterRow">
-      <ion-button v-if="addingAdditionalLendingAccount" id="closeAccountNameEditButton" class="mediumMarginBottom nMediumSmallMarginLeft" fill="clear" @click="cancelAddingAdditionalLendingAccount()">
-        <ion-icon :src="close" color="dark" class="noClickEvent"></ion-icon>
-      </ion-button>
 
-      <Select
-      v-if="hasAtleast1Account && !addingAdditionalLendingAccount"
-      id="accountSelect"
-      class="standardFontSize mediumMarginTop mediumMarginBottom"
-      v-model="accountSelect" 
-      :options="accountList" 
-      optionLabel="accountName" 
-      optionValue="userAccountIndex" 
-      placeholder="Select Account"
-      appendTo="self"
-      @change="updateStoredSelectedAccount()">
-        <template #footer>
-          <div class="flexCenterRow">
-            <ion-button id="newAccountButton" @click="setNewAccountDefaultName()" color="dark">
-              <ion-label class="noClickEvent" color="light">New</ion-label>
-            </ion-button>
-          </div>
-        </template>
-      </Select>
-
-      <ion-input
-      v-else
-      v-model="accountName"
-      ref="accountNameEditInputRef"
-      id="accountNameEditInput"
-      class="mediumMarginTop smallMarginBottom"
-      :class="{ 'invalid': overByteSizeLimit }"
-      style="width: min(290px, 70vw)"
-      fill="outline"
-      :counter="true"
-      :counter-formatter="customFormatter"
-      :maxlength=MAX_ACCOUNT_NAME_LENGTH>
-        <EmojiButton
-        :marginTop="'4px'"
-        :colorHexValue="colorHexValue"
-        :openSide="'right'"
-        @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
-      </ion-input>
-    </div>
-
-    <div v-if="!exactSameLiquidatorAsLiquidati">
+    <div v-if="!exactSameLiquidatorAsLiquidati && !connectedWallet.isTempPriceAccountAlive">
       <ion-radio-group v-model="radioGroupSelection" @ionChange="handleRadioChange($event)">
         <ion-radio :color="colorName" value="Wallet" label-placement="end">Deposit Liquidation To Wallet</ion-radio><br>
         <ion-radio :color="colorName" value="Account" label-placement="end">Deposit Liquidation To Lending Account</ion-radio><br>
@@ -224,7 +232,8 @@
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
     getOraclePriceValidatorPDA,
-    createJitoTipInstruction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    createJitoTipInstruction,
+    closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
@@ -232,6 +241,8 @@
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
   import * as anchor from "@coral-xyz/anchor"
+  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
+  import * as bs58 from 'bs58'
 
   const toast = inject('toast')
   const colorName = inject('colorName') as string
@@ -253,6 +264,7 @@
   var repayMax = ref(false)
   var repayHalf = ref(false)
   var liquidationDecimalAmount: number
+  var exactSameLiquidatorAsLiquidati = ref(false)
   
   var accountName = ref()
   var accountSelect = ref()
@@ -302,15 +314,6 @@
       localStorage.setItem("depositLiquidationToWallet", "false")
   }
 
-  var exactSameLiquidatorAsLiquidati = computed (() =>
-  {
-    if((liquidatiAddress.toString() == connectedWallet.addressString) &&
-    (liquidatiAccountIndex == accountSelect.value))
-      return true
-    else
-      return false
-  })
-
   var depositLiquidationToWallet = computed (() =>
   {
     if(radioGroupSelection.value == "Wallet")
@@ -345,7 +348,7 @@
     const price = priceObjectMap.data[liquidationTokenMintAddress.toString()]?.usdPrice
     if(price)
     {
-      return (Number(repaymentValue.value) / Number(price))
+      return (Number(repaymentValue.value.replace(/,/g, '')) / Number(price))
     }   
     else
       return 0
@@ -411,6 +414,15 @@
       return 0
   })
 
+  const setExactSameLiquidatorAsLiquidati = () =>
+  {
+    if((liquidatiAddress.toString() == connectedWallet.addressString) &&
+    (liquidatiAccountIndex == accountSelect.value))
+      exactSameLiquidatorAsLiquidati.value = true
+    else
+      exactSameLiquidatorAsLiquidati.value = false
+  }
+
   const liquidationInfoMSG = "\nYou can repay up to 50% of\na Liquidati's debt position\nif it isn't insolvent and\nclaim a 7% bonus value on\nthe liquidated deposited\ncollateral that you choose.\n\nIf it is insolvent, you can\nrepay up to 100% of their\ndebt position, although\nthis is not immediately\nprofitable.\n\n A 1% value fee is\nalso collected for the\nHODL Treasury\n"
 
   //Move cursor back after emoji insert
@@ -437,9 +449,9 @@
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
-  const handleClickOutside = function(event: any) 
+  const handleClickOutside = (event: any) => 
   {
-    if(liquidating.value)
+    if(liquidating.value && modalRef.value)
     {
       //const emojiButton = 
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
@@ -489,6 +501,7 @@
     borrowPositionToRepaySelect.value = undefined
     depositPositionToLiquidateSelect.value = undefined
     
+    setExactSameLiquidatorAsLiquidati()
     stopTabCalculation()
     startTabCalculation()
     stopHealthFactorCalculation()
@@ -707,6 +720,7 @@
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+    setExactSameLiquidatorAsLiquidati()
   }
 
   function setRepaymentTokenMintAddress()
@@ -714,8 +728,9 @@
     repayMax.value = false
     repayHalf.value = false
     repaymentTokenMintAddress = borrowPositionToRepaySelect.value.repaymentTokenMintAddress
+    const repaymentTokenId = borrowPositionToRepaySelect.value.repaymentTokenId
 
-    const tokenInfo = tokenReserveFontEndInfoHashMap.get(repaymentTokenMintAddress.toString())
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(repaymentTokenId)
     borrowSVG.value = tokenInfo.svg
     repaymentTokenDecimalAmount = tokenInfo.decimalAmount
     repaymentTokenProgram = tokenInfo.tokenProgram
@@ -727,8 +742,9 @@
     repayMax.value = false
     repayHalf.value = false
     liquidationTokenMintAddress = depositPositionToLiquidateSelect.value.liquidationTokenMintAddress
+    const liquidationTokenId = depositPositionToLiquidateSelect.value.liquidationTokenId
 
-    const tokenInfo = tokenReserveFontEndInfoHashMap.get(liquidationTokenMintAddress.toString())
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(liquidationTokenId)
     depositSVG.value = tokenInfo.svg
     liquidationDecimalAmount = tokenInfo.decimalAmount
     liquidationTokenProgram = tokenInfo.tokenProgram
@@ -751,7 +767,7 @@
 
     for(var i=0; i<liquidatiTabList.length; i++)
     {
-      const tokenMintAddress = tokenIdHashMap.map.get(liquidatiTabList[i].tokenId)
+      const tokenMintAddress = new PublicKey(tokenIdHashMap.map.get(liquidatiTabList[i].tokenId))
       const tokenInfo = tokenReserveFontEndInfoHashMap.get(liquidatiTabList[i].tokenId)
       const tokenName = tokenInfo.name
       const decimalAmount = tokenInfo.decimalAmount
@@ -784,6 +800,7 @@
 
         const listOption = tokenName + " SubOwner: " + getCustomOrTrimmedUserDisplayName(liquidatiTabList[i].subMarketOwnerAddress.toString()) +
         " SubIndex " + liquidatiTabList[i].subMarketIndex
+        
         const listValue = 
         {
           repaymentTokenId: liquidatiTabList[i].tokenId,
@@ -897,7 +914,8 @@
       liquidationInstructionRemainingAccounts.push(liquidatiLendingUserRemainingAccount)
 
       //Populate Repayment Token Reserve ATA remaining account
-      const repaymentTokenReserveATA = await deriveATA(getTokenReservePDA(repaymentTokenMintAddress), repaymentTokenMintAddress, true)
+      const repaymentTokenReserveATA = await deriveATA(getTokenReservePDA(repaymentTokenMintAddress), repaymentTokenMintAddress, repaymentTokenProgram, true)
+
       const repaymentTokenReserveATARemainingAccount = 
       {
         pubkey: repaymentTokenReserveATA,
@@ -907,7 +925,7 @@
       liquidationInstructionRemainingAccounts.push(repaymentTokenReserveATARemainingAccount)
 
       //Populate Liquidation Token Reserve ATA remaining account
-      const liquidationTokenReserveATA = await deriveATA(getTokenReservePDA(liquidationTokenMintAddress), liquidationTokenMintAddress, true)
+      const liquidationTokenReserveATA = await deriveATA(getTokenReservePDA(liquidationTokenMintAddress), liquidationTokenMintAddress, liquidationTokenProgram, true)
       const liquidationTokenReserveATARemainingAccount = 
       {
         pubkey: liquidationTokenReserveATA,
@@ -915,7 +933,7 @@
         isWritable: true
       }
       liquidationInstructionRemainingAccounts.push(liquidationTokenReserveATARemainingAccount)
-  
+
       //Populate Oracle Price Validator remaining account
       const oraclePriceValidatorPDA = getOraclePriceValidatorPDA()
       const oraclePriceValidatorRemainingAccount = 
@@ -1249,13 +1267,6 @@
       var refreshingLiquidatiRemainingAccounts = []
       var payingOffInsolventAccount = false
 
-      
-      /*
-      var liquidatorLookUpTableInstructionsToSend: anchor.web3.TransactionInstruction[] = []
-      var liquidatorUserLookUpTableAddress: PublicKey | undefined = undefined
-      
-      var createLiquidatiMonthlyStatementInstructions: anchor.web3.TransactionInstruction[] = []*/
-      
       const [uniqueTokenIds, createLiquidatiMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts] =
       await getNeccessaryRefreshInstructionData(remainingTabAccounts, liquidatiAddress, liquidatiAccountIndex)
 
@@ -1282,9 +1293,12 @@
       .instruction()
 
       const subMarketsAreSame =
+      (borrowPositionToRepaySelect.value.repaymentTokenId == depositPositionToLiquidateSelect.value.liquidationTokenId) &&
       (borrowPositionToRepaySelect.value.repaymentSubMarketOwnerAddress.toString() == depositPositionToLiquidateSelect.value.liquidationSubMarketOwnerAddress.toString()) &&
       (borrowPositionToRepaySelect.value.repaymentSubMarketIndex == depositPositionToLiquidateSelect.value.liquidationSubMarketIndex)
+
       const tokensAreDifferent = repaymentTokenMintAddress.toString() != liquidationTokenMintAddress.toString()
+
       const liquidationInstructionRemainingAccounts = await generateLiquidateAccountRemainingAccounts(tokensAreDifferent, subMarketsAreSame, tempPriceRemainingAccount)
 
       var liquidateAccountInstruction: anchor.web3.TransactionInstruction 
@@ -1373,23 +1387,25 @@
         liquidateFunctionCallName = "liquidate_account_same_token"
       }
 
+      const computeUnitIncreaseInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
+      instructionsToSend.push(computeUnitIncreaseInstruction)
       instructionsToSend.push(...createLiquidatiMonthlyStatementInstructions)
       instructionsToSend.push(refreshLiquidatiHealthAndTokenReservesInstruction)
       instructionsToSend.push(...liquidatorLookUpTableInstructionsToSend)
       instructionsToSend.push(liquidateAccountInstruction)
+      if(!LOCAL_PRICE_ORACLE)
+        instructionsToSend.push(createJitoTipInstruction())
 
-      //Get Protocol Look Up Table
+      //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
-      //Get SubMarket Look Up Table By Owner
-      /*var subMarketLookTableAccounts: anchor.web3.AddressLookupTableAccount[] = []
-      uniqueSubMarketOwnersAddressStrings.forEach((subMarketOwnersAddressString) =>
+      //Get SubMarket Look Up Table
+      //Only worth if there are 2 or more submarkets. (This assumes they are different submarkets that belong to adminAccounts.lendingCEOAddressString)
+      if(remainingTabAccounts.length >= 2)
       {
-        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(subMarketOwnersAddressString)
-        if(subMarketLookTableAccount)
-          subMarketLookTableAccounts.push(subMarketLookTableAccount)
-      })
-      lookUpTableAccounts.push(...subMarketLookTableAccounts)*/
+        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
+        lookUpTableAccounts.push(subMarketLookTableAccount)
+      }
 
       //Get Liquidati Lending User Look Up Table Account
       const liquidatiLendingAccount = lendingUserHashMap.map.get(liquidatiAddress.toString() + liquidatiAccountIndex.toString())
@@ -1409,7 +1425,11 @@
       }
 
       const response = await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
-      const userTxs = response.userTxs
+
+      var userTxs = []
+  
+      for(var i=0; i<signedTransactions.length; i++)
+        userTxs.push(bs58.default.encode(signedTransactions[i].signatures[0]))
 
       if(userTxs.length)
         for(var i=0; i<userTxs.length; i++)

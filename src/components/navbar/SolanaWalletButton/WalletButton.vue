@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, toRefs, onMounted, watch } from "vue"
+  import { computed, ref, toRefs, onMounted, onUnmounted, watch } from "vue"
   import { onClickOutside, useClipboard } from "@vueuse/core"
   import { IonButton, IonLabel, IonPopover, IonText } from '@ionic/vue'
   import { PublicKey } from "@solana/web3.js"
@@ -90,7 +90,9 @@
   import WalletConnectButton from '/src/components/navbar/SolanaWalletButton/WalletConnectButton.vue'
   import WalletIcon from './WalletIcon.vue'
   import WalletModalProvider from '/src/components/navbar/SolanaWalletButton/WalletModalProvider.vue'
-  import { getAddressLookUpTableProgramAccountWrapper } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { getAddressLookUpTableProgramAccountWrapper,
+    getPriceAccountPDA,
+    isTempPriceAccountAlive } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { lendingUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { isSubmitterAccountInitialized, getProcessorAccount } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { getChatAccount } from '/src/assets/contracts/Solana/ChatProtocol.vue'
@@ -114,6 +116,8 @@
   const event = ref()
 
   var lendingUserLookUpTableWatcherId: any
+  var lendingUserTempPriceAccountWatcherId: any
+  
 
   onMounted(async() =>
   {
@@ -131,6 +135,7 @@
       connectedWallet.isConnected = false
       connectedWallet.lendingUserLookUpTableAddress = undefined
       connectedWallet.lendingUserLookUpTableAccount = undefined
+      connectedWallet.isTempPriceAccountAlive = false
     }
     else
     { 
@@ -159,6 +164,9 @@
         connectedWallet.lendingUserLookUpTableAddress = undefined
         connectedWallet.lendingUserLookUpTableAccount = undefined
       }
+
+      connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
+      await listenForLendingUserTempPriceAccountChanges()
 
       const chatAccount = getChatAccount(connectedWallet.addressString)
       if(chatAccount)
@@ -213,12 +221,31 @@
     }
   })
 
+  onUnmounted(() =>
+  {
+    if(lendingUserLookUpTableWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserLookUpTableWatcherId)
+      lendingUserLookUpTableWatcherId = undefined
+    }
+    if(lendingUserTempPriceAccountWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserTempPriceAccountWatcherId)
+      lendingUserTempPriceAccountWatcherId = undefined
+    }
+  })
+
   watch(publicKey, async() =>
   {
     if(lendingUserLookUpTableWatcherId != undefined)
     {
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserLookUpTableWatcherId)
       lendingUserLookUpTableWatcherId = undefined
+    }
+    if(lendingUserTempPriceAccountWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserTempPriceAccountWatcherId)
+      lendingUserTempPriceAccountWatcherId = undefined
     }
 
     if(publicKey.value == null || publicKey.value.toBase58() == SYSTEM_PROGRAM_ADDRESS_STRING)
@@ -235,6 +262,7 @@
       connectedWallet.isConnected = false,
       connectedWallet.lendingUserLookUpTableAddress = undefined
       connectedWallet.lendingUserLookUpTableAccount = undefined
+      connectedWallet.isTempPriceAccountAlive = false
     }
     else
     {
@@ -263,6 +291,9 @@
         connectedWallet.lendingUserLookUpTableAddress = undefined
         connectedWallet.lendingUserLookUpTableAccount = undefined
       }
+
+      connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
+      await listenForLendingUserTempPriceAccountChanges()
 
       const chatAccount = getChatAccount(connectedWallet.addressString)
       if(chatAccount)
@@ -484,6 +515,23 @@
       })
 
       connectedWallet.lendingUserLookUpTableAccount = lookupTableAccountInstance
+    })
+  }
+
+  async function listenForLendingUserTempPriceAccountChanges()
+  {
+    //Remove previous listener before starting another one if it exists
+    if(lendingUserTempPriceAccountWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserTempPriceAccountWatcherId)
+      lendingUserTempPriceAccountWatcherId = undefined
+    }
+
+    //Subscribe to account changes
+    lendingUserTempPriceAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getPriceAccountPDA(connectedWallet.publicKey), async() => 
+    {
+      //Handle account change..
+      connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
     })
   }
 

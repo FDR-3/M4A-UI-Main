@@ -253,9 +253,9 @@
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
-  const handleClickOutside = function(event: any) 
+  const handleClickOutside = (event: any) =>
   {
-    if(depositing.value)
+    if(depositing.value && modalRef.value)
     {
       //const emojiButton = 
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
@@ -300,10 +300,15 @@
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
-    tokenProgram = tokenInfo.tokenProgram
 
+    tokenProgram = tokenInfo.tokenProgram
     subMarketList.value = subMarkets
-    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + "selectedMainSubMarketIndex")) || 0
+
+    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() +
+    connectedWallet.addressString +
+    connectedWallet.selectedLendingUserAccountIndex.toString() +
+    "selectedMainSubMarketIndex")) || 0
+
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     
     if(lendingUserAccountsHashMap.map)
@@ -580,7 +585,10 @@
 
   function updateStoredSelectedSubMarketIndex(tokenId: number, mainSubMarketIndex: string)
   {
-    localStorage.setItem(tokenId.toString() + "selectedMainSubMarketIndex", mainSubMarketIndex)
+    localStorage.setItem(tokenId.toString() +
+    connectedWallet.addressString +
+    connectedWallet.selectedLendingUserAccountIndex.toString() +
+    "selectedMainSubMarketIndex", mainSubMarketIndex)
   }
 
   defineExpose(
