@@ -69,16 +69,16 @@
             <div class="flexCenterRowHeight">
               <div class="smallMarginLeft" >
                 <div v-if=" slotProps.data.owner==adminAccounts.lendingCEOAddressString">
-                  <RIPKingStarWolf v-if="adminAccounts.ceoIsDead && slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
+                  <RIPKingStarWolf v-if="adminAccounts.ceoIsDead && slotProps.data.ranking==1" class="kingStarWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <RIPStarWolf v-else-if="adminAccounts.ceoIsDead" class="starWolfButton" :fill="slotProps.data.ranking==1 ? '#ffd700' :
                   slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' : colorHexValue"/>
-                  <KingStarWolf v-else-if="slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
+                  <KingStarWolf v-else-if="slotProps.data.ranking==1" class="kingStarWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <StarWolf v-else class="starWolfButton" :fill="slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' : colorHexValue"/>
                 </div>
                 <div v-else>
-                  <KingStarWolf v-if="slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
+                  <KingStarWolf v-if="slotProps.data.ranking==1" class="kingStarWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <StarWolf v-else class="starWolfButton" :fill="slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' :
                   darkTheme.value ? '#FFFFFF' : '#000000'"/>
@@ -171,7 +171,9 @@
                   <ion-button class="fullWidthButton thinBorder" fill="clear" @click="openSelectedPortfolio()">
                     <ion-label color="green">View</ion-label>
                   </ion-button>
-                  <ion-button class="fullWidthButton thinBorder lendingActionButton" fill="clear" @click="$emit('openLiquidationModal', event.owner, event.accountIndex)" >
+                  <ion-button class="fullWidthButton thinBorder lendingActionButton" fill="clear"
+                  @click="$emit('openLiquidationModal', event.owner, event.accountIndex); viewPortfolioPopoverOpen = false"
+                  <!--:disabled="event.healthFactor > 0-->">
                     <ion-label color="red" class="noClickEvent">Liquidate</ion-label>
                   </ion-button>
                 </div>

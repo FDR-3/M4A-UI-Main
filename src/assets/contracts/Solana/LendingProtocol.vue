@@ -1436,29 +1436,43 @@
       const { blockhash } = await connection.getLatestBlockhash()
       const payerKey = connectedWallet.publicKey;
 
-      // Hard Solana MTU limit is 1232 bytes.
-      // We reserve a 64-byte buffer for the user's signature applied later.
-      const MAX_UNSIGNED_SIZE = 1232 - 64; 
+      //Hard Solana MTU limit is 1232 bytes.
+      //We reserve a 64-byte buffer for the user's signature applied later
+      const MAX_UNSIGNED_SIZE = 1232 - 64
 
       var currentBatch: anchor.web3.TransactionInstruction[] = []
 
       for(var i=0; i<instructionsToSend.length; i++)
       {
         const nextInstruction = instructionsToSend[i]
-        
-        //Test compilation adding the next instruction to our active batch
-        const testInstructions = [...currentBatch, nextInstruction]
-        const testMessage = new TransactionMessage(
+        var itFits
+
+        try
         {
-          payerKey,
-          recentBlockhash: blockhash,
-          instructions: testInstructions
-        }).compileToV0Message(lookUpTableAccounts)
+          //Test compilation adding the next instruction to our active batch
+          const testInstructions = [...currentBatch, nextInstruction]
+          const testMessage = new TransactionMessage(
+          {
+            payerKey,
+            recentBlockhash: blockhash,
+            instructions: testInstructions
+          }).compileToV0Message(lookUpTableAccounts)
 
-        const testTx = new VersionedTransaction(testMessage)
-        const testSize = testTx.serialize().length
+          const testTx = new VersionedTransaction(testMessage)
+          const testSize = testTx.serialize().length
+          console.log("testSize: ", testSize)
 
-        if(testSize <= MAX_UNSIGNED_SIZE)
+          if(testSize <= MAX_UNSIGNED_SIZE)
+            itFits = true
+          else
+            itFits = false
+        }
+        catch(error)
+        {
+          itFits = false
+        }
+
+        if(itFits)
           //It fits! Append the instruction to the current transaction batch
           currentBatch.push(nextInstruction)
         else
@@ -1505,6 +1519,12 @@
       }
 
       console.log(`User Instructions Packed into ${unsignedTransactions.length} transaction(s).`)
+
+      for(var i=0; i<unsignedTransactions.length; i++)
+      {
+        const unsignedTransactionSize = unsignedTransactions[i].serialize().length
+        console.log(`Usigned Transaction size: ${unsignedTransactionSize}`)
+      }
 
       //Send the optimized transactions to the wallet for a single-prompt batch sign
       const signedTransactions = await anchorPrograms.lending.lendingProgram.provider.wallet.signAllTransactions(unsignedTransactions)
@@ -1593,19 +1613,30 @@
       for(let i=0; i<instructionsToSend.length; i++)
       {
         const nextInstruction = instructionsToSend[i]
-        
-        const testInstructions = [placeholderLimitIx, ...currentBatch, nextInstruction]
-        const testMessage = new TransactionMessage(
+        var itFits
+
+        try
         {
-          payerKey,
-          recentBlockhash: blockhash,
-          instructions: testInstructions
-        }).compileToV0Message(lookUpTableAccounts)
+          const testInstructions = [placeholderLimitIx, ...currentBatch, nextInstruction]
+          const testMessage = new TransactionMessage(
+          {
+            payerKey,
+            recentBlockhash: blockhash,
+            instructions: testInstructions
+          }).compileToV0Message(lookUpTableAccounts)
 
-        const testTx = new VersionedTransaction(testMessage)
-        const testSize = testTx.serialize().length
+          const testTx = new VersionedTransaction(testMessage)
+          const testSize = testTx.serialize().length
 
-        if(testSize <= MAX_UNSIGNED_SIZE)
+          if(testSize <= MAX_UNSIGNED_SIZE)
+            itFits = true
+        }
+        catch(error)
+        {
+          var itFits = false
+        }
+
+        if(itFits)
           currentBatch.push(nextInstruction)
         else
         {
@@ -1723,6 +1754,7 @@
     var uniqueTokenIds = new Set<number>()
     var lendingTabSubMarketAndMonthlyStatementRemainingAccounts = []
     var createMonthlyStatementInstructions: anchor.web3.TransactionInstruction[] = []
+    var subMarketOwnerHashMap = new Map<string, number>()
 
     for(var i=0; i<userRemainingTabAccounts.length; i++)
     {
@@ -1744,6 +1776,22 @@
       }
       lendingTabSubMarketAndMonthlyStatementRemainingAccounts.push(subMarketRemainingAccount)
 
+      //Update SubMarketOwner Hash Map
+      const previousEntry = subMarketOwnerHashMap.get(userRemainingTabAccounts[i].subMarketOwnerAddress)
+      if(previousEntry)
+        subMarketOwnerHashMap.set(userRemainingTabAccounts[i].subMarketOwnerAddress, previousEntry + 1)
+      else
+        subMarketOwnerHashMap.set(userRemainingTabAccounts[i].subMarketOwnerAddress, 1)
+
+      console.log(anchorPrograms.currentStatementMonthNumber.toString())
+      console.log(anchorPrograms.currentStatementYear.toString())
+      console.log(userRemainingTabAccounts[i].tokenId.toString())
+      console.log(userRemainingTabAccounts[i].subMarketOwnerAddress)
+      console.log(userRemainingTabAccounts[i].subMarketIndex.toString())
+      console.log(userAddress.toString())
+      console.log(userAccountIndex.toString())
+      
+
       //Push Remaining Monthly Statement Account
       const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
       anchorPrograms.currentStatementYear.toString() +
@@ -1754,7 +1802,7 @@
       userAccountIndex.toString())
 
       var monthlyStatementPDA: PublicKey
-
+      console.log(monthlyStatement)
       //Create monthly statement for the new month if it doesn't exist
       if(!monthlyStatement)
       {
@@ -1805,7 +1853,9 @@
       lendingTabSubMarketAndMonthlyStatementRemainingAccounts.push(monthlyStatementRemainingAccount)
     }
 
-    return [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts]
+    const subMarketOwnerArray = Array.from(subMarketOwnerHashMap, ([subMarketOwnerAddress, count]) => ({ subMarketOwnerAddress, count }))
+
+    return [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts, subMarketOwnerArray]
   }
 
   export function getTokenReserveRemainingAccounts(tokenIds: number[])

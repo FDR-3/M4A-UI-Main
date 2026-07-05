@@ -114,3 +114,12 @@ ion-textarea
 {
   background: none
 }
+
+.horizontalLine
+{
+  width: auto;
+  height: 1px;
+  margin-left: -20px;
+  margin-right: -20px;
+  background-color: #ffffff
+}

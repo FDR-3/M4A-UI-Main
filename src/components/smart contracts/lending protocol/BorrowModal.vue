@@ -87,7 +87,7 @@
 
     <div v-if="connectedWallet.isTempPriceAccountAlive" class="flexCenterColumn">
       <br>
-      <ion-text>Your temp price data account is alive. You must close it before you can call the repay function.</ion-text>
+      <ion-text>Your temp price data account is alive. You must close it before you can call the borrow function.</ion-text>
       <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
         Close Temp Price Account
       </ion-button>
@@ -199,7 +199,7 @@
 
   watch(lendingUserTabAccountListHashMap, async() =>
   {
-    if(borrowing.value)//Don't start another count down if on another modal since the withdrawal modal is still mounted even when not visible
+    if(borrowing.value)//Don't start another count down if on another modal since the borrow modal is still mounted even when not visible
     {
       stopHealthFactorCalculation()
       startHealthFactorCalculation()
@@ -253,6 +253,8 @@
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
         stopHealthFactorCalculation()
+        borrowMax.value = false
+        borrowHalf.value = false
         borrowing.value = false
         window.removeEventListener('click', handleClickOutside)
       }  
@@ -430,7 +432,7 @@
 
     try
     { 
-      const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts] =
+      const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts, subMarketOwnerArray] =
       await getNeccessaryRefreshInstructionData(remainingTabAccounts, connectedWallet.publicKey, accountSelect.value)
 
       //If user is borrowing from a token they have never interacted with before, add it to the array for price checks
@@ -478,16 +480,18 @@
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
       //Get SubMarket Look Up Table
-      //Only worth if there are 2 or more submarkets. (This assumes they are different submarkets that belong to adminAccounts.lendingCEOAddressString)
-      if(remainingTabAccounts.length >= 2)
+      //Only worth if there are 2 or more submarkets of the same owner.
+      for(var i=0; i<subMarketOwnerArray.length; i++)
       {
-        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
-        lookUpTableAccounts.push(subMarketLookTableAccount)
+        if(subMarketOwnerArray[i].count >= 2)
+        {
+          const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(subMarketOwnerArray[i].subMarketOwnerAddress)
+          lookUpTableAccounts.push(subMarketLookTableAccount)
+        }
       }
 
       //Get Lending User Look Up Table Account
-      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
-        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+      lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
 
       const signedTransactions = await userSignsLendingTransactions(instructionsToSend, lookUpTableAccounts)
 

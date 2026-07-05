@@ -1,5 +1,5 @@
 {
-  "address": "2RYYqg5qpA5NWCn7gb9iobaDr6zmhn2XdLtTXdBGr4qh",
+  "address": "HPSRDRBK5tr9o4gcFzsEZaNLutMqf4SLRdj1BBri3KWa",
   "metadata": {
     "name": "lending_protocol",
     "version": "0.1.0",
@@ -6546,6 +6546,94 @@
       ]
     },
     {
+      "name": "update_max_tab_amount",
+      "discriminator": [
+        49,
+        242,
+        167,
+        41,
+        175,
+        136,
+        48,
+        111
+      ],
+      "accounts": [
+        {
+          "name": "lending_protocol",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "new_max_tab_amount",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "update_token_reserve",
       "discriminator": [
         4,
@@ -7584,6 +7672,10 @@
             "type": "u16"
           },
           {
+            "name": "max_tabs_per_lending_account",
+            "type": "u8"
+          },
+          {
             "name": "look_up_table_address",
             "type": "pubkey"
           }
@@ -7764,7 +7856,7 @@
             "type": "u64"
           },
           {
-            "name": "monthly_sub_market_fees_generated_amount",
+            "name": "fees_generated_amount",
             "type": "u64"
           },
           {
@@ -7772,15 +7864,7 @@
             "type": "u64"
           },
           {
-            "name": "monthly_solvency_insurance_fees_generated_amount",
-            "type": "u64"
-          },
-          {
             "name": "monthly_solvency_insurance_fees_collected_amount",
-            "type": "u64"
-          },
-          {
-            "name": "monthly_liquidation_fees_generated_amount",
             "type": "u64"
           },
           {
@@ -7892,27 +7976,7 @@
             "type": "u64"
           },
           {
-            "name": "sub_market_fees_generated_amount",
-            "type": "u64"
-          },
-          {
-            "name": "sub_market_fees_collected_amount",
-            "type": "u64"
-          },
-          {
-            "name": "solvency_insurance_fees_generated_amount",
-            "type": "u64"
-          },
-          {
-            "name": "solvency_insurance_fees_collected_amount",
-            "type": "u64"
-          },
-          {
-            "name": "liquidation_fees_generated_amount",
-            "type": "u64"
-          },
-          {
-            "name": "liquidation_fees_collected_amount",
+            "name": "fees_generated_amount",
             "type": "u64"
           },
           {
@@ -8224,23 +8288,11 @@
             "type": "u128"
           },
           {
-            "name": "sub_market_fees_generated_amount",
-            "type": "u128"
-          },
-          {
             "name": "solvency_insurance_fee_rate",
             "type": "u16"
           },
           {
-            "name": "solvency_insurance_fees_generated_amount",
-            "type": "u128"
-          },
-          {
             "name": "uncollected_solvency_insurance_fees_amount",
-            "type": "u128"
-          },
-          {
-            "name": "liquidation_fees_generated_amount",
             "type": "u128"
           },
           {

@@ -54,14 +54,16 @@
     />
     <ion-text style="font-size: 11px">Enter fee percentage on interest earned for your sub market from 0% to 100%</ion-text><br>
 
-    <ion-button
-      color="dark"
-      @click="createSubMarket()"
-      class="mediumMarginTop"
-      :disabled="!isValidPublicKey || !connectedWallet.isConnected"
-    >
-      Create SubMarket
-    </ion-button>
+    <div class="mediumMarginTop">
+      <InfoButton :infoMessage="subMarketInfoMSG"/>
+      <ion-button
+        color="dark"
+        @click="createSubMarket()"
+        :disabled="!isValidPublicKey || !connectedWallet.isConnected"
+      >
+        Create SubMarket
+      </ion-button>
+    </div>
   </div>
 </template>
 
@@ -88,6 +90,7 @@
   import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { AddressLookupTableProgram } from '@solana/web3.js'
+  import InfoButton from '/src/components/help/InfoButton.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue') as string
@@ -106,6 +109,7 @@
   var event = ref()
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
   var modalRef = ref()
+  const subMarketInfoMSG = "Developers can create\nSubMarkets to generate\ninterest for their\nusers while collecting fees\nto pay what ever bill they\nchoose. Developers will\nneed to build their own UIs\nfor their user deposits,\netc."
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = (event: any) =>

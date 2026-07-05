@@ -48,12 +48,21 @@
       </Select>
     </div>
 
-    <ion-label class="alignSelfLeft">Debt: {{ userDebt.toFixed(tokenDecimalAmount) }}</ion-label>
+    <HealthFactorSmall :assetValue="totalAssetValue" :debtValue="totalDebtValue"/>
+
+    <ion-label class="alignSelfLeft">Wallet: {{ userWalletBalance.toLocaleString('en-US', {
+      minimumFractionDigits: tokenDecimalAmount,
+      maximumFractionDigits: tokenDecimalAmount }) }}
+    </ion-label>
+    <ion-label class="alignSelfLeft">Debt: {{ userDebt.toLocaleString('en-US', {
+      minimumFractionDigits: tokenDecimalAmount,
+      maximumFractionDigits: tokenDecimalAmount }) }}
+    </ion-label>
     <InputNumber
       v-model="repayAmount"
       :inputStyle="{'text-align': 'center'}"
       :minFractionDigits="tokenDecimalAmount" :maxFractionDigits="tokenDecimalAmount"
-      :max="userDebt"
+      :max="userWalletBalance < userDebt ? userWalletBalance : userDebt"
       :min="0"
       :step="repayIncrementAmount"
       showButtons
@@ -62,11 +71,13 @@
       @focus="repayMax=false; repayHalf=false"
     />
     <div class="alignSelfLeft">
-      <button style="background-color: transparent" @click="repayAmount=userDebt; repayHalf=false; repayMax=true">
+      <button style="background-color: transparent" @click="repayAmount=userWalletBalance < userDebt ? userWalletBalance : userDebt;
+        repayHalf=false; repayMax=true">
         <ion-label color="dark">Max</ion-label>
       </button>
 
-      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="repayAmount=userDebt*0.5; repayMax=false; repayHalf=true">
+      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="repayAmount=userWalletBalance < userDebt*0.5 ? userWalletBalance : userDebt*0.5;
+        repayMax=false; repayHalf=true">
         <ion-label color="dark">Half</ion-label>
       </button>
     </div>
@@ -117,16 +128,19 @@
     getTempRemainingPriceAccount,
     createJitoTipInstruction,
     closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { subMarketsHashMap, subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
     lendingUserTabAccountsHashMap,
+    lendingUserTabAccountListHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
+  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
+  import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
+  import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
   import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import * as bs58 from 'bs58'
 
@@ -147,6 +161,7 @@
   var repayMax = ref(false)
   var repayHalf = ref(false)
   var subMarketTokenName = ref()
+  var userWalletBalance = ref()
   var userDebt = ref(0)
   var userOriginalDebt = 0
   var selectedTokenId = 0
@@ -154,10 +169,13 @@
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
   var interestAccruedIntervalId: any
+  var healthFactorIntervalId: any
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
+  var totalAssetValue = ref(0)
+  var totalDebtValue = ref(0)
   var modalRef = ref()
 
   var repayValue = computed ( () =>
@@ -171,6 +189,18 @@
       return (0).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })   
+  })
+
+  watch(lendingUserTabAccountListHashMap, async() =>
+  {
+    if(repaying.value)//Don't start another count down if on another modal since the repayment modal is still mounted even when not visible
+    {
+      setInitialDebtBalance()
+      stopInterestCalculation()
+      startInterestCalculation()
+      stopHealthFactorCalculation()
+      startHealthFactorCalculation()
+    }
   })
   
   //Json string of wallet to detect object property changes
@@ -194,20 +224,18 @@
     && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
       return
 
-    stopInterestCalculation()
-    setInitialDebtBalance()
-    startInterestCalculation()
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-  })
+    const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
+    if(balance)
+      userWalletBalance.value = Number(balance)
+    else
+      userWalletBalance.value = 0
 
-  watch(lendingUserTabAccountsHashMap, () =>
-  {
-    if(repaying.value)
-    {
-      stopInterestCalculation()
-      setInitialDebtBalance()
-      startInterestCalculation()
-    }
+    setInitialDebtBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
+    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
@@ -227,6 +255,9 @@
       !event?.target?.closest('path')) //Keep transaction toast close button from sometimes closing modal
       {
         stopInterestCalculation()
+        stopHealthFactorCalculation()
+        repayMax.value = false
+        repayHalf.value = false
         repaying.value = false
         window.removeEventListener('click', handleClickOutside)
       }
@@ -259,6 +290,12 @@
         accountList.value = userAccountList
     }
 
+    const balance = connectedWallet.tokenBalanceMap.get(tokenMintAddress)
+    if(balance)
+      userWalletBalance.value = Number(balance)
+    else
+      userWalletBalance.value = 0
+
     selectedTokenId = tokenId
     selectedTokenMintAddress = new PublicKey(tokenMintAddress)
     tokenReserve = cloneDeep(tokenReservesHashMap.map.get(selectedTokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
@@ -272,6 +309,8 @@
     setInitialDebtBalance()
     stopInterestCalculation()
     startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
   }
 
   function openTokenPopover(e: Event) 
@@ -323,36 +362,57 @@
     userOriginalDebt = userDebt.value
   }
 
-  function updateStoredSelectedSubMarketIndex(tokenId: number, mainSubMarketIndex: string)
+  function calculateHealthFactorValues(timeStamp: number)
   {
-    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(tokenId.toString() +
-    adminAccounts.lendingCEOAddressString +
-    mainSubMarketIndex +
-    connectedWallet.addressString +
-    accountSelect.value.toString())
+    if(!lendingUserTabAccountListHashMap.map || selectedTokenMintAddress.toString()==SYSTEM_PROGRAM_ADDRESS_STRING)
+      return
 
-    if(lendingUserTabAccount)
-    {
-      const decimalAmount = tokenDecimalHashMap.get(tokenId)
+    const userTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value)
 
-      if(lendingUserTabAccount)
-        userDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-      else
-        userDebt.value = 0
-    }
-    else
-      userDebt.value = 0
+    var calculatedAssetValue = 0
+    var calculatedDebtValue = 0
 
-    userOriginalDebt = userDebt.value
-    repayAmount.value = 0
+    if(userTabAccounts)
+      for(var i=0; i<userTabAccounts.length; i++)
+      {
+        const tokenMintAddressString = tokenIdHashMap.map.get(userTabAccounts[i].tokenId)
+        const price = priceObjectMap.data[tokenMintAddressString].usdPrice
+        const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenId)
+        const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenId)
+        const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenId.toString() +
+        userTabAccounts[i].subMarketOwnerAddress.toString() +
+        userTabAccounts[i].subMarketIndex.toString())
 
-    localStorage.setItem(tokenId.toString() +
-    connectedWallet.addressString +
-    connectedWallet.selectedLendingUserAccountIndex.toString() +
-    "selectedMainSubMarketIndex", mainSubMarketIndex)
+        const userBalanceWithInterestEarned = calculateNewBalance(
+        tabTokenReserve,
+        subMarket,
+        Number(userTabAccounts[i].depositedAmount),
+        Number(userTabAccounts[i].supplyInterestChangeIndex),
+        timeStamp)
 
-    stopInterestCalculation()
-    startInterestCalculation()
+        const userDebtWithInterestAccrued =  calculateNewDebtBalance(
+        tabTokenReserve,
+        Number(userTabAccounts[i].borrowedAmount),
+        Number(userTabAccounts[i].borrowInterestChangeIndex),
+        timeStamp)
+
+        calculatedAssetValue += Number(userBalanceWithInterestEarned / Math.pow(10, decimalAmount)) * Number(price)
+        calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
+      }
+    
+    const priceOfSelectedToken = Number(priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice)
+
+    //Account for value that is about to be repaid
+    //Check for less than zero values when doing complete withdrawals, due to the price possibly being slighly off
+    calculatedDebtValue -= repayAmount.value * Number(priceOfSelectedToken)
+    if(calculatedAssetValue < 0)
+      calculatedAssetValue = 0
+
+    if(calculatedDebtValue < 0)
+      calculatedDebtValue = 0
+
+    totalAssetValue.value = calculatedAssetValue
+    totalDebtValue.value = calculatedDebtValue
   }
 
   function startInterestCalculation()
@@ -373,6 +433,26 @@
     {
       clearInterval(interestAccruedIntervalId)
       interestAccruedIntervalId = undefined
+    }
+  }
+
+  function startHealthFactorCalculation()
+  {
+    if(blockChainData.timeStamp == 0)
+      return
+
+    healthFactorIntervalId = setInterval(() =>
+    {
+      calculateHealthFactorValues(blockChainData.timeStamp)
+    }, 55)
+  }
+
+  function stopHealthFactorCalculation()
+  {
+    if(healthFactorIntervalId != undefined)
+    {
+      clearInterval(healthFactorIntervalId)
+      healthFactorIntervalId = undefined
     }
   }
 
@@ -408,9 +488,9 @@
     userDebt.value = userOriginalDebt * tokenReserve.newBorrowInterestChangeIndex / Number(lendingUserTabAccount.borrowInterestChangeIndex)
 
     if(repayHalf.value)
-      repayAmount.value = userDebt.value * 0.5
+      repayAmount.value = userWalletBalance.value < userDebt.value * 0.5 ? userWalletBalance.value : userDebt.value * 0.5
     if(repayMax.value)
-      repayAmount.value = userDebt.value
+      repayAmount.value = userWalletBalance.value < userDebt.value ? userWalletBalance.value : userDebt.value
   }
 
   async function repayTokens()
@@ -422,7 +502,7 @@
 
     try
     {
-      const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts] =
+      const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts, subMarketOwnerArray] =
       await getNeccessaryRefreshInstructionData(remainingTabAccounts, connectedWallet.publicKey, accountSelect.value)
 
       const uniqueTokenReserveRemainingAccounts = getTokenReserveRemainingAccounts(uniqueTokenIds)
@@ -467,16 +547,18 @@
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
       //Get SubMarket Look Up Table
-      //Only worth if there are 2 or more submarkets. (This assumes they are different submarkets that belong to adminAccounts.lendingCEOAddressString)
-      if(remainingTabAccounts.length >= 2)
+      //Only worth if there are 2 or more submarkets of the same owner.
+      for(var i=0; i<subMarketOwnerArray.length; i++)
       {
-        const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
-        lookUpTableAccounts.push(subMarketLookTableAccount)
+        if(subMarketOwnerArray[i].count >= 2)
+        {
+          const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(subMarketOwnerArray[i].subMarketOwnerAddress)
+          lookUpTableAccounts.push(subMarketLookTableAccount)
+        }
       }
 
       //Get Lending User Look Up Table Account
-      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
-        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+      lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
 
       const signedTransactions = await userSignsLendingTransactions(instructionsToSend, lookUpTableAccounts)
 
@@ -500,6 +582,7 @@
         await confirmLendingTransaction(userTxs, toast, "repay_tokens")
 
       stopInterestCalculation()
+      stopHealthFactorCalculation()
       repaying.value = false
       repayMax.value = false
     }
@@ -508,6 +591,22 @@
       var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
       toastPreTransactionError(errorMessage, toast, "repay_tokens")  
     }
+  }
+
+  function updateStoredSelectedSubMarketIndex(tokenId: number, mainSubMarketIndex: string)
+  {
+    repayAmount.value = 0
+
+    localStorage.setItem(tokenId.toString() +
+    connectedWallet.addressString +
+    connectedWallet.selectedLendingUserAccountIndex.toString() +
+    "selectedMainSubMarketIndex", mainSubMarketIndex)
+
+    setInitialDebtBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
   }
 
   defineExpose(

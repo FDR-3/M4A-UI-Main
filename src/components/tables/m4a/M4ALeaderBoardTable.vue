@@ -69,16 +69,16 @@
             <div class="flexCenterRowHeight">
               <div class="smallMarginLeft" >
                 <div v-if=" slotProps.data.submitterAddress==adminAccounts.m4aCEOAddress">
-                  <RIPKingStarWolf v-if="adminAccounts.ceoIsDead && slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
+                  <RIPKingStarWolf v-if="adminAccounts.ceoIsDead && slotProps.data.ranking==1" class="kingStarWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <RIPStarWolf v-else-if="adminAccounts.ceoIsDead" class="starWolfButton" :fill="slotProps.data.ranking==1 ? '#ffd700' :
                   slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' : '#39bd39'"/>
-                  <KingStarWolf v-else-if="slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
+                  <KingStarWolf v-else-if="slotProps.data.ranking==1" class="kingStarWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <StarWolf v-else class="starWolfButton" :fill="slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' : '#39bd39'"/>
                 </div>
                 <div v-else>
-                  <KingStarWolf v-if="slotProps.data.ranking==1" class="starWolfButton" style="margin-left: -7px; margin-right: -5px"/>
+                  <KingStarWolf v-if="slotProps.data.ranking==1" class="kingStarWolfButton" style="margin-left: -7px; margin-right: -5px"/>
                   <StarWolf v-else class="starWolfButton" :fill="slotProps.data.ranking == 2 ? '#b5bbcad3' :
                   slotProps.data.ranking == 3 ? '#a77822' :
                   darkTheme.value ? '#FFFFFF' : '#000000'"/>

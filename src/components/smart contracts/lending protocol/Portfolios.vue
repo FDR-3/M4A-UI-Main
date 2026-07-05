@@ -45,7 +45,12 @@
       <div class="flexCenterRow" style="justify-content:space-around !important">
         <div>
           <h2 class="underLine yellow">7 Day Projection Rate</h2>
-          <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toFixed(2) }}</span> A Week</h3>
+          <h3 class="nMediumMarginTop">Value:
+            $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2 }) }}
+            </span> A Week
+          </h3>
         </div>
 
         <Select
@@ -62,7 +67,12 @@
 
         <div>
           <h2 class="underLine yellow">Life Time Interest Earned</h2>
-          <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toFixed(2) }}</span></h3>
+          <h3 class="nMediumMarginTop">Value:
+            $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2 }) }}
+            </span>
+          </h3>
         </div>
       </div>
 
@@ -84,12 +94,22 @@
 
       <div>
         <h2 class="underLine yellow">7 Day Projection Rate</h2>
-        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toFixed(2) }}</span> A Week</h3>
+        <h3 class="nMediumMarginTop">Value:
+          $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span> A Week
+        </h3>
       </div>
 
       <div>
         <h2 class="underLine nSmallMarginTop yellow">Life Time Interest Earned</h2>
-        <h3 class="nMediumMarginTop">Value: $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toFixed(2) }}</span></h3>
+        <h3 class="nMediumMarginTop">Value:
+          $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span>
+        </h3>
       </div>   
 
       <div class="nTinyMarginTop">
@@ -101,13 +121,23 @@
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
       <div>
         <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value:
+          $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span> A Week
+        </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div>
         <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value:
+          $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span>
+        </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
       </div>  
     </div>
@@ -115,13 +145,23 @@
     <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay">
       <div>
         <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value:
+          $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span> A Week
+        </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div class="nMediumMarginTop">
         <h4 class="underLine green" style="line-height: 27px">Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value:
+          $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span>
+        </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
     </div>
@@ -156,13 +196,23 @@
       :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '14px' : '0px'}">
       <div>
         <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value:
+          $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span> A Week
+        </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div>
         <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value:
+          $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span>
+        </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
     </div>
@@ -172,13 +222,23 @@
       
       <div>
         <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toFixed(2) }}</span> A Week</h5>
+        <h5 class="nMediumLargeMarginTop">Value:
+          $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span> A Week
+        </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
       </div>
 
       <div class="nMediumMarginTop">
         <h4 class="underLine green" style="line-height: 27px">Life Time Interest Earned</h4>
-        <h5 class="nMediumLargeMarginTop">Value: $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toFixed(2) }}</span></h5>
+        <h5 class="nMediumLargeMarginTop">Value:
+          $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 }) }}
+          </span>
+        </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
       </div>
 

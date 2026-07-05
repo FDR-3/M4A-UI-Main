@@ -854,10 +854,10 @@
 
     emits('interestEarned',
     props.userTabIndex,
-    Number(sevenDayCalculatedUserInterestEarned.value),
-    Number(sevenDayInterestEarnedValueString.value),
-    Number(calculatedUserInterestEarned.value),
-    Number(interestEarnedValueString.value))
+    Number(sevenDayCalculatedUserInterestEarned.value.replace(/,/g, '')),
+    Number(sevenDayInterestEarnedValueString.value.replace(/,/g, '')),
+    Number(calculatedUserInterestEarned.value.replace(/,/g, '')),
+    Number(interestEarnedValueString.value.replace(/,/g, '')))
   }
 
   function startInterestCalculation()

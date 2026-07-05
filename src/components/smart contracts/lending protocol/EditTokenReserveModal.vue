@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, onMounted, onUnmounted } from 'vue'
+  import { ref, inject, onUnmounted } from 'vue'
   import type { Component } from 'vue'
   import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import Select from 'primevue/select'
@@ -132,11 +132,6 @@
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
   var modalRef = ref()
 
-  onMounted(() =>
-  {
-    window.addEventListener('click', handleClickOutside)
-  })
-
   onUnmounted(() =>
   {
     window.removeEventListener('click', handleClickOutside)
@@ -170,6 +165,7 @@
   useFixedBorrowApy: boolean,
   globalLimit: number)
   {
+    window.addEventListener('click', handleClickOutside)
     selectedTokenId = tokenId
     selectedTokenMintAddress = tokenMintAddress
     selectedTokenMintAddressString = tokenMintAddress.toString()

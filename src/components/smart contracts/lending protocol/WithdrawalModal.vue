@@ -73,7 +73,7 @@
       </button>
 
       <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="withdrawMax=false; withdrawHalf=true">
-        <div style="margin-top: 2px"><ion-label color="dark" >Half</ion-label></div>
+        <div style="margin-top: 2px"><ion-label color="dark">Half</ion-label></div>
       </button>
     </div>
 
@@ -83,7 +83,7 @@
 
     <div v-if="connectedWallet.isTempPriceAccountAlive" class="flexCenterColumn">
       <br>
-      <ion-text>Your temp price data account is alive. You must close it before you can call the repay function.</ion-text>
+      <ion-text>Your temp price data account is alive. You must close it before you can call the withdraw function.</ion-text>
       <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
         Close Temp Price Account
       </ion-button>
@@ -265,6 +265,8 @@
       {
         stopInterestCalculation()
         stopHealthFactorCalculation()
+        withdrawMax.value = false
+        withdrawHalf.value = false
         withdrawing.value = false
         window.removeEventListener('click', handleClickOutside)
       }  
@@ -559,22 +561,23 @@
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
 
       //Get Lending User Look Up Table Account
-      if(connectedWallet.lendingUserLookUpTableAccount)//Won't be available on first deposit
-        lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+      lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
 
       if(totalDebtValue.value != 0)
       {
-        //Get SubMarket Look Up Table
-        //Only if the user has debt for the refresh monthly statement instruction that will have to run
-        //Only worth if there are 2 or more submarkets. (This assumes they are different submarkets that belong to adminAccounts.lendingCEOAddressString)
-        if(remainingTabAccounts.length >= 2)
-        {
-          const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(adminAccounts.lendingCEOAddressString)
-          lookUpTableAccounts.push(subMarketLookTableAccount)
-        }
-
-        const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts] =
+        const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts, subMarketOwnerArray] =
         await getNeccessaryRefreshInstructionData(remainingTabAccounts, connectedWallet.publicKey, accountSelect.value)
+
+        //Get SubMarket Look Up Table
+        //Only worth if there are 2 or more submarkets of the same owner.
+        for(var i=0; i<subMarketOwnerArray.length; i++)
+        {
+          if(subMarketOwnerArray[i].count >= 2)
+          {
+            const subMarketLookTableAccount = subMarketLookUpTableByOwnerHashMap.map.get(subMarketOwnerArray[i].subMarketOwnerAddress)
+            lookUpTableAccounts.push(subMarketLookTableAccount)
+          }
+        }
 
         const uniqueTokenReserveRemainingAccounts = getTokenReserveRemainingAccounts(uniqueTokenIds)
         const tempPriceRemainingAccount = getTempRemainingPriceAccount()
@@ -670,12 +673,10 @@
   {
     withdrawAmount.value = 0
 
-    localStorage.setItem(selectedTokenId.toString() +
+    localStorage.setItem(tokenId.toString() +
     connectedWallet.addressString +
     connectedWallet.selectedLendingUserAccountIndex.toString() +
      "selectedMainSubMarketIndex", subMarketIndex)
-
-    const subMarket = subMarketsHashMap.map.get(tokenId.toString() + adminAccounts.lendingCEOAddressString + subMarketSelect.value.toString())
 
     setInitialBalance()
     stopInterestCalculation()

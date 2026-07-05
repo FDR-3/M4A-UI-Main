@@ -81,6 +81,8 @@
       </ion-input>
     </div>
 
+    <HealthFactorSmall :assetValue="totalAssetValue" :debtValue="totalDebtValue"/>
+
     <ion-label class="alignSelfLeft">Wallet: {{ userWalletBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <ion-label class="alignSelfLeft">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
     <InputNumber
@@ -98,6 +100,10 @@
       <!--If it's the SOL Token, leave some SOL when hitting the Max button for transaction fees-->
       <button style="background-color: transparent" @click="selectedTokenMintAddress?.toString()!=tokenAddressStrings.solTokenMintAddress ? depositAmount=userWalletBalance : depositAmount=userWalletBalance-0.1">
         <ion-label color="dark">Max</ion-label>
+      </button>
+
+      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="depositAmount=userWalletBalance * 0.5">
+        <div style="margin-top: 2px"><ion-label color="dark">Half</ion-label></div>
       </button>
     </div>
 
@@ -142,16 +148,18 @@
     confirmLendingTransaction,
     parseProgramErrorCode,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { getLendingUserLookUpTableAddressAndInstructions, sendVersionedLendingProtocolTransaction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
+  import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import { getDynamicPriorityFeePrice } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
+  import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
   import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
 
   const toast = inject('toast')
@@ -181,6 +189,7 @@
   var tokenDecimalAmount: number
   var tokenProgram: PublicKey
   var interestEarnedIntervalId: any
+  var healthFactorIntervalId: any
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -188,6 +197,8 @@
 
   var savedEmojiCursorPosition: any
   var overByteSizeLimit = ref()
+  var totalAssetValue = ref(0)
+  var totalDebtValue = ref(0)
   var modalRef = ref()
 
   const depositInfoMSG = "\nThe initial transaction fees for\ndepositing a new Token for the first\ntime are more expensive than normal to\ninitialize your account data. You need\ndifferent account data for each\ndifferent Token you deposit into.\nYou also need new account data when a\nnew month comes for your monthly\nstatement accounts. A new monthly\nstatement account is only generated\nwhen you're executing a transaction\nduring a new month.\n\nAn initial deposit transaction fee\nmight be around 0.008881 SOL and\n0.00008 SOL when no new data is needed."
@@ -203,6 +214,18 @@
       return (0).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })   
+  })
+
+  watch(lendingUserTabAccountListHashMap, async() =>
+  {
+    if(depositing.value)//Don't start another count down if on another modal since the deposit modal is still mounted even when not visible
+    {
+      setInitialBalance()
+      stopInterestCalculation()
+      startInterestCalculation()
+      stopHealthFactorCalculation()
+      startHealthFactorCalculation()
+    }
   })
 
   //Json string of wallet to detect object property changes
@@ -236,6 +259,8 @@
     setInitialBalance()
     stopInterestCalculation()
     startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
   })
 
   //Move cursor back after emoji insert
@@ -280,13 +305,15 @@
       !dataPcSectionValue?.includes('button container') && //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path'))) //Keep transaction toast close button from sometimes closing modal
       {
-        depositing.value = false
         if(addingAdditionalLendingAccount.value)
         {
-          stopInterestCalculation()
           cancelAddingAdditionalLendingAccount()
           addingAdditionalLendingAccount.value = false
         }
+
+        depositing.value = false
+        stopInterestCalculation()
+        stopHealthFactorCalculation()
         window.removeEventListener('click', handleClickOutside)
       }
     }
@@ -357,6 +384,8 @@
     setInitialBalance()
     stopInterestCalculation()
     startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
   }
 
   function openTokenPopover(e: Event) 
@@ -457,6 +486,56 @@
     userOriginalBalance = userBalance.value
   }
 
+  function calculateHealthFactorValues(timeStamp: number)
+  {
+    if(!lendingUserTabAccountListHashMap.map || selectedTokenMintAddress.toString()==SYSTEM_PROGRAM_ADDRESS_STRING)
+      return
+
+    const userTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value)
+
+    var calculatedAssetValue = 0
+    var calculatedDebtValue = 0
+
+    if(userTabAccounts)
+      for(var i=0; i<userTabAccounts.length; i++)
+      {
+        const tokenMintAddressString = tokenIdHashMap.map.get(userTabAccounts[i].tokenId)
+        const price = priceObjectMap.data[tokenMintAddressString].usdPrice
+        const decimalAmount = tokenDecimalHashMap.get(userTabAccounts[i].tokenId)
+        const tabTokenReserve = tokenReservesHashMap.map.get(userTabAccounts[i].tokenId)
+        const subMarket = subMarketsHashMap.map.get(userTabAccounts[i].tokenId.toString() +
+        userTabAccounts[i].subMarketOwnerAddress.toString() +
+        userTabAccounts[i].subMarketIndex.toString())
+
+        const userBalanceWithInterestEarned = calculateNewBalance(
+        tabTokenReserve,
+        subMarket,
+        Number(userTabAccounts[i].depositedAmount),
+        Number(userTabAccounts[i].supplyInterestChangeIndex),
+        timeStamp)
+
+        const userDebtWithInterestAccrued =  calculateNewDebtBalance(
+        tabTokenReserve,
+        Number(userTabAccounts[i].borrowedAmount),
+        Number(userTabAccounts[i].borrowInterestChangeIndex),
+        timeStamp)
+
+        calculatedAssetValue += Number(userBalanceWithInterestEarned / Math.pow(10, decimalAmount)) * Number(price)
+        calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
+      }
+    
+    const priceOfSelectedToken = Number(priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice)
+
+    //Account for value that is about to be deposited
+    //Check for less than zero values when doing complete withdrawals, due to the price possibly being slighly off
+    calculatedAssetValue += depositAmount.value * Number(priceOfSelectedToken)
+    if(calculatedAssetValue < 0)
+      calculatedAssetValue = 0
+
+    totalAssetValue.value = calculatedAssetValue
+    totalDebtValue.value = calculatedDebtValue
+  }
+
   function startInterestCalculation()
   {
     if(blockChainData.timeStamp == 0)
@@ -475,6 +554,26 @@
     {
       clearInterval(interestEarnedIntervalId)
       interestEarnedIntervalId = undefined
+    }
+  }
+
+  function startHealthFactorCalculation()
+  {
+    if(blockChainData.timeStamp == 0)
+      return
+
+    healthFactorIntervalId = setInterval(() =>
+    {
+      calculateHealthFactorValues(blockChainData.timeStamp)
+    }, 55)
+  }
+
+  function stopHealthFactorCalculation()
+  {
+    if(healthFactorIntervalId != undefined)
+    {
+      clearInterval(healthFactorIntervalId)
+      healthFactorIntervalId = undefined
     }
   }
 
@@ -573,6 +672,8 @@
 
       await confirmLendingTransaction(tx, toast, "deposit_tokens")
 
+      stopInterestCalculation()
+      stopHealthFactorCalculation()
       depositing.value = false
       addingAdditionalLendingAccount.value = false
     }
@@ -585,10 +686,18 @@
 
   function updateStoredSelectedSubMarketIndex(tokenId: number, mainSubMarketIndex: string)
   {
+    depositAmount.value = 0
+
     localStorage.setItem(tokenId.toString() +
     connectedWallet.addressString +
     connectedWallet.selectedLendingUserAccountIndex.toString() +
     "selectedMainSubMarketIndex", mainSubMarketIndex)
+
+    setInitialBalance()
+    stopInterestCalculation()
+    startInterestCalculation()
+    stopHealthFactorCalculation()
+    startHealthFactorCalculation()
   }
 
   defineExpose(
