@@ -37,7 +37,7 @@
     if(isProduction())
       rpcUrl.value = "https://m4a.io/TestNetProxy"
     else
-      rpcUrl.value = DEV_MODE ? "http://127.0.0.1:8899"/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
+      rpcUrl.value = DEV_MODE ? clusterApiUrl("testnet")/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
       //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com"/*Interchangeable with clusterApiUrl("devnet")*/ : "https://solana-rpc.publicnode.com"
   }
 

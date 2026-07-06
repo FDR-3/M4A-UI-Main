@@ -223,10 +223,10 @@
     try
     {
       //Subscribe to account changes
-      tokenReserveSOLWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(adminAccounts.tokenReserveAddress, async() => 
+      tokenReserveSOLWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveSOLATA, async() => 
       {
         //Handle account change...
-        const tokenReserveSOLBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(adminAccounts.tokenReserveAddress)
+        const tokenReserveSOLBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(tokenReserveSOLATA)
         const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
         tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, (tokenReserveSOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
       })
