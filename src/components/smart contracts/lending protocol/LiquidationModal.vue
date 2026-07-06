@@ -52,7 +52,15 @@
         <component v-else :is="borrowSVG" style="width: 44px"></component>
         <ion-label>Borrowed Amount: {{ selectedBorrowedAmount }}</ion-label>
       </div>
-      <ion-label class="alignSelfLeft tinyMarginTop">Repayment Amount: </ion-label>
+
+      <ion-label class="alignSelfLeft tinyMarginTop">Wallet Balance: {{ liquidatorWalletBalance.toLocaleString('en-US', {
+        minimumFractionDigits: repaymentTokenDecimalAmount,
+        maximumFractionDigits: repaymentTokenDecimalAmount }) }}
+      </ion-label>
+      <ion-label class="alignSelfLeft" style="margin-top: -1px">Repayment Amount: {{ repayAmount.toLocaleString('en-US', {
+        minimumFractionDigits: repaymentTokenDecimalAmount,
+        maximumFractionDigits: repaymentTokenDecimalAmount }) }}
+      </ion-label>
   
       <InputNumber
         v-model="repayAmount"

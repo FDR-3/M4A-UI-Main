@@ -59,7 +59,7 @@
       <ion-label class="alignSelfLeft">Value: {{ availableToBorrowValue }}</ion-label>
     </div>
     <div>
-      <ion-label>Available in Token Reserve: {{ availableInTokenReserveAmount.toLocaleString('en-US', {
+      <ion-label>Available in Token Reserve: {{ availableInTokenReserveAmount?.toLocaleString('en-US', {
         minimumFractionDigits: tokenDecimalAmount,
         maximumFractionDigits: tokenDecimalAmount }) }}
       </ion-label>
@@ -197,19 +197,6 @@
         maximumFractionDigits: 2 })   
   })
 
-  watch(tokenReservesHashMap, () =>
-  {
-    if(borrowing.value)
-    {
-      const tokenReserve = tokenReservesHashMap.map.get(selectedTokenMintAddress.toString())
-      if(tokenReserve)
-      {
-        const temp = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
-        availableInTokenReserveAmount.value = temp < 0 ? 0 : temp
-      }
-    }
-  })
-
   watch(tokenReserveBalancesHashMap, () =>
   {
     if(borrowing.value)
@@ -286,15 +273,19 @@
   {
     window.addEventListener('click', handleClickOutside)
     
-    const tokenReserve = tokenReservesHashMap.map.get(tokenId)//Borrow Modal doesn't update anything on tokenReserve, so no cloneDeep needed
     const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenId)
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
     
     tokenProgram = tokenInfo.tokenProgram
-    availableInTokenReserveAmount.value = tokenReserveBalancesHashMap.map.get(tokenId)
     subMarketList.value = subMarkets
+
+    const tokenReserveBalance = tokenReserveBalancesHashMap.map.get(tokenId)
+    if(tokenReserveBalance)
+      availableInTokenReserveAmount.value = tokenReserveBalance
+    else
+      availableInTokenReserveAmount.value = 0
 
     subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + 
     connectedWallet.addressString +

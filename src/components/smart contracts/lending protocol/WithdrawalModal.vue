@@ -59,7 +59,7 @@
         minimumFractionDigits: tokenDecimalAmount,
         maximumFractionDigits: tokenDecimalAmount }) }}
       </ion-label>
-      <ion-label class="alignSelfLeft">Token Reserve: {{ availableInTokenReserveAmount.toLocaleString('en-US', {
+      <ion-label class="alignSelfLeft">Token Reserve: {{ availableInTokenReserveAmount?.toLocaleString('en-US', {
         minimumFractionDigits: tokenDecimalAmount,
         maximumFractionDigits: tokenDecimalAmount }) }}
       </ion-label>
@@ -296,8 +296,13 @@
     const tokenSVG = tokenInfo.svg
     
     tokenProgram = tokenInfo.tokenProgram
-    availableInTokenReserveAmount.value = tokenReserveBalancesHashMap.map.get(tokenId)
     subMarketList.value = subMarkets
+
+    const tokenReserveBalance = tokenReserveBalancesHashMap.map.get(tokenId)
+    if(tokenReserveBalance)
+      availableInTokenReserveAmount.value = tokenReserveBalance
+    else
+      availableInTokenReserveAmount.value = 0
 
     subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() +
     connectedWallet.addressString +

@@ -146,6 +146,7 @@
 
       if(!modalRef.value.contains(event?.target) &&
       (event?.target?.id != "openEditTokenReserveModalButton") &&
+      !event?.target?.classList.contains("ion-page") &&
       !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("p-toast-message-content") && //Keep transaction toast text from closing modal
       !event?.target?.classList.contains("p-toast-close-icon") && //Keep transaction toast close button from closing modal

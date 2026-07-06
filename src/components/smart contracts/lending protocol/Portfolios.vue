@@ -741,7 +741,7 @@
   }
 
   function resetSelectedYearForTokenMintAddressHashMap(subMarketArray: any[])
-  {console.log("reseting")
+  {
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
 
@@ -1427,11 +1427,6 @@
   calculatedUserInterestEarned: number,
   interestEarnedValue: number)
   {
-    /*userCryptoCurrencyInterestHelper[userTabIndex].sevenDayCalculatedUserInterestEarned = 0
-    userMonthlyStatementCryptoCurrencyList.value[userTabIndex].sevenDayInterestEarnedValue = 0
-    userMonthlyStatementCryptoCurrencyList.value[userTabIndex].calculatedUserInterestEarned = 0
-    userMonthlyStatementCryptoCurrencyList.value[userTabIndex].interestEarnedValue = 0*/
-
     userCryptoCurrencyInterestHelper[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
     userCryptoCurrencyInterestHelper[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
     userCryptoCurrencyInterestHelper[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned

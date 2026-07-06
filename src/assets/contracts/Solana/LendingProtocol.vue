@@ -1461,7 +1461,7 @@
 
           const testTx = new VersionedTransaction(testMessage)
           const testSize = testTx.serialize().length
-          console.log("testSize: ", testSize)
+          console.log("testSize: ", testSize + " bytes")
 
           if(testSize <= MAX_UNSIGNED_SIZE)
             itFits = true
@@ -1722,8 +1722,8 @@
       uint8Array.set(txBytes, offset) //Copy raw transaction bytes
       offset += txBytes.length
     }
-    console.log("FRONTEND: totalSize allocated =", totalSize)
-    console.log("FRONTEND: actual uint8Array byteLength =", uint8Array.byteLength)
+    console.log("FRONTEND: totalSize allocated =", totalSize + " bytes")
+    console.log("FRONTEND: actual uint8Array byteLength =", uint8Array.byteLength + " bytes")
 
     var baseURL = ""
 
@@ -1783,16 +1783,7 @@
         subMarketOwnerHashMap.set(userRemainingTabAccounts[i].subMarketOwnerAddress, previousEntry + 1)
       else
         subMarketOwnerHashMap.set(userRemainingTabAccounts[i].subMarketOwnerAddress, 1)
-
-      console.log(anchorPrograms.currentStatementMonthNumber.toString())
-      console.log(anchorPrograms.currentStatementYear.toString())
-      console.log(userRemainingTabAccounts[i].tokenId.toString())
-      console.log(userRemainingTabAccounts[i].subMarketOwnerAddress)
-      console.log(userRemainingTabAccounts[i].subMarketIndex.toString())
-      console.log(userAddress.toString())
-      console.log(userAccountIndex.toString())
       
-
       //Push Remaining Monthly Statement Account
       const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
       anchorPrograms.currentStatementYear.toString() +
@@ -1803,7 +1794,7 @@
       userAccountIndex.toString())
 
       var monthlyStatementPDA: PublicKey
-      console.log(monthlyStatement)
+
       //Create monthly statement for the new month if it doesn't exist
       if(!monthlyStatement)
       {

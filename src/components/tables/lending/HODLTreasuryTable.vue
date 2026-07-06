@@ -472,7 +472,7 @@
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
 
-      const treasuryTotalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+      const treasuryTotalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
 
       if(!priceData)
         return
