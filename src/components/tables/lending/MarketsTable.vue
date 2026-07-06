@@ -37,7 +37,7 @@
 
           <div v-if="hasAtleast1Account" class="nMediumSmallMarginBottom">
             <div class="flexCenterRow">
-              <div style="margin-right: -3px">
+              <div class="smallMarginRight">
                 <InfoButton :infoMessage="userLendingInfoMSG"/>
               </div>
 
@@ -124,7 +124,7 @@
            {{ slotProps.data.priceString }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h %Price Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -268,7 +268,7 @@
            {{ slotProps.data.priceString }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h %Price Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -463,7 +463,10 @@
       checkForLendingUserAssets()
     }
     else
+    {
       setLendingUserAccountList()
+      depositedAssetAmount.value = 0
+    }
 
     checkForMainSubMarkets()
   })

@@ -52,11 +52,17 @@
 
     <ion-label>Available</ion-label>
     <div class="flexCenterRow">
-      <ion-label class="alignSelfLeft">Amount: {{ availableToBorrowAmount.toFixed(tokenDecimalAmount) }}</ion-label>
+      <ion-label class="alignSelfLeft">Amount: {{ availableToBorrowAmount.toLocaleString('en-US', {
+        minimumFractionDigits: tokenDecimalAmount,
+        maximumFractionDigits: tokenDecimalAmount }) }}
+      </ion-label>
       <ion-label class="alignSelfLeft">Value: {{ availableToBorrowValue }}</ion-label>
     </div>
     <div>
-      <ion-label>Available in Token Reserve: {{ availableInTokenReserveAmount.toFixed(tokenDecimalAmount) }}</ion-label>
+      <ion-label>Available in Token Reserve: {{ availableInTokenReserveAmount.toLocaleString('en-US', {
+        minimumFractionDigits: tokenDecimalAmount,
+        maximumFractionDigits: tokenDecimalAmount }) }}
+      </ion-label>
     </div>
     
     <InputNumber
@@ -128,7 +134,11 @@
     createJitoTipInstruction,
     closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
-  import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
+  import { tokenReservesHashMap,
+    tokenReserveFontEndInfoHashMap,
+    tokenReserveBalancesHashMap,
+    tokenIdHashMap,
+    priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
     lendingUserTabAccountListHashMap,
@@ -189,12 +199,21 @@
 
   watch(tokenReservesHashMap, () =>
   {
-    const tokenReserve = tokenReservesHashMap.map.get(selectedTokenMintAddress.toString())
-    if(tokenReserve)
+    if(borrowing.value)
     {
-      const temp = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
-      availableInTokenReserveAmount.value = temp < 0 ? 0 : temp
+      const tokenReserve = tokenReservesHashMap.map.get(selectedTokenMintAddress.toString())
+      if(tokenReserve)
+      {
+        const temp = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
+        availableInTokenReserveAmount.value = temp < 0 ? 0 : temp
+      }
     }
+  })
+
+  watch(tokenReserveBalancesHashMap, () =>
+  {
+    if(borrowing.value)
+      availableInTokenReserveAmount.value = tokenReserveBalancesHashMap.map.get(selectedTokenId)
   })
 
   watch(lendingUserTabAccountListHashMap, async() =>
@@ -218,20 +237,22 @@
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
-    let newWallet = JSON.parse(newJSONObjectString)
-    let oldWallet= JSON.parse(oldJSONObjectString)
+    if(borrowing.value)
+    {
+      let newWallet = JSON.parse(newJSONObjectString)
+      let oldWallet= JSON.parse(oldJSONObjectString)
 
-    //Only want this running if the connected Wallet Address String is changing and modal is visible
-    if(!borrowing.value ||
-    (newWallet.addressString == oldWallet.addressString &&
-    newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
-      return
+      //Only want this running if the connected Wallet Address String is changing and modal is visible
+      if((newWallet.addressString == oldWallet.addressString &&
+      newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
+        return
 
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-    
-    borrowAmount.value = 0
-    stopHealthFactorCalculation()
-    startHealthFactorCalculation()
+      accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+      
+      borrowAmount.value = 0
+      stopHealthFactorCalculation()
+      startHealthFactorCalculation()
+    }
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
@@ -270,10 +291,9 @@
     const tokenName = tokenInfo.name
     const decimalAmount = tokenInfo.decimalAmount
     const tokenSVG = tokenInfo.svg
-
+    
     tokenProgram = tokenInfo.tokenProgram
-    const temp = Number(tokenReserve.depositedAmount) - Number(tokenReserve.borrowedAmount)
-    availableInTokenReserveAmount.value = temp < 0 ? 0 : temp
+    availableInTokenReserveAmount.value = tokenReserveBalancesHashMap.map.get(tokenId)
     subMarketList.value = subMarkets
 
     subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() + 

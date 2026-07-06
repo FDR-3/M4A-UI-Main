@@ -22,7 +22,7 @@
     >
       <template #header>
         <div>
-          <h2>Solvency Insurance Treasury Value: $<span class="rainbowText">{{ tvl.solvencyTVL.toLocaleString('en-US', {
+          <h2>Solvency Insurance Treasury Value: $<span class="rainbowText">{{ tvl.solvencyTreasury.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span>
           </h2>
@@ -71,7 +71,7 @@
            {{ slotProps.data.priceString }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h %Price Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -155,7 +155,7 @@
            {{ slotProps.data.priceString }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h %Price Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -201,8 +201,10 @@
   var stableCoinTableData = ref()
   var CryptoCurrencyTableData = ref()
   var isLoading = ref(true)
-  var stableValue = ref(0)
-  var cryptoValue = ref(0)
+  var treasuryStableValue = ref(0)
+  var treasuryCryptoValue = ref(0)
+  var tvlContributionStableValue = ref(0)
+  var tvlContributionCryptoValue = ref(0)
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -220,7 +222,8 @@
     {
       processSolvencyStableCoinTableData()
       processSolvencyCryptoCurrencyTableData()
-      tvl.solvencyTVL = stableValue.value + cryptoValue.value
+      tvl.solvencyTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+      tvl.solvencyTVLContribution = tvlContributionStableValue.value + tvlContributionCryptoValue.value
 
       isLoading.value = false
     }
@@ -239,7 +242,8 @@
   {
     processSolvencyStableCoinTableData()
     processSolvencyCryptoCurrencyTableData()
-    tvl.solvencyTVL = stableValue.value + cryptoValue.value
+    tvl.solvencyTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.solvencyTVLContribution = tvlContributionStableValue.value + tvlContributionCryptoValue.value
 
     if(isLoading.value && lendingUserTabAccountsHashMap.map)
       isLoading.value = false
@@ -249,7 +253,8 @@
   {
     processSolvencyStableCoinTableData()
     processSolvencyCryptoCurrencyTableData()
-    tvl.solvencyTVL = stableValue.value + cryptoValue.value
+    tvl.solvencyTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.solvencyTVLContribution = tvlContributionStableValue.value + tvlContributionCryptoValue.value
 
     if(isLoading.value && solvencyInsuranceTreasuryWalletBalancesHashMap.map)
       isLoading.value = false
@@ -259,7 +264,8 @@
   {
     processSolvencyStableCoinTableData()
     processSolvencyCryptoCurrencyTableData()
-    tvl.solvencyTVL = stableValue.value + cryptoValue.value
+    tvl.solvencyTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.solvencyTVLContribution = tvlContributionStableValue.value + tvlContributionCryptoValue.value
   })
 
   watch([tokenReservesHashMap, subMarketsHashMap], () => 
@@ -292,7 +298,8 @@
     if(!solvencyInsuranceTreasuryWalletBalancesHashMap.map || !lendingUserTabAccountsHashMap.map)
       return
 
-    var value = 0
+    var treasuryValue = 0
+    var tvlContributionValue = 0
     var unprocessedTableData = []
 
     for(var i=0; i<StableCoins.length; i++)
@@ -333,24 +340,29 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      const totalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees)
-
-      var calculatedValue = 0
-
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
-      if(priceData)
-        calculatedValue = (totalAmount * priceData.usdPrice)
 
-      value += calculatedValue
+      const treasuryTotalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees)
+      const tvlContributionTotalAmount = Number(unprocessedTableData[i].wallet)
 
-      unprocessedTableData[i].value = calculatedValue
-      unprocessedTableData[i].valueString = '$' + calculatedValue.toLocaleString('en-US', {
+      if(!priceData)
+        return
+
+      const treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
+      const tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
+
+      treasuryValue += treasuryCalculatedValue
+      tvlContributionValue += tvlContributionCalculatedValue
+
+      unprocessedTableData[i].value = treasuryCalculatedValue
+      unprocessedTableData[i].valueString = '$' + treasuryCalculatedValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }
 
-    stableValue.value = value
+    treasuryStableValue.value = treasuryValue
+    tvlContributionStableValue.value = tvlContributionValue
     stableCoinTableData.value = unprocessedTableData
   }
 
@@ -359,7 +371,8 @@
     if(!lendingUserTabAccountsHashMap.map)
       return
 
-    var value = 0
+    var treasuryValue = 0
+    var tvlContributionValue = 0
     var unprocessedTableData = []
 
     for(var i=0; i<CryptoCurrency.length; i++)
@@ -400,24 +413,29 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      const totalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees)
-
-      var calculatedValue = 0
-
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
-      if(priceData)
-        calculatedValue = (totalAmount * priceData.usdPrice)
 
-      value += calculatedValue
+      const treasuryTotalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees)
+      const tvlContributionTotalAmount = Number(unprocessedTableData[i].wallet)
 
-      unprocessedTableData[i].value = calculatedValue
-      unprocessedTableData[i].valueString = '$' + calculatedValue.toLocaleString('en-US', {
+      if(!priceData)
+        return
+
+      const treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
+      const tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
+
+      treasuryValue += treasuryCalculatedValue
+      tvlContributionValue += tvlContributionCalculatedValue
+
+      unprocessedTableData[i].value = treasuryCalculatedValue
+      unprocessedTableData[i].valueString = '$' + treasuryCalculatedValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }
 
-    cryptoValue.value = value
+    treasuryCryptoValue.value = treasuryValue
+    tvlContributionStableValue.value = tvlContributionValue
     CryptoCurrencyTableData.value = unprocessedTableData
   }
 

@@ -3,7 +3,7 @@
     <!--TokenReserveTable-->
     <DataTable
       v-if="!showTokenSubMarkets"
-      class="tableMinWidth"
+      class="tokenReserveTableMinWidth"
       v-model:filters="filters"
       show-gridlines
       sortField="tokenMintAddressString" 
@@ -11,20 +11,38 @@
       size="small" 
       :value="tokenReserveTableData"
       :loading="isLoading"
-      :globalFilterFields="['name', 'tokenMintAddressString', 'tokenReserveATA', 'price', 'percentChange24h', 'depositedAmount', 'value', 'subMarketCount']"  
+      :globalFilterFields="
+      [
+        'name',
+        'tokenMintAddressString',
+        'tokenReserveATA',
+        'price',
+        'percentChange24h',
+        'depositedAmount',
+        'depositedValue',
+        'borrowedAmount',
+        'borrowedValue',
+        'subMarketCount'
+      ]"  
     >
       <template #header>
         <div class="flexCenterRow">
-          <div class="tinyMarginBottom" style="margin-right: -10px">
-            <InfoButton :infoMessage="subMarketInfoMSG"/>
+          <div>
+            <h2>Token Reserve Deposited Value: $<span class="rainbowText">{{ tvl.tokenReserveTVL.toLocaleString('en-US',
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2 
+                }) }}
+              </span>
+            </h2>
+            <h2>Token Reserve Borrowed Value: $<span class="poopText">{{ totalBorrowedValue.toLocaleString('en-US',
+                {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2 
+                }) }}
+              </span>
+            </h2>
           </div>
-          <h2>Token Reserves Value: $<span class="rainbowText">{{ tvl.tokenReserveTVL.toLocaleString('en-US',
-              {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 
-              }) }}
-            </span>
-          </h2>
           <br>
         </div>
         <ion-input v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
@@ -57,13 +75,15 @@
         </template>
       </Column>
       <Column field="price" header="Price" style="width: 0%" sortable></Column>
-      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h %Price Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
       <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable></Column>
-      <Column field="value" header="Value" style="width: 0%" sortable></Column>
+      <Column field="depositedValue" header="Deposited Value" style="width: 0%" sortable></Column>
+      <Column field="borrowedAmount" header="Borrows" style="width: 0%" sortable></Column>
+      <Column field="borrowedValue" header="Borrowed Value" style="width: 0%" sortable></Column>
       <Column field="subMarketCount" header="SubMarket Count" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
         <template #body="slotProps">
@@ -91,7 +111,7 @@
     <DataTable
       v-if="showTokenSubMarkets"
       id="tokenReserveSubMarketsTable"
-      class="tableMinWidth"
+      class="subMarketTableMinWidth"
       v-model:filters="filters" 
       paginator 
       show-gridlines 
@@ -166,7 +186,9 @@
         </template>
       </Column>
       <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable></Column>
-      <Column field="value" header="Value" style="width: 0%" sortable></Column>
+      <Column field="depositedValue" header="Deposited Value" style="width: 0%" sortable></Column>
+      <Column field="borrowedAmount" header="Borrows" style="width: 0%" sortable></Column>
+      <Column field="borrowedValue" header="Borrowed Value" style="width: 0%" sortable></Column>
       <Column field="subMarketFeesGeneratedAmount" header="Fees Generated" style="width: 0%" sortable></Column>
       <Column field="uncollectedSubMarketFeesAmount" header="Uncollected Fees" style="width: 0%" sortable></Column>
       <Column field="feeCollectorAddress" header="Fee Collector Address" style="width: 0%" sortable>
@@ -286,7 +308,6 @@
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import cloneDeep from 'lodash/cloneDeep'
-  import InfoButton from '/src/components/help/InfoButton.vue'
 
   var emits = defineEmits(['createSubMarketModal', 'collectSubMarketFeesModal'])
 
@@ -312,8 +333,8 @@
   var copyFullAddressButtonText = ref(copyFullAddressText)
 
   var tokenReserveATAPopoverOpen = ref(false)
+  var totalBorrowedValue = ref(0)
   var copyTokenReserveATAButtonText = ref(copyTreasuryATAText)
-  const subMarketInfoMSG = "Developers can create\nSubMarkets to generate\ninterest for their\nusers while collecting fees\nto pay what ever bill they\nchoose. Developers will\nneed to build their own UIs\nfor their user deposits,\netc."
 
   var inputFeeRefs = ref(new Map())
 
@@ -400,7 +421,11 @@
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].depositedAmount.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
-      else if(unfilteredTableData[i].value.toLowerCase().includes(filterString.toLowerCase()))
+      else if(unfilteredTableData[i].depositedValue.toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].borrowedAmount.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].borrowedValue.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].subMarketFeesGeneratedAmount.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
@@ -468,7 +493,8 @@
 
   function processTokenReserveTableData()
   {
-    var value = 0
+    var depositedValue = 0
+    var borrowedValue = 0
     var processedTableData = []
     var newTableData = cloneDeep(tokenReserves)
 
@@ -497,17 +523,31 @@
         processedTableData[i].percentChange24h = priceObjectMap.data[tokenMintAddressString].priceChange24h.toFixed(2)
       }
 
-      const balance = processedTableData[i].depositedAmount
-      var calculatedValue = 0
-
       const priceData = priceObjectMap.data[tokenMintAddressString]
-      if(priceData)
-        calculatedValue = (balance * priceData.usdPrice)
 
-      processedTableData[i].value = '$' + calculatedValue.toLocaleString('en-US', {
+      //Calculate Deposit Value
+      const depositedBalance = processedTableData[i].depositedAmount
+      var depositCalculatedValue = 0
+
+      if(priceData)
+        depositCalculatedValue = (depositedBalance * priceData.usdPrice)
+
+      processedTableData[i].depositedValue = '$' + depositCalculatedValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
-      value += calculatedValue + value
+      depositedValue += depositCalculatedValue
+
+      //Calculate Borrow Value
+      const borrowedBalance = processedTableData[i].borrowedAmount
+      var borrowCalculatedValue = 0
+
+      if(priceData)
+        borrowCalculatedValue = (borrowedBalance * priceData.usdPrice)
+
+      processedTableData[i].borrowedValue = '$' + borrowCalculatedValue.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+      borrowedValue += borrowCalculatedValue
 
       //Get SubMarket List And Count
       var tokenReserveSubMarketList = []
@@ -526,16 +566,27 @@
 
             if(priceObjectMap.data)
             {
-              const balance = unProcessedTokenSubMarketList[j].depositedAmount
-              var calculatedValue = 0
+              //Calculate Deposit Value
+              const depositedBalance = unProcessedTokenSubMarketList[j].depositedAmount
+              var depositCalculatedValue = 0
 
-              const priceData = priceObjectMap.data[tokenMintAddressString]
               if(priceData)
-                calculatedValue = (balance * priceData.usdPrice)
+                depositCalculatedValue = (depositedBalance * priceData.usdPrice)
 
-                unProcessedTokenSubMarketList[j].value = '$' + calculatedValue.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 })
+              unProcessedTokenSubMarketList[j].depositedValue = '$' + depositCalculatedValue.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2 })
+
+              //Calculate Borrow Value
+              const borrowedBalance = unProcessedTokenSubMarketList[j].borrowedAmount
+              var borrowCalculatedValue = 0
+
+              if(priceData)
+                borrowCalculatedValue = (borrowedBalance * priceData.usdPrice)
+
+              unProcessedTokenSubMarketList[j].borrowedValue = '$' + borrowCalculatedValue.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2 })
             }
 
             tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
@@ -548,7 +599,8 @@
         processedTableData[i].subMarketCount = 0
     }
 
-    tvl.tokenReserveTVL = value
+    tvl.tokenReserveTVL = depositedValue
+    totalBorrowedValue.value = borrowedValue
     tokenReserveTableData.value = processedTableData
   }
 
@@ -781,9 +833,14 @@
     margin: 20px
   }
 
-  .tableMinWidth
+  .tokenReserveTableMinWidth
   {
-    min-width: 1340px
+    min-width: 1210px
+  }
+
+  .subMarketTableMinWidth
+  {
+    min-width: 1600px
   }
 
   ion-input

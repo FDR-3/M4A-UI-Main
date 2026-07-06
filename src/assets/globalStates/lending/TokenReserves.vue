@@ -109,5 +109,10 @@
     ata: PublicKey
   }
 
+  export const tokenReserveBalancesHashMap = reactive(
+  {
+    map: new Map<number, number>()
+  })
+
   export default tokenReserves
 </script>

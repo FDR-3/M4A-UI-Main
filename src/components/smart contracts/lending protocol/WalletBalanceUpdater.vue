@@ -10,7 +10,6 @@
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { LAMPORTS_PER_SOL } from "@solana/web3.js"
   import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token"
-  //import { getTokenReservePDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
 
   //These are for the Chat and M4A fees
@@ -49,74 +48,6 @@
 
   onMounted(async() =>
   {
-    /*//The ATA address can be harded coded in once you know the address
-    //Token Reserve USDS ATA
-    let tokenReserveUSDSPDA = getTokenReservePDA(tokenAddressKeys.usdsTokenMintAddress)
-    //console.log(tokenReserveUSDSPDA.toString())
-    let tokenReserveUSDSWalletATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
-      tokenReserveUSDSPDA, //Token Reserve PDA
-      true
-    )
-    console.log(tokenReserveUSDSWalletATA.toString())
-    
-    //Token Reserve USDC ATA
-    let tokenReserveUSDCPDA = getTokenReservePDA(tokenAddressKeys.usdcTokenMintAddress)
-    //console.log(tokenReserveUSDCPDA.toString())
-    let tokenReserveUSDCWalletATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeys.usdcTokenMintAddress, //Token Mint Address
-      tokenReserveUSDCPDA, //Token Reserve PDA
-      true
-    )
-    console.log(tokenReserveUSDCWalletATA.toString())
-
-    //Token Reserve SOL ATA
-    let tokenReserveSOLPDA = getTokenReservePDA(tokenAddressKeys.solTokenMintAddress)
-    //console.log(tokenReserveSOLPDA.toString())
-    let tokenReserveSOLWalletATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeys.solTokenMintAddress, //Token Mint Address
-      tokenReserveSOLPDA, //Token Reserve PDA
-      true
-    )
-    console.log(tokenReserveSOLWalletATA.toString())
-
-    //Token Reserve WEth ATA
-    let tokenReserveWEthPDA = getTokenReservePDA(tokenAddressKeys.wethTokenMintAddress)
-    //console.log(tokenReserveWEthPDA.toString())
-    let tokenReserveWEthATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeys.wethTokenMintAddress, //Token Mint Address
-      tokenReserveWEthPDA, //Token Reserve PDA
-      true
-    )
-    console.log(tokenReserveWEthATA.toString())
-
-
-    //The ATA address can be harded coded in once you know the address
-    //Token Reserve WBtc ATA
-    let tokenReserveWBtcPDA = getTokenReservePDA(tokenAddressKeys.wbtcTokenMintAddress)
-    //console.log(tokenReserveWBtcPDA.toString())
-    let tokenReserveWBtcATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeys.wbtcTokenMintAddress, //Token Mint Address
-      tokenReserveWBtcPDA, //Token Reserve PDA
-      true
-    )
-    console.log(tokenReserveWBtcATA.toString())*/
-
     //The ATA address can be harded coded in once you know the address
     //Hodl USDS Wallet Account
     /*let hodlTreasuryUSDSWalletATA = await Token.getAssociatedTokenAddress
@@ -139,6 +70,7 @@
     {
       console.log("HODL USDS Wallet ATA Not Found")
     }
+
     //Solvency USDS Wallet Account
     /*let solvencyTreasuryUSDSWalletATA = await Token.getAssociatedTokenAddress
     (
@@ -183,6 +115,7 @@
     {
       console.log("HODL USDC Wallet ATA Not Found")
     }
+    
     //Solvency USDC Wallet Account
     /*let solvencyTreasuryUSDCWalletATA = await Token.getAssociatedTokenAddress
     (

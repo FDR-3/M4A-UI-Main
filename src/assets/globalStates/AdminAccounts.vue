@@ -88,9 +88,11 @@
 
   export const tvl = reactive(
   {
-    singlePayerTVL: 0,
-    hodlTVL: 0,
-    solvencyTVL: 0,
+    singlePayerPayOuts: 0,
+    hodlTVLContribution: 0,
+    hodlTreasury: 0,
+    solvencyTVLContribution: 0,
+    solvencyTreasury: 0,
     tokenReserveTVL: 0
   })
 

@@ -42,10 +42,16 @@
 </script>
 
 <style scoped>
+  ion-button
+  {
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+
   ion-icon
   {
-    width: 25px;
-    height: 25px
+    width: min(25px, 5vw);
+    height: min(25px, 5vw)
   }
 
   .popoverWidth::part(content)

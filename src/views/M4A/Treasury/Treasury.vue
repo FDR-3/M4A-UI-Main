@@ -1,12 +1,18 @@
 <template>
   <h2>Under Construction On Devnet<br>Monopoly Money</h2>
   <div class="flexCenterColumn">
-    <TVLLongSVG id="tvlLongSVG" class="nLargeMarginTop" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
-    <TVLShortSVG id="tvlShortSVG" class="nLargeMarginTop" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+    <div class="flexCenterRow">
+      
+      <TVLLongSVG id="tvlLongSVG" class="nLargeMarginTop" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+      <TVLShortSVG id="tvlShortSVG" class="nLargeMarginTop" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+      <span id="infoButton" class=" infoButtonContainer ">
+        <InfoButton :infoMessage="tvlInfoMSG"/>
+      </span>
+    </div>
   </div>
   <!--<M4AProtocolTVLLongHTMLText/>-->
   <!--<M4AProtocolTVLShortHTMLText/>-->
-  <h1 class="nMediumLargeMarginTop">$<span class="rainbowText">{{ (tvl.singlePayerTVL + tvl.hodlTVL + tvl.solvencyTVL + tvl.tokenReserveTVL).toLocaleString('en-US', {
+  <h1 class="nMediumLargeMarginTop">$<span class="rainbowText">{{ (tvl.hodlTVLContribution + tvl.solvencyTVLContribution + tvl.tokenReserveTVL).toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) }}</span></h1>
       
@@ -57,6 +63,7 @@
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'
   import KingobamaMobile from '/src/components/fancy/poly/KingobamaMobile.vue'
+  import InfoButton from '/src/components/help/InfoButton.vue'
   import M4AProtocolTVLLongHTMLText from './M4AProtocolTVLLongHTMLText.vue'
   import M4AProtocolTVLShortHTMLText from './M4AProtocolTVLShortHTMLText.vue'
 
@@ -77,6 +84,8 @@
 
   let frontObserver: ResizeObserver | null = null
   let backObserver: ResizeObserver | null = null
+
+  const tvlInfoMSG = "M4A Protocol TVL is calculated by\nadding the deposit value of all of the\nToken Reserves, the wallet balances of\nthe Solvency Treasurer, and the Stable\nCoin wallet balances of the HODL\nTreasurer."
 
   function handleHeightUpdate()
   {
@@ -206,6 +215,11 @@
     transform: rotateX(0deg) /*Needed Just for fire fox ignoring backface-visibilty*/
   }
 
+  .infoButtonContainer
+  {
+    width: min(44px, 20vw)
+  }
+
   .backTable
   {
     transform: rotateY(180deg)
@@ -222,6 +236,11 @@
     {
       display: none
     }
+    #infoButton
+    {
+      margin-bottom: -10px;
+      margin-left: -5px
+    }
   }
   @media screen and (max-width: 977px)
   { 
@@ -232,6 +251,10 @@
     #tvlShortSVG
     {
       display: block
+    }
+    #infoButton
+    {
+      margin: 0px
     }
   }
   

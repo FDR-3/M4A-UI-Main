@@ -21,7 +21,7 @@
     >
       <template #header>
         <div>
-          <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ tvl.singlePayerTVL.toLocaleString('en-US', {
+          <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ tvl.singlePayerPayOuts.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span>
           </h2>
@@ -70,7 +70,7 @@
            {{ slotProps.data.priceString }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h% Price Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -153,7 +153,7 @@
            {{ slotProps.data.priceString }}
         </template>
       </Column>
-      <Column field="percentChange24h" header="24h% Change" style="width: 0%" sortable>
+      <Column field="percentChange24h" header="24h% Price Change" style="width: 0%" sortable>
         <template #body="slotProps">
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
@@ -218,7 +218,7 @@
     {
       processSinglePayerStableCoinTableData()
       processSinglePayerCryptoCurrencyTableData()
-      tvl.singlePayerTVL = stableValue.value + cryptoValue.value
+      tvl.singlePayerPayOuts = stableValue.value + cryptoValue.value
 
       isLoading.value = false
     }
@@ -237,7 +237,7 @@
   {
     processSinglePayerStableCoinTableData()
     processSinglePayerCryptoCurrencyTableData()
-    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
+    tvl.singlePayerPayOuts = stableValue.value + cryptoValue.value
 
     if(isLoading.value)
       isLoading.value = false
@@ -247,7 +247,7 @@
   {
     processSinglePayerStableCoinTableData()
     processSinglePayerCryptoCurrencyTableData()
-    tvl.singlePayerTVL = stableValue.value + cryptoValue.value
+    tvl.singlePayerPayOuts = stableValue.value + cryptoValue.value
   })
 
   watch([tokenReservesHashMap, subMarketsHashMap], () => 

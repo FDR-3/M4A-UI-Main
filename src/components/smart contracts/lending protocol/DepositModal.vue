@@ -83,8 +83,14 @@
 
     <HealthFactorSmall :assetValue="totalAssetValue" :debtValue="totalDebtValue"/>
 
-    <ion-label class="alignSelfLeft">Wallet: {{ userWalletBalance.toFixed(tokenDecimalAmount) }}</ion-label>
-    <ion-label class="alignSelfLeft">Balance: {{ userBalance.toFixed(tokenDecimalAmount) }}</ion-label>
+    <ion-label class="alignSelfLeft">Wallet: {{ userWalletBalance.toLocaleString('en-US', {
+      minimumFractionDigits: tokenDecimalAmount,
+      maximumFractionDigits: tokenDecimalAmount }) }}
+    </ion-label>
+    <ion-label class="alignSelfLeft">Balance: {{ userBalance.toLocaleString('en-US', {
+      minimumFractionDigits: tokenDecimalAmount,
+      maximumFractionDigits: tokenDecimalAmount }) }}
+    </ion-label>
     <InputNumber
       v-model="depositAmount"
       :inputStyle="{'text-align': 'center'}"
@@ -119,7 +125,6 @@
       <InfoButton :infoMessage="depositInfoMSG" :openSide="'top'"/>
       <ion-button
         color="dark"
-        class="nMediumSmallMarginLeft"
         @click="depositTokens()"
         :disabled="depositAmount == 0 || overByteSizeLimit"
       >
@@ -228,6 +233,18 @@
     }
   })
 
+  watch(connectedWallet, async() =>
+  {
+    if(depositing.value)
+    {
+      const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
+      if(balance)
+        userWalletBalance.value = Number(balance)
+      else
+        userWalletBalance.value = 0
+    }
+  })
+
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
   {
@@ -240,27 +257,30 @@
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
-    let newWallet = JSON.parse(newJSONObjectString)
-    let oldWallet= JSON.parse(oldJSONObjectString)
+    if(depositing.value)
+    {
+      let newWallet = JSON.parse(newJSONObjectString)
+      let oldWallet= JSON.parse(oldJSONObjectString)
 
-    //Only want this running if the connected Wallet Address String is changing
-    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
-      return
+      //Only want this running if the connected Wallet Address String is changing
+      if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+        return
 
-    const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
-    if(balance)
-      userWalletBalance.value = Number(balance)
-    else
-      userWalletBalance.value = 0
+      const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
+      if(balance)
+        userWalletBalance.value = Number(balance)
+      else
+        userWalletBalance.value = 0
 
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-    depositAmount.value = 0
+      accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+      depositAmount.value = 0
 
-    setInitialBalance()
-    stopInterestCalculation()
-    startInterestCalculation()
-    stopHealthFactorCalculation()
-    startHealthFactorCalculation()
+      setInitialBalance()
+      stopInterestCalculation()
+      startInterestCalculation()
+      stopHealthFactorCalculation()
+      startHealthFactorCalculation()
+    }
   })
 
   //Move cursor back after emoji insert

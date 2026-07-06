@@ -166,14 +166,14 @@
               side="top" 
               alignment="center"
               >
-                <div class="flexCenterColumn" style="margin: 20px" @mouseleave="closeViewPortfolioPopover($event)">
+                <div class="flexCenterColumn" style="margin: 20px">
                   <HealthFactorSmall :assetValue="healthFactorPopUpDepositedValue" :debtValue="healthFactorPopUpBorrowedValue"/>
                   <ion-button class="fullWidthButton thinBorder" fill="clear" @click="openSelectedPortfolio()">
                     <ion-label color="green">View</ion-label>
                   </ion-button>
                   <ion-button class="fullWidthButton thinBorder lendingActionButton" fill="clear"
                   @click="$emit('openLiquidationModal', event.owner, event.accountIndex); viewPortfolioPopoverOpen = false"
-                  <!--:disabled="event.healthFactor > 0-->">
+                  :disabled="event.healthFactor > 0">
                     <ion-label color="red" class="noClickEvent">Liquidate</ion-label>
                   </ion-button>
                 </div>
@@ -303,7 +303,8 @@
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
   import RIPStarWolf from '/src/assets/svg/rip-star-wolf-svg.vue'
   import KingStarWolf from '/src/components/fancy/KingStarWolf.vue'
-  import RIPKingStarWolf from '/src/components/fancy/rip/RIPKingStarWolf.vue' 
+  import RIPKingStarWolf from '/src/components/fancy/rip/RIPKingStarWolf.vue'
+  import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { FilterMatchMode } from '@primevue/core/api'
   import { lendingLeaderBoardTable, lendingUserHashMap, lendingUserTabAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { priceObjectMap, tokenReservesHashMap, tokenIdHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
@@ -926,19 +927,14 @@
     viewPortfolioPopoverOpen.value = true
   }
 
-  //Used to close popover once user hovers over it and then moves away
-  function closeViewPortfolioPopover(e: Event) 
-  {
-    //Need this delay so that emits("viewPortfolio") data doesn't get over ruled
-    setTimeout(() =>
-    {
-      event.value = e
-      viewPortfolioPopoverOpen.value = false
-    }, 100)
-  }
-
   function openSelectedPortfolio()
   {
+    if(event.value.owner == connectedWallet.addressString)
+    {
+      connectedWallet.selectedLendingUserAccountIndex = event.value.accountIndex
+      localStorage.setItem("selectedLendingAccountIndex", event.value.accountIndex.toString())
+    }
+
     //Closes popover
     viewPortfolioPopoverOpen.value = false
 

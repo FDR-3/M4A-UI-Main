@@ -202,6 +202,18 @@
       startHealthFactorCalculation()
     }
   })
+
+  watch(connectedWallet, async() =>
+  {
+    if(repaying.value)
+    {
+      const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
+      if(balance)
+        userWalletBalance.value = Number(balance)
+      else
+        userWalletBalance.value = 0
+    }
+  })
   
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
@@ -215,27 +227,29 @@
 
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
-    let newWallet = JSON.parse(newJSONObjectString)
-    let oldWallet= JSON.parse(oldJSONObjectString)
+    if(repaying.value)
+    {
+      let newWallet = JSON.parse(newJSONObjectString)
+      let oldWallet= JSON.parse(oldJSONObjectString)
 
-    //Only want this running if the connected Wallet Address String is changing and modal is visible
-    if(!repaying.value ||
-    (newWallet.addressString == oldWallet.addressString
-    && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
-      return
+      //Only want this running if the connected Wallet Address String is changing and modal is visible
+      if((newWallet.addressString == oldWallet.addressString
+      && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
+        return
 
-    const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
-    if(balance)
-      userWalletBalance.value = Number(balance)
-    else
-      userWalletBalance.value = 0
+      const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
+      if(balance)
+        userWalletBalance.value = Number(balance)
+      else
+        userWalletBalance.value = 0
 
-    setInitialDebtBalance()
-    stopInterestCalculation()
-    startInterestCalculation()
-    stopHealthFactorCalculation()
-    startHealthFactorCalculation()
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+      setInitialDebtBalance()
+      stopInterestCalculation()
+      startInterestCalculation()
+      stopHealthFactorCalculation()
+      startHealthFactorCalculation()
+      accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+    }
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though

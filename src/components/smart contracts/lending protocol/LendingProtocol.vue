@@ -1,6 +1,7 @@
 <template>
     <Suspense><PriceUpdater/></Suspense>
     <Suspense><WalletBalanceUpdater/></Suspense>
+    <Suspense><TokenReserveBalanceUpdater/></Suspense>
 </template>
 
 <script setup lang="ts">
@@ -30,6 +31,7 @@
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import PriceUpdater from './PriceUpdater.vue'
   import WalletBalanceUpdater from './WalletBalanceUpdater.vue'
+  import TokenReserveBalanceUpdater from './TokenReserveBalanceUpdater.vue'
   import { sleep } from '/src/assets/helperFunctions/sleep.ts'
 
   var lendingProtocolWatcherId: any

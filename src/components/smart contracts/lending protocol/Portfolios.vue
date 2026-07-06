@@ -39,7 +39,7 @@
     </div>
   </div>
  
-  <div v-if="(userTabStableCoinSubMarketList?.length > 0 || userTabCryptoCurrencySubMarketList?.length > 0) && !isBrowsingAllUsers" class="thickBorder smallMarginTop">
+  <div v-if="(userMonthlyStatementStableCoinList?.length > 0 || userMonthlyStatementCryptoCurrencyList?.length > 0) && !isBrowsingAllUsers" class="thickBorder smallMarginTop">
     <div class="topHHeaderDisplay thinBorderBottom">
   
       <div class="flexCenterRow" style="justify-content:space-around !important">
@@ -76,7 +76,7 @@
         </div>
       </div>
 
-      <HealthFactorBig :accountOwnerAddress="addressToCheck" :accountIndex="accountSelect"/>
+      <HealthFactorBig :accountOwnerAddress="searchAddress" :accountIndex="accountSelect"/>
     </div>
 
     <div class="topVHeaderDisplay thinBorderBottom" style="justify-content:space-around !important">
@@ -113,12 +113,12 @@
       </div>   
 
       <div class="nTinyMarginTop">
-        <HealthFactorBig :accountOwnerAddress="addressToCheck" :accountIndex="accountSelect"/>
+        <HealthFactorBig :accountOwnerAddress="searchAddress" :accountIndex="accountSelect"/>
       </div>
     </div>
 
     <!--Stable Coin Charts-->
-    <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
+    <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
       <div>
         <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value:
@@ -142,7 +142,7 @@
       </div>  
     </div>
 
-    <div v-if="userTabStableCoinSubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay">
+    <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="smallMarginTop vHeaderDisplay">
       <div>
         <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value:
@@ -166,22 +166,22 @@
       </div>
     </div>
 
-    <div v-if="userTabStableCoinSubMarketList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
-      <div v-for="(subMarketTab, userTabIndex) in userTabStableCoinSubMarketList">
+    <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
+      <div v-for="(monthlyStatement, userTabIndex) in enrichedStableCoinMonthlyStatementList">
         <PortfolioChart
         :key="chartReRenderKey"
         :isStableCoin="true"
         :depositedAssetAmount="depositedAssetAmount"
-        :tokenId="subMarketTab.tokenId"
-        :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
-        :subMarketOwnerAddressTrimmed="subMarketTab.subMarketOwnerAddressTrimmed"
-        :subMarketIndex="subMarketTab.subMarketIndex"
+        :tokenId="monthlyStatement.tokenId"
+        :subMarketOwnerAddress="monthlyStatement.subMarketOwnerAddress"
+        :subMarketOwnerAddressTrimmed="monthlyStatement.subMarketOwnerAddressTrimmed"
+        :subMarketIndex="monthlyStatement.subMarketIndex"
         :ownerAddress="searchAddress"
         :accountIndex="accountSelect"
-        :subMarketFee="subMarketTab.subMarketFee"
+        :subMarketFee="monthlyStatement.subMarketFee"
         :userTabIndex="userTabIndex"
-        :chartData="getChartData(subMarketTab.tokenId, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
-        :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenId, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :chartData="monthlyStatement.chartData"
+        :selectedYear="monthlyStatement.selectedYear"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
         @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
         @openWithdrawalModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketOption)"
@@ -192,8 +192,8 @@
     </div>
 
     <!--Crypto Charts-->
-    <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay" :class="userTabStableCoinSubMarketList?.length > 0 ? 'thinBorderTop' : ''"
-      :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '14px' : '0px'}">
+    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay" :class="userMonthlyStatementStableCoinList?.length > 0 ? 'thinBorderTop' : ''"
+      :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '14px' : '0px'}">
       <div>
         <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value:
@@ -217,8 +217,8 @@
       </div>
     </div>
 
-    <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="smallMarginTop vHeaderDisplay" :class="userTabStableCoinSubMarketList?.length > 0 ? 'thinBorderTop' : ''"
-      :style="{paddingTop: userTabStableCoinSubMarketList?.length > 0 ? '4px' : '0px'}">
+    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="smallMarginTop vHeaderDisplay" :class="userMonthlyStatementStableCoinList?.length > 0 ? 'thinBorderTop' : ''"
+      :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '4px' : '0px'}">
       
       <div>
         <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
@@ -244,22 +244,22 @@
 
     </div>
 
-    <div v-if="userTabCryptoCurrencySubMarketList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
-      <div v-for="(subMarketTab, userTabIndex) in userTabCryptoCurrencySubMarketList">
+    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
+      <div v-for="(monthlyStatement, userTabIndex) in enrichedCryptoMonthlyStatementList">
         <PortfolioChart
         :key="chartReRenderKey"
         :isStableCoin="false"
         :depositedAssetAmount="depositedAssetAmount"
-        :tokenId="subMarketTab.tokenId"
-        :subMarketOwnerAddress="subMarketTab.subMarketOwnerAddress"
-        :subMarketOwnerAddressTrimmed="subMarketTab.subMarketOwnerAddressTrimmed"
-        :subMarketIndex="subMarketTab.subMarketIndex"
+        :tokenId="monthlyStatement.tokenId"
+        :subMarketOwnerAddress="monthlyStatement.subMarketOwnerAddress"
+        :subMarketOwnerAddressTrimmed="monthlyStatement.subMarketOwnerAddressTrimmed"
+        :subMarketIndex="monthlyStatement.subMarketIndex"
         :ownerAddress="searchAddress"
         :accountIndex="accountSelect"
-        :subMarketFee="subMarketTab.subMarketFee"
+        :subMarketFee="monthlyStatement.subMarketFee"
         :userTabIndex="userTabIndex"
-        :chartData="getChartData(subMarketTab.tokenId, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
-        :selectedYear="getSelectedYearForOnMounted(subMarketTab.tokenId, subMarketTab.subMarketOwnerAddress, subMarketTab.subMarketIndex)"
+        :chartData="monthlyStatement.chartData"
+        :selectedYear="monthlyStatement.selectedYear"
         @changeYear="updateSelectedYearForTokenMintAddressHashMap"
         @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
         @openWithdrawalModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketOption)"
@@ -313,8 +313,10 @@
   var addressToCheck = ref()
   var isValidPublicKey = ref(false)
 
-  var userTabStableCoinSubMarketList = ref()
-  var userTabCryptoCurrencySubMarketList = ref()
+  var userMonthlyStatementStableCoinList = ref()
+  var userStableCoinInterestHelper: string | any[]
+  var userMonthlyStatementCryptoCurrencyList = ref()
+  var userCryptoCurrencyInterestHelper: string | any[]
 
   var intervalId: any
 
@@ -328,9 +330,7 @@
   var isBrowsingAllUsers = ref()
 
   var selectedYearHashMap = new Map<string, any>()
-  var selectedUserChartDataHashMap = ref()
-  var initialStableCoinSelectedYearSet = false
-  var initialCryptoCurrencySelectedYearSet = false
+  var selectedUserChartDataHashMap = new Map<string, any>()
   var depositedAssetAmount = ref()
 
   var stableCoin7DayProjectionRateAmount = ref("0")
@@ -342,6 +342,69 @@
   var crypto7DayProjectionRateValue = ref(0)
   var cryptoLifeTimeInterestEarnedAmount = ref("0")
   var cryptoLifeTimeInterestEarnedValue = ref(0)
+
+  const enrichedStableCoinMonthlyStatementList = computed(() =>
+  {
+    if(!userMonthlyStatementStableCoinList.value)
+      return []
+
+    //Force Vue to track this dependency. 
+    //Whenever chartReRenderKey increments, this computed property WILL re-run.
+    const forceUpdate = chartReRenderKey.value
+
+    return userMonthlyStatementStableCoinList.value.map((monthlyStatement: { tokenId: number; subMarketOwnerAddress: string; subMarketIndex: number }) =>
+    {
+      return{
+        //Keep all the existing properties (tokenId, address, etc.)
+        ...monthlyStatement,
+        
+        //Calculate these ONCE per reactivity cycle, not on every template render
+        chartData: getChartData
+        (
+          monthlyStatement.tokenId, 
+          monthlyStatement.subMarketOwnerAddress, 
+          monthlyStatement.subMarketIndex
+        ),
+        selectedYear: getSelectedYearForOnMounted
+        (
+          monthlyStatement.tokenId, 
+          monthlyStatement.subMarketOwnerAddress, 
+          monthlyStatement.subMarketIndex
+        )
+      }
+    })
+  })
+
+  const enrichedCryptoMonthlyStatementList = computed(() =>
+  {
+    if (!userMonthlyStatementCryptoCurrencyList.value) return []
+
+    //Force Vue to track this dependency. 
+    //Whenever chartReRenderKey increments, this computed property WILL re-run.
+    const forceUpdate = chartReRenderKey.value
+
+    return userMonthlyStatementCryptoCurrencyList.value.map((monthlyStatement: { tokenId: number; subMarketOwnerAddress: string; subMarketIndex: number }) =>
+    {
+      return{
+        // Keep all the existing properties (tokenId, address, etc.)
+        ...monthlyStatement,
+        
+        // Calculate these ONCE per reactivity cycle, not on every template render
+        chartData: getChartData
+        (
+          monthlyStatement.tokenId, 
+          monthlyStatement.subMarketOwnerAddress, 
+          monthlyStatement.subMarketIndex
+        ),
+        selectedYear: getSelectedYearForOnMounted
+        (
+          monthlyStatement.tokenId, 
+          monthlyStatement.subMarketOwnerAddress, 
+          monthlyStatement.subMarketIndex
+        )
+      }
+    })
+  })
 
   const baseChartData =
   {
@@ -483,7 +546,6 @@
     addressToCheck.value = searchAddress.value
     isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-    selectedUserChartDataHashMap.value = new Map<string, any>()
 
     setLendingUserAccountList()
     checkForLendingUserAssets()
@@ -501,21 +563,15 @@
 
     if(lendingUserMonthlyStatementsHashMap.map)
     {
-      userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
-      if(userTabStableCoinSubMarketList.value)
-        if(userTabStableCoinSubMarketList.value.length)
-        {
-          resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
-          initialStableCoinSelectedYearSet = true
-        }
+      userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+      userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
+      if(userMonthlyStatementStableCoinList.value?.length)
+        resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
 
-      userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
-      if(userTabCryptoCurrencySubMarketList.value)
-        if(userTabCryptoCurrencySubMarketList.value.length)
-        {
-          resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
-          initialCryptoCurrencySelectedYearSet = true
-        }
+      userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+      userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
+      if(userMonthlyStatementCryptoCurrencyList.value?.length)
+        resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
 
       setChartData()
       startGradientAnimation()
@@ -554,15 +610,15 @@
 
       if(lendingUserMonthlyStatementsHashMap.map)
       {
-        userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
-        if(userTabStableCoinSubMarketList.value)
-          if(userTabStableCoinSubMarketList.value.length)
-            resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
+        userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+        userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
+        if(userMonthlyStatementStableCoinList.value?.length)
+          resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
 
-        userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
-        if(userTabCryptoCurrencySubMarketList.value)
-          if(userTabCryptoCurrencySubMarketList.value.length)
-            resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
+        userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+        userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
+        if(userMonthlyStatementCryptoCurrencyList.value?.length)
+          resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
 
         setChartData()
       }
@@ -592,19 +648,15 @@
 
   watch(lendingUserMonthlyStatementsHashMap, async() =>
   {
-    userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    if(!initialStableCoinSelectedYearSet && userTabStableCoinSubMarketList.value?.length)
-    {
-      resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
-      initialStableCoinSelectedYearSet = true
-    }
+    userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
+    if(userMonthlyStatementStableCoinList.value?.length)
+      resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
 
-    userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    if(!initialCryptoCurrencySelectedYearSet && userTabCryptoCurrencySubMarketList.value?.length)
-    {
-      resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
-      initialCryptoCurrencySelectedYearSet = true
-    }
+    userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
+    if(userMonthlyStatementCryptoCurrencyList.value?.length)
+      resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
 
     setChartData()
 
@@ -689,7 +741,7 @@
   }
 
   function resetSelectedYearForTokenMintAddressHashMap(subMarketArray: any[])
-  {
+  {console.log("reseting")
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
 
@@ -697,14 +749,18 @@
     {
       for(var i=0; i<subMarketArray.length; i++)
       {
-        selectedYearHashMap.set(subMarketArray[i].tokenId.toString() + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex, currentYear)
+        const key = subMarketArray[i].tokenId.toString() + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex.toString()
+        
+        // Only set the year if this specific token doesn't already have one!
+        if(!selectedYearHashMap.has(key)) 
+          selectedYearHashMap.set(key, currentYear)
       }
     }
   }
 
-  function updateSelectedYearForTokenMintAddressHashMap(tokenMintAddress: string, subMarketOwnerAddress: string, subMarketIndex: number, selectedYear: number)
+  function updateSelectedYearForTokenMintAddressHashMap(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number, selectedYear: number)
   {
-    selectedYearHashMap.set(tokenMintAddress + subMarketOwnerAddress + subMarketIndex.toString(), selectedYear)
+    selectedYearHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString(), selectedYear)
     chartReRenderKey.value += 1
   }
 
@@ -716,12 +772,12 @@
     var tempHashMap = new Map<string, any>()
 
     //Get Stable Coin Yearly Chart Data
-    if(userTabStableCoinSubMarketList.value)
-      for(var i=0; i<userTabStableCoinSubMarketList.value.length; i++)
+    if(userMonthlyStatementStableCoinList.value)
+      for(var i=0; i<userMonthlyStatementStableCoinList.value.length; i++)
       {
-        const tokenId = userTabStableCoinSubMarketList.value[i].tokenId
-        const subMarketOwnerAddress = userTabStableCoinSubMarketList.value[i].subMarketOwnerAddress
-        const subMarketIndex = userTabStableCoinSubMarketList.value[i].subMarketIndex
+        const tokenId = userMonthlyStatementStableCoinList.value[i].tokenId
+        const subMarketOwnerAddress = userMonthlyStatementStableCoinList.value[i].subMarketOwnerAddress
+        const subMarketIndex = userMonthlyStatementStableCoinList.value[i].subMarketIndex
 
         var lastKnownActionType = 0
         var lastKnownActionAmount = 0
@@ -935,12 +991,12 @@
       }
 
     //Get Crypto Currency Yearly Chart Data
-    if(userTabCryptoCurrencySubMarketList.value)
-      for(var i=0; i<userTabCryptoCurrencySubMarketList.value.length; i++)
+    if(userMonthlyStatementCryptoCurrencyList.value)
+      for(var i=0; i<userMonthlyStatementCryptoCurrencyList.value.length; i++)
       {
-        const tokenId = userTabCryptoCurrencySubMarketList.value[i].tokenId
-        const subMarketOwnerAddress = userTabCryptoCurrencySubMarketList.value[i].subMarketOwnerAddress
-        const subMarketIndex = userTabCryptoCurrencySubMarketList.value[i].subMarketIndex
+        const tokenId = userMonthlyStatementCryptoCurrencyList.value[i].tokenId
+        const subMarketOwnerAddress = userMonthlyStatementCryptoCurrencyList.value[i].subMarketOwnerAddress
+        const subMarketIndex = userMonthlyStatementCryptoCurrencyList.value[i].subMarketIndex
 
         var lastKnownActionType = 0
         var lastKnownActionAmount = 0
@@ -970,6 +1026,7 @@
           var collectedLiquidationFees = []
           var collectedSubMarketFees = []
           var collectedSolvencyFees = []
+          
           var tempChartData = cloneDeep(baseChartData)
         
           //If current year, go up until the current month, otherwise cover the whole year
@@ -1152,15 +1209,15 @@
         }
       }
 
-      selectedUserChartDataHashMap.value = tempHashMap
+      selectedUserChartDataHashMap = tempHashMap
   }
 
   function getChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
   {
-    return selectedUserChartDataHashMap.value.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + selectedYearHashMap.get(tokenId + subMarketOwnerAddress + subMarketIndex.toString()))
+    return selectedUserChartDataHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + selectedYearHashMap.get(tokenId.toString()  + subMarketOwnerAddress + subMarketIndex.toString()))
   }
 
-  function getSelectedYearForOnMounted(tokenId: string, subMarketOwnerAddress: string, subMarketIndex: number)
+  function getSelectedYearForOnMounted(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
   {
     return selectedYearHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString())
   }
@@ -1201,12 +1258,20 @@
 
     if(lendingUserMonthlyStatementsHashMap.map)
     {
-      userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelected.toString())
-      userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelected.toString())
+      userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelected.toString())
+      userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
+      userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelected.toString())
+      userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
       accountSelect.value = accountSelected
 
-      resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
-      resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
+      if(searchAddress.value == connectedWallet.addressString)
+      {
+        connectedWallet.selectedLendingUserAccountIndex = accountSelected
+        localStorage.setItem("selectedLendingAccountIndex", accountSelected.toString())
+      }
+
+      resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
+      resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
       setLendingUserAccountList()
       checkForLendingUserAssets()
       setChartData()
@@ -1231,11 +1296,13 @@
     cryptoLifeTimeInterestEarnedAmount.value = "0"
     cryptoLifeTimeInterestEarnedValue.value = 0
 
-    userTabStableCoinSubMarketList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    userTabCryptoCurrencySubMarketList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
+    userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
 
-    resetSelectedYearForTokenMintAddressHashMap(userTabStableCoinSubMarketList.value)
-    resetSelectedYearForTokenMintAddressHashMap(userTabCryptoCurrencySubMarketList.value)
+    resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
+    resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
     checkForLendingUserAssets()
     setChartData()
   }
@@ -1292,18 +1359,6 @@
     localStorage.setItem("isBrowsingAllLendingUsers", flag.toString())
   }
 
-  function setInputFocus()
-  {
-    accountName.value = accountList.value[accountSelect.value].accountName
-
-    setTimeout(() =>
-    {
-      const inputElement = accountNameEditInputRef.value?.$el.querySelector(".native-input")
-      if(inputElement)
-        inputElement.focus()
-    }, 10) 
-  }
-
   function checkForLendingUserAssets()
   {
     if(!lendingUserTabAccountListHashMap.map)
@@ -1333,10 +1388,10 @@
   calculatedUserInterestEarned: number,
   interestEarnedValue: number)
   {
-    userTabStableCoinSubMarketList.value[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
-    userTabStableCoinSubMarketList.value[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
-    userTabStableCoinSubMarketList.value[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned
-    userTabStableCoinSubMarketList.value[userTabIndex].interestEarnedValue = interestEarnedValue
+    userStableCoinInterestHelper[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
+    userStableCoinInterestHelper[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
+    userStableCoinInterestHelper[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned
+    userStableCoinInterestHelper[userTabIndex].interestEarnedValue = interestEarnedValue
 
     var highestTokenDecimalAmount = 0
     var sevenDayCalculatedUserInterestEarned = 0
@@ -1344,16 +1399,16 @@
     var calculatedUserInterestEarned = 0
     var interestEarnedValue = 0
 
-    for(var i=0; i<userTabStableCoinSubMarketList.value.length; i++)
+    for(var i=0; i<userStableCoinInterestHelper.length; i++)
     {
-      const decimalAmount = tokenDecimalHashMap.get(userTabStableCoinSubMarketList.value[i].tokenId)
+      const decimalAmount = tokenDecimalHashMap.get(userStableCoinInterestHelper[i].tokenId)
       if(decimalAmount>highestTokenDecimalAmount)
         highestTokenDecimalAmount = decimalAmount
 
-      sevenDayCalculatedUserInterestEarned += userTabStableCoinSubMarketList.value[i].sevenDayCalculatedUserInterestEarned
-      sevenDayInterestEarnedValue += userTabStableCoinSubMarketList.value[i].sevenDayInterestEarnedValue
-      calculatedUserInterestEarned += userTabStableCoinSubMarketList.value[i].calculatedUserInterestEarned
-      interestEarnedValue += userTabStableCoinSubMarketList.value[i].interestEarnedValue
+      sevenDayCalculatedUserInterestEarned += userStableCoinInterestHelper[i].sevenDayCalculatedUserInterestEarned
+      sevenDayInterestEarnedValue += userStableCoinInterestHelper[i].sevenDayInterestEarnedValue
+      calculatedUserInterestEarned += userStableCoinInterestHelper[i].calculatedUserInterestEarned
+      interestEarnedValue += userStableCoinInterestHelper[i].interestEarnedValue
     }
 
     stableCoin7DayProjectionRateAmount.value = sevenDayCalculatedUserInterestEarned.toLocaleString('en-US', {
@@ -1372,17 +1427,15 @@
   calculatedUserInterestEarned: number,
   interestEarnedValue: number)
   {
-    //userTabCryptoCurrencySubMarketList.value = undefined
+    /*userCryptoCurrencyInterestHelper[userTabIndex].sevenDayCalculatedUserInterestEarned = 0
+    userMonthlyStatementCryptoCurrencyList.value[userTabIndex].sevenDayInterestEarnedValue = 0
+    userMonthlyStatementCryptoCurrencyList.value[userTabIndex].calculatedUserInterestEarned = 0
+    userMonthlyStatementCryptoCurrencyList.value[userTabIndex].interestEarnedValue = 0*/
 
-    userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayCalculatedUserInterestEarned = 0
-    userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayInterestEarnedValue = 0
-    userTabCryptoCurrencySubMarketList.value[userTabIndex].calculatedUserInterestEarned = 0
-    userTabCryptoCurrencySubMarketList.value[userTabIndex].interestEarnedValue = 0
-
-    userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
-    userTabCryptoCurrencySubMarketList.value[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
-    userTabCryptoCurrencySubMarketList.value[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned
-    userTabCryptoCurrencySubMarketList.value[userTabIndex].interestEarnedValue = interestEarnedValue
+    userCryptoCurrencyInterestHelper[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
+    userCryptoCurrencyInterestHelper[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
+    userCryptoCurrencyInterestHelper[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned
+    userCryptoCurrencyInterestHelper[userTabIndex].interestEarnedValue = interestEarnedValue
 
     var highestTokenDecimalAmount = 0
     var sevenDayCalculatedUserInterestEarned = 0
@@ -1390,16 +1443,16 @@
     var calculatedUserInterestEarned = 0
     var interestEarnedValue = 0
 
-    for(var i=0; i<userTabCryptoCurrencySubMarketList.value.length; i++)
+    for(var i=0; i<userCryptoCurrencyInterestHelper.length; i++)
     {
-      const decimalAmount = tokenDecimalHashMap.get(userTabCryptoCurrencySubMarketList.value[i].tokenId)
+      const decimalAmount = tokenDecimalHashMap.get(userCryptoCurrencyInterestHelper[i].tokenId)
       if(decimalAmount>highestTokenDecimalAmount)
         highestTokenDecimalAmount = decimalAmount
 
-      sevenDayCalculatedUserInterestEarned += userTabCryptoCurrencySubMarketList.value[i].sevenDayCalculatedUserInterestEarned
-      sevenDayInterestEarnedValue += userTabCryptoCurrencySubMarketList.value[i].sevenDayInterestEarnedValue
-      calculatedUserInterestEarned += userTabCryptoCurrencySubMarketList.value[i].calculatedUserInterestEarned
-      interestEarnedValue += userTabCryptoCurrencySubMarketList.value[i].interestEarnedValue
+      sevenDayCalculatedUserInterestEarned += userCryptoCurrencyInterestHelper[i].sevenDayCalculatedUserInterestEarned
+      sevenDayInterestEarnedValue += userCryptoCurrencyInterestHelper[i].sevenDayInterestEarnedValue
+      calculatedUserInterestEarned += userCryptoCurrencyInterestHelper[i].calculatedUserInterestEarned
+      interestEarnedValue += userCryptoCurrencyInterestHelper[i].interestEarnedValue
     }
 
     crypto7DayProjectionRateAmount.value = sevenDayCalculatedUserInterestEarned.toLocaleString('en-US', {

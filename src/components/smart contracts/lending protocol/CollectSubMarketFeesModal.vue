@@ -228,8 +228,11 @@
 
   watch(subMarketByTokenIdAndOwnerHashMap,() =>
   {
-    generateOwnersSelectList()
-    generateSubMarketList()
+    if(collecting.value)
+    {
+      generateOwnersSelectList()
+      generateSubMarketList()
+    }
   })
 
   //When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though

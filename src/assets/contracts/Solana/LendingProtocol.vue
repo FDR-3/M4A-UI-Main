@@ -195,6 +195,7 @@
       const decimalAmount = tokenDecimalHashMap.get(subMarket.tokenId)
       subMarket.tokenMintAddress = tokenIdHashMap.map.get(subMarket.tokenId)
       subMarket.depositedAmount = (Number(subMarket.depositedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
+      subMarket.borrowedAmount = (Number(subMarket.borrowedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
       subMarket.subMarketFeesGeneratedAmount = (Number(subMarket.subMarketFeesGeneratedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
       subMarket.uncollectedSubMarketFeesAmount = (Number(subMarket.uncollectedSubMarketFeesAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount)
 

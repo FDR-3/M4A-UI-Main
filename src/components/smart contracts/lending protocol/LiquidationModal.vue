@@ -24,7 +24,7 @@
     
       <div class="nMediumMarginLeft nMediumMarginTop flexCenterRow tinyMarginBottom">
         <InfoButton :infoMessage="liquidationInfoMSG" :openSide="'bottom'"/>
-        <div class="nMediumLargeMarginLeft">
+        <div class="nSmallMarginLeft">
           <ion-text v-if="solvent" color="green">Solvent</ion-text>
           <ion-text v-else color="red">Insolvent</ion-text>
         </div>
@@ -430,7 +430,7 @@
   const checkForSameLiquidatorAsLiquidati = () =>
   {
     if((liquidatiAddress.toString() == connectedWallet.addressString) &&
-    (liquidatiAccountIndex == accountSelect.value))
+    (liquidatiAccountIndex == connectedWallet.selectedLendingUserAccountIndex))
       exactSameLiquidatorAsLiquidati.value = true
     else
       exactSameLiquidatorAsLiquidati.value = false
@@ -458,6 +458,18 @@
     {
       stopTabCalculation()
       startTabCalculation()
+    }
+  })
+
+  watch(connectedWallet, async() =>
+  {
+    if(liquidating.value)
+    {
+      const balance = connectedWallet.tokenBalanceMap.get(borrowPositionToRepaySelect.value.repaymentTokenMintAddress.toString())
+      if(balance)
+        liquidatorWalletBalance.value = Number(balance)
+      else
+        liquidatorWalletBalance.value = 0
     }
   })
 

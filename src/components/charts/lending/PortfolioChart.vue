@@ -51,7 +51,7 @@
           optionLabel="yearAvailable" 
           optionValue="yearAvailable" 
           placeholder="Select Year"
-          @change="$emit('changeYear', tokenMintAddressString, subMarketOwnerAddress, subMarketIndex, yearSelect)">
+          @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, yearSelect)">
           </Select>
 
           <div v-if="ownerAddress==connectedWallet.addressString">
@@ -157,7 +157,7 @@
         optionLabel="yearAvailable" 
         optionValue="yearAvailable" 
         placeholder="Select Year"
-        @change="$emit('changeYear', tokenMintAddressString, subMarketOwnerAddress, subMarketIndex, yearSelect)">
+        @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, yearSelect)">
         </Select>
         <div v-if="ownerAddress==connectedWallet.addressString" class="nSmallMarginTop">
           <ion-button v-if="depositedAssetAmount==0" class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption)">
@@ -564,11 +564,11 @@
     if(!lendingUserTabAccountsHashMap.map)
       return
 
-    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(props.tokenId +
+    lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(props.tokenId +
     props.subMarketOwnerAddress +
     props.subMarketIndex.toString() +
     props.ownerAddress +
-    props.accountIndex.toString())
+    props.accountIndex.toString()))
 
     userOriginalBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
     userOriginalInterestEarned.value = Number(lendingUserTabAccount.interestEarnedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal

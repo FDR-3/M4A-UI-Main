@@ -8,11 +8,11 @@
   </div>
 
   <div class="flexCenterRow nTinyMarginTop healthFactorBarContainer" style="width: 100%">
-    <div class="nMediumMarginLeft">
+    <div class="nSmallMarginLeft">
       <InfoButton :infoMessage="healthFactorInfo" :openSide="openSide"/>
     </div>
     
-    <div class="progressBarContainer noClickEvent nMediumSmallMarginLeft">
+    <div class="progressBarContainer noClickEvent">
       <div class="progressBar" :style="{ width: healthFactor + '%', backgroundColor: barColor}"></div>
     </div>
 
