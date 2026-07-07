@@ -72,7 +72,6 @@
 
     //Token Reserves
     tokenReserves.data = await getTokenReserves()
-    
     setTokenReserveFontEndInfoHashMap()
     await listenForTokenReserveChanges()
 

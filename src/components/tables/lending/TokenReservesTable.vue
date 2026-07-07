@@ -19,8 +19,10 @@
         'price',
         'percentChange24h',
         'depositedAmount',
+        'depositedAmountString',
         'depositedValue',
         'borrowedAmount',
+        'borrowedAmountString',
         'borrowedValue',
         'subMarketCount'
       ]"  
@@ -80,9 +82,17 @@
            <ion-text :color="slotProps.data.percentChange24h<0 ? 'red' : 'green'">{{ slotProps.data.percentChange24h }}%</ion-text>
         </template>
       </Column>
-      <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable></Column>
+      <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.depositedAmountString }}
+        </template>
+      </Column>
       <Column field="depositedValue" header="Deposited Value" style="width: 0%" sortable></Column>
-      <Column field="borrowedAmount" header="Borrows" style="width: 0%" sortable></Column>
+      <Column field="borrowedAmount" header="Borrows" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.borrowedAmountString }}
+        </template>
+      </Column>
       <Column field="borrowedValue" header="Borrowed Value" style="width: 0%" sortable></Column>
       <Column field="subMarketCount" header="SubMarket Count" style="width: 0%" sortable></Column>
       <Column field="tokenDecimalAmount" header="Actions" style="width: 0%" sortable>
@@ -185,9 +195,17 @@
           </div>
         </template>
       </Column>
-      <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable></Column>
+      <Column field="depositedAmount" header="Deposits" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.depositedAmountString }}
+        </template>
+      </Column>
       <Column field="depositedValue" header="Deposited Value" style="width: 0%" sortable></Column>
-      <Column field="borrowedAmount" header="Borrows" style="width: 0%" sortable></Column>
+      <Column field="borrowedAmount" header="Borrows" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.borrowedAmountString }}
+        </template>
+      </Column>
       <Column field="borrowedValue" header="Borrowed Value" style="width: 0%" sortable></Column>
       <Column field="subMarketFeesGeneratedAmount" header="Fees Generated" style="width: 0%" sortable></Column>
       <Column field="uncollectedSubMarketFeesAmount" header="Uncollected Fees" style="width: 0%" sortable></Column>
@@ -421,9 +439,13 @@
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].depositedAmount.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].depositedAmountString.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].depositedValue.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].borrowedAmount.toString().toLowerCase().includes(filterString.toLowerCase()))
+        filteredTable.push(unfilteredTableData[i])
+      else if(unfilteredTableData[i].borrowedAmountString.toString().toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
       else if(unfilteredTableData[i].borrowedValue.toLowerCase().includes(filterString.toLowerCase()))
         filteredTable.push(unfilteredTableData[i])
@@ -532,6 +554,9 @@
       if(priceData)
         depositCalculatedValue = (depositedBalance * priceData.usdPrice)
 
+      processedTableData[i].depositedAmountString = Number(depositedBalance).toLocaleString('en-US', {
+          minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
+          maximumFractionDigits: processedTableData[i].tokenDecimalAmount })
       processedTableData[i].depositedValue = '$' + depositCalculatedValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
@@ -544,6 +569,9 @@
       if(priceData)
         borrowCalculatedValue = (borrowedBalance * priceData.usdPrice)
 
+      processedTableData[i].borrowedAmountString = Number(borrowedBalance).toLocaleString('en-US', {
+          minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
+          maximumFractionDigits: processedTableData[i].tokenDecimalAmount })
       processedTableData[i].borrowedValue = '$' + borrowCalculatedValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
@@ -573,6 +601,9 @@
               if(priceData)
                 depositCalculatedValue = (depositedBalance * priceData.usdPrice)
 
+              unProcessedTokenSubMarketList[j].depositedAmountString = Number(depositedBalance).toLocaleString('en-US', {
+                minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
+                maximumFractionDigits: processedTableData[i].tokenDecimalAmount })
               unProcessedTokenSubMarketList[j].depositedValue = '$' + depositCalculatedValue.toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2 })
@@ -584,6 +615,9 @@
               if(priceData)
                 borrowCalculatedValue = (borrowedBalance * priceData.usdPrice)
 
+              unProcessedTokenSubMarketList[j].borrowedAmountString = Number(borrowedBalance).toLocaleString('en-US', {
+                minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
+                maximumFractionDigits: processedTableData[i].tokenDecimalAmount })
               unProcessedTokenSubMarketList[j].borrowedValue = '$' + borrowCalculatedValue.toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2 })

@@ -54,10 +54,10 @@
     </ion-split-pane>
 
     <!--Calm Contract Background Processes-->
-    <ChatProtocol/>
-    <AlertProtocol/>
-    <LendingProtocol/>
-    <M4AProtocol/>
+    <ChatProtocolRunner/>
+    <AlertProtocolRunner/>
+    <LendingProtocolRunner/>
+    <M4AProtocolRunner/>
 
   </ion-app>
 </template>
@@ -94,10 +94,10 @@
   import { useWindowResize } from './assets/globalStates/WindowWidth.ts'
   import { MAINTENANCE_MODE } from './assets/globalStates/EnvironmentSettings.ts'
   import ContractSwitcher from '/src/components/smart contracts/ContractSwitcher.vue'
-  import AlertProtocol from '/src/components/smart contracts/alert protocol/AlertProtocol.vue'
-  import LendingProtocol from '/src/components/smart contracts/lending protocol/LendingProtocol.vue'
-  import M4AProtocol from '/src/components/smart contracts/m4a protocol/M4AProtocol.vue'
-  import ChatProtocol from '/src/components/smart contracts/chat protocol/ChatProtocol.vue'
+  import AlertProtocolRunner from '/src/components/smart contracts/alert protocol/AlertProtocolRunner.vue'
+  import LendingProtocolRunner from '/src/components/smart contracts/lending protocol/LendingProtocolRunner.vue'
+  import M4AProtocolRunner from '/src/components/smart contracts/m4a protocol/M4AProtocolRunner.vue'
+  import ChatProtocolRunner from '/src/components/smart contracts/chat protocol/ChatProtocolRunner.vue'
 
   const route = useRoute()
   

@@ -522,11 +522,11 @@
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 }) + '%'
           StableCoins[i].deposits = tokenReserve.depositedAmount //Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
-          StableCoins[i].depositsString = StableCoins[i].deposits.toLocaleString('en-US', {
+          StableCoins[i].depositsString = Number(StableCoins[i].deposits).toLocaleString('en-US', {
           minimumFractionDigits: StableCoins[i].decimalAmount,
           maximumFractionDigits: StableCoins[i].decimalAmount })
           StableCoins[i].borrows = tokenReserve.borrowedAmount //Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
-          StableCoins[i].borrowsString = StableCoins[i].borrows.toLocaleString('en-US', {
+          StableCoins[i].borrowsString = Number(StableCoins[i].borrows).toLocaleString('en-US', {
           minimumFractionDigits: StableCoins[i].decimalAmount,
           maximumFractionDigits: StableCoins[i].decimalAmount })
           StableCoins[i].globalLimit = Number(tokenReserve.globalLimit) / Math.pow(10, StableCoins[i].decimalAmount) //Convert to decimal from fixed point notation
@@ -575,11 +575,11 @@
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 }) + '%'
           CryptoCurrency[i].deposits = tokenReserve.depositedAmount //Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
-          CryptoCurrency[i].depositsString = CryptoCurrency[i].deposits.toLocaleString('en-US', {
+          CryptoCurrency[i].depositsString = Number(CryptoCurrency[i].deposits).toLocaleString('en-US', {
           minimumFractionDigits: CryptoCurrency[i].decimalAmount,
           maximumFractionDigits: CryptoCurrency[i].decimalAmount })
           CryptoCurrency[i].borrows = tokenReserve.borrowedAmount //Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation
-          CryptoCurrency[i].borrowsString = CryptoCurrency[i].borrows.toLocaleString('en-US', {
+          CryptoCurrency[i].borrowsString = Number(CryptoCurrency[i].borrows).toLocaleString('en-US', {
           minimumFractionDigits: CryptoCurrency[i].decimalAmount,
           maximumFractionDigits: CryptoCurrency[i].decimalAmount })
           CryptoCurrency[i].globalLimit = Number(tokenReserve.globalLimit) / Math.pow(10, CryptoCurrency[i].decimalAmount) //Convert to decimal from fixed point notation

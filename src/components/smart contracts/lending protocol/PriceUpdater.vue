@@ -26,13 +26,11 @@
     intervalId = setInterval(async() => 
     {
       await fetchPrices()
-    }, 2222)
+    }, 10_000)
   }
 
   async function fetchPrices()
   {
-    console.log("Updating Prices")
-    
     const price = await(await fetch
     (
       "https://api.jup.ag/price/v3?ids=" +

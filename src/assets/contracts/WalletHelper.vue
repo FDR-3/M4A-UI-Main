@@ -94,7 +94,14 @@
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
-        console.log("confirmation error: ", confirmation.value.err)
+        var tempErrorMessage
+        if(confirmation.value.err.InstructionError)
+          tempErrorMessage = confirmation.value.err.InstructionError[1].Custom
+        else
+          tempErrorMessage = confirmation.value.err
+
+        var errorMessage = parseProgramErrorCode(tempErrorMessage, anchorPrograms.m4a.m4aProgram)
+        console.log("confirmation error: ", errorMessage)
         toast.add({ severity: 'error',
         summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
         detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
@@ -108,9 +115,16 @@
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
-    catch(error)
+    catch(error: any)
     {
-      console.log("confirmation error: ", error)
+      var tempErrorMessage
+      if(error.InstructionError)
+        tempErrorMessage = error.InstructionError[1].Custom
+      else
+        tempErrorMessage = error
+
+      var errorMessage = parseProgramErrorCode(tempErrorMessage, anchorPrograms.m4a.m4aProgram)
+      console.log("confirmation error: ", errorMessage)
       toast.add({ severity: 'error',
       summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
       detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
@@ -126,10 +140,17 @@
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
-        console.log("confirmation error: ", confirmation.value.err)
+        var tempErrorMessage
+        if(confirmation.value.err.InstructionError)
+          tempErrorMessage = confirmation.value.err.InstructionError[1].Custom
+        else
+          tempErrorMessage = confirmation.value.err
+
+        var errorMessage = parseProgramErrorCode(tempErrorMessage, anchorPrograms.chat.chatProgram)
+        console.log("confirmation error: ", errorMessage)
         toast.add({ severity: 'error',
         summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-        detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
+        detail: `TX_ID: ${transaction}\n\n${errorMessage}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
@@ -140,9 +161,16 @@
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
-    catch(error)
+    catch(error: any)
     {
-      console.log("confirmation error: ", error)
+      var tempErrorMessage
+      if(error.InstructionError)
+        tempErrorMessage = error.InstructionError[1].Custom
+      else
+        tempErrorMessage = error
+
+      var errorMessage = parseProgramErrorCode(tempErrorMessage, anchorPrograms.chat.chatProgram)
+      console.log("confirmation error: ", errorMessage)
       toast.add({ severity: 'error',
       summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
       detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
@@ -158,10 +186,17 @@
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
-        console.log("confirmation error: ", confirmation.value.err)
+        var tempErrorMessage
+        if(confirmation.value.err.InstructionError)
+          tempErrorMessage = confirmation.value.err.InstructionError[1].Custom
+        else
+          tempErrorMessage = confirmation.value.err
+
+        var errorMessage = parseProgramErrorCode(tempErrorMessage, anchorPrograms.lending.lendingProgram)
+        console.log("confirmation error: ", errorMessage)
         toast.add({ severity: 'error',
         summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-        detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
+        detail: `TX_ID: ${transaction}\n\n${errorMessage}`, life: TOAST_TIME_LEN_MILLISECONDS })
       }
       else
       {
@@ -172,12 +207,19 @@
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
-    catch(error)
+    catch(error: any)
     {
-      console.log("confirmation error: ", error)
+      var tempErrorMessage
+      if(error.InstructionError)
+        tempErrorMessage = error.InstructionError[1].Custom
+      else
+        tempErrorMessage = error
+
+      var errorMessage = parseProgramErrorCode(tempErrorMessage, anchorPrograms.lending.lendingProgram)
+      console.log("confirmation error: ", errorMessage)
       toast.add({ severity: 'error',
       summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
-      detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
+      detail: `TX_ID: ${transaction}\n\n${errorMessage}`, life: TOAST_TIME_LEN_MILLISECONDS })
     }
   }
 
@@ -190,7 +232,14 @@
       // Check if the transaction was successful
       if(confirmation.value.err)
       {
-        console.log("confirmation error: ", confirmation.value.err)
+        var tempErrorMessage
+        if(confirmation.value.err.InstructionError)
+          tempErrorMessage = confirmation.value.err.InstructionError[1].Custom
+        else
+          tempErrorMessage = confirmation.value.err
+
+        var errorMessage = parseProgramErrorCode(tempErrorMessage, anchorPrograms.alert.alertProgram)
+        console.log("confirmation error: ", errorMessage)
         toast.add({ severity: 'error',
         summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
         detail: `TX_ID: ${transaction}\n\n${confirmation.value.err}`, life: TOAST_TIME_LEN_MILLISECONDS })
@@ -204,9 +253,16 @@
         life: TOAST_TIME_LEN_MILLISECONDS })
       }
     }
-    catch(error)
+    catch(error: any)
     {
-      console.log("confirmation error: ", error)
+      var tempErrorMessage
+      if(error.InstructionError)
+        tempErrorMessage = error.InstructionError[1].Custom
+      else
+        tempErrorMessage = error
+
+      var errorMessage = parseProgramErrorCode(tempErrorMessage, anchorPrograms.alert.alertProgram)
+      console.log("confirmation error: ", errorMessage)
       toast.add({ severity: 'error',
       summary: `"${contractFunctionName}" Smart Contract Transaction Failed`,
       detail: `TX_ID: ${transaction}\n\n${error}`, life: TOAST_TIME_LEN_MILLISECONDS })
@@ -327,27 +383,34 @@
 
   export function parseProgramErrorCode(error: any, program: any)
   {
+    const errorCode = Number(error)
     var errorMessage = ""
     var idlError = null
 
-    const errorMatch1 = error.message.match(/Error Number: (\d+)/)
-    const errorMatch2 = error.message.match(/"Custom":(\d+)/)
-
-    if(errorMatch1)
+    if(error.message)
     {
-      if(errorMatch1[1])
-        idlError = program.idl.errors.find((error: { code: number }) => error.code === parseInt(errorMatch1[1]))
+      errorMessage = error.message
+      const errorMatch1 = error.message.match(/Error Number: (\d+)/)
+      const errorMatch2 = error.message.match(/"Custom":(\d+)/)
+      
+      if(errorMatch1)
+      {
+        if(errorMatch1[1])
+          idlError = program.idl.errors.find((error: { code: number }) => error.code === parseInt(errorMatch1[1]))
+      }
+      else if(errorMatch2)
+      {
+        if(errorMatch2[1])
+          idlError = program.idl.errors.find((error: { code: number }) => error.code === parseInt(errorMatch2[1]))
+      }
     }
-    else if(errorMatch2)
+    else if(typeof errorCode === 'number')
     {
-      if(errorMatch2[1])
-        idlError = program.idl.errors.find((error: { code: number }) => error.code === parseInt(errorMatch2[1]))
+      idlError = program.idl.errors.find((error: { code: number }) => error.code === errorCode)
     }
 
     if(idlError)
       errorMessage = idlError.msg
-    else
-      errorMessage = error.message
 
     console.log(errorMessage)
     return errorMessage
