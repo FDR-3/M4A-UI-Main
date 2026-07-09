@@ -9,7 +9,7 @@
     <NextPageButton/>
   </div>
   <div class="flexCenterColumnWidth">
-    <ion-button color="dark" @click="pageSelect(0)">1-Overview</ion-button>
+    <ion-button color="dark" @click="pageSelect(0)">1-Overview (Back)</ion-button>
     <ion-button color="dark" @click="nextPage()">2-Getting Started</ion-button>
     <ion-button color="dark" @click="pageSelect(7)">3-Menu And Theming</ion-button>
     <ion-button color="dark" @click="pageSelect(9)">4-Footer</ion-button>

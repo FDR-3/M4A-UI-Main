@@ -622,7 +622,8 @@
         if(subMarketEntries)
         {
           for(var j=0; j<subMarketEntries.length; j++)
-          {
+          { 
+            //The HODL Treasurer and the Singler Payer should only ever deposit into the %100 Fee Sub Market
             if((connectedWallet.addressString == adminAccounts.hodlTreasuryAddress.toString() ||
             connectedWallet.addressString == adminAccounts.singlePayerTreasuryAddress.toString()) &&
             subMarketEntries[j].subMarketIndex == 0)
@@ -653,6 +654,7 @@
         {
           for(var j=0; j<subMarketEntries.length; j++)
           {
+            //The HODL Treasurer and the Singler Payer should only ever deposit into the %100 Fee Sub Market
             if((connectedWallet.addressString == adminAccounts.hodlTreasuryAddress.toString() ||
             connectedWallet.addressString == adminAccounts.singlePayerTreasuryAddress.toString()) &&
             subMarketEntries[j].subMarketIndex == 0)
@@ -718,7 +720,7 @@
               StableCoins[i].depositBalance = depositBalance
 
             const borrowBalance = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-            if(depositBalance)
+            if(borrowBalance)
               StableCoins[i].borrowBalance = borrowBalance
           }
         }
@@ -742,12 +744,12 @@
 
           if(lendingUserTabAccount)
           {
-            const depositBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
+            const depositBalance = Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount)//Convert from fixed point notation to decimal
             if(depositBalance)
               CryptoCurrency[i].depositBalance = depositBalance
 
-            const borrowBalance = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-            if(depositBalance)
+            const borrowBalance = Number(lendingUserTabAccount.borrowedAmount) / Math.pow(10, decimalAmount)//Convert from fixed point notation to decimal
+            if(borrowBalance)
               CryptoCurrency[i].borrowBalance = borrowBalance
           }
         }

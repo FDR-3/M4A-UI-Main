@@ -3,7 +3,7 @@
     <div class="smallMarginBottom">
       <InfoButton :infoMessage="claimQueueTableInfoMSG"/>
     </div>
-    <h1 class="nMediumSmallMarginLeft">Claim Queue</h1>
+    <h1>Claim Queue</h1>
   </div>
 
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>

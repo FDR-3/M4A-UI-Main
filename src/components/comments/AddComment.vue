@@ -86,7 +86,7 @@
       <ion-text > is sent to the original poster for each up vote they receive.</ion-text> 
     </div>
 
-    <h2>Chat Protocol Currently Switched to Dev Net For Lending Protocol Integration Testing</h2>
+    <h2>Chat Protocol Running On<br>Devnet</h2>
     <h2>Comment Section</h2>
 
     <h3 v-if="commentSectionInfo.isCommentSectionReady" class="nMediumMarginTop nSmallMarginBottom "> Initialized By: {{ commentSectionInfo.initiatorDisplayName }}</h3>

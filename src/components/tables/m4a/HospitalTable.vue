@@ -3,7 +3,7 @@
     <div style="margin-bottom: 8px">
       <InfoButton :infoMessage="hospitalTableInfoMSG"/>
     </div>
-    <h1 class="nMediumSmallMarginLeft">Hospitals</h1>
+    <h1>Hospitals</h1>
   </div>
 
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>

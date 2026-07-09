@@ -582,7 +582,7 @@
         console.log(`Signed Transaction Size: ${size} bytes`)
       }
 
-      const response = await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
+      await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
 
       var userTxs = []
   

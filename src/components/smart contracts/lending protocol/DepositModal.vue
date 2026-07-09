@@ -351,10 +351,15 @@
     tokenProgram = tokenInfo.tokenProgram
     subMarketList.value = subMarkets
 
-    subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() +
-    connectedWallet.addressString +
-    connectedWallet.selectedLendingUserAccountIndex.toString() +
-    "selectedMainSubMarketIndex")) || 0
+    //The HODL Treasurer and the Singler Payer should only ever deposit into the %100 Fee Sub Market
+    if((connectedWallet.addressString == adminAccounts.hodlTreasuryAddress.toString()) ||
+    (connectedWallet.addressString == adminAccounts.singlePayerTreasuryAddress.toString()))
+      subMarketSelect.value = 1
+    else
+      subMarketSelect.value = Number(localStorage.getItem(tokenId.toString() +
+      connectedWallet.addressString +
+      connectedWallet.selectedLendingUserAccountIndex.toString() +
+      "selectedMainSubMarketIndex")) || 0
 
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     

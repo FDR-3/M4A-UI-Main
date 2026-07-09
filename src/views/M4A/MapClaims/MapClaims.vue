@@ -1,9 +1,9 @@
 <template>
-  <h2>Under Construction On Devnet<br>Monopoly Money</h2>
+  <h2>M4A Protocol Running On<br>Devnet</h2>
   <h1 v-if="!mapSelection.isStateSelected">Universal Health Care Road Map</h1>
   <div v-if="mapSelection.isStateSelected" class="smallMarginTop">
     <!--<BETACountDown/>-->
-    <BETADelayExcuse/>
+    <!--<BETADelayExcuse/>-->
     <h1>{{ mapSelection.selectedStateName }} Hospitals</h1>
   </div>
   <div >

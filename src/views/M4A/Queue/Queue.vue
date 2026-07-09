@@ -1,5 +1,5 @@
 <template>
-  <h2 id="tableTop">Under Construction On Devnet<br>Monopoly Money</h2>
+  <h2 id="tableTop">M4A Protocol Running On<br>Devnet</h2>
   <div>
     <ClaimQueueTable 
       v-if="tableSelect == 0"

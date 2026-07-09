@@ -3,7 +3,7 @@
     <div style="margin-bottom: 8px">
       <InfoButton :infoMessage="insuranceCompanyTableInfoMSG"/>
     </div>
-    <span class="nLargeMarginLeft">💩</span>
+    <span class="nMediumLargeMarginLeft">💩</span>
     <h1 style="padding-top: 22px">Insurance Companies</h1>
   </div>
   <h2 class="statSpacingTop">Total Charges Against: $<span class="poopText">{{ approvedClaimAmountString }}</span></h2>

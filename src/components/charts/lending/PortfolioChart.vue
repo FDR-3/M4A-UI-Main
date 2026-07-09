@@ -35,10 +35,22 @@
           <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text>
         </div>
 
-        <ion-text>Balance: <span class="rainbowText">{{ userCalculatedBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text>
-        <ion-text class="smallMarginBottom">Debt: <span class="poopText">{{ userCalculatedDebt }}</span> Value: $<span class="poopText"> {{ debtValueString }} </span></ion-text>
+        <ion-text>Balance:
+          <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }) }}
+          </span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span>
+        </ion-text>
+        <ion-text class="smallMarginBottom">Debt:
+          <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }) }}
+          </span> Value: $<span class="poopText"> {{ debtValueString }} </span>
+        </ion-text>
 
-        <ion-label >Last Action: {{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount + ' ' + tokenName}}
+        <ion-label >Last Action: {{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount?.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }) + ' ' + tokenName}}
           <br>{{ convertUnixTimeToLocalDate(chartData?.lastActionTimeStamp) + ' ' + convertUnixTimeToLocalTime(chartData?.lastActionTimeStamp)}}
         </ion-label>
 
@@ -120,19 +132,38 @@
       <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text><br>
 
       <div class="unStackedBalanceDebt">
-        <br><ion-text>Balance: <span class="rainbowText">{{ userCalculatedBalance }}</span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br>
-        <ion-text class="smallMarginBottom">Debt: <span class="poopText">{{ userCalculatedDebt}}</span> Value: $<span class="poopText"> {{ debtValueString }} </span></ion-text>
+        <br><ion-text>Balance:
+          <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }) }}
+          </span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br>
+        <ion-text class="smallMarginBottom">Debt:
+          <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }) }}
+          </span> Value: $<span class="poopText"> {{ debtValueString }} </span>
+        </ion-text>
       </div>
 
       <div class="stackedBalanceDebt">
-        <br><ion-text>Balance: <span class="rainbowText">{{ userCalculatedBalance }}</span>
+        <br><ion-text>Balance:
+          <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }) }}
+          </span>
         <br>Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br><br>
-        <ion-text class="smallMarginBottom">Debt: <span class="poopText">{{ userCalculatedDebt}}</span>
+        <ion-text class="smallMarginBottom">Debt:
+          <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }) }}
+          </span>
         <br>Value: $<span class="poopText"> {{ debtValueString }} </span></ion-text>
       </div>
 
       <div class="mediumSmallMarginTop">
-        <ion-label>Last Action: <br>{{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount + ' ' + tokenName}}
+        <ion-label>Last Action: <br>{{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount?.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }) + ' ' + tokenName}}
           <br>{{ convertUnixTimeToLocalTime(chartData?.lastActionTimeStamp) }}<br>{{ convertUnixTimeToLocalDate(chartData?.lastActionTimeStamp) }}
         </ion-label>
       </div>

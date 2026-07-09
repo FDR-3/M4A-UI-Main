@@ -1884,7 +1884,7 @@
   {
     const randomTipAccount = new PublicKey(JITO_TIP_ACCOUNTS[Math.floor(Math.random() * JITO_TIP_ACCOUNTS.length)])
 
-    const tipAmount = 10000 //10,000 lamports is the minimum Jito Tip
+    const tipAmount = 1000 //1,000 lamports is the minimum Jito Tip
     const jitoTipInstruction = SystemProgram.transfer(
     {
       fromPubkey: connectedWallet.publicKey,

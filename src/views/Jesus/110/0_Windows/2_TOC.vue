@@ -8,7 +8,7 @@
     <NextPageButton/>
   </div>
   <div class="flexCenterColumnWidth">
-    <ion-button color="dark" @click="pageSelect(0)">1-A Debate About Jesus</ion-button>
+    <ion-button color="dark" @click="pageSelect(0)">1-A Debate About Jesus (Back)</ion-button>
     <ion-button color="dark" @click="nextPage()">2-OBS Video Capture Software</ion-button>
     <ion-button color="dark" @click="pageSelect(4)">3-AI Voice Change Client</ion-button>
     <ion-button color="dark" @click="pageSelect(5)">4-Train A Custom RVC Voice Model</ion-button>

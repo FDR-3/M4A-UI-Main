@@ -3,7 +3,7 @@
     <div class="tableCard" :class="flipped">
       
       <div class="frontTable" ref="frontTableRef" :style="{display: display1stTable}">
-        <h2>Under Construction On Devnet<br>Monopoly Money</h2>
+        <h2>Lending Protocol Running On<br>Testnet</h2>
         <h1>Markets</h1>
     
         <ion-button @click="flipTable(); portfolioReRenderHelper+=1" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
@@ -14,7 +14,7 @@
       </div>
 
       <div class="backTable" ref="backTableRef" :style="{display: display2ndTable}">
-        <h2>Under Construction On Devnet<br>Monopoly Money</h2>
+        <h2>Lending Protocol Running On<br>Testnet</h2>
 
         <div class="flexCenterRow nTinyMarginTop">
           <InfoButton :infoMessage="portfolioChartInfoMSG"/>

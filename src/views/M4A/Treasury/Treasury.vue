@@ -1,5 +1,5 @@
 <template>
-  <h2>Under Construction On Devnet<br>Monopoly Money</h2>
+  <h2>Lending Protocol Running On<br>Testnet</h2>
   <div class="flexCenterColumn">
     <div class="flexCenterRow">
       

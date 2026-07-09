@@ -3,7 +3,7 @@
     <div class="smallMarginBottom">
       <InfoButton :infoMessage="processedClaimsTableInfoMSG"/>
     </div>
-    <h1 class="nMediumSmallMarginLeft">Processed Claims</h1>
+    <h1>Processed Claims</h1>
   </div>
 
   <h2 class="statSpacingTop">Total Approved Claim Amount: $<span class="rainbowText">{{ approvedClaimAmountString }}</span></h2>

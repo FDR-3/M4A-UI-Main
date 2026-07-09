@@ -1,7 +1,7 @@
 <template>
   <!--This tableTop id ensures that the top of the table and hospital svg are visible when opening records from the state hospital list table-->
   <div id="tableTop" class="flexCenterRow smallMarginTop" style="font-size: 50px">
-    <div style="margin-top: 10px; margin-right: -30px">
+    <div style="margin-top: 10px; margin-right: -20px">
       <InfoButton :infoMessage="hospitalRecordTableInfoMSG"/>
     </div>
     <ion-button v-if="hospitalType==HospitalTypes.General" style="margin-top:20px; margin-bottom: -15px; margin-right: -10px" fill="clear" @click="givePokemonCenterCreatorCredit()">

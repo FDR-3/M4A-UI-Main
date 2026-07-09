@@ -3,7 +3,7 @@
     <div style="margin-bottom: 8px">
       <InfoButton :infoMessage="insuranceCompanyRecordTableInfoMSG"/>
     </div>
-    <span class="nLargeMarginLeft">💩</span>
+    <span class="nMediumMarginLeft">💩</span>
     <h1 style="padding-top: 22px">{{ insuranceCompanyName }}</h1>
   </div>
   <h2 class="statSpacing">Insurance Company Records</h2>

@@ -386,7 +386,7 @@
 
   var totalLiquidationAmount = computed(() =>
   {
-    return (Number(liquidationAmountWith7PercentBonus.value) + Number(liquidation1PercentFee.value)).toLocaleString('en-US', {
+    return (Number(liquidationAmountWith7PercentBonus.value.replace(/,/g, '')) + Number(liquidation1PercentFee.value)).toLocaleString('en-US', {
         minimumFractionDigits: liquidationDecimalAmount,
         maximumFractionDigits: liquidationDecimalAmount })  
   })
@@ -396,7 +396,7 @@
     const price = priceObjectMap.data[liquidationTokenMintAddress.toString()]?.usdPrice
     if(price)
     {
-      return (Number(totalLiquidationAmount.value) * Number(price)).toLocaleString('en-US', {
+      return (Number(totalLiquidationAmount.value.replace(/,/g, '')) * Number(price)).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })  
     }   
@@ -409,7 +409,7 @@
     const price = priceObjectMap.data[liquidationTokenMintAddress.toString()]?.usdPrice
     if(price)
     {
-      return (Number(liquidationAmountWith7PercentBonus.value) * Number(price)).toLocaleString('en-US', {
+      return (Number(liquidationAmountWith7PercentBonus.value.replace(/,/g, '')) * Number(price)).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })  
     }   
@@ -1472,7 +1472,7 @@
         console.log(`Signed Transaction Size: ${size} bytes`)
       }
 
-      const response = await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
+      await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
 
       var userTxs = []
   
