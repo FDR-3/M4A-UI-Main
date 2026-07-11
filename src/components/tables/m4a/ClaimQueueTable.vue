@@ -242,7 +242,7 @@
 
   var copyFullAddressButtonText = ref(copyFullAddressText)
 
-  const claimQueueTableInfoMSG = "\nYou can view Submitter,\nHospital, and Insurance\nCompany info by\nclicking on their names\n\n"
+  const claimQueueTableInfoMSG = "You can view Submitter, Hospital, and Insurance Company info by clicking on their names."
 
   onMounted(async () => 
   {

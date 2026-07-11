@@ -315,7 +315,7 @@
   import { tokenIds, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { getCompoundingFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
@@ -349,7 +349,7 @@
   var tokenReservesHashMapCopy: Map<string, any>
   var timeStampIntervalId: any
 
-  const lendingLeaderBoardInfoMSG = "\nYou can copy a User's\naddress by clicking on\nthem.\nYou can view or liquidate\nan Account by clicking \non them.\n\n"
+  const lendingLeaderBoardInfoMSG = "You can copy a User's address by clicking on them. You can view or liquidate an Account by clicking on them."
 
   var event = ref()
   var healthFactorPopUpDepositedValue = ref(0)
@@ -437,7 +437,7 @@
       var subRowCount = 0
       var tempHealthFactorHashMap = new Map<string, HealthFactor>()
 
-      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
+      calculateTokenReserveInterestChangeIndex(unixData.timeStamp)
 
       for(var i=0; i<tempData.length; i++)
       {

@@ -122,5 +122,5 @@ function calculateTokenReserveInterestChangeIndex(timeStamp: number)
     tokenReserve.sevenDaySupplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex * (1 + supplyApy * SECONDS_IN_A_WEEK / SECONDS_IN_A_YEAR)
   }*/
 
-export const healthFactorInfo = "\nHealth Factor equals\n\n(Assets * 0.8 - Debt)\n-----------------\n(Assets * 0.8)\n\nWhen Debt is equal or more than 80%\nof Assets, IE: Health Factor is 0%,\n the Account is exposed to Liquidation.\n\n The Account is insolvent when Debt\nValue is 100% or more of Asset Value.\n\nA User can borrow up to 70% of the\nvalue of their assets initially.\n\n"
+export const healthFactorInfo = "Health Factor equals\n\n(Assets * 0.8 - Debt)\n-----------------\n(Assets * 0.8)\n\nWhen Debt is equal or more than 80% of Assets, IE: Health Factor is 0%, the Account is exposed to Liquidation.\n\nThe Account is insolvent when Debt Value is 100% or more of Asset Value.\n\nA User can borrow up to 70% of the value of their assets initially."
 export default  healthFactorInfo

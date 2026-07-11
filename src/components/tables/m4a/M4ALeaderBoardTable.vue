@@ -186,7 +186,7 @@
   var sortField = ref("approvedClaimAmount")
   var sortOrder = ref(-1)
 
-  const m4aLeaderBoardInfoMSG = "You can view a Submitter by\nclicking on them."
+  const m4aLeaderBoardInfoMSG = "You can view a Submitter by clicking on them."
 
   var event = ref()
   var submitterPopoverOpen = ref(false)
@@ -196,7 +196,7 @@
   {
     if(m4aLeaderBoard.data)
     {
-      tableData.value = m4aLeaderBoard.data;console.log(tableData.value)
+      tableData.value = m4aLeaderBoard.data
       updateLeaderBoardDisplayNames()
       sortTable()
       isLoading.value = false

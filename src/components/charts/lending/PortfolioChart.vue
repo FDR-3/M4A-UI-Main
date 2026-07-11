@@ -404,7 +404,7 @@
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { getCompoundingFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import cloneDeep from 'lodash/cloneDeep'
   
@@ -490,7 +490,7 @@
 
       yearList.value = getYearList()
 
-      if(blockChainData.timeStamp != 0)
+      if(unixData.timeStamp != 0)
         startInterestCalculation()
     }
 
@@ -898,7 +898,7 @@
   {
     interestChangeIntervalId = setInterval(() =>
     {
-      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
+      calculateTokenReserveInterestChangeIndex(unixData.timeStamp)
       calculateUserInterest()
     }, 55)
   }

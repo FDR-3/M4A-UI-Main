@@ -312,7 +312,7 @@
   var event = ref()
   var copyFullAddressButtonText = ref(copyFullAddressText)
 
-  const hospitalRecordTableInfoMSG = "\nYou can view Submitter and\nInsurance Company info by\nclicking on their names\n\n You can also view the\nclaim note by clicking on\nthe ailment\n\n"
+  const hospitalRecordTableInfoMSG = "You can view Submitter and Insurance Company info by clicking on their names.\n\nYou can also view the claim note by clicking on the ailment."
 
   onMounted(() =>
   {

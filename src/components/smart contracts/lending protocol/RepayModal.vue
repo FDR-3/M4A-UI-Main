@@ -137,10 +137,9 @@
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { calculateNewBalance, calculateNewDebtBalance, getCompoundingFactor  } from './InterestCalcHelpers.ts'
-  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import * as bs58 from 'bs58'
 
   const toast = inject('toast')
@@ -430,12 +429,12 @@
 
   function startInterestCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     interestAccruedIntervalId = setInterval(() =>
     {
-      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
+      calculateTokenReserveInterestChangeIndex(unixData.timeStamp)
       calculateUserInterest()
     }, 55)
   }
@@ -451,12 +450,12 @@
 
   function startHealthFactorCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     healthFactorIntervalId = setInterval(() =>
     {
-      calculateHealthFactorValues(blockChainData.timeStamp)
+      calculateHealthFactorValues(unixData.timeStamp)
     }, 55)
   }
 
@@ -554,8 +553,6 @@
       instructionsToSend.push(...createMonthlyStatementInstructions)
       instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
       instructionsToSend.push(repayInstruction)
-      if(!LOCAL_PRICE_ORACLE)
-        instructionsToSend.push(createJitoTipInstruction())
 
       //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)

@@ -392,7 +392,7 @@
   var actionsPopoverOpen = ref(false)
   var event = ref()
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
-  const userLendingInfoMSG = "Create new accounts while\nmaking a deposit"
+
   var accountSelect = ref(0)
   var accountList = ref()
   var hasAtleast1Account = ref()
@@ -402,6 +402,8 @@
   var savedEmojiCursorPosition: any
   var overByteSizeLimit = ref()
   var depositedAssetAmount = ref(0)
+
+  const userLendingInfoMSG = "Create new accounts while making a deposit."
 
   onMounted(() =>
   {

@@ -122,14 +122,17 @@
       Connect wallet to deposit
     </ion-text>
     <div v-else-if="anchorPrograms.isLendingProtocolReady" class="mediumSmallMarginTop nTinyMarginBottom nMediumLargeMarginLeft">
-      <InfoButton :infoMessage="depositInfoMSG" :openSide="'top'"/>
-      <ion-button
-        color="dark"
-        @click="depositTokens()"
-        :disabled="overByteSizeLimit"
-      >
-        Deposit
-      </ion-button>
+      <div>
+        <InfoButton :infoMessage="depositInfoMSG" :openSide="'top'"/>
+        <ion-button
+          color="dark"
+          @click="depositTokens()"
+          :disabled="overByteSizeLimit"
+        >
+          Deposit
+        </ion-button>
+      </div>
+      <AddMissingUserLUTAddresses/>
     </div>
     <ion-text v-else>Loading</ion-text>
   </div>
@@ -163,9 +166,9 @@
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance, getCompoundingFactor } from './InterestCalcHelpers.ts'
-  import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
+  import AddMissingUserLUTAddresses from '/src/components/smart contracts/lending protocol/AddMissingUserLUTAddresses.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
@@ -206,7 +209,7 @@
   var totalDebtValue = ref(0)
   var modalRef = ref()
 
-  const depositInfoMSG = "\nThe initial transaction fees for\ndepositing a new Token for the first\ntime are more expensive than normal to\ninitialize your account data. You need\ndifferent account data for each\ndifferent Token you deposit into.\nYou also need new account data when a\nnew month comes for your monthly\nstatement accounts. A new monthly\nstatement account is only generated\nwhen you're executing a transaction\nduring a new month.\n\nAn initial deposit transaction fee\nmight be around 0.008881 SOL and\n0.00008 SOL when no new data is needed."
+  const depositInfoMSG = "The initial transaction fees for depositing a new Token for the first time are more expensive than normal to initialize your account data. You need different account data for each different Token you deposit into. You also need new account data when a new month comes for your monthly statement accounts. A new monthly statement account is only generated when you're executing a transaction during a new month.\n\nAn initial deposit transaction fee might be around 0.008881 SOL and 0.00008 SOL when no new data accounts are needed."
 
   var depositValue = computed(() =>
   {
@@ -563,12 +566,12 @@
 
   function startInterestCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     interestEarnedIntervalId = setInterval(() =>
     {
-      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
+      calculateTokenReserveInterestChangeIndex(unixData.timeStamp)
       calculateUserInterest()
     }, 55)
   }
@@ -584,12 +587,12 @@
 
   function startHealthFactorCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     healthFactorIntervalId = setInterval(() =>
     {
-      calculateHealthFactorValues(blockChainData.timeStamp)
+      calculateHealthFactorValues(unixData.timeStamp)
     }, 55)
   }
 

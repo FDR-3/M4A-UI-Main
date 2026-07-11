@@ -195,7 +195,7 @@
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { calculateTokenReserveSevenDaySupplyInterestChangeIndex } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   var stableCoinTableData = ref()
@@ -480,7 +480,7 @@
       var sevenDayStableCoinProjectionValue = 0
       for(var i=0; i<stableCoinFeeArray.length; i++)
       {
-        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, stableCoinFeeArray[i].tokenId)
+        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(unixData.timeStamp, stableCoinFeeArray[i].tokenId)
         if(stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
           sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenMintAddressString, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
@@ -488,7 +488,7 @@
       var sevenDayCryptoCurrencyProjectionValue = 0
       for(var i=0; i<cryptoCurrencyFeeArray.length; i++)
       {
-        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(blockChainData.timeStamp, cryptoCurrencyFeeArray[i].tokenId)
+        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(unixData.timeStamp, cryptoCurrencyFeeArray[i].tokenId)
         if(cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
           sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenId, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }

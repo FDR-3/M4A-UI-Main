@@ -330,7 +330,7 @@
 
   var copyFullAddressButtonText = ref(copyFullAddressText)
 
-  const processedClaimsTableInfoMSG = "\nYou can view Submitter,\nHospital, and Insurance\nCompany info by\nclicking on their names\n\n You can also view the\nclaim note by clicking on\nthe ailment"
+  const processedClaimsTableInfoMSG = "You can view Submitter, Hospital, and Insurance Company info by clicking on their names.\n\nYou can also view the claim note by clicking on the ailment."
 
   onMounted(() =>
   {

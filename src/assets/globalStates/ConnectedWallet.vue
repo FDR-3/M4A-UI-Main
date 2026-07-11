@@ -21,6 +21,8 @@
     selectedLendingUserAccountIndex: 0,
     lendingUserLookUpTableAddress: undefined,
     lendingUserLookUpTableAccount: undefined,
+    
+    missingLUTAddresses: [] as PublicKey[],
     isTempPriceAccountAlive: false
   })
 

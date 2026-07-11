@@ -9,7 +9,9 @@
   @didDismiss="infoPopoverOpen=false"
   :side="openSide"
   alignment="center">
-    <ion-text align="center" class="preserveWhiteSpace infoButtonText">{{ infoMessage }}</ion-text>
+    <div class="popupContainer">
+      <ion-text align="center" class="preserveWhiteSpace infoButtonText">{{ infoMessage }}</ion-text>
+    </div>
   </ion-popover>
 </template>
 
@@ -52,6 +54,19 @@
   {
     width: min(25px, 5vw);
     height: min(25px, 5vw)
+  }
+
+  .popupContainer
+  {
+    padding: 7px;
+    text-align: center;
+    border-radius: 4px;
+    border: thin solid var(--ion-color-dark)
+  }
+
+  .infoButtonText
+  {
+    white-space: pre-wrap
   }
 
   .popoverWidth::part(content)

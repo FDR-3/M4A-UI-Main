@@ -93,7 +93,7 @@
     blockChainTimeStamp: 0
   })
 
-  export const blockChainData = reactive(
+  export const unixData = reactive(
   { 
     timeStamp: 0
   })

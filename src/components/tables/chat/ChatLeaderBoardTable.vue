@@ -161,7 +161,7 @@
   var sortField = ref("voteMoneyEarned")
   var sortOrder = ref(-1)
 
-  const chatLeaderBoardInfoMSG = "You can view a User by\nclicking on them."
+  const chatLeaderBoardInfoMSG = "You can view a User by clicking on them."
 
   var event = ref()
   var ownerPopoverOpen = ref(false)

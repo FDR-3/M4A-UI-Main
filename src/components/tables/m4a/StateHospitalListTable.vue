@@ -183,7 +183,7 @@
   var hospitalPopoverOpen = ref(false)
   var event = ref()
 
-  const stateHospitalTableInfoMSG = "\nYou can view Hospital\nRecords by clicking on\ntheir names in the table\n\n"
+  const stateHospitalTableInfoMSG = "You can view Hospital Records by clicking on their names in the table."
 
   function openHospitalPopover(e: Event, rowData: any)
   {

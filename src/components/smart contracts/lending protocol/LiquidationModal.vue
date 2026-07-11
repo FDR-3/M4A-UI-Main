@@ -263,10 +263,9 @@
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance } from './InterestCalcHelpers.ts'
   import * as anchor from "@coral-xyz/anchor"
-  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import * as bs58 from 'bs58'
 
   const toast = inject('toast')
@@ -319,6 +318,8 @@
 
   var tabDepositHashMap = new Map<string, string>()
   var tabBorrowHashMap = new Map<string, string>()
+
+  const liquidationInfoMSG = "You can repay up to 50% of a Liquidati's debt position if it isn't insolvent and claim a 7% bonus value on the liquidated deposited collateral that you choose.\n\nIf it is insolvent, you can repay up to 100% of their debt position, although this is not immediately profitable.\n\nA 1% value fee is also collected for the HODL Treasury"
 
   const handleRadioChange = (event: CustomEvent) =>
   {
@@ -443,8 +444,6 @@
     else
       exactSameLiquidatorAsLiquidati.value = false
   }
-
-  const liquidationInfoMSG = "\nYou can repay up to 50% of\na Liquidati's debt position\nif it isn't insolvent and\nclaim a 7% bonus value on\nthe liquidated deposited\ncollateral that you choose.\n\nIf it is insolvent, you can\nrepay up to 100% of their\ndebt position, although\nthis is not immediately\nprofitable.\n\n A 1% value fee is\nalso collected for the\nHODL Treasury\n"
 
   //Move cursor back after emoji insert
   onUpdated(() => 
@@ -668,12 +667,12 @@
 
   function startTabCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     tabIntervalId = setInterval(() =>
     {
-      generateTabLists(blockChainData.timeStamp)
+      generateTabLists(unixData.timeStamp)
     }, 55)
   }
 
@@ -688,12 +687,12 @@
 
   function startHealthFactorCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     healthFactorIntervalId = setInterval(() =>
     {
-      calculateHealthFactorValues(blockChainData.timeStamp)
+      calculateHealthFactorValues(unixData.timeStamp)
     }, 55)
   }
 
@@ -1438,8 +1437,6 @@
       instructionsToSend.push(refreshLiquidatiHealthAndTokenReservesInstruction)
       instructionsToSend.push(...liquidatorLookUpTableInstructionsToSend)
       instructionsToSend.push(liquidateAccountInstruction)
-      if(!LOCAL_PRICE_ORACLE)
-        instructionsToSend.push(createJitoTipInstruction())
 
       //Get Lending Protocol Look Up Table Account
       lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)

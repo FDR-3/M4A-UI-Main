@@ -35,7 +35,7 @@
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import { calculateNewBalance, calculateNewDebtBalance, healthFactorInfo } from './InterestCalcHelpers.ts'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   
   const props = defineProps(['accountOwnerAddress', 'accountIndex'])
 
@@ -124,12 +124,12 @@
 
   function startHealthFactorCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     healthFactorIntervalId = setInterval(() =>
     {
-      calculateHealthFactorValues(blockChainData.timeStamp)
+      calculateHealthFactorValues(unixData.timeStamp)
     }, 55)
   }
 

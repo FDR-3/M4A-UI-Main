@@ -70,7 +70,7 @@
 
   var portfolioReRenderHelper = ref(0)
 
-  const portfolioChartInfoMSG = "\nInterest earned and accrued is updated\nin the charts after a user does any\nlending activity, IE: depositing,\nrepaying, etc."
+  const portfolioChartInfoMSG = "Interest earned and accrued is updated in the charts after a user does any lending activity, IE: depositing, repaying, etc."
   
   const activeContainerHeight = ref('auto')
   const frontTableRef = ref<HTMLElement | null>(null)

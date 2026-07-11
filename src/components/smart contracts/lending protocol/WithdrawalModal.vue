@@ -148,15 +148,13 @@
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
-  import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance, getCompoundingFactor } from './InterestCalcHelpers.ts'
-  import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
-  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import * as bs58 from 'bs58'
 
   const toast = inject('toast')
-  const colorName = inject('colorName')
-  const colorHexValue = inject('colorHexValue')
+  const colorName = inject('colorName') as string
+  const colorHexValue = inject('colorHexValue') as string
 
   var tokenReserve: any
   var lendingUserTabAccount: any
@@ -468,12 +466,12 @@
 
   function startInterestCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     interestEarnedIntervalId = setInterval(() =>
     {
-      calculateTokenReserveInterestChangeIndex(blockChainData.timeStamp)
+      calculateTokenReserveInterestChangeIndex(unixData.timeStamp)
       calculateUserInterest()
     }, 55)
   }
@@ -489,12 +487,12 @@
 
   function startHealthFactorCalculation()
   {
-    if(blockChainData.timeStamp == 0)
+    if(unixData.timeStamp == 0)
       return
 
     healthFactorIntervalId = setInterval(() =>
     {
-      calculateHealthFactorValues(blockChainData.timeStamp)
+      calculateHealthFactorValues(unixData.timeStamp)
     }, 55)
   }
 
@@ -630,8 +628,6 @@
         instructionsToSend.push(...createMonthlyStatementInstructions)
         instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
         instructionsToSend.push(withdrawInstruction)
-        if(!LOCAL_PRICE_ORACLE)
-          instructionsToSend.push(createJitoTipInstruction())
 
         const signedTransactions = await userSignsLendingTransactions(instructionsToSend, lookUpTableAccounts)
 

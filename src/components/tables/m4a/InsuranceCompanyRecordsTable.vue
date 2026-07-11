@@ -311,7 +311,7 @@
   var insuranceCompanyDeniedAppealCount = ref(0)
   var insuranceCompanyRevokedApprovalCount = ref(0)
 
-  const insuranceCompanyRecordTableInfoMSG = "\nYou can view Submitter and \nHospital info by\nclicking on their names\n\n You can also view the\nclaim note by clicking on\nthe ailment\n\n"
+  const insuranceCompanyRecordTableInfoMSG = "You can view Submitter and Hospital info by clicking on their names.\n\nYou can also view the claim note by clicking on the ailment."
 
   onMounted(() =>
   {

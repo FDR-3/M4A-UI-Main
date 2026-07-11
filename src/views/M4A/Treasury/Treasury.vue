@@ -85,7 +85,7 @@
   let frontObserver: ResizeObserver | null = null
   let backObserver: ResizeObserver | null = null
 
-  const tvlInfoMSG = "M4A Protocol TVL is calculated by\nadding the deposit value of all of the\nToken Reserves, the wallet balances of\nthe Solvency Treasurer, and the Stable\nCoin wallet balances of the HODL\nTreasurer."
+  const tvlInfoMSG = "M4A Protocol TVL is calculated by adding the deposit value of all of the Token Reserves, the wallet balances of the Solvency Treasurer, and the Stable Coin wallet balances of the HODL Treasurer."
 
   function handleHeightUpdate()
   {

@@ -92,8 +92,9 @@
   import WalletModalProvider from '/src/components/navbar/SolanaWalletButton/WalletModalProvider.vue'
   import { getAddressLookUpTableProgramAccountWrapper,
     getPriceAccountPDA,
-    isTempPriceAccountAlive } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { lendingUserHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+    isTempPriceAccountAlive,
+    determineMissingLUTAddresses } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { lendingUserHashMap, lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { isSubmitterAccountInitialized, getProcessorAccount } from '/src/assets/contracts/Solana/M4AProtocol.vue'
   import { getChatAccount } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { submitterHashMap } from '/src/assets/globalStates/m4a/SubmittersAndPatients.vue'
@@ -135,6 +136,7 @@
       connectedWallet.isConnected = false
       connectedWallet.lendingUserLookUpTableAddress = undefined
       connectedWallet.lendingUserLookUpTableAccount = undefined
+      connectedWallet.missingLUTAddresses = []
       connectedWallet.isTempPriceAccountAlive = false
     }
     else
@@ -150,6 +152,9 @@
         {
           connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
           connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+          connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+            connectedWallet.publicKey,
+            connectedWallet.selectedLendingUserAccountIndex)
           connectedWallet.hasGoodEnding = true
           await listenForLendingUserLookUpTableChanges()
         }
@@ -157,12 +162,14 @@
         {
           connectedWallet.lendingUserLookUpTableAddress = undefined
           connectedWallet.lendingUserLookUpTableAccount = undefined
+          connectedWallet.missingLUTAddresses = []
         }
       }
       else
       {
         connectedWallet.lendingUserLookUpTableAddress = undefined
         connectedWallet.lendingUserLookUpTableAccount = undefined
+        connectedWallet.missingLUTAddresses = []
       }
 
       connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
@@ -262,6 +269,7 @@
       connectedWallet.isConnected = false,
       connectedWallet.lendingUserLookUpTableAddress = undefined
       connectedWallet.lendingUserLookUpTableAccount = undefined
+      connectedWallet.missingLUTAddresses = []
       connectedWallet.isTempPriceAccountAlive = false
     }
     else
@@ -277,6 +285,9 @@
         {
           connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
           connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+          connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+            connectedWallet.publicKey,
+            connectedWallet.selectedLendingUserAccountIndex)
           connectedWallet.hasGoodEnding = true
           await listenForLendingUserLookUpTableChanges()
         }
@@ -284,12 +295,14 @@
         {
           connectedWallet.lendingUserLookUpTableAddress = undefined
           connectedWallet.lendingUserLookUpTableAccount = undefined
+          connectedWallet.missingLUTAddresses = []
         }
       }
       else
       {
         connectedWallet.lendingUserLookUpTableAddress = undefined
         connectedWallet.lendingUserLookUpTableAccount = undefined
+        connectedWallet.missingLUTAddresses = []
       }
 
       connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
@@ -475,15 +488,18 @@
     }
   })
 
-  watch(lendingUserHashMap, async() =>
+  watch([lendingUserHashMap, lendingUserRemainingTabAccountListHashMap], async() =>
   {
-    if(connectedWallet.lendingUserLookUpTableAddress == undefined)
+    if(connectedWallet.lendingUserLookUpTableAddress == undefined || connectedWallet.lendingUserLookUpTableAccount == undefined)
     {
       const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
       if(lendingUserAccount)
       {
         connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
         connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
+        connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+          connectedWallet.publicKey,
+          connectedWallet.selectedLendingUserAccountIndex)
         connectedWallet.hasGoodEnding = true
         await listenForLendingUserLookUpTableChanges()
       }
@@ -491,8 +507,13 @@
       {
         connectedWallet.lendingUserLookUpTableAddress = undefined
         connectedWallet.lendingUserLookUpTableAccount = undefined
+        connectedWallet.missingLUTAddresses = []
       }
     }
+    else
+      connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+        connectedWallet.publicKey,
+        connectedWallet.selectedLendingUserAccountIndex)
   })
 
   async function listenForLendingUserLookUpTableChanges()
@@ -515,6 +536,9 @@
       })
 
       connectedWallet.lendingUserLookUpTableAccount = lookupTableAccountInstance
+      connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+            connectedWallet.publicKey,
+            connectedWallet.selectedLendingUserAccountIndex)
     })
   }
 

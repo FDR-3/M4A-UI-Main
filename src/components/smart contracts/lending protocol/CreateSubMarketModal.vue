@@ -109,7 +109,7 @@
   var event = ref()
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
   var modalRef = ref()
-  const subMarketInfoMSG = "Developers can create\nSubMarkets to generate\ninterest for their\nusers while collecting fees\nto pay what ever bill they\nchoose. Developers will\nneed to build their own UIs\nfor their user deposits,\netc."
+  const subMarketInfoMSG = "Developers can create SubMarkets to generate interest for their users while collecting fees to pay what ever bill they choose. Developers will need to build their own UIs for their user deposits, etc."
 
   // When the user clicks anywhere outside of the create sub market modal, close it, not when closing toast alert though
   const handleClickOutside = (event: any) =>

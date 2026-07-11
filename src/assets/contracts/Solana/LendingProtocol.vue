@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { inject } from 'vue'
   import * as anchor from "@coral-xyz/anchor"
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenReserves, tokenReserveFontEndInfoHashMap, tokenReservesHashMap, tokenIdHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
@@ -37,9 +36,10 @@
     AddressLookupTableAccount,
     VersionedTransaction,
     TransactionMessage,
-    SystemProgram } from "@solana/web3.js"
+    SystemProgram,
+    LAMPORTS_PER_SOL } from "@solana/web3.js"
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
+  import { LOCAL_PRICE_ORACLE, USE_JITO_BUNDLES } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import cloneDeep from 'lodash/cloneDeep'
 
   export async function getLendingProtocol()
@@ -1287,8 +1287,9 @@
       }
     }
 
+    //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
     //Check if Monthly Statement Account has been initialized
-    const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+    /*const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
     anchorPrograms.currentStatementYear.toString() +
     selectedTokenId.toString() +
     destinationSubMarketOwnerAddress.toString() +
@@ -1296,9 +1297,8 @@
     lendingUserAddress.toString() +
     lendingUserAccountIndex.toString())
 
-    //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
     //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
-    /*if(!monthlyStatement)
+    if(!monthlyStatement)
     {
       //Determine PDA for new MonthlyStatementAccount that will be created
       const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
@@ -1359,8 +1359,9 @@
         }
       }
 
+      //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
       //Check if Monthly Statement Account has been initialized
-      const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
+      /*const monthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(anchorPrograms.currentStatementMonthNumber.toString() +
       anchorPrograms.currentStatementYear.toString() +
       selectedTokenId.toString() +
       initialSubMarketOwnerAddress.toString() +
@@ -1368,9 +1369,9 @@
       lendingUserAddress.toString() +
       lendingUserAccountIndex.toString())
 
-      //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
+      
       //Add Monthly Statement Account to Lending User Look Up Table if it doesn't exist
-      /*if(!monthlyStatement)
+      if(!monthlyStatement)
       {
         //Determine PDA for new MonthlyStatementAccount that will be created
         const monthlyStatementPDA = getLendingUserMonthlyStatementAccountPDA(anchorPrograms.currentStatementMonthNumber,
@@ -1398,6 +1399,36 @@
     //console.log("Lending User Look Up Table Address: " + lendingUserLookUpTableAddress?.toString())
     //console.log("Lending User Look Up Table Instructions to Send: " + lendingUserLookUpTableInstructionsToSend.length)
     return[lendingUserLookUpTableAddress, lendingUserLookUpTableInstructionsToSend, creatingNewLookUpTable]
+  }
+
+  export function determineMissingLUTAddresses(lookUpTableAccount: AddressLookupTableAccount, lendingUserAddress: PublicKey, accountIndex: number): PublicKey[]
+  {
+    if(!lendingUserTabAccountListHashMap.map)
+      return []
+    
+    var missingLookUpTableAddresses = []
+    var expectedLookUpTableAddresses = []
+
+    const lendingUserPDA = getLendingUserAccountPDA(lendingUserAddress, accountIndex)
+    const expectedLendingUserTabs = lendingUserRemainingTabAccountListHashMap.map.get(lendingUserAddress.toString() + accountIndex.toString())
+
+    expectedLookUpTableAddresses.push(lendingUserPDA)
+    expectedLookUpTableAddresses.push(...expectedLendingUserTabs.map((tab: { pubkey: PublicKey }) => tab.pubkey))
+
+    for(var i=0; i<expectedLookUpTableAddresses.length; i++)
+    {
+      for(var j=0; j<lookUpTableAccount.state.addresses.length; j++)
+      {
+        if(expectedLookUpTableAddresses[i].toString() == lookUpTableAccount.state.addresses[j].toString())
+          break
+
+        //Expected Address wasn't found, end of saved LUT Addresses
+        if(j == lookUpTableAccount.state.addresses.length - 1)
+          missingLookUpTableAddresses.push(expectedLookUpTableAddresses[i])
+      }
+    }
+
+    return missingLookUpTableAddresses
   }
 
   export async function sendVersionedLendingProtocolTransaction(instructionsToSend: anchor.web3.TransactionInstruction[], lookUpTableAccounts: AddressLookupTableAccount[])
@@ -1432,7 +1463,6 @@
   {
     try
     {
-      const unsignedTransactions: VersionedTransaction[] = []
       const connection = anchorPrograms.lending.lendingProgram.provider.connection
       const { blockhash } = await connection.getLatestBlockhash()
       const payerKey = connectedWallet.publicKey;
@@ -1441,82 +1471,104 @@
       //We reserve a 64-byte buffer for the user's signature applied later
       const MAX_UNSIGNED_SIZE = 1232 - 64
 
-      var currentBatch: anchor.web3.TransactionInstruction[] = []
-
-      for(var i=0; i<instructionsToSend.length; i++)
+      //Helper function to pack a set of instructions into transactions
+      const packInstructions = (instructions: anchor.web3.TransactionInstruction[]): VersionedTransaction[] =>
       {
-        const nextInstruction = instructionsToSend[i]
-        var itFits
+        const unsignedTransactions: VersionedTransaction[] = []
+        var currentBatch: anchor.web3.TransactionInstruction[] = []
 
-        try
+        for(var i=0; i<instructions.length; i++)
         {
-          //Test compilation adding the next instruction to our active batch
-          const testInstructions = [...currentBatch, nextInstruction]
-          const testMessage = new TransactionMessage(
+          const nextInstruction = instructions[i]
+          var itFits
+
+          try
           {
-            payerKey,
-            recentBlockhash: blockhash,
-            instructions: testInstructions
-          }).compileToV0Message(lookUpTableAccounts)
-
-          const testTx = new VersionedTransaction(testMessage)
-          const testSize = testTx.serialize().length
-          console.log("testSize: ", testSize + " bytes")
-
-          if(testSize <= MAX_UNSIGNED_SIZE)
-            itFits = true
-          else
-            itFits = false
-        }
-        catch(error)
-        {
-          itFits = false
-        }
-
-        if(itFits)
-          //It fits! Append the instruction to the current transaction batch
-          currentBatch.push(nextInstruction)
-        else
-        {
-          //It doesn't fit. If we have a pending batch, serialize it first
-          if(currentBatch.length > 0)
-          {
-            const finalMessage = new TransactionMessage(
+            //Test compilation adding the next instruction to our active batch
+            const testInstructions = [...currentBatch, nextInstruction]
+            const testMessage = new TransactionMessage(
             {
               payerKey,
               recentBlockhash: blockhash,
-              instructions: currentBatch
+              instructions: testInstructions
             }).compileToV0Message(lookUpTableAccounts)
-            
-            unsignedTransactions.push(new VersionedTransaction(finalMessage))
+
+            const testTx = new VersionedTransaction(testMessage)
+            const testSize = testTx.serialize().length
+            console.log("testSize: ", testSize + " bytes")
+
+            if(testSize <= MAX_UNSIGNED_SIZE)
+              itFits = true
+            else
+              itFits = false
           }
-          
-          //Start a brand new transaction batch with the instruction that overflowed
-          currentBatch = [nextInstruction]
-          
-          //Safety check: verify a single instruction doesn't break the bank on its own
-          const singleTxMessage = new TransactionMessage(
+          catch(error)
           {
+            itFits = false
+          }
+
+          if(itFits)
+            //It fits! Append the instruction to the current transaction batch
+            currentBatch.push(nextInstruction)
+          else
+            {
+              //It doesn't fit. If we have a pending batch, serialize it first
+              if(currentBatch.length > 0)
+              {
+                const finalMessage = new TransactionMessage(
+                {
+                  payerKey,
+                  recentBlockhash: blockhash,
+                  instructions: currentBatch
+                }).compileToV0Message(lookUpTableAccounts)
+                
+                unsignedTransactions.push(new VersionedTransaction(finalMessage))
+              }
+              
+              //Start a brand new transaction batch with the instruction that overflowed
+              currentBatch = [nextInstruction]
+              
+              //Safety check: verify a single instruction doesn't break the bank on its own
+              const singleTxMessage = new TransactionMessage(
+              {
+                payerKey,
+                recentBlockhash: blockhash,
+                instructions: currentBatch
+              }).compileToV0Message(lookUpTableAccounts)
+              
+              if(new VersionedTransaction(singleTxMessage).serialize().length > MAX_UNSIGNED_SIZE)
+                throw new Error(`Instruction at index ${i} is too large to fit in a single transaction on its own!`)
+            }
+        }
+
+        //Don't leave the trailing final batch behind
+        if(currentBatch.length > 0)
+        {
+          const finalMessage = new TransactionMessage({
             payerKey,
             recentBlockhash: blockhash,
             instructions: currentBatch
           }).compileToV0Message(lookUpTableAccounts)
           
-          if(new VersionedTransaction(singleTxMessage).serialize().length > MAX_UNSIGNED_SIZE)
-            throw new Error(`Instruction at index ${i} is too large to fit in a single transaction on its own!`)
+          unsignedTransactions.push(new VersionedTransaction(finalMessage))
         }
+
+        return unsignedTransactions
       }
 
-      //Don't leave the trailing final batch behind
-      if(currentBatch.length > 0)
+      //1. Run initial pack without Jito Tip
+      let finalInstructions = [...instructionsToSend]
+      let unsignedTransactions = packInstructions(finalInstructions)
+
+      //2. Only append Jito Tip and repack if Jito bundles are explicitly enabled AND it is a multi-transaction bundle
+      if(USE_JITO_BUNDLES && unsignedTransactions.length > 1)
       {
-        const finalMessage = new TransactionMessage({
-          payerKey,
-          recentBlockhash: blockhash,
-          instructions: currentBatch
-        }).compileToV0Message(lookUpTableAccounts)
+        console.log("Multi-transaction bundle detected with Jito enabled. Appending Jito Tip instruction...")
+        const jitoTipInstruction = await createJitoTipInstruction()
+        finalInstructions.push(jitoTipInstruction)
         
-        unsignedTransactions.push(new VersionedTransaction(finalMessage))
+        //Repack everything to ensure sizing rules are strictly followed with the new instruction
+        unsignedTransactions = packInstructions(finalInstructions)
       }
 
       console.log(`User Instructions Packed into ${unsignedTransactions.length} transaction(s).`)
@@ -1880,11 +1932,51 @@
     }
   }
 
-  export  function createJitoTipInstruction()
+  interface TipFloorData
+  {
+    time: string;
+    landed_tips_25th_percentile: number;
+    landed_tips_50th_percentile: number;
+    landed_tips_75th_percentile: number;
+    landed_tips_95th_percentile: number;
+    landed_tips_99th_percentile: number;
+    ema_landed_tips_50th_percentile: number
+  }
+
+  async function getJitoTipFloor(): Promise<number>
+  {
+    const url = "https://m4a.io/JitoTipProxy"
+
+    try
+    {
+      //1. Send the GET request
+      const response = await fetch(url)
+
+      //2. Check if the response is successful (status 200-299)
+      if(!response.ok)
+        throw new Error(`HTTP error get Jito Tip Floor! Status: ${response.status}`)
+
+      //3. Parse the JSON body into our defined TypeScript interface
+      const data: TipFloorData[] = await response.json()
+
+      //4. Log or return the data
+      console.log("Current 50th Percentile Jito Tip:", Math.floor((data[0].landed_tips_50th_percentile * LAMPORTS_PER_SOL)))
+      return Math.floor((data[0].landed_tips_50th_percentile * LAMPORTS_PER_SOL))
+
+    }
+    catch(error)
+    {
+      console.error("Failed to fetch Jito tip floor:", error)
+      return 1000 //1,000 lamports is the minimum Jito Tip
+    }
+  }
+
+  export async function createJitoTipInstruction()
   {
     const randomTipAccount = new PublicKey(JITO_TIP_ACCOUNTS[Math.floor(Math.random() * JITO_TIP_ACCOUNTS.length)])
 
-    const tipAmount = 1000 //1,000 lamports is the minimum Jito Tip
+    const tipAmount = await getJitoTipFloor()
+
     const jitoTipInstruction = SystemProgram.transfer(
     {
       fromPubkey: connectedWallet.publicKey,

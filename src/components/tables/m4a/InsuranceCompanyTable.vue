@@ -120,7 +120,7 @@
   var insuranceCompanyPopoverOpen = ref(false)
   var event = ref()
 
-  const insuranceCompanyTableInfoMSG = "\nYou can view Insurance \nCompany Records by clicking\non their names in the table\n\n"
+  const insuranceCompanyTableInfoMSG = "You can view Insurance Company Records by clicking on their names in the table."
 
   onMounted(() =>
   {
