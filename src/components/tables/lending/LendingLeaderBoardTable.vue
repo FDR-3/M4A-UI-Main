@@ -316,8 +316,8 @@
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
+  import { getCompoundingFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
@@ -767,14 +767,16 @@
       }
       else
       {
-        //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
+        //Token Reserve Supply Interest Index = Old Supply Interest Index * Taylor Series 4th Order Interest Calculation: e^x = 1 + x + (x^2 / 2!) + (x^3 / 3!) + (x^4 / 4!)
         const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
         const changeInTime = timeStamp - oldTime
         const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
         const borrowApy = tokenReserve.borrowApy / 10000 //convert from fixed point to decimal
+        const supplyCompoundingFactor = getCompoundingFactor(supplyApy, changeInTime)
+        const borrowCompoundingFactor = getCompoundingFactor(borrowApy, changeInTime)
 
-        tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * changeInTime / SECONDS_IN_A_YEAR)
-        tokenReserve.newBorrowInterestChangeIndex = Number(tokenReserve.borrowInterestChangeIndex) * (1 + borrowApy * changeInTime / SECONDS_IN_A_YEAR)
+        tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * supplyCompoundingFactor
+        tokenReserve.newBorrowInterestChangeIndex = Number(tokenReserve.borrowInterestChangeIndex) * borrowCompoundingFactor
       }
     }
   }

@@ -149,7 +149,7 @@
   import cloneDeep from 'lodash/cloneDeep'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
+  import { calculateNewBalance, calculateNewDebtBalance, getCompoundingFactor } from './InterestCalcHelpers.ts'
   import { SECONDS_IN_A_YEAR } from '/src/assets/constants/TimeLengths.ts'
   import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import * as bs58 from 'bs58'
@@ -514,12 +514,13 @@
     if(!tokenReserve)
       return
 
-    //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
+    //Token Reserve Supply Interest Index = Old Supply Interest Index * Taylor Series 4th Order Interest Calculation: e^x = 1 + x + (x^2 / 2!) + (x^3 / 3!) + (x^4 / 4!)
     const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
     const changeInTime = timeStamp - oldTime
     const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
+    const supplyCompoundingFactor = getCompoundingFactor(supplyApy, changeInTime)
 
-    tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * changeInTime / SECONDS_IN_A_YEAR)
+    tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * supplyCompoundingFactor
   }
 
   function calculateUserInterest()

@@ -194,7 +194,7 @@
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
+  import { calculateTokenReserveSevenDaySupplyInterestChangeIndex } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
@@ -437,21 +437,6 @@
     treasuryCryptoValue.value = treasuryValue
     tvlContributionStableValue.value = tvlContributionValue
     CryptoCurrencyTableData.value = unprocessedTableData
-  }
-
-  function calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp: number, tokenMintAddress: string)
-  {
-    const tokenReserve = tokenReservesHashMap.map.get(tokenMintAddress)
-
-    if(!tokenReserve)
-      return
-
-    //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
-    const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
-    const sevenDayChangeInTime = SECONDS_IN_A_WEEK + timeStamp - oldTime
-    const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
-
-    return Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * sevenDayChangeInTime / SECONDS_IN_A_YEAR)
   }
 
   function calculateSubMarketSevenDayFeeAccrued(tokenId: number, tokenReserveSevenDaySupplyInterestChangeIndex: number)

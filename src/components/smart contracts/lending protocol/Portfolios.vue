@@ -771,49 +771,57 @@
     const currentMonth = newDate.getMonth() + 1
     var tempHashMap = new Map<string, any>()
 
-    //Get Stable Coin Yearly Chart Data
-    if(userMonthlyStatementStableCoinList.value)
-      for(var i=0; i<userMonthlyStatementStableCoinList.value.length; i++)
-      {
-        const tokenId = userMonthlyStatementStableCoinList.value[i].tokenId
-        const subMarketOwnerAddress = userMonthlyStatementStableCoinList.value[i].subMarketOwnerAddress
-        const subMarketIndex = userMonthlyStatementStableCoinList.value[i].subMarketIndex
+    const isTreasuryAddress = searchAddress.value == adminAccounts.singlePayerTreasuryAddress.toString() ||
+                              searchAddress.value == adminAccounts.hodlTreasuryAddress.toString() ||
+                              searchAddress.value == adminAccounts.solvencyTreasuryAddress.toString()
 
-        var lastKnownActionType = 0
-        var lastKnownActionAmount = 0
-        var lastKnownActionTimeStamp = 0
-        var previousBalance = 0
-        var previousDebt = 0
-
-        const userAvailableYearsByTokenMintAddressList = lendingUserAvailableStableCoinYearsBySubMarketHashMap.map.get(tokenId.toString() +
-        subMarketOwnerAddress +
-        subMarketIndex.toString() +
-        searchAddress.value +
-        accountSelect.value.toString())
-
-        for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
+    function processStatementList(statementList: any, availableYearsHashMap: any)
+    {
+      if(statementList.value)
+        for(var i=0; i<statementList.value.length; i++)
         {
-          var labels = []
-          var balances = []
-          var earnedInterests = []
-          var debts = []
-          var accruedInterests = []
-          var deposits = []
-          var withdrawals = []
-          var borrows = []
-          var repays = []
-          var liquidator = []
-          var liquidated = []
-          var collectedLiquidationFees = []
-          var collectedSubMarketFees = []
-          var collectedSolvencyFees = []
+          const tokenId = statementList.value[i].tokenId
+          const subMarketOwnerAddress = statementList.value[i].subMarketOwnerAddress
+          const subMarketIndex = statementList.value[i].subMarketIndex
 
-          var tempChartData = cloneDeep(baseChartData)
-        
-          //If current year, go up until the current month, otherwise cover the whole year
-          if(year == currentYear)
+          var lastKnownActionType = 0
+          var lastKnownActionAmount = 0
+          var lastKnownActionTimeStamp = 0
+          var previousBalance = 0
+          var previousDebt = 0
+
+          const userAvailableYearsByTokenMintAddressList = availableYearsHashMap.map.get(tokenId.toString() +
+          subMarketOwnerAddress +
+          subMarketIndex.toString() +
+          searchAddress.value +
+          accountSelect.value.toString())
+
+          if(!userAvailableYearsByTokenMintAddressList || userAvailableYearsByTokenMintAddressList.length === 0)
+            continue
+
+          for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
           {
-            for(var month=1; month<=currentMonth; month++)
+            var labels = []
+            var balances = []
+            var earnedInterests = []
+            var debts = []
+            var accruedInterests = []
+            var deposits = []
+            var withdrawals = []
+            var borrows = []
+            var repays = []
+            var liquidator = []
+            var liquidated = []
+            var collectedLiquidationFees = []
+            var collectedSubMarketFees = []
+            var collectedSolvencyFees = []
+
+            var tempChartData = cloneDeep(baseChartData)
+            
+            // If current year, go up until the current month, otherwise cover the whole year
+            const maxMonth = (year == currentYear) ? currentMonth : 12
+
+            for(var month=1; month<=maxMonth; month++)
             {
               labels.push(monthList[month-1].monthName)
 
@@ -828,29 +836,31 @@
               if(userMonthlyStatement)
               {
                 const decimalAmount = tokenDecimalHashMap.get(tokenId)
-                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
-                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
-                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
-                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / Math.pow(10, decimalAmount)
+                const divisor = Math.pow(10, decimalAmount)
 
-                tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
-                tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-                tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
+                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / divisor
+                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
+                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / divisor
+                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / divisor
+
+                tempChartData.lastActionType = lastKnownActionType
+                tempChartData.lastActionAmount = lastKnownActionAmount
+                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
 
                 balances.push(previousBalance)
                 debts.push(previousDebt)
-                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / Math.pow(10, decimalAmount))
-                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / Math.pow(10, decimalAmount))
-                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
-                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
-                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
-                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
-                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
-                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
-                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / Math.pow(10, decimalAmount))
-                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / Math.pow(10, decimalAmount))
-                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / Math.pow(10, decimalAmount))
+                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / divisor)
+                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / divisor)
+                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / divisor)
+                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / divisor)
+                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / divisor)
+                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / divisor)
+                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / divisor)
+                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / divisor)
+                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / divisor)
+                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / divisor)
+                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / divisor)
               }
               else
               {
@@ -888,328 +898,26 @@
             tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees 
             tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
             tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
-            if(searchAddress.value != adminAccounts.singlePayerTreasuryAddress.toString() &&
-            searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() &&
-            searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
-            {
-              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
-            }
-
-            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
-          }
-          else
-          {
-            for(var month=1; month<=12; month++)
-            {
-              labels.push(monthList[month-1].monthName)
-
-              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
-              year.toString() +
-              tokenId.toString() +
-              subMarketOwnerAddress +
-              subMarketIndex.toString() +
-              searchAddress.value +
-              accountSelect.value.toString())
-
-              if(userMonthlyStatement)
-              {
-                const decimalAmount = tokenDecimalHashMap.get(tokenId)
-                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
-                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
-                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
-                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / Math.pow(10, decimalAmount)
-
-                tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
-                tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-                tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
-
-                balances.push(previousBalance)
-                debts.push(previousDebt)
-                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / Math.pow(10, decimalAmount))
-                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / Math.pow(10, decimalAmount))
-                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
-                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
-                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
-                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
-                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
-                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
-                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / Math.pow(10, decimalAmount))
-                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / Math.pow(10, decimalAmount))
-                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / Math.pow(10, decimalAmount))
-              }
-              else
-              {
-                tempChartData.lastActionType = lastKnownActionType
-                tempChartData.lastActionAmount = lastKnownActionAmount
-                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
-
-                balances.push(previousBalance)
-                debts.push(previousDebt)
-                earnedInterests.push(0)
-                accruedInterests.push(0)
-                deposits.push(0)
-                withdrawals.push(0)
-                borrows.push(0)
-                repays.push(0)
-                liquidator.push(0)
-                liquidated.push(0)
-                collectedLiquidationFees.push(0)
-                collectedSubMarketFees.push(0)
-                collectedSolvencyFees.push(0)
-              }
-            }
-
-            tempChartData.labels = labels
-            tempChartData.datasets[ChartIndex.Balances].data = balances
-            tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
-            tempChartData.datasets[ChartIndex.Debts].data = debts
-            tempChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
-            tempChartData.datasets[ChartIndex.Deposits].data = deposits
-            tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-            tempChartData.datasets[ChartIndex.Borrows].data = borrows
-            tempChartData.datasets[ChartIndex.Repays].data = repays
-            tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
-            tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
-            tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
-            tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
-            tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
-            if(searchAddress.value != adminAccounts.singlePayerTreasuryAddress.toString() &&
-            searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() &&
-            searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
-            {
-              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
-            }
-
-            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
-          }
-        }
-      }
-
-    //Get Crypto Currency Yearly Chart Data
-    if(userMonthlyStatementCryptoCurrencyList.value)
-      for(var i=0; i<userMonthlyStatementCryptoCurrencyList.value.length; i++)
-      {
-        const tokenId = userMonthlyStatementCryptoCurrencyList.value[i].tokenId
-        const subMarketOwnerAddress = userMonthlyStatementCryptoCurrencyList.value[i].subMarketOwnerAddress
-        const subMarketIndex = userMonthlyStatementCryptoCurrencyList.value[i].subMarketIndex
-
-        var lastKnownActionType = 0
-        var lastKnownActionAmount = 0
-        var lastKnownActionTimeStamp = 0
-        var previousBalance = 0
-        var previousDebt = 0
-
-        const userAvailableYearsByTokenMintAddressList = lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap.map.get(tokenId.toString() +
-        subMarketOwnerAddress +
-        subMarketIndex.toString() +
-        searchAddress.value +
-        accountSelect.value.toString())
-
-        for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
-        {
-          var labels = []
-          var balances = []
-          var earnedInterests = []
-          var debts = []
-          var accruedInterests = []
-          var deposits = []
-          var withdrawals = []
-          var borrows = []
-          var repays = []
-          var liquidator = []
-          var liquidated = []
-          var collectedLiquidationFees = []
-          var collectedSubMarketFees = []
-          var collectedSolvencyFees = []
-          
-          var tempChartData = cloneDeep(baseChartData)
-        
-          //If current year, go up until the current month, otherwise cover the whole year
-          if(year == currentYear)
-          {
-            for(var month=1; month<=currentMonth; month++)
-            {
-              labels.push(monthList[month-1].monthName)
-
-              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
-              year.toString() +
-              tokenId.toString() +
-              subMarketOwnerAddress +
-              subMarketIndex.toString() +
-              searchAddress.value +
-              accountSelect.value.toString())
-
-              if(userMonthlyStatement)
-              {
-                const decimalAmount = tokenDecimalHashMap.get(tokenId)
-                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
-                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
-                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
-                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / Math.pow(10, decimalAmount)
-
-                tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
-                tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-                tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
-
-                balances.push(previousBalance)
-                debts.push(previousDebt)
-                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / Math.pow(10, decimalAmount))
-                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / Math.pow(10, decimalAmount))
-                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
-                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
-                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
-                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
-                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
-                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
-                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / Math.pow(10, decimalAmount))
-                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / Math.pow(10, decimalAmount))
-                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / Math.pow(10, decimalAmount))
-              }
-              else
-              {
-                tempChartData.lastActionType = lastKnownActionType
-                tempChartData.lastActionAmount = lastKnownActionAmount
-                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
-
-                balances.push(previousBalance)
-                debts.push(previousDebt)
-                earnedInterests.push(0)
-                accruedInterests.push(0)
-                deposits.push(0)
-                withdrawals.push(0)
-                borrows.push(0)
-                repays.push(0)
-                liquidator.push(0)
-                liquidated.push(0)
-                collectedLiquidationFees.push(0)
-                collectedSubMarketFees.push(0)
-                collectedSolvencyFees.push(0)
-              }
-            }
-
-            tempChartData.labels = labels
-            tempChartData.datasets[ChartIndex.Balances].data = balances
-            tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
-            tempChartData.datasets[ChartIndex.Debts].data = debts
-            tempChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
-            tempChartData.datasets[ChartIndex.Deposits].data = deposits
-            tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-            tempChartData.datasets[ChartIndex.Borrows].data = borrows
-            tempChartData.datasets[ChartIndex.Repays].data = repays
-            tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
-            tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
-            tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
-            tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
-            tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
-            if(searchAddress.value != adminAccounts.singlePayerTreasuryAddress.toString() &&
-            searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() &&
-            searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
-            {
-              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
-            }
-
-            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
-          }
-          else
-          {
-            for(var month=1; month<=12; month++)
-            {
-              labels.push(monthList[month-1].monthName)
-
-              const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
-              year.toString() +
-              tokenId.toString() +
-              subMarketOwnerAddress +
-              subMarketIndex.toString() +
-              searchAddress.value +
-              accountSelect.value.toString())
-
-              if(userMonthlyStatement)
-              {
-                const decimalAmount = tokenDecimalHashMap.get(tokenId)
-                lastKnownActionType = userMonthlyStatement.lastLendingActivityType
-                lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-                lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
-                previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / Math.pow(10, decimalAmount)
-                previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / Math.pow(10, decimalAmount)
-
-                tempChartData.lastActionType = userMonthlyStatement.lastLendingActivityType
-                tempChartData.lastActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / Math.pow(10, decimalAmount)
-                tempChartData.lastActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
-
-                balances.push(previousBalance)
-                debts.push(previousDebt)
-                earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / Math.pow(10, decimalAmount))
-                accruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / Math.pow(10, decimalAmount))
-                deposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / Math.pow(10, decimalAmount))
-                withdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / Math.pow(10, decimalAmount))
-                borrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / Math.pow(10, decimalAmount))
-                repays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / Math.pow(10, decimalAmount))
-                liquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / Math.pow(10, decimalAmount))
-                liquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / Math.pow(10, decimalAmount))
-                collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / Math.pow(10, decimalAmount))
-                collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / Math.pow(10, decimalAmount))
-                collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / Math.pow(10, decimalAmount))
-              }
-              else
-              {
-                tempChartData.lastActionType = lastKnownActionType
-                tempChartData.lastActionAmount = lastKnownActionAmount
-                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
-
-                balances.push(previousBalance)
-                debts.push(previousDebt)
-                earnedInterests.push(0)
-                accruedInterests.push(0)
-                deposits.push(0)
-                withdrawals.push(0)
-                borrows.push(0)
-                repays.push(0)
-                liquidator.push(0)
-                liquidated.push(0)
-                collectedLiquidationFees.push(0)
-                collectedSubMarketFees.push(0)
-                collectedSolvencyFees.push(0)
-              }
-            }
-
-            tempChartData.labels = labels
-            tempChartData.datasets[ChartIndex.Balances].data = balances
-            tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
-            tempChartData.datasets[ChartIndex.Debts].data = debts
-            tempChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
-            tempChartData.datasets[ChartIndex.Deposits].data = deposits
-            tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-            tempChartData.datasets[ChartIndex.Borrows].data = borrows
-            tempChartData.datasets[ChartIndex.Repays].data = repays
-            tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
-            tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
-            tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees
-            tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
-            tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
-            if(searchAddress.value != adminAccounts.singlePayerTreasuryAddress.toString() &&
-            searchAddress.value != adminAccounts.hodlTreasuryAddress.toString() &&
-            searchAddress.value != adminAccounts.solvencyTreasuryAddress.toString())
-            {
-              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
-            }
             
+            if(!isTreasuryAddress)
+            {
+              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
+              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+            }
+
             tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
           }
         }
-      }
+    }
 
-      selectedUserChartDataHashMap = tempHashMap
+    // Process Stable Coin Yearly Chart Data
+    processStatementList(userMonthlyStatementStableCoinList, lendingUserAvailableStableCoinYearsBySubMarketHashMap)
+
+    // Process Crypto Currency Yearly Chart Data
+    processStatementList(userMonthlyStatementCryptoCurrencyList, lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap)
+
+    selectedUserChartDataHashMap = tempHashMap
   }
 
   function getChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)

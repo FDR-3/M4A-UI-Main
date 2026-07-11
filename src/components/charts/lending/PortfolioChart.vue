@@ -402,9 +402,10 @@
   import { copyAddress, copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { SECONDS_IN_A_YEAR, SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
+  import { SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { getCompoundingFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(
@@ -791,17 +792,19 @@
   {
     tokenReserve = cloneDeep(tokenReservesHashMap.map.get(props.tokenId))//cloneDeep to keep changes to tokenReserve variable from setting off tokenReservesHashMap watchers
 
-    //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
     const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)
     const changeInTime = timeStamp - oldTime
     const supplyApy = tokenReserve.supplyApy / 10000 //convert from fixed point to decimal
     const borrowApy = tokenReserve.borrowApy / 10000 //convert from fixed point to decimal
 
-    tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * changeInTime / SECONDS_IN_A_YEAR)
-    tokenReserve.newBorrowInterestChangeIndex = Number(tokenReserve.borrowInterestChangeIndex) * (1 + borrowApy * changeInTime / SECONDS_IN_A_YEAR)
+    const supplyCompoundingFactor = getCompoundingFactor(supplyApy, changeInTime)
+    const borrowCompoundingFactor = getCompoundingFactor(borrowApy, changeInTime)
+    const sevenDaySupplyCompoundingFactor = getCompoundingFactor(supplyApy, SECONDS_IN_A_WEEK)
 
-    const sevenDayChangeInTime = SECONDS_IN_A_WEEK + timeStamp - oldTime
-    tokenReserve.sevenDaySupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * sevenDayChangeInTime / SECONDS_IN_A_YEAR)
+    tokenReserve.newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * supplyCompoundingFactor
+    tokenReserve.newBorrowInterestChangeIndex = Number(tokenReserve.borrowInterestChangeIndex) * borrowCompoundingFactor
+
+    tokenReserve.sevenDaySupplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex * sevenDaySupplyCompoundingFactor
   }
 
   function calculateUserInterest()

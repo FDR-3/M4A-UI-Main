@@ -34,7 +34,7 @@
   import { lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
-  import { calculateNewBalance, calculateNewDebtBalance, healthFactorInfo } from './HealthFactorInfo.ts'
+  import { calculateNewBalance, calculateNewDebtBalance, healthFactorInfo } from './InterestCalcHelpers.ts'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
   
   const props = defineProps(['accountOwnerAddress', 'accountIndex'])

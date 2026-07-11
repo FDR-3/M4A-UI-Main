@@ -264,7 +264,7 @@
   import InfoButton from '/src/components/help/InfoButton.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { blockChainData } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { calculateNewBalance, calculateNewDebtBalance } from './HealthFactorInfo.ts'
+  import { calculateNewBalance, calculateNewDebtBalance } from './InterestCalcHelpers.ts'
   import * as anchor from "@coral-xyz/anchor"
   import { LOCAL_PRICE_ORACLE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import * as bs58 from 'bs58'

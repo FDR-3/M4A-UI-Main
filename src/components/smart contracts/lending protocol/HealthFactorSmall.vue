@@ -24,7 +24,7 @@
   import { ref, onMounted, watch } from 'vue'
   import { IonText, IonLabel } from '@ionic/vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
-  import healthFactorInfo from './HealthFactorInfo.ts'
+  import healthFactorInfo from './InterestCalcHelpers.ts'
 
   const props = defineProps(
   {
