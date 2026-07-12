@@ -810,7 +810,7 @@
   function calculateUserInterest()
   {
     setInitialBalance()
-    
+
     //For tab accounts initialized with no deposits, keeps from dividing by zero
     //For example, can happen to when claiming submarket fees in different destination submarket on new initial tab account
     if(Number(lendingUserTabAccount.supplyInterestChangeIndex) == 0)
@@ -849,7 +849,7 @@
     userCalculatedDebt.value = newDebt.toFixed(decimalAmount)
 
     //Calculate 7 day interest earned
-    const sevenDayUserCalculatedBalanceBeforeFee = (userOriginalBalance * tokenReserve.sevenDaySupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
+    const sevenDayUserCalculatedBalanceBeforeFee = (userOriginalBalance * tokenReserve.sevenDaySupplyInterestChangeIndex / tokenReserve.newSupplyInterestChangeIndex)
     const sevenDayInterestEarnedBeforeFee = sevenDayUserCalculatedBalanceBeforeFee - userOriginalBalance
 
     sevenDayCalculatedUserInterestEarned.value = sevenDayInterestEarnedBeforeFee - (sevenDayInterestEarnedBeforeFee * props.subMarketFee / 100)

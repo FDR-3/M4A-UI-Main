@@ -57,8 +57,8 @@
     <div class="flexCenterRow tinyMarginLeft" style="white-space: normal;">
       <ion-text>{{ commentSectionInfo.videoVoteScore.toLocaleString() }}</ion-text>
       
-      <ion-button fill="clear"  @click="giveVoteIconCredits()">
-        <component style="width: 50px; height: 40px" :is="voteIcon" class="nSmallMarginLeft"></component>
+      <ion-button fill="clear" class="smallMarginRight" @click="giveVoteIconCredits()">
+        <component style="width: 50px; height: 40px" :is="voteIcon" ></component>
       </ion-button>
     </div>
 
@@ -691,6 +691,14 @@
 </script>
 
 <style scoped>
+  ion-button
+  {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+  
   .voteButton
   {
     width: 180px;

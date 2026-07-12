@@ -171,19 +171,21 @@
         <ion-label class="replyDate">{{ convertUnixTimeToLocalTime(unixCreationTimeStamp) }}<br>{{ convertUnixTimeToLocalDate(unixCreationTimeStamp) }}</ion-label>
 
         <!--Action Bar-->
-        <CommentActionBar 
-          v-if="!editMode"
-          type="replyToReply"
-          :commentSectionNamePrefix="commentSectionNamePrefix"
-          :commentSectionName="commentSectionName"
-          :chatAccountPostCountIndex="chatAccountPostCountIndex"
-          :postOwnerAddress="postOwnerAddress" 
-          @replyToComment="replying=true" 
-          @editComment="editMode=true; showVideoMessage=false"
-          :colorName="colorName"
-          :colorHexValue="colorHexValue"
-          :isDeleted="isDeleted"
-        />
+        <div class="nSmallMarginRight">
+          <CommentActionBar 
+            v-if="!editMode"
+            type="replyToReply"
+            :commentSectionNamePrefix="commentSectionNamePrefix"
+            :commentSectionName="commentSectionName"
+            :chatAccountPostCountIndex="chatAccountPostCountIndex"
+            :postOwnerAddress="postOwnerAddress" 
+            @replyToComment="replying=true" 
+            @editComment="editMode=true; showVideoMessage=false"
+            :colorName="colorName"
+            :colorHexValue="colorHexValue"
+            :isDeleted="isDeleted"
+          />
+        </div>
         <EditBar v-if="editMode" @saveEdit="saveEdit()" @cancelEdit="editMode=false" :colorName="colorName"/>
       </div>
     </div>
@@ -351,19 +353,21 @@
         </div>
 
         <!--Action Bar-->
-        <CommentActionBar 
-          v-if="!editMode"
-          type="replyToReply"
-          :commentSectionNamePrefix="commentSectionNamePrefix"
-          :commentSectionName="commentSectionName"
-          :chatAccountPostCountIndex="chatAccountPostCountIndex"
-          :postOwnerAddress="postOwnerAddress" 
-          @replyToComment="replying=true" 
-          @editComment="editMode=true; showVideoMessage=false"
-          :colorName="colorName"
-          :colorHexValue="colorHexValue"
-          :isDeleted="isDeleted"
-        />
+        <div class="nTinyMarginLeft">
+          <CommentActionBar 
+            v-if="!editMode"
+            type="replyToReply"
+            :commentSectionNamePrefix="commentSectionNamePrefix"
+            :commentSectionName="commentSectionName"
+            :chatAccountPostCountIndex="chatAccountPostCountIndex"
+            :postOwnerAddress="postOwnerAddress" 
+            @replyToComment="replying=true" 
+            @editComment="editMode=true; showVideoMessage=false"
+            :colorName="colorName"
+            :colorHexValue="colorHexValue"
+            :isDeleted="isDeleted"
+          />
+        </div>
 
         <div v-if="replyCount!=0" :class=" editMode ? '' : 'tinyMarginTop'">
           <ion-button class="showRepliesButton" v-if="!showReplies" @click="toggleShowReplies(true)" fill="clear" :color="colorName">

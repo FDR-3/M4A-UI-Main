@@ -1,7 +1,8 @@
 <template>
   <ion-button 
     ref="emojiButton"
-    style="margin-left: -7px; margin-right: -20px"
+    class="tightButton"
+    style="margin-right: -11px"
     :style="{marginTop: marginTop}"
     slot="end"
     fill="clear"

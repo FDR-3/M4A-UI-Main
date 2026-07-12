@@ -16,24 +16,26 @@
 </script>
 
 <style scoped>
+  ion-button
+  {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+
+  .editButtons
+  {
+    margin-bottom: -15px;
+    display: flex;
+    gap: 20px
+  } 
+
   @media screen and (min-width: 1115px)  
   {
     .editButtons
     {
-      
-      margin-bottom: -15px;
-      display: flex;
-      justify-content: right;
-      margin-right: -10px
-    } 
-  }
-
-  @media screen and (max-width: 1114.9px) 
-  {
-    .editButtons
-    {
-      margin-bottom: -15px;
-      display: flex;    
+      justify-content: right
     } 
   }
 </style>

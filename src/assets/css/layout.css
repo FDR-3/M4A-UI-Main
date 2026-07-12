@@ -414,3 +414,29 @@ h3, h4
 {
   width: 100px
 }
+
+.tightButton 
+{
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0
+}
+
+.tightImgButton 
+{
+  /* 1. Remove all inner padding inside the Ionic shadow DOM wrapper */
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+
+  /* 2. Strip default min-height restrictions so the button collapses to the image height */
+  --height: auto;
+  --min-height: 0;
+  height: auto;
+
+  /* 3. Standard external layout spacing */
+  margin-top: 20px;
+  margin-bottom: 5px;
+}

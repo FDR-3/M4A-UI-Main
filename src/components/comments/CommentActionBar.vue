@@ -3,15 +3,17 @@
     <ion-button v-if="connectedWallet.addressString!=SYSTEM_PROGRAM_ADDRESS_STRING" fill="clear" @click="$emit('replyToComment')">
       <ion-icon :color="colorName" :src="arrowUndo"></ion-icon>
     </ion-button>
-    <div v-if="(connectedWallet.addressString==postOwnerAddress?.toBase58() ||
-        connectedWallet.addressString == postOwnerAddress?.toBase58()) && !isDeleted">
-      <ion-button fill="clear" @click="editMode=true; $emit('editComment')">
+
+    <ion-button v-if="(connectedWallet.addressString==postOwnerAddress?.toBase58() ||
+      connectedWallet.addressString == postOwnerAddress?.toBase58()) && !isDeleted"
+      fill="clear" @click="editMode=true; $emit('editComment')">
         <EditSVG class="actionBarIcon" :fill="colorHexValue"/>
-      </ion-button>
-      <ion-button fill="clear" @click="openPopover($event)">
+    </ion-button>
+    <ion-button v-if="(connectedWallet.addressString==postOwnerAddress?.toBase58() ||
+      connectedWallet.addressString == postOwnerAddress?.toBase58()) && !isDeleted"
+      fill="clear" @click="openPopover($event)">
         <DeleteSVG class="actionBarIcon" :fill="colorHexValue"/>
-      </ion-button>
-    </div>
+    </ion-button>
     <ion-popover :is-open="popoverOpen" :event="event" @didDismiss="popoverOpen=false" side="top" alignment="center" size="auto">
       <ion-label align="center">Confirm Delete?</ion-label>
       <div class="deleteSelectionButtons">
@@ -225,6 +227,20 @@
 </script>
 
 <style scoped>
+  ion-button
+  {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+  
+  ion-icon
+  {
+    width: 25px;
+    height: 25px
+  }
+
   .commentActionBar
   {
     max-width: 550px;
@@ -233,13 +249,8 @@
     margin-bottom: 7px;
     display: flex;
     flex-direction: row;
-    justify-content: center
-  }
-
-  ion-icon
-  {
-    width: 25px;
-    height: 25px
+    justify-content: center;
+    gap: 20px
   }
 
   .actionBarIcon

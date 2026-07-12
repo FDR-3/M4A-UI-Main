@@ -11,28 +11,28 @@
   <div>
     <div>
       <div class="flexCenterRow statTopHospitalSpacing">
-        <ion-button style="margin-left: -42px" fill="clear" @click="givePokemonCenterCreatorCredit()">
+        <ion-button class="tightImgButton" style="margin-left: -42px" fill="clear" @click="givePokemonCenterCreatorCredit()">
           <img src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazN1BiMybI527AkmeVxopsR6nYgKDZFazU8GXHu" width="80"/>
         </ion-button>
-        <h2 style="padding-top: 7px; margin-left: -10px">General Hospitals: {{ generalHospitalCount }}</h2>
+        <h2 style="padding-top: 7px">General Hospitals: {{ generalHospitalCount }}</h2>
       </div>
       <div class="flexCenterRow statHospitalSpacing">
-        <ion-button style="margin-left: -42px" fill="clear" @click="givePokemonCenterCreatorCredit()">
+        <ion-button class="tightImgButton" style="margin-left: -42px" fill="clear" @click="givePokemonCenterCreatorCredit()">
           <img src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNWtAaGHwuNPjCJgbOYz4DrkMvpEVGBFh1X6s5" width="80"/>
         </ion-button>
-        <h2 style="padding-top: 7px; margin-left: -10px">Dental Hospitals: {{ dentalHospitalCount }}</h2>
+        <h2 style="padding-top: 7px">Dental Hospitals: {{ dentalHospitalCount }}</h2>
       </div>
       <div class="flexCenterRow statHospitalSpacing">
-        <ion-button style="margin-left: -42px" fill="clear" @click="givePokemonCenterCreatorCredit()">
+        <ion-button class="tightImgButton" style="margin-left: -42px" fill="clear" @click="givePokemonCenterCreatorCredit()">
           <img src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNrYFyAr2cvyILZuPHpomK5CU6N2bAltaz03cT" width="80" style="padding:-10px"/>
         </ion-button>
-        <h2 style="padding-top: 7px; margin-left: -10px">Vision Hospitals: {{ visionHospitalCount }}</h2>
+        <h2 style="padding-top: 7px">Vision Hospitals: {{ visionHospitalCount }}</h2>
       </div>
       <div class="flexCenterRow statHospitalSpacing">
-        <ion-button style="margin-left: -42px" fill="clear" @click="givePokemonCenterCreatorCredit()">
+        <ion-button class="tightImgButton" style="margin-left: -42px" fill="clear" @click="givePokemonCenterCreatorCredit()">
           <img src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNCnJgmUjrdlPMfOjk8zL1aoRbyDWUGc9mQ0ew" width="80"/>
         </ion-button>
-        <h2 style="padding-top: 7px; margin-left: -10px">Mental Hospitals: {{ mentalHospitalCount }}</h2>
+        <h2 style="padding-top: 7px">Mental Hospitals: {{ mentalHospitalCount }}</h2>
       </div>
     </div>
 </div>
@@ -177,7 +177,7 @@
   var hospitalPopoverOpen = ref(false)
   var event = ref()
 
-  const hospitalTableInfoMSG = "\nYou can view Hospital\nRecords by clicking on\ntheir names in the table\n\n"
+  const hospitalTableInfoMSG = "You can view Hospital Records by clicking on their names in the table."
 
   onMounted(() =>
   {

@@ -801,12 +801,25 @@
 </script>
 
 <style scoped>
+  ion-button
+  {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+
+  ion-icon
+  {
+    min-width: min(7vw, 25px);
+    height: min(7vw, 25px)
+  }
+
   .voteBar
   {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    border-radius: 77px
+    align-items: center
   }
 
   .voteButton
@@ -830,12 +843,6 @@
     margin-left: 11px;
     margin-right: -8px;
     min-width: 185px
-  }
-
-  ion-icon
-  {
-    min-width: min(7vw, 25px);
-    height: min(7vw, 25px)
   }
 
   .upVoteIncrementorContainer

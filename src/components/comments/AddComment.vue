@@ -5,17 +5,17 @@
       <div class="flexCenterRow">
         <ion-text>Add a comment or software question for just a</ion-text>
         
-        <ion-button fill="clear" @click="giveUXWingDollarCredit()"  >
+        <ion-button fill="clear" class="tinyMarginLeft" @click="giveUXWingDollarCredit()"  >
           <Dollar style="width: min(50px, 11vw)"/>
         </ion-button>
-        <ion-button fill="clear" @click="giveUXWingTreeCredit()" class="nMediumLargeMarginLeft">
+        <ion-button fill="clear" @click="giveUXWingTreeCredit()">
           <Tree class="svgSize"/>
         </ion-button>
       </div>
 
       <div class="flexCenterRow">
         <ion-text>Vote or reply for just a</ion-text>
-        <ion-button fill="clear" style="width: 15%" @click="giveUXWingTreeCredit()">
+        <ion-button fill="clear" style="width: 15%" class="nTinyMarginLeft" @click="giveUXWingTreeCredit()">
           <Tree class="svgSize"/>
         </ion-button>
         <ion-text style="margin-left: 7px">+</ion-text>
@@ -29,7 +29,7 @@
           </ion-button>
         </div>
 
-        <ion-button fill="clear" @click="giveUXWingTreeCredit()" class="nLargeMarginLeft">
+        <ion-button fill="clear" @click="giveUXWingTreeCredit()" class="nTinyMarginLeft">
           <Tree class="svgSize"/>
         </ion-button>
       </div>
@@ -40,7 +40,7 @@
           <ion-button fill="clear" @click="sourceUSDC()" >
             <USDCSVG class="svgSize"/>
           </ion-button>
-          <ion-label class="nSmallMarginLeft">USDC</ion-label>
+          <ion-label>USDC</ion-label>
         </div>
       </ion-text>
  
@@ -58,14 +58,14 @@
           <ion-button fill="clear" @click="sourceBowingJapaneseMan()">
             <img id="bow" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNRvMD9h9nMKDparwjbHtxvqFyh8i2fL5ZXEd0">
           </ion-button>
-          <strong class="nMediumSmallMarginTop">Please</strong>
+          <strong class="nTinyMarginTop">Please</strong>
         </div>
 
       </ion-text><br>
       <ion-text>Any advice on improving the code or processes for the customer experience would be greatly appreciated. You do not have to be a software developer to have a great idea or to give <b>"constructive"</b> critism.<br> 
         Asking questions not directly derived from the website content may not receive a response
         <ion-button fill="clear" @click="giveSadSadPepeFeelsBadManCredit()">
-          <FeelsBadSVG style="width: min(10vw, 50px); height: min(10vw, 55px)" class="nMediumMarginLeft"/>
+          <FeelsBadSVG style="width: min(10vw, 50px); height: min(10vw, 55px)"/>
         </ion-button>
         <br>ie. Asking how to do something specific to your project that wasn't already done in this one. A random commentor might respond though.
       </ion-text>
@@ -79,7 +79,7 @@
       </ion-text>
  
       <span class="flexCenterRow">$0.01
-        <ion-button fill="clear" @click="sourceUSDC()" class="nSmallMarginLeft">
+        <ion-button fill="clear" @click="sourceUSDC()" class="nTinyMarginLeft">
           <USDCSVG class="svgSize"/>
         </ion-button>
       </span>
@@ -366,6 +366,27 @@
 </script>
 
 <style scoped>
+
+  ion-button
+  {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0
+  }
+
+  ion-icon
+  {
+    min-width: min(7vw, 35px);
+    height: min(7vw, 35px);
+    margin-left: 5px
+  }
+
+  ion-textarea
+  {
+    --highlight-color: v-bind(colorHexValue)
+  }
+
   .commentSection
   {
     margin-bottom: 50px
@@ -403,13 +424,6 @@
     padding: 10px
   }
 
-  ion-icon
-  {
-    min-width: min(7vw, 35px);
-    height: min(7vw, 35px);
-    margin-left: 5px
-  }
-
   .svgSize
   {
     min-width: min(7vw, 35px);
@@ -417,10 +431,6 @@
     margin-left: 5px
   }
 
-  ion-textarea
-  {
-    --highlight-color: v-bind(colorHexValue)
-  }
 
   @media screen and (min-width: 921px) 
   { 

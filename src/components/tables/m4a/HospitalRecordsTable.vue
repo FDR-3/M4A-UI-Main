@@ -1,20 +1,20 @@
 <template>
   <!--This tableTop id ensures that the top of the table and hospital svg are visible when opening records from the state hospital list table-->
   <div id="tableTop" class="flexCenterRow smallMarginTop" style="font-size: 50px">
-    <div style="margin-top: 10px; margin-right: -20px">
+    <div style="margin-top: 10px; margin-right: 0px">
       <InfoButton :infoMessage="hospitalRecordTableInfoMSG"/>
     </div>
-    <ion-button v-if="hospitalType==HospitalTypes.General" style="margin-top:20px; margin-bottom: -15px; margin-right: -10px" fill="clear" @click="givePokemonCenterCreatorCredit()">
-      <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNVb4n4DEhW7MqHDNnjQlr4SsC0pORAEcIoe2B" width="150"/>
+    <ion-button v-if="hospitalType==HospitalTypes.General" class="tightImgButton" fill="clear" @click="givePokemonCenterCreatorCredit()">
+      <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNVb4n4DEhW7MqHDNnjQlr4SsC0pORAEcIoe2B"/>
     </ion-button>
-    <ion-button v-else-if="hospitalType==HospitalTypes.Dental" style="margin-top: 20px; margin-bottom: -10px" fill="clear" @click="givePokemonCenterCreatorCredit()">
-      <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNWtAaGHwuNPjCJgbOYz4DrkMvpEVGBFh1X6s5" width="150"/>
+    <ion-button v-else-if="hospitalType==HospitalTypes.Dental" class="tightImgButton" fill="clear" @click="givePokemonCenterCreatorCredit()">
+      <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNWtAaGHwuNPjCJgbOYz4DrkMvpEVGBFh1X6s5"/>
     </ion-button>
-    <ion-button v-else-if="hospitalType==HospitalTypes.Vision" style="margin-top: 20px; margin-bottom: -10px"fill="clear" @click="givePokemonCenterCreatorCredit()">
-      <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNrYFyAr2cvyILZuPHpomK5CU6N2bAltaz03cT" width="150"/>
+    <ion-button v-else-if="hospitalType==HospitalTypes.Vision" class="tightImgButton" fill="clear" @click="givePokemonCenterCreatorCredit()">
+      <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNrYFyAr2cvyILZuPHpomK5CU6N2bAltaz03cT"/>
     </ion-button>
-    <ion-button v-else-if="hospitalType==HospitalTypes.Mental" style="margin-top: 20px; margin-bottom: -10px" fill="clear" @click="givePokemonCenterCreatorCredit()">
-      <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNCnJgmUjrdlPMfOjk8zL1aoRbyDWUGc9mQ0ew" width="150"/>
+    <ion-button v-else-if="hospitalType==HospitalTypes.Mental" class="tightImgButton" fill="clear" @click="givePokemonCenterCreatorCredit()">
+      <img  src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNCnJgmUjrdlPMfOjk8zL1aoRbyDWUGc9mQ0ew"/>
     </ion-button>
     <h1 class="mediumMarginTop">{{ hospitalName }}</h1>
   </div>
@@ -524,5 +524,12 @@
   ion-input, ion-textarea
   {
     --highlight-color: var(--ion-color-green)
+  }
+
+  img 
+  {
+    display: block;
+    width: 150px;
+    height: auto
   }
 </style>

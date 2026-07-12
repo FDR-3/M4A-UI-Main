@@ -194,7 +194,7 @@
   import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { calculateTokenReserveSevenDaySupplyInterestChangeIndex } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
+  import { calculateTokenReserveSevenDaySupplyInterestFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
@@ -439,7 +439,7 @@
     CryptoCurrencyTableData.value = unprocessedTableData
   }
 
-  function calculateSubMarketSevenDayFeeAccrued(tokenId: number, tokenReserveSevenDaySupplyInterestChangeIndex: number)
+  function calculateSubMarketSevenDayFeeAccrued(tokenId: number, tokenReserveSevenDaySupplyInterestFactor: number)
   {
     const tokenReserve = tokenReservesHashMap.map.get(tokenId)
     const tokenReserveSubMarketList = tokenReserveSubMarketListHashMap.map.get(tokenId)
@@ -454,10 +454,10 @@
       if(Number(tokenReserveSubMarketList[i].supplyInterestChangeIndex) == 0)
         continue
 
-      //SubMarket New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / SubMarket Earned Interest Index
+      //SubMarket New 7 day Balance Before Fee = Old Balance * Token Reserve 7 day Earned Interest Index / Token Reserve current Earned Interest Index
       //Interest Earned Before Fee = New Balance Before Fee - Old Balance
       //Fee Generated = Interest Earned Before Fee * Token Reserve Solvency Insurance Fee Rate
-      const sevenDaySubMarketBalanceBeforeFee = (Number(tokenReserveSubMarketList[i].depositedAmount) * tokenReserveSevenDaySupplyInterestChangeIndex / Number(tokenReserveSubMarketList[i].supplyInterestChangeIndex))
+      const sevenDaySubMarketBalanceBeforeFee = (Number(tokenReserveSubMarketList[i].depositedAmount) * tokenReserveSevenDaySupplyInterestFactor)
       const sevenDayInterestEarnedBeforeFee = sevenDaySubMarketBalanceBeforeFee - Number(tokenReserveSubMarketList[i].depositedAmount)
       totalSolvencyInsuranceFeesGenerated += (sevenDayInterestEarnedBeforeFee * tokenReserve.solvencyInsuranceFeeRate / 100)
     }
@@ -480,17 +480,17 @@
       var sevenDayStableCoinProjectionValue = 0
       for(var i=0; i<stableCoinFeeArray.length; i++)
       {
-        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(unixData.timeStamp, stableCoinFeeArray[i].tokenId)
-        if(stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
-          sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenMintAddressString, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestFactor = calculateTokenReserveSevenDaySupplyInterestFactor(unixData.timeStamp, stableCoinFeeArray[i].tokenId)
+        if(stableCoinFeeArray[i].tokenReserve7DaySupplyInterestFactor)
+          sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenMintAddressString, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestFactor)
       }
 
       var sevenDayCryptoCurrencyProjectionValue = 0
       for(var i=0; i<cryptoCurrencyFeeArray.length; i++)
       {
-        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex = calculateTokenReserveSevenDaySupplyInterestChangeIndex(unixData.timeStamp, cryptoCurrencyFeeArray[i].tokenId)
-        if(cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
-          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenId, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestFactor = calculateTokenReserveSevenDaySupplyInterestFactor(unixData.timeStamp, cryptoCurrencyFeeArray[i].tokenId)
+        if(cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestFactor)
+          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenId, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestFactor)
       }
 
       sevenDayProjectionRate.value = (sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue).toLocaleString('en-US', {

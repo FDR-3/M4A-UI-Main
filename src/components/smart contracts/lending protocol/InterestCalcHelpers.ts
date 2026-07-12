@@ -69,7 +69,7 @@ timeStamp: number)
   return originalBorrowedAmount * newBorrowInterestChangeIndex / userBorrowInterestChangeIndex
 }
 
-export function calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp: number, tokenId: number)
+export function calculateTokenReserveSevenDaySupplyInterestFactor(timeStamp: number, tokenId: number)
   {
     const tokenReserve = tokenReservesHashMap.map.get(tokenId)
 
@@ -89,7 +89,7 @@ export function calculateTokenReserveSevenDaySupplyInterestChangeIndex(timeStamp
     const sevenDayCompoundingFactor = getCompoundingFactor(supplyApy, SECONDS_IN_A_WEEK)
     const projectedSevenDayIndex = currentAccruedIndex * sevenDayCompoundingFactor
 
-    return projectedSevenDayIndex
+    return projectedSevenDayIndex / currentAccruedIndex
   }
 
 //Taylor Series 4th Order Interest Calculation: e^x = 1 + x + (x^2 / 2!) + (x^3 / 3!) + (x^4 / 4!)
