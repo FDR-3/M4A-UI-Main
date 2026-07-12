@@ -59,7 +59,7 @@
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { PublicKey } from "@solana/web3.js"
-  import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
+  import { startUnixTimeStampRefresh, startUnixChainTimeStampEstimation, stopUnixTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'
   import KingobamaMobile from '/src/components/fancy/poly/KingobamaMobile.vue'
@@ -124,13 +124,13 @@
     if(backTableRef.value)
       backObserver.observe(backTableRef.value)
 
-    await startBlockChainTimeStampRefresh()
-    startBlockChainTimeStampEstimation()
+    await startUnixTimeStampRefresh()
+    startUnixChainTimeStampEstimation()
   })
 
   onUnmounted(() =>
   {
-    stopBlockChainTimeStampRefresh()
+    stopUnixTimeStampRefresh()
     if(frontObserver)
       frontObserver.disconnect()
     if(backObserver)

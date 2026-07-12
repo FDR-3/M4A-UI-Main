@@ -53,7 +53,7 @@
   import LiquidationModal from '/src/components/smart contracts/lending protocol/LiquidationModal.vue'
   import KingobamaMobile from '/src/components/fancy/poly/KingobamaMobile.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
-  import { startBlockChainTimeStampRefresh, startBlockChainTimeStampEstimation, stopBlockChainTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
+  import { startUnixTimeStampRefresh, startUnixChainTimeStampEstimation, stopUnixTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   
   defineProps(['colorName', 'colorHexValue'])//This just keeps a warning from going off since all pages get feed these props
 
@@ -114,13 +114,13 @@
     if(backTableRef.value)
       backObserver.observe(backTableRef.value)
 
-    await startBlockChainTimeStampRefresh()
-    startBlockChainTimeStampEstimation()
+    await startUnixTimeStampRefresh()
+    startUnixChainTimeStampEstimation()
   })
 
   onUnmounted(() =>
   {
-    stopBlockChainTimeStampRefresh()
+    stopUnixTimeStampRefresh()
     if(frontObserver)
       frontObserver.disconnect()
     if(backObserver)

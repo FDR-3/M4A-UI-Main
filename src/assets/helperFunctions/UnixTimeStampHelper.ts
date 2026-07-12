@@ -50,15 +50,15 @@ export function convertUnixTimeToLocalDate(timeStamp: number)
   return localDateString;
 }
 
-var blockChainTimeStampRefreshIntervalId: any
-var blockChainTimeStampEstimationIntervalId: any
+var unixTimeStampRefreshIntervalId: any
+var unixTimeStampEstimationIntervalId: any
 
-export async function startBlockChainTimeStampRefresh()
+export async function startUnixTimeStampRefresh()
 {
   unixData.timeStamp = Date.now() / 1000
   
 
-  blockChainTimeStampRefreshIntervalId = setInterval(async() =>
+  unixTimeStampRefreshIntervalId = setInterval(async() =>
   {
     unixData.timeStamp = Date.now() / 1000
     //const slot = await anchorPrograms.lending.lendingProgram.provider.connection.getSlot()
@@ -66,27 +66,27 @@ export async function startBlockChainTimeStampRefresh()
 
     //console.log("unixData.timeStamp: ", unixData.timeStamp)
     //console.log("blockChainTimeStamp: ", blockChainTimeStamp)
-  }, 60000) 
+  }, 7000) 
 }
 
-export function startBlockChainTimeStampEstimation()
+export function startUnixChainTimeStampEstimation()
 {
-  blockChainTimeStampEstimationIntervalId = setInterval(async() =>
+  unixTimeStampEstimationIntervalId = setInterval(async() =>
   {
     unixData.timeStamp += 55/1000//convert milliseconds into seconds
   }, 55) 
 }
 
-export function stopBlockChainTimeStampRefresh()
+export function stopUnixTimeStampRefresh()
 {
-  if(blockChainTimeStampRefreshIntervalId != undefined)
+  if(unixTimeStampRefreshIntervalId != undefined)
   {
-    clearInterval(blockChainTimeStampRefreshIntervalId)
-    blockChainTimeStampRefreshIntervalId = undefined
+    clearInterval(unixTimeStampRefreshIntervalId)
+    unixTimeStampRefreshIntervalId = undefined
   }
-  if(blockChainTimeStampEstimationIntervalId != undefined)
+  if(unixTimeStampEstimationIntervalId != undefined)
   {
-    clearInterval(blockChainTimeStampEstimationIntervalId)
-    blockChainTimeStampEstimationIntervalId = undefined
+    clearInterval(unixTimeStampEstimationIntervalId)
+    unixTimeStampEstimationIntervalId = undefined
   }
 }
