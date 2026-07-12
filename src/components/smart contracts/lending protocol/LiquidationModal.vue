@@ -257,7 +257,6 @@
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
     getOraclePriceValidatorPDA,
-    createJitoTipInstruction,
     closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
@@ -1108,6 +1107,7 @@
     var liquidatorLookUpTableInstructionsToSend = []
     var liquidatorLookUpTableAddress
     var creatingNewLookUpTable = false
+    var addressesToExtend = []
 
     const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
 
@@ -1129,17 +1129,7 @@
       const lendingUserAccountPDA = getLendingUserAccountPDA(connectedWallet.publicKey, accountSelect.value)
 
       if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserAccountPDA))
-      {
-        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-        {
-          authority: connectedWallet.publicKey,
-          payer: connectedWallet.publicKey,
-          lookupTable: liquidatorLookUpTableAddress,
-          addresses: [lendingUserAccountPDA]
-        })
-
-        liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-      }
+        addressesToExtend.push(lendingUserAccountPDA)
     }
     else
       liquidatorLookUpTableAddress = lendingUserAccount.lookUpTableAddress
@@ -1162,17 +1152,7 @@
       accountSelect.value)
 
       if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, liquidatorRepaymentTabAccountPDA))
-      {
-        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-        {
-          authority: connectedWallet.publicKey,
-          payer: connectedWallet.publicKey,
-          lookupTable: liquidatorLookUpTableAddress,
-          addresses: [liquidatorRepaymentTabAccountPDA]
-        })
-
-        liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-      }
+        addressesToExtend.push(liquidatorRepaymentTabAccountPDA)
     }
 
     //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
@@ -1199,17 +1179,7 @@
       accountSelect.value)
 
       if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, liquidatorRepaymentMonthlyStatementPDA))
-      {
-        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-        {
-          authority: connectedWallet.publicKey,
-          payer: connectedWallet.publicKey,
-          lookupTable: liquidatorLookUpTableAddress,
-          addresses: [liquidatorRepaymentMonthlyStatementPDA]
-        })
-
-        liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-      }
+        addressesToExtend.push(liquidatorRepaymentMonthlyStatementPDA)
     }*/
 
     //Don't bother with the Liquidate accounts if they are idential to the Repayment ones
@@ -1235,17 +1205,7 @@
         accountSelect.value)
 
         if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, liquidatorLiquidationTabAccountPDA))
-        {
-          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-          {
-            authority: connectedWallet.publicKey,
-            payer: connectedWallet.publicKey,
-            lookupTable: liquidatorLookUpTableAddress,
-            addresses: [liquidatorLiquidationTabAccountPDA]
-          })
-
-          liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-        }
+          addressesToExtend.push(liquidatorLiquidationTabAccountPDA)
       }
 
       //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
@@ -1271,18 +1231,21 @@
         accountSelect.value)
 
         if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, liquidatorLiquidationMonthlyStatementPDA))
-        {
-          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-          {
-            authority: connectedWallet.publicKey,
-            payer: connectedWallet.publicKey,
-            lookupTable: liquidatorLookUpTableAddress,
-            addresses: [liquidatorLiquidationMonthlyStatementPDA]
-          })
-
-          liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-        }
+          addressesToExtend.push(liquidatorLiquidationMonthlyStatementPDA)
       }*/
+    }
+
+    if(addressesToExtend.length > 0)
+    {
+      const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+      {
+        authority: connectedWallet.publicKey,
+        payer: connectedWallet.publicKey,
+        lookupTable: liquidatorLookUpTableAddress,
+        addresses: addressesToExtend
+      })
+
+      liquidatorLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
     }
 
     return [liquidatorLookUpTableInstructionsToSend, liquidatorLookUpTableAddress, creatingNewLookUpTable]

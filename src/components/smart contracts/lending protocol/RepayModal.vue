@@ -93,16 +93,20 @@
         Close Temp Price Account
       </ion-button>
     </div>
-    <ion-button
-      v-else-if="anchorPrograms.isLendingProtocolReady"
-      id="repayButton"
-      color="dark"
-      @click="repayTokens()"
-      class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="repayAmount == 0"
-    >
-      Repay
-    </ion-button>
+    <div v-else-if="anchorPrograms.isLendingProtocolReady">
+      <ion-button
+        id="repayButton"
+        color="dark"
+        @click="repayTokens()"
+        class="mediumSmallMarginTop nTinyMarginBottom"
+        :disabled="repayAmount == 0"
+      >
+        Repay
+      </ion-button>
+      <div class="nLargeMarginLeft tinyMarginTop nSmallMarginBottom">
+        <AddMissingUserLUTAddresses/>
+      </div>
+    </div>
     <ion-text v-else>Loading</ion-text>
   </div>
 </template>
@@ -126,7 +130,6 @@
     getNeccessaryRefreshInstructionData,
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
-    createJitoTipInstruction,
     closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenReservesHashMap, tokenReserveFontEndInfoHashMap, tokenIdHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketsHashMap, subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
@@ -140,11 +143,12 @@
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { calculateNewBalance, calculateNewDebtBalance, getCompoundingFactor  } from './InterestCalcHelpers.ts'
+  import AddMissingUserLUTAddresses from '/src/components/smart contracts/lending protocol/AddMissingUserLUTAddresses.vue'
   import * as bs58 from 'bs58'
 
   const toast = inject('toast')
-  const colorName = inject('colorName')
-  const colorHexValue = inject('colorHexValue')
+  const colorName = inject('colorName') as string
+  const colorHexValue = inject('colorHexValue') as string
 
   var tokenReserve: any
   var lendingUserTabAccount: any

@@ -137,6 +137,7 @@
       connectedWallet.lendingUserLookUpTableAddress = undefined
       connectedWallet.lendingUserLookUpTableAccount = undefined
       connectedWallet.missingLUTAddresses = []
+      connectedWallet.missingLUTAddressDescriptions = []
       connectedWallet.isTempPriceAccountAlive = false
     }
     else
@@ -151,8 +152,8 @@
         if(lendingUserAccount)
         {
           connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
-          connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
-          connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+          connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress);
+          [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
             connectedWallet.publicKey,
             connectedWallet.selectedLendingUserAccountIndex)
           connectedWallet.hasGoodEnding = true
@@ -163,6 +164,7 @@
           connectedWallet.lendingUserLookUpTableAddress = undefined
           connectedWallet.lendingUserLookUpTableAccount = undefined
           connectedWallet.missingLUTAddresses = []
+          connectedWallet.missingLUTAddressDescriptions = []
         }
       }
       else
@@ -170,6 +172,7 @@
         connectedWallet.lendingUserLookUpTableAddress = undefined
         connectedWallet.lendingUserLookUpTableAccount = undefined
         connectedWallet.missingLUTAddresses = []
+        connectedWallet.missingLUTAddressDescriptions = []
       }
 
       connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
@@ -270,6 +273,7 @@
       connectedWallet.lendingUserLookUpTableAddress = undefined
       connectedWallet.lendingUserLookUpTableAccount = undefined
       connectedWallet.missingLUTAddresses = []
+      connectedWallet.missingLUTAddressDescriptions = []
       connectedWallet.isTempPriceAccountAlive = false
     }
     else
@@ -284,8 +288,8 @@
         if(lendingUserAccount)
         {
           connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
-          connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
-          connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+          connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress);
+          [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
             connectedWallet.publicKey,
             connectedWallet.selectedLendingUserAccountIndex)
           connectedWallet.hasGoodEnding = true
@@ -296,6 +300,7 @@
           connectedWallet.lendingUserLookUpTableAddress = undefined
           connectedWallet.lendingUserLookUpTableAccount = undefined
           connectedWallet.missingLUTAddresses = []
+          connectedWallet.missingLUTAddressDescriptions = []
         }
       }
       else
@@ -303,6 +308,7 @@
         connectedWallet.lendingUserLookUpTableAddress = undefined
         connectedWallet.lendingUserLookUpTableAccount = undefined
         connectedWallet.missingLUTAddresses = []
+        connectedWallet.missingLUTAddressDescriptions = []
       }
 
       connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
@@ -496,8 +502,8 @@
       if(lendingUserAccount)
       {
         connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
-        connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress)
-        connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+        connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress);
+        [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
           connectedWallet.publicKey,
           connectedWallet.selectedLendingUserAccountIndex)
         connectedWallet.hasGoodEnding = true
@@ -508,10 +514,11 @@
         connectedWallet.lendingUserLookUpTableAddress = undefined
         connectedWallet.lendingUserLookUpTableAccount = undefined
         connectedWallet.missingLUTAddresses = []
+        connectedWallet.missingLUTAddressDescriptions = []
       }
     }
     else
-      connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+      [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
         connectedWallet.publicKey,
         connectedWallet.selectedLendingUserAccountIndex)
   })
@@ -535,8 +542,8 @@
         state: lookupTableState
       })
 
-      connectedWallet.lendingUserLookUpTableAccount = lookupTableAccountInstance
-      connectedWallet.missingLUTAddresses = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+      connectedWallet.lendingUserLookUpTableAccount = lookupTableAccountInstance;
+      [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
             connectedWallet.publicKey,
             connectedWallet.selectedLendingUserAccountIndex)
     })

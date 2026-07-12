@@ -97,16 +97,20 @@
         Close Temp Price Account
       </ion-button>
     </div>
-    <ion-button
-      v-else-if="anchorPrograms.isLendingProtocolReady"
-      id="withdrawModalButton"
-      color="dark"
-      @click="withdrawTokens()"
-      class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="withdrawAmount==0"
-    >
-      Withdraw
-    </ion-button>
+    <div v-else-if="anchorPrograms.isLendingProtocolReady">
+      <ion-button
+        id="withdrawModalButton"
+        color="dark"
+        @click="withdrawTokens()"
+        class="mediumSmallMarginTop nTinyMarginBottom"
+        :disabled="withdrawAmount==0"
+      >
+        Withdraw
+      </ion-button>
+      <div class="nLargeMarginLeft tinyMarginTop nSmallMarginBottom">
+        <AddMissingUserLUTAddresses/>
+      </div>
+    </div>
     <ion-text v-else>Loading</ion-text>
   </div>
 </template>
@@ -131,7 +135,6 @@
     getNeccessaryRefreshInstructionData,
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
-    createJitoTipInstruction,
     closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenReservesHashMap,
     tokenReserveFontEndInfoHashMap,
@@ -150,6 +153,7 @@
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance, getCompoundingFactor } from './InterestCalcHelpers.ts'
+  import AddMissingUserLUTAddresses from '/src/components/smart contracts/lending protocol/AddMissingUserLUTAddresses.vue'
   import * as bs58 from 'bs58'
 
   const toast = inject('toast')

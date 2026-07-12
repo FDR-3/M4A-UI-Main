@@ -98,16 +98,20 @@
         Close Temp Price Account
       </ion-button>
     </div>
-    <ion-button
-      v-else-if="anchorPrograms.isLendingProtocolReady"
-      id="borrowModalButton"
-      color="dark"
-      @click="borrowTokens()"
-      class="mediumSmallMarginTop nTinyMarginBottom"
-      :disabled="borrowAmount==0"
-    >
-      Borrow
-    </ion-button>
+    <div v-else-if="anchorPrograms.isLendingProtocolReady">
+      <ion-button
+        id="borrowModalButton"
+        color="dark"
+        @click="borrowTokens()"
+        class="mediumSmallMarginTop nTinyMarginBottom"
+        :disabled="borrowAmount==0"
+      >
+        Borrow
+      </ion-button>
+      <div class="nLargeMarginLeft tinyMarginTop nSmallMarginBottom">
+        <AddMissingUserLUTAddresses/>
+      </div>
+    </div>
     <ion-text v-else>Loading</ion-text>
   </div>
 </template>
@@ -131,7 +135,6 @@
     getNeccessaryRefreshInstructionData,
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
-    createJitoTipInstruction,
     closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { tokenReservesHashMap,
@@ -148,11 +151,12 @@
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateNewBalance, calculateNewDebtBalance } from './InterestCalcHelpers.ts'
+  import AddMissingUserLUTAddresses from '/src/components/smart contracts/lending protocol/AddMissingUserLUTAddresses.vue'
   import * as bs58 from 'bs58'
 
   const toast = inject('toast')
-  const colorName = inject('colorName')
-  const colorHexValue = inject('colorHexValue')
+  const colorName = inject('colorName') as string
+  const colorHexValue = inject('colorHexValue') as string
 
   var subMarketSelect = ref()
   var subMarketList = ref()

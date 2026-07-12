@@ -1207,6 +1207,7 @@
     var lendingUserLookUpTableInstructionsToSend = []
     var lendingUserLookUpTableAddress = null
     var createLookUpTableInstruction: anchor.web3.TransactionInstruction
+    var addressesToExtend = []
 
     //We don't want to accidently create another Address Look Up Table if we aren't able to fetch the Lending User Accounts for some weird error
     if(lendingUserHashMap.map == undefined)
@@ -1241,17 +1242,7 @@
       const lendingUserAccountPDA = getLendingUserAccountPDA(lendingUserAddress, lendingUserAccountIndex)
 
       if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, lendingUserAccountPDA))
-      {
-        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-        {
-          authority: lendingUserAddress,
-          payer: lendingUserAddress,
-          lookupTable: lendingUserLookUpTableAddress,
-          addresses: [lendingUserAccountPDA]
-        })
-
-        lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-      }
+        addressesToExtend.push(lendingUserAccountPDA)
     }
     else
       lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
@@ -1274,17 +1265,7 @@
       lendingUserAccountIndex)
 
       if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
-      {
-        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-        {
-          authority: lendingUserAddress,
-          payer: lendingUserAddress,
-          lookupTable: lendingUserLookUpTableAddress,
-          addresses: [lendingUserTabAccountPDA]
-        })
-
-        lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-      }
+        addressesToExtend.push(lendingUserTabAccountPDA)
     }
 
     //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
@@ -1310,17 +1291,7 @@
       lendingUserAccountIndex)
 
       if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, monthlyStatementPDA))
-      {
-        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-        {
-          authority: lendingUserAddress,
-          payer: lendingUserAddress,
-          lookupTable: lendingUserLookUpTableAddress,
-          addresses: [monthlyStatementPDA]
-        })
-
-        lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-      }
+        addressesToExtend.push(monthlyStatementPDA)
     }*/
 
     //This is for the claimSubMarketFeesAndDepositInDifferentSubMarket function
@@ -1346,17 +1317,7 @@
         lendingUserAccountIndex)
 
         if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
-        {
-          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-          {
-            authority: lendingUserAddress,
-            payer: lendingUserAddress,
-            lookupTable: lendingUserLookUpTableAddress,
-            addresses: [lendingUserTabAccountPDA]
-          })
-
-          lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-        }
+          addressesToExtend.push(lendingUserTabAccountPDA)
       }
 
       //Going to try not adding the monthly statement accounts to the lookuptables since there will always be more monthly statements
@@ -1383,32 +1344,37 @@
         lendingUserAccountIndex)
 
         if(!doesKeyExistInLookUpTable(lendingUserLookUpTableAccount, monthlyStatementPDA))
-        {
-          const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
-          {
-            authority: lendingUserAddress,
-            payer: lendingUserAddress,
-            lookupTable: lendingUserLookUpTableAddress,
-            addresses: [monthlyStatementPDA]
-          })
-
-          lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
-        }
+          addressesToExtend.push(monthlyStatementPDA)
       }*/
     }
     //console.log("Lending User Look Up Table Address: " + lendingUserLookUpTableAddress?.toString())
     //console.log("Lending User Look Up Table Instructions to Send: " + lendingUserLookUpTableInstructionsToSend.length)
+
+    if(addressesToExtend.length > 0)
+    {
+      const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+      {
+        authority: lendingUserAddress,
+        payer: lendingUserAddress,
+        lookupTable: lendingUserLookUpTableAddress,
+        addresses: addressesToExtend
+      })
+
+      lendingUserLookUpTableInstructionsToSend.push(extendLookUpTableInstruction)
+    }
+
     return[lendingUserLookUpTableAddress, lendingUserLookUpTableInstructionsToSend, creatingNewLookUpTable]
   }
 
-  export function determineMissingLUTAddresses(lookUpTableAccount: AddressLookupTableAccount, lendingUserAddress: PublicKey, accountIndex: number): PublicKey[]
+  export function determineMissingLUTAddresses(lookUpTableAccount: AddressLookupTableAccount, lendingUserAddress: PublicKey, accountIndex: number): [PublicKey[], string[]]
   {
     if(!lendingUserTabAccountListHashMap.map)
-      return []
+      return [[], []]
     
-    var missingLookUpTableAddresses = []
     var expectedLookUpTableAddresses = []
-
+    var missingLookUpTableAddresses = []
+    var missingAddressDescriptions = []
+    
     const lendingUserPDA = getLendingUserAccountPDA(lendingUserAddress, accountIndex)
     const expectedLendingUserTabs = lendingUserRemainingTabAccountListHashMap.map.get(lendingUserAddress.toString() + accountIndex.toString())
 
@@ -1424,11 +1390,33 @@
 
         //Expected Address wasn't found, end of saved LUT Addresses
         if(j == lookUpTableAccount.state.addresses.length - 1)
+        {
           missingLookUpTableAddresses.push(expectedLookUpTableAddresses[i])
+
+          function getAddressDescription(addressToCheck: PublicKey)
+          {
+            if(addressToCheck.toString() == lendingUserPDA.toString())
+              return "Lending User Address"
+            else
+            {
+              var tokenId = 0
+
+              for(var k=0; k<expectedLendingUserTabs.length; k++)
+                if(expectedLendingUserTabs[k].pubkey.toString() == addressToCheck.toString())
+                  tokenId = expectedLendingUserTabs[k].tokenId
+
+              const tokenInfo = tokenReserveFontEndInfoHashMap.get(tokenId)
+
+              return `${tokenInfo.name} Tab Address`
+            }  
+          }
+
+          missingAddressDescriptions.push(getAddressDescription(expectedLookUpTableAddresses[i]))
+        }
       }
     }
 
-    return missingLookUpTableAddresses
+    return [missingLookUpTableAddresses, missingAddressDescriptions]
   }
 
   export async function sendVersionedLendingProtocolTransaction(instructionsToSend: anchor.web3.TransactionInstruction[], lookUpTableAccounts: AddressLookupTableAccount[])
