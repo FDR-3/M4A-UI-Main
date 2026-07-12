@@ -121,7 +121,7 @@
     >
       Connect wallet to deposit
     </ion-text>
-    <div v-else-if="anchorPrograms.isLendingProtocolReady" class="mediumSmallMarginTop nTinyMarginBottom nMediumLargeMarginLeft">
+    <div v-else-if="anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady" class="mediumSmallMarginTop nTinyMarginBottom nMediumLargeMarginLeft">
       <div>
         <InfoButton :infoMessage="depositInfoMSG" :openSide="'top'"/>
         <ion-button

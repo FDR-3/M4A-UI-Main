@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
   import { inject } from 'vue'
-  import { IonButton } from '@ionic/vue'
+  import { IonButton, IonText } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import { confirmLendingTransaction, doesKeyExistInLookUpTable, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'

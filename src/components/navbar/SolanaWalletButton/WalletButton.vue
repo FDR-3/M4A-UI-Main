@@ -229,6 +229,8 @@
         connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       }
     }
+
+    connectedWallet.lendingUserLUTAccountReady = true
   })
 
   onUnmounted(() =>
@@ -365,6 +367,8 @@
         connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       }
     }
+
+    connectedWallet.lendingUserLUTAccountReady = true
   })
 
   watch(submitterHashMap, () =>
@@ -521,6 +525,54 @@
       [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
         connectedWallet.publicKey,
         connectedWallet.selectedLendingUserAccountIndex)
+  })
+
+  //Json string of wallet to detect object property changes
+  const walletWatch = computed(() =>
+  {
+    return JSON.stringify(
+    {
+      addressString: connectedWallet.addressString,
+      selectedLendingUserAccountIndex: connectedWallet.selectedLendingUserAccountIndex
+    })
+  })
+
+  watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
+  {
+    let newWallet = JSON.parse(newJSONObjectString)
+    let oldWallet= JSON.parse(oldJSONObjectString)
+
+    //Only want this running if the connected Wallet Address String is changing
+    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+      return
+
+    connectedWallet.lendingUserLUTAccountReady = false
+    if(lendingUserLookUpTableWatcherId != undefined)
+    {
+      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserLookUpTableWatcherId)
+      lendingUserLookUpTableWatcherId = undefined
+    }
+
+    const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+    if(lendingUserAccount)
+    {
+      connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
+      connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress);
+      [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+        connectedWallet.publicKey,
+        connectedWallet.selectedLendingUserAccountIndex)
+      connectedWallet.hasGoodEnding = true
+      await listenForLendingUserLookUpTableChanges()
+    }
+    else
+    {
+      connectedWallet.lendingUserLookUpTableAddress = undefined
+      connectedWallet.lendingUserLookUpTableAccount = undefined
+      connectedWallet.missingLUTAddresses = []
+      connectedWallet.missingLUTAddressDescriptions = []
+    }
+
+    connectedWallet.lendingUserLUTAccountReady = true
   })
 
   async function listenForLendingUserLookUpTableChanges()

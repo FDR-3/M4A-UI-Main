@@ -196,13 +196,13 @@
                   <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                     <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
                   </ion-button>
-                  <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                  <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
                     <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
                   </ion-button>
-                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
                     <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
                   </ion-button>
-                  <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                  <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
                     <ion-label class="noClickEvent" color="dark">Repay</ion-label>
                   </ion-button>
                 </div>
@@ -340,13 +340,13 @@
                   <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
                     <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
                   </ion-button>
-                  <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                  <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
                     <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
                   </ion-button>
-                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
                     <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
                   </ion-button>
-                  <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+                  <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
                     <ion-label class="noClickEvent" color="dark">Repay</ion-label>
                   </ion-button>
                 </div>
@@ -634,6 +634,8 @@
             const option = 
             {
               subMarketFeeName: (subMarketEntries[j].feeOnInterestEarnedRate).toString() + "% Fee Market",
+              tokenId: StableCoins[i].tokenId,
+              subMarketOwnerAddress: adminAccounts.lendingCEOAddressKey,
               subMarketIndex: subMarketEntries[j].subMarketIndex
             }
             StableCoins[i].subMarketList.push(option)
@@ -665,6 +667,8 @@
             const option = 
             {
               subMarketFeeName: (subMarketEntries[j].feeOnInterestEarnedRate).toString() + "% Fee Market",
+              tokenId: CryptoCurrency[i].tokenId,
+              subMarketOwnerAddress: adminAccounts.lendingCEOAddressKey,
               subMarketIndex: subMarketEntries[j].subMarketIndex
             }
             CryptoCurrency[i].subMarketList.push(option)
@@ -826,10 +830,29 @@
     event.value.tokenId = rowData.tokenId
     event.value.tokenMintAddressString = rowData.tokenMintAddressString
     event.value.subMarketList = rowData.subMarketList
+    event.value.userSpecificSubMarketList = getUserPriorInteractionSubMarkets(rowData.subMarketList)
     event.value.depositBalance = rowData.depositBalance
     event.value.borrowBalance = rowData.borrowBalance
 
     actionsPopoverOpen.value = true
+  }
+
+  function getUserPriorInteractionSubMarkets(subMarketList: any[])
+  {
+    const userPriorInteractedWithSubMarkets = []
+    const userTabs = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value)
+
+    for(var i=0; i<subMarketList.length; i++)
+      for(var j=0; j<userTabs.length; j++)
+        if((subMarketList[i].tokenId == userTabs[j].tokenId) &&
+        (subMarketList[i].subMarketOwnerAddress.toString() == userTabs[j].subMarketOwnerAddress.toString()) &&
+        (subMarketList[i].subMarketIndex == userTabs[j].subMarketIndex))
+          userPriorInteractedWithSubMarkets.push(subMarketList[i])
+
+    if(userPriorInteractedWithSubMarkets.length == 0)
+      userPriorInteractedWithSubMarkets.push(subMarketList[0])
+    
+    return userPriorInteractedWithSubMarkets
   }
 
   function setInputFocus()

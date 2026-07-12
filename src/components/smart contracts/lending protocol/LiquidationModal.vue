@@ -205,7 +205,7 @@
       </ion-text>
 
       <ion-button
-        v-else-if="anchorPrograms.isLendingProtocolReady"
+        v-else-if="anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady"
         color="dark"
         @click="liquidateAccount()"
         class="tinySmallMarginTop nSmallMarginBottom"

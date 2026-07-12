@@ -93,7 +93,7 @@
         Close Temp Price Account
       </ion-button>
     </div>
-    <div v-else-if="anchorPrograms.isLendingProtocolReady">
+    <div v-else-if="anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady">
       <ion-button
         id="repayButton"
         color="dark"
@@ -296,6 +296,10 @@
     connectedWallet.addressString +
     connectedWallet.selectedLendingUserAccountIndex.toString() +
     "selectedMainSubMarketIndex")) || 0
+
+    const isIndexContained = subMarkets.some(item => item.subMarketIndex === subMarketSelect.value)
+    if(!isIndexContained)
+      subMarketSelect.value = subMarkets[0].subMarketIndex
 
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
