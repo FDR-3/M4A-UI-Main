@@ -425,25 +425,45 @@
     CryptoCurrencyTableData.value = unprocessedTableData
   }
 
-  function calculateSubMarketSevenDayFeeAccrued(tokenId: number, tokenReserveSevenDaySupplyInterestFactor: number)
+  function calculateSubMarketSevenDayFeeAccrued(tokenId: number, tokenReserveSupplyInterestChangeIndex: number, tokenReserveSevenDaySupplyChangeIndex: number)
   {
     const tokenReserve = tokenReservesHashMap.map.get(tokenId)
-    const subMarket = subMarketsHashMap.map.get(tokenId +
+    const subMarket100PercentFee = subMarketsHashMap.map.get(tokenId +
     adminAccounts.lendingCEOAddressString +
     adminAccounts.lendingMain100PercentSubMarketIndex.toString())
 
-    if(!tokenReserve || !subMarket)
+    if(!tokenReserve || !subMarket100PercentFee)
       return 0
 
-    if(Number(subMarket.supplyInterestChangeIndex) == 0)
+    if(Number(subMarket100PercentFee.supplyInterestChangeIndex) == 0)
       return 0
+
+    var subMarketFee
+    if(subMarket100PercentFee.feeOnInterestEarnedRate + tokenReserve.solvencyInsuranceFeeRate <= 100)
+      subMarketFee = subMarket100PercentFee.feeOnInterestEarnedRate
+    else
+      subMarketFee = 100 - tokenReserve.solvencyInsuranceFeeRate
+
+    //SubMarket New Balance Before Fee = Old Balance * Token Reserve current Earned Interest Index / Sub Market Reserve Earned Interest Index
+    const newSubMarketDepositedAmountBeforeFees = Number(subMarket100PercentFee.depositedAmount) * tokenReserveSupplyInterestChangeIndex / subMarket100PercentFee.supplyInterestChangeIndex
+    const subMarketInterestedEarnedBeforeFees = newSubMarketDepositedAmountBeforeFees - Number(subMarket100PercentFee.depositedAmount) 
+    const subMarketInterestedEarnedAfterFees = subMarketInterestedEarnedBeforeFees - (subMarketInterestedEarnedBeforeFees * subMarketFee / 100) - (subMarketInterestedEarnedBeforeFees * tokenReserve.solvencyInsuranceFeeRate / 100)
+    const newSubMarketDepositedAmountAfterFees = Number(subMarket100PercentFee.depositedAmount) + subMarketInterestedEarnedAfterFees
+    //We know the deposited amount actually won't go up here because the fees are at %100 in this Sub Market
 
     //SubMarket New 7 day Balance Before Fee = Old Balance * Token Reserve 7 day Earned Interest Index / Token Reserve current Earned Interest Index
     //Interest Earned Before Fee = New Balance Before Fee - Old Balance
     //Fee Generated = Interest Earned Before Fee * SubMarket Fee Rate
-    const sevenDaySubMarketBalanceBeforeFee = (subMarket.depositedAmount * tokenReserveSevenDaySupplyInterestFactor)
-    const sevenDayInterestEarnedBeforeFee = sevenDaySubMarketBalanceBeforeFee - subMarket.depositedAmount
-    const sevenDaySubMarketFeeGenerated = (sevenDayInterestEarnedBeforeFee * subMarket.feeOnInterestEarnedRate / 100)
+    const sevenDaySubMarketBalanceBeforeFee = (newSubMarketDepositedAmountAfterFees * tokenReserveSevenDaySupplyChangeIndex / tokenReserveSupplyInterestChangeIndex)
+    const sevenDayInterestEarnedBeforeFee = sevenDaySubMarketBalanceBeforeFee - newSubMarketDepositedAmountAfterFees
+
+    var subMarketFee
+    if(subMarket100PercentFee.feeOnInterestEarnedRate + tokenReserve.solvencyInsuranceFeeRate <= 100)
+      subMarketFee = subMarket100PercentFee.feeOnInterestEarnedRate
+    else
+      subMarketFee = 100 - tokenReserve.solvencyInsuranceFeeRate
+    
+    const sevenDaySubMarketFeeGenerated = (sevenDayInterestEarnedBeforeFee * subMarketFee / 100)
 
     const tokenMintAddressString = tokenIdHashMap.map.get(tokenId)
     const usdPrice = priceObjectMap.data[tokenMintAddressString].usdPrice
@@ -466,17 +486,17 @@
       var sevenDayStableCoinProjectionValue = 0
       for(var i=0; i<stableCoinFeeArray.length; i++)
       {
-        stableCoinFeeArray[i].tokenReserve7DaySupplyInterestFactor = calculateTokenReserveSevenDaySupplyInterestFactor(unixData.timeStamp, stableCoinFeeArray[i].tokenId)
-        if(stableCoinFeeArray[i].tokenReserve7DaySupplyInterestFactor)
-          sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenId, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestFactor)
+        [stableCoinFeeArray[i].tokenReserveSupplyInterestChangeIndex, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex]  = calculateTokenReserveSevenDaySupplyInterestFactor(unixData.timeStamp, stableCoinFeeArray[i].tokenId)
+        if(stableCoinFeeArray[i].tokenReserveSupplyInterestChangeIndex && stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+          sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenId, stableCoinFeeArray[i].tokenReserveSupplyInterestChangeIndex, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
 
       var sevenDayCryptoCurrencyProjectionValue = 0
       for(var i=0; i<cryptoCurrencyFeeArray.length; i++)
       {
-        cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestFactor = calculateTokenReserveSevenDaySupplyInterestFactor(unixData.timeStamp, cryptoCurrencyFeeArray[i].tokenId)
-        if(cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestFactor)
-          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenId, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestFactor)
+        [cryptoCurrencyFeeArray[i].tokenReserveSupplyInterestChangeIndex, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex] = calculateTokenReserveSevenDaySupplyInterestFactor(unixData.timeStamp, cryptoCurrencyFeeArray[i].tokenId)
+        if(cryptoCurrencyFeeArray[i].tokenReserveSupplyInterestChangeIndex && cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
+          sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenId, cryptoCurrencyFeeArray[i].tokenReserveSupplyInterestChangeIndex, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
 
       sevenDayProjectionRate.value = (sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue).toLocaleString('en-US', {

@@ -89,7 +89,7 @@ export function calculateTokenReserveSevenDaySupplyInterestFactor(timeStamp: num
     const sevenDayCompoundingFactor = getCompoundingFactor(supplyApy, SECONDS_IN_A_WEEK)
     const projectedSevenDayIndex = currentAccruedIndex * sevenDayCompoundingFactor
 
-    return projectedSevenDayIndex / currentAccruedIndex
+    return [currentAccruedIndex, projectedSevenDayIndex]
   }
 
 //Taylor Series 4th Order Interest Calculation: e^x = 1 + x + (x^2 / 2!) + (x^3 / 3!) + (x^4 / 4!)

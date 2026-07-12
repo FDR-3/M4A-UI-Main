@@ -825,19 +825,12 @@
     const interestEarnedBeforeFees = newBalanceBeforeFee - userOriginalBalance
 
     var subMarketFee
-    var solvencyInsuranceFee
     if(props.subMarketFee + tokenReserve.solvencyInsuranceFeeRate <= 100)
-    {
       subMarketFee = props.subMarketFee
-      solvencyInsuranceFee = tokenReserve.solvencyInsuranceFeeRate
-    }
     else
-    {
-      solvencyInsuranceFee = tokenReserve.solvencyInsuranceFeeRate
       subMarketFee = 100 - tokenReserve.solvencyInsuranceFeeRate
-    }
 
-    var interestEarnedAfterFees = interestEarnedBeforeFees - (interestEarnedBeforeFees * subMarketFee / 100) - (interestEarnedBeforeFees * solvencyInsuranceFee / 100)
+    var interestEarnedAfterFees = interestEarnedBeforeFees - (interestEarnedBeforeFees * subMarketFee / 100) - (interestEarnedBeforeFees * tokenReserve.solvencyInsuranceFeeRate / 100)
     interestEarnedAfterFees = Number(interestEarnedAfterFees.toFixed(decimalAmount))
 
     userCalculatedBalance.value = (userOriginalBalance + interestEarnedAfterFees).toFixed(decimalAmount)
@@ -849,8 +842,8 @@
     userCalculatedDebt.value = newDebt.toFixed(decimalAmount)
 
     //Calculate 7 day interest earned
-    const sevenDayUserCalculatedBalanceBeforeFee = (userOriginalBalance * tokenReserve.sevenDaySupplyInterestChangeIndex / tokenReserve.newSupplyInterestChangeIndex)
-    const sevenDayInterestEarnedBeforeFee = sevenDayUserCalculatedBalanceBeforeFee - userOriginalBalance
+    const sevenDayUserCalculatedBalanceBeforeFee = (Number(userCalculatedBalance.value) * tokenReserve.sevenDaySupplyInterestChangeIndex / tokenReserve.newSupplyInterestChangeIndex)
+    const sevenDayInterestEarnedBeforeFee = sevenDayUserCalculatedBalanceBeforeFee - Number(userCalculatedBalance.value)
 
     sevenDayCalculatedUserInterestEarned.value = sevenDayInterestEarnedBeforeFee - (sevenDayInterestEarnedBeforeFee * props.subMarketFee / 100)
     sevenDayCalculatedUserInterestEarned.value = sevenDayCalculatedUserInterestEarned.value < 0 ? (0).toFixed(decimalAmount) : sevenDayCalculatedUserInterestEarned.value.toFixed(decimalAmount)
