@@ -813,8 +813,11 @@
 
     //For tab accounts initialized with no deposits, keeps from dividing by zero
     //For example, can happen to when claiming submarket fees in different destination submarket on new initial tab account
+    //Or the Solvency Treasury might have zeros for supply and borrow change index if they aren't doing deposits or borrows
     if(Number(lendingUserTabAccount.supplyInterestChangeIndex) == 0)
       lendingUserTabAccount.supplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex
+    if(Number(lendingUserTabAccount.borrowInterestChangeIndex) == 0)
+      lendingUserTabAccount.borrowInterestChangeIndex = tokenReserve.borrowInterestChangeIndex
 
     //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
     //Interest Earned Before Fee = New Balance Before Fee - Old Balance
@@ -938,7 +941,7 @@
   
   .yearSelect
   {
-    width: 125px;
+    width: 130px;
     padding-left: 20px
   }
 

@@ -17,6 +17,12 @@ timeStamp: number)
   //const newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * (1 + supplyApy * changeInTime / SECONDS_IN_A_YEAR)
   const newSupplyInterestChangeIndex = Number(tokenReserve.supplyInterestChangeIndex) * supplyCompoundingFactor
 
+  //For tab accounts initialized with no deposits, keeps from dividing by zero
+  //For example, can happen to when claiming submarket fees in different destination submarket on new initial tab account
+  //Or the Solvency Treasury might have zeros for supply and borrow change index if they aren't doing deposits or borrows
+  if(userSupplyInterestChangeIndex == 0)
+    userSupplyInterestChangeIndex = newSupplyInterestChangeIndex
+
   //User New Balance Before Fee = Old Balance * Token Reserve Earned Interest Index / User Earned Interest Index
   //Interest Earned Before Fee = New Balance Before Fee - Old Balance
   //Interest Earned After Fee = Interest Earned Before Fee - (Interest Earned Before Fee * SubMarket Fee Rate)
@@ -61,6 +67,7 @@ timeStamp: number)
 
   //For tab accounts initialized with no deposits, keeps from dividing by zero
   //For example, can happen to when claiming submarket fees in different destination submarket on new initial tab account
+  //Or the Solvency Treasury might have zeros for supply and borrow change index if they aren't doing deposits or borrows
   if(userBorrowInterestChangeIndex == 0)
     userBorrowInterestChangeIndex = newBorrowInterestChangeIndex
 

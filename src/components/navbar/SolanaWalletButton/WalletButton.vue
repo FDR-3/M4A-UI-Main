@@ -553,6 +553,9 @@
       lendingUserLookUpTableWatcherId = undefined
     }
 
+    if(!lendingUserHashMap.map)
+      return
+
     const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
     if(lendingUserAccount)
     {

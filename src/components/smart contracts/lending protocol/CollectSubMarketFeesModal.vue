@@ -126,6 +126,7 @@
     </div>
 
     <ion-button
+      v-if="anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady"
       color="dark"
       @click="claimSubMarketFees()"
       class="mediumSmallMarginTop nTinyMarginBottom"
@@ -133,6 +134,7 @@
     >
       Deposit Fees
     </ion-button>
+    <ion-text v-else>Loading</ion-text>
   </div>
 </template>
 

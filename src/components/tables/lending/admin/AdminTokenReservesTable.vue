@@ -137,20 +137,26 @@
               >
                 <ion-label color="dark" class="noClickEvent">Edit TokenReserve</ion-label>
               </ion-button>
+              
               <ion-button
-              v-if="connectedWallet.addressString==solvencyTreasuryWalletPublicKeyString"
+              v-if="connectedWallet.addressString==solvencyTreasuryWalletPublicKeyString &&
+              anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady"
               fill="clear"
               @click="collectSolvencyFees()"
               >
                 <ion-label color="dark">Collect Solvency Fees</ion-label>
               </ion-button>
+              <ion-text v-else-if="connectedWallet.addressString==solvencyTreasuryWalletPublicKeyString">Loading</ion-text>
+
               <ion-button
-              v-if="connectedWallet.addressString==adminAccounts.liquidationTreasuryAddress.toString()"
-              fill="clear"
-              @click="collectLiquidationFees()"
-              >
-                <ion-label color="dark">Collect Liquidation Fees</ion-label>
+                v-if="connectedWallet.addressString==adminAccounts.liquidationTreasuryAddress.toString() &&
+                anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady"
+                fill="clear"
+                @click="collectLiquidationFees()"
+                >
+                  <ion-label color="dark">Collect Liquidation Fees</ion-label>
               </ion-button>
+              <ion-text v-else-if="connectedWallet.addressString==adminAccounts.liquidationTreasuryAddress.toString()">Loading</ion-text>
             </ion-popover>
           </div>
         </template>

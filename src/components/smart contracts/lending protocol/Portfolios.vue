@@ -1219,9 +1219,9 @@
   .accountSelect
   {
     height: 38px; 
-    width: min(250px, 80vw);
-    max-width: 250px;
-    padding-left: 30px;
+    width: min(270px, 80vw);
+    max-width: 270px;
+    padding-left: 15px;
     align-self: center
   }
 
