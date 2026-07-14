@@ -9,8 +9,10 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { LAMPORTS_PER_SOL } from "@solana/web3.js"
-  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token"
+  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { getSOLBalanceWrapper, getTokenAccountBalanceWrapper } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 
   //These are for the Chat and M4A fees
   const hodlTreasuryUSDSWalletATA = hodlTreasuryWalletATAHashMap.get(tokenAddressStrings.usdsTokenMintAddress)
@@ -19,7 +21,6 @@
   //These are for Lending Protocol Solvency fees
   const solvencyTreasuryUSDSWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.usdsTokenMintAddress)
   const solvencyTreasuryUSDCWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.usdcTokenMintAddress)
-  const solvencyTreasurySOLWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.solTokenMintAddress)
   const solvencyTreasuryWEthWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.wethTokenMintAddress)
   const solvencyTreasuryWBtcWalletATA = solvencyInsuranceTreasuryWalletATAHashMap.get(tokenAddressStrings.wbtcTokenMintAddress)
   
@@ -28,7 +29,6 @@
   var hodlTreasuryUSDCWalletATA: any
   var solvencyTreasuryUSDSWalletATA: any
   var solvencyTreasuryUSDCWalletATA: any
-  var solvencyTreasurySOLWalletATA: any
   var solvencyTreasuryWEthWalletATA: any
   var solvencyTreasuryWBtcWalletATA: any*/
   
@@ -61,7 +61,7 @@
     try
     {
       //Get HODL USDS Balance
-      const hodlUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDSWalletATA)
+      const hodlUSDSAccount = await getTokenAccountBalanceWrapper(hodlTreasuryUSDSWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
       hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdsTokenMintAddress, hodlUSDSAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForHODLTreasuryUSDSWalletChanges()
@@ -83,7 +83,7 @@
     try
     {
       //Get Solvency USDS Balance
-      const solvencyUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryUSDSWalletATA)
+      const solvencyUSDSAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryUSDSWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
       solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, solvencyUSDSAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSolvencyTreasuryUSDSWalletChanges()
@@ -106,7 +106,7 @@
     try
     {
       //Get HODL USDC Balance
-      const hodlUDSCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCWalletATA)
+      const hodlUDSCAccount = await getTokenAccountBalanceWrapper(hodlTreasuryUSDCWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
       hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdcTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForHODLTreasuryUSDCWalletChanges()
@@ -128,7 +128,7 @@
     try
     {
       //Get Solvency USDC Balance
-      const solvencyUDSCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryUSDCWalletATA)
+      const solvencyUDSCAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryUSDCWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
       solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, solvencyUDSCAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSolvencyTreasuryUSDCWalletChanges()
@@ -140,18 +140,10 @@
 
     //The ATA address can be harded coded in once you know the address
     //Solvency SOL Wallet Account
-    /*let solvencyTreasurySOLWalletATA = await Token.getAssociatedTokenAddress
-    (
-      ASSOCIATED_TOKEN_PROGRAM_ID,
-      TOKEN_PROGRAM_ID,
-      tokenAddressKeys.solTokenMintAddress, //Token Mint Address
-      adminAccounts.solvencyTreasuryAddress //Wallet Public Key
-    )
-    console.log(solvencyTreasurySOLWalletATA.toString())*/
     try
     {
       //Get Solvency SOL Balance
-      const solvencySOLBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(adminAccounts.solvencyTreasuryAddress)
+      const solvencySOLBalance = await getSOLBalanceWrapper(adminAccounts.solvencyTreasuryAddress)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
       solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
       await listenForSolvencyTreasurySOLWalletChanges()
@@ -174,7 +166,7 @@
     try
     {
       //Get Solvency WEth Balance
-      const solvencyWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryWEthWalletATA)
+      const solvencyWEthAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryWEthWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.wethTokenId)
       solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, solvencyWEthAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSolvencyTreasuryWEthWalletChanges()
@@ -197,7 +189,7 @@
     try
     {
       //Get Solvency WBtc Balance
-      const solvencyWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryWBtcWalletATA)
+      const solvencyWBtcAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryWBtcWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.wbtcTokenId)
       solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, solvencyWBtcAccount.value.uiAmount.toFixed(decimalAmount))
       await listenForSolvencyTreasuryWBtcWalletChanges()
@@ -337,7 +329,7 @@
     try
     {
       //Get User USDS Wallet Balance
-      const userUSDSWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUSDSWalletATA)
+      const userUSDSWalletAccount = await getTokenAccountBalanceWrapper(userUSDSWalletATA)
       connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdsTokenMintAddress, userUSDSWalletAccount.value.uiAmount)
       await listenForUserUSDSWalletChanges()
     }
@@ -357,7 +349,7 @@
     try
     {
       //Get User USDC Wallet Balance
-      const userUSDCWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUSDCWalletATA)
+      const userUSDCWalletAccount = await getTokenAccountBalanceWrapper(userUSDCWalletATA)
       connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdcTokenMintAddress, userUSDCWalletAccount.value.uiAmount)
       await listenForUserUSDCWalletChanges()
     }
@@ -369,7 +361,7 @@
     try
     {
       //Get User SOL Wallet Balance
-      const userSolWalletBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(connectedWallet.publicKey)
+      const userSolWalletBalance = await getSOLBalanceWrapper(connectedWallet.publicKey)
       connectedWallet.tokenBalanceMap.set(tokenAddressStrings.solTokenMintAddress, userSolWalletBalance / LAMPORTS_PER_SOL)
       await listenForUserSOLWalletChanges()
     }
@@ -389,7 +381,7 @@
     try
     {
       //Get User WEth Wallet Balance
-      const userWEthWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWEthWalletATA)
+      const userWEthWalletAccount = await getTokenAccountBalanceWrapper(userWEthWalletATA)
       connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wethTokenMintAddress, userWEthWalletAccount.value.uiAmount)
       await listenForUserWEthWalletChanges()
     }
@@ -409,7 +401,7 @@
     try
     {
       //Get User WBtc Balance
-      const userWBtcWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWBtcWalletATA)
+      const userWBtcWalletAccount = await getTokenAccountBalanceWrapper(userWBtcWalletATA)
       connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wbtcTokenMintAddress, userWBtcWalletAccount.value.uiAmount)
       await listenForUserWBtcWalletChanges()
     }
@@ -421,128 +413,205 @@
 
   async function listenForHODLTreasuryUSDSWalletChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      hodlUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDSWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const hodlUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDSWalletATA)
-        hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdsTokenMintAddress, hodlUSDSAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        hodlUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDSWalletATA, async() => 
+        {
+          //Handle account change...
+          const hodlUSDSAccount = await getTokenAccountBalanceWrapper(hodlTreasuryUSDSWalletATA)
+          hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdsTokenMintAddress, hodlUSDSAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
   
   async function listenForHODLTreasuryUSDCWalletChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      hodlUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDCWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const hodlUSDCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(hodlTreasuryUSDCWalletATA)
-        hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdcTokenMintAddress, hodlUSDCAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        hodlUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDCWalletATA, async() => 
+        {
+          //Handle account change...
+          const hodlUSDCAccount = await getTokenAccountBalanceWrapper(hodlTreasuryUSDCWalletATA)
+          hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdcTokenMintAddress, hodlUSDCAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForSolvencyTreasuryUSDSWalletChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      solvencyUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDSWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const solvencyUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryUSDSWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, solvencyUSDSAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        solvencyUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDSWalletATA, async() => 
+        {
+          //Handle account change...
+          const solvencyUSDSAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryUSDSWalletATA)
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, solvencyUSDSAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
   
   async function listenForSolvencyTreasuryUSDCWalletChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      solvencyUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDCWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const solvencyUDSCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryUSDCWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, solvencyUDSCAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        solvencyUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDCWalletATA, async() => 
+        {
+          //Handle account change...
+          const solvencyUDSCAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryUSDCWalletATA)
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, solvencyUDSCAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForSolvencyTreasurySOLWalletChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      solvencySOLWalletWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(adminAccounts.solvencyTreasuryAddress, async() => 
+      try
       {
-        //Handle account change...
-        const solvencySOLBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(adminAccounts.solvencyTreasuryAddress)
-        const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        solvencySOLWalletWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(adminAccounts.solvencyTreasuryAddress, async() => 
+        {
+          //Handle account change...
+          const solvencySOLBalance = await getSOLBalanceWrapper(adminAccounts.solvencyTreasuryAddress)
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForSolvencyTreasuryWEthWalletChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      solvencyWEthWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryWEthWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const solvencyWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryWEthWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, solvencyWEthAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        solvencyWEthWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryWEthWalletATA, async() => 
+        {
+          //Handle account change...
+          const solvencyWEthAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryWEthWalletATA)
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, solvencyWEthAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForSolvencyTreasuryWBtcWalletChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      solvencyWBtcWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryWBtcWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const solvencyWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(solvencyTreasuryWBtcWalletATA)
-        solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, solvencyWBtcAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        solvencyWBtcWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryWBtcWalletATA, async() => 
+        {
+          //Handle account change...
+          const solvencyWBtcAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryWBtcWalletATA)
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, solvencyWBtcAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
@@ -555,19 +624,31 @@
       tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
       connectedWallet.publicKey //Wallet Public Key
     )
-    try
+
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      userUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUSDSATA, async() => 
+      try
       {
-        //Handle account change...
-        const userUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUSDSATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdsTokenMintAddress, userUSDSAccount.value.uiAmount)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        userUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUSDSATA, async() => 
+        {
+          //Handle account change...
+          const userUSDSAccount = await getTokenAccountBalanceWrapper(userUSDSATA)
+          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdsTokenMintAddress, userUSDSAccount.value.uiAmount)
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
@@ -580,37 +661,60 @@
       tokenAddressKeys.usdcTokenMintAddress, //Token Mint Address
       connectedWallet.publicKey //Wallet Public Key
     )
-    try
+
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      userUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUsdcWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const userUsdcWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userUsdcWalletATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdcTokenMintAddress, userUsdcWalletAccount.value.uiAmount)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        userUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUsdcWalletATA, async() => 
+        {
+          //Handle account change...
+          const userUsdcWalletAccount = await getTokenAccountBalanceWrapper(userUsdcWalletATA)
+          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdcTokenMintAddress, userUsdcWalletAccount.value.uiAmount)
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForUserSOLWalletChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      userSOLWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.publicKey, async() => 
+      try
       {
-        //Handle account change...
-        const userSolWalletBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(connectedWallet.publicKey)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStrings.solTokenMintAddress, userSolWalletBalance / LAMPORTS_PER_SOL)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        userSOLWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.publicKey, async() => 
+        {
+          //Handle account change...
+          const userSolWalletBalance = await getSOLBalanceWrapper(connectedWallet.publicKey)
+          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.solTokenMintAddress, userSolWalletBalance / LAMPORTS_PER_SOL)
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
@@ -623,19 +727,31 @@
       tokenAddressKeys.wethTokenMintAddress, //Token Mint Address
       connectedWallet.publicKey //Wallet Public Key
     )
-    try
+
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      userWEthWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userWEthWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const userWEthWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWEthWalletATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wethTokenMintAddress, userWEthWalletAccount.value.uiAmount)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        userWEthWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userWEthWalletATA, async() => 
+        {
+          //Handle account change...
+          const userWEthWalletAccount = await getTokenAccountBalanceWrapper(userWEthWalletATA)
+          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wethTokenMintAddress, userWEthWalletAccount.value.uiAmount)
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
@@ -648,19 +764,31 @@
       tokenAddressKeys.wbtcTokenMintAddress, //Token Mint Address
       connectedWallet.publicKey //Wallet Public Key
     )
-    try
+
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      userWBtcWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userWBtcWalletATA, async() => 
+      try
       {
-        //Handle account change...
-        const userWBtcWalletAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(userWBtcWalletATA)
-        connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wbtcTokenMintAddress, userWBtcWalletAccount.value.uiAmount)
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        userWBtcWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userWBtcWalletATA, async() => 
+        {
+          //Handle account change...
+          const userWBtcWalletAccount = await getTokenAccountBalanceWrapper(userWBtcWalletATA)
+          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wbtcTokenMintAddress, userWBtcWalletAccount.value.uiAmount)
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 </script>

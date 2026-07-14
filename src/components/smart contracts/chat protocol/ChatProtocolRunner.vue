@@ -50,6 +50,7 @@
   import M4AChatUpdater from './M4AChatUpdater.vue'
   import PLIChatUpdater from './PLIChatUpdater.vue'
   import AboutChatUpdater from './AboutChatUpdater.vue'
+  import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 
   var isChatProtocolReadyWatchId: any
   var m4aChatWatchId: any
@@ -269,225 +270,433 @@
 
   async function listenForChatProtocolChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      isChatProtocolReadyWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolPDA(), async() => 
+      try
       {
-        //Handle account change...
-        const chatProtocol = await getChatProtocol()
-        anchorPrograms.chatProtocolInitiatorAddress = chatProtocol.chatProtocolInitiatorAddress.toBase58()
-        anchorPrograms.isChatProtocolReady = true
+        //Subscribe to account changes
+        isChatProtocolReadyWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolPDA(), async() => 
+        {
+          //Handle account change...
+          const chatProtocol = await getChatProtocol()
+          anchorPrograms.chatProtocolInitiatorAddress = chatProtocol.chatProtocolInitiatorAddress.toBase58()
+          anchorPrograms.isChatProtocolReady = true
 
-        anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(isChatProtocolReadyWatchId)
-        isChatProtocolReadyWatchId = undefined
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-      anchorPrograms.isChatProtocolReady = false
+          anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(isChatProtocolReadyWatchId)
+          isChatProtocolReadyWatchId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForChatFeeTokenAccount()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      isChatFeeTokenAccountReadyWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatTokenFeePDA(anchorPrograms.usdcFeeTokenAddress), async() => 
+      try
       {
-        //Handle account change...
-        anchorPrograms.isChatFeeTokenAccountReady = true
-        anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(isChatFeeTokenAccountReadyWatchId)
-        isChatFeeTokenAccountReadyWatchId = undefined
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        isChatFeeTokenAccountReadyWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatTokenFeePDA(anchorPrograms.usdcFeeTokenAddress), async() => 
+        {
+          //Handle account change...
+          anchorPrograms.isChatFeeTokenAccountReady = true
+          anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(isChatFeeTokenAccountReadyWatchId)
+          isChatFeeTokenAccountReadyWatchId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForChatAccountStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      chatAccountStatsWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatAccountStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        anchorPrograms.areChatQOLAccountsReady = true
-        await setChatAccountAndUserNameHashMap()
-        setChatProtocolLeaderBoard()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        chatAccountStatsWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatAccountStatsPDA(), async() => 
+        {
+          //Handle account change...
+          anchorPrograms.areChatQOLAccountsReady = true
+          await setChatAccountAndUserNameHashMap()
+          setChatProtocolLeaderBoard()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForM4AChatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      m4aChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getM4AChatPDA(), async() => 
+      try
       {
-        //Handle account change...
-        m4aChat.data = await getM4AChat()
-        anchorPrograms.m4aChatInitiatorAddress = m4aChat.data.chatInitiatorAddress.toBase58()
-        anchorPrograms.isM4AChatReady = true
+        //Subscribe to account changes
+        m4aChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getM4AChatPDA(), async() => 
+        {
+          //Handle account change...
+          m4aChat.data = await getM4AChat()
+          anchorPrograms.m4aChatInitiatorAddress = m4aChat.data.chatInitiatorAddress.toBase58()
+          anchorPrograms.isM4AChatReady = true
 
-        await setChatAccountHashMap()
-        setChatProtocolLeaderBoard()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-      anchorPrograms.isM4AChatReady = false
+          await setChatAccountHashMap()
+          setChatProtocolLeaderBoard()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.error(error)
+          anchorPrograms.isM4AChatReady = false
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForPLIChatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      pliChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPLIChatPDA(), async() => 
+      try
       {
-        //Handle account change...
-        pliChat.data = await getPLIChat()
-        anchorPrograms.pliChatInitiatorAddress = pliChat.data.chatInitiatorAddress.toBase58()
-        anchorPrograms.isPLIChatReady = true
+        //Subscribe to account changes
+        pliChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPLIChatPDA(), async() => 
+        {
+          //Handle account change...
+          pliChat.data = await getPLIChat()
+          anchorPrograms.pliChatInitiatorAddress = pliChat.data.chatInitiatorAddress.toBase58()
+          anchorPrograms.isPLIChatReady = true
 
-        await setChatAccountHashMap()
-        setChatProtocolLeaderBoard()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-      anchorPrograms.isPLIChatReady = false
+          await setChatAccountHashMap()
+          setChatProtocolLeaderBoard()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.error(error)
+          anchorPrograms.isPLIChatReady = false
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForAboutChatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      aboutChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getAboutChatPDA(), async() => 
+      try
       {
-        //Handle account change...
-        aboutChat.data = await getAboutChat()
-        anchorPrograms.aboutChatInitiatorAddress = aboutChat.data.chatInitiatorAddress.toBase58()
-        anchorPrograms.isAboutChatReady = true
+        //Subscribe to account changes
+        aboutChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getAboutChatPDA(), async() => 
+        {
+          //Handle account change...
+          aboutChat.data = await getAboutChat()
+          anchorPrograms.aboutChatInitiatorAddress = aboutChat.data.chatInitiatorAddress.toBase58()
+          anchorPrograms.isAboutChatReady = true
 
-        await setChatAccountHashMap()
-        setChatProtocolLeaderBoard()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-      anchorPrograms.isAboutChatReady = false
+          await setChatAccountHashMap()
+          setChatProtocolLeaderBoard()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.error(error)
+          anchorPrograms.isAboutChatReady = false
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForCommentSectionStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      commentSectionStatsWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getCommentSectionStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        commentSections.data = await getCommentSections()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        commentSectionStatsWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getCommentSectionStatsPDA(), async() => 
+        {
+          //Handle account change...
+          commentSections.data = await getCommentSections()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForIdeaStatChanges()
   {
-    //Subscribe to account changes
-    ideaStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getIdeaStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      ideas.data = await getIdeas()
-    })
+      try
+      {
+        //Subscribe to account changes
+        ideaStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getIdeaStatsPDA(), async() => 
+        {
+          //Handle account change..
+          ideas.data = await getIdeas()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForFEDStatChanges()
   {
-    //Subscribe to account changes
-    fedStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getFEDStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      feds.data = await getFEDRecords()
-    })
+      try
+      {
+        //Subscribe to account changes
+        fedStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getFEDStatsPDA(), async() => 
+        {
+          //Handle account change..
+          feds.data = await getFEDRecords()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForPostVoteStatChanges()
   {
-    //Subscribe to account changes
-    postVoteStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPostVoteStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      postVoteRecords.data = await getPostVoteRecords()
-    })
+      try
+      {
+        //Subscribe to account changes
+        postVoteStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPostVoteStatsPDA(), async() => 
+        {
+          //Handle account change..
+          postVoteRecords.data = await getPostVoteRecords()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForPollStatChanges()
   {
-    //Subscribe to account changes
-    pollStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPollStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      polls.data = await getAllPolls()
-    })
+      try
+      {
+        //Subscribe to account changes
+        pollStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPollStatsPDA(), async() => 
+        {
+          //Handle account change..
+          polls.data = await getAllPolls()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForPollVoteStatChanges()
   {
-    //Subscribe to account changes
-    pollVoteStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPollVoteStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      pollVoteRecords.data = await getPollVoteRecords()
-    })
+      try
+      {
+        //Subscribe to account changes
+        pollVoteStatsWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPollVoteStatsPDA(), async() => 
+        {
+          //Handle account change..
+          pollVoteRecords.data = await getPollVoteRecords()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForChatCEOAccountInitialization()
   {
-    //Subscribe to account changes
-    chatProtocolCEOAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolCEOAccountPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      const chatCEOAccount = await getChatProtocolCEOAccount()
-      adminAccounts.isChatCEOAccountReady = true
-      adminAccounts.chatCEOAddress = chatCEOAccount.address.toBase58()
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolCEOAccountWatcherId)
-      chatProtocolCEOAccountWatcherId = undefined
-    })
+      try
+      {
+        //Subscribe to account changes
+        chatProtocolCEOAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolCEOAccountPDA(), async() => 
+        {
+          //Handle account change..
+          const chatCEOAccount = await getChatProtocolCEOAccount()
+          adminAccounts.isChatCEOAccountReady = true
+          adminAccounts.chatCEOAddress = chatCEOAccount.address.toBase58()
+          anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolCEOAccountWatcherId)
+          chatProtocolCEOAccountWatcherId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForChatTreasurerAccountInitialization()
   {
-    //Subscribe to account changes
-    chatProtocolTreasurerAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolTreasurerAccountPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      const chatTreasurerAccount = await getChatProtocolTreasurerAccount()
-      adminAccounts.chatTreasurerAddress = chatTreasurerAccount.address.toBase58()
-      anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolTreasurerAccountWatcherId)
-      chatProtocolTreasurerAccountWatcherId = undefined
-    })
+      try
+      {
+        //Subscribe to account changes
+        chatProtocolTreasurerAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolTreasurerAccountPDA(), async() => 
+        {
+          //Handle account change..
+          const chatTreasurerAccount = await getChatProtocolTreasurerAccount()
+          adminAccounts.chatTreasurerAddress = chatTreasurerAccount.address.toBase58()
+          anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolTreasurerAccountWatcherId)
+          chatProtocolTreasurerAccountWatcherId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 </script>

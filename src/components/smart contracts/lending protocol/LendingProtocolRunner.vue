@@ -32,7 +32,7 @@
   import PriceUpdater from './PriceUpdater.vue'
   import WalletBalanceUpdater from './WalletBalanceUpdater.vue'
   import TokenReserveBalanceUpdater from './TokenReserveBalanceUpdater.vue'
-  import { sleep } from '/src/assets/helperFunctions/sleep.ts'
+  import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 
   var lendingProtocolWatcherId: any
   var lendingProtocolCEOAccountWatcherId: any
@@ -128,93 +128,201 @@
 
   async function listenForTokenReserveChanges()
   {
-    //Subscribe to account changes
-    tokenReserveStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getTokenReserveStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      tokenReserves.data = await getTokenReserves()
-      setTokenReserveFontEndInfoHashMap()
+      try
+      {
+        //Subscribe to account changes
+        tokenReserveStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getTokenReserveStatsPDA(), async() => 
+        {
+          //Handle account change..
+          tokenReserves.data = await getTokenReserves()
+          setTokenReserveFontEndInfoHashMap()
 
-      await sleep(1000) //1000 milliseconds = 1 second. Waiting for next block slot if a new token reserve pda was added to look up table
-      anchorPrograms.lendingProtocolLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(anchorPrograms.lendingProtocolLookUpTableAddress)
-    })
+          await sleep(1000) //1000 milliseconds = 1 second. Waiting for next block slot if a new token reserve pda was added to look up table
+          anchorPrograms.lendingProtocolLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(anchorPrograms.lendingProtocolLookUpTableAddress)
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForSubMarketChanges()
   {
-    //Subscribe to account changes
-    subMarketStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getSubMarketStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      subMarkets.data = await getSubMarkets()
+      try
+      {
+        //Subscribe to account changes
+        subMarketStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getSubMarketStatsPDA(), async() => 
+        {
+          //Handle account change..
+          subMarkets.data = await getSubMarkets()
 
-      await setSubMarketLookUpTableHashMap()
-    })
+          await setSubMarketLookUpTableHashMap()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForLendingStatChanges()
   {
-    //Subscribe to account changes
-    lendingStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      tokenReserves.data = await getTokenReserves()
-      setTokenReserveFontEndInfoHashMap()
-      subMarkets.data = await getSubMarkets()
-      lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
-    
-      await setLendingUserAccountHashMap()
-      await setLendingUserTabHashMapsAndLendingLeaderBoard()
-      await setLendingUserPortfolioHashMaps()
-      await setMonthlyStatementHashMap()
-    })
+      try
+      {
+        //Subscribe to account changes
+        lendingStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingStatsPDA(), async() => 
+        {
+          //Handle account change..
+          tokenReserves.data = await getTokenReserves()
+          setTokenReserveFontEndInfoHashMap()
+          subMarkets.data = await getSubMarkets()
+          lendingUserMonthlyStatements.data = await getLendingUserMonthlyStatementsWrapper()
+        
+          await setLendingUserAccountHashMap()
+          await setLendingUserTabHashMapsAndLendingLeaderBoard()
+          await setLendingUserPortfolioHashMaps()
+          await setMonthlyStatementHashMap()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForLendingUserStatChanges()
   {
-    //Subscribe to account changes
-    lendingUserStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getUserLendingStatsPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      await setLendingUserAccountHashMap()
-    })
+      try
+      {
+        //Subscribe to account changes
+        lendingUserStatsWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getUserLendingStatsPDA(), async() => 
+        {
+          //Handle account change..
+          await setLendingUserAccountHashMap()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForLendingProtocolChanges()
   {
-    //Subscribe to account changes
-    lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(),
-    async(accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      const lendingProtocol = anchorPrograms.lending.lendingProgram.account.lendingProtocol.coder.accounts.decode("lendingProtocol", accountInfo.data)
+      try
+      {
+        //Subscribe to account changes
+        lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(),
+        async(accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+        {
+          //Handle account change..
+          const lendingProtocol = anchorPrograms.lending.lendingProgram.account.lendingProtocol.coder.accounts.decode("lendingProtocol", accountInfo.data)
 
-      anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
-      anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
-      anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
-      anchorPrograms.lendingProtocolLookUpTableAddress = lendingProtocol.lookUpTableAddress
+          anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
+          anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
+          anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
+          anchorPrograms.lendingProtocolLookUpTableAddress = lendingProtocol.lookUpTableAddress
 
-      if(!anchorPrograms.lendingProtocolLookUpTableAccount)
-        anchorPrograms.lendingProtocolLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(anchorPrograms.lendingProtocolLookUpTableAddress)
-      if(!anchorPrograms.isLendingProtocolInitialized)
-        anchorPrograms.isLendingProtocolInitialized = true
-    })
+          if(!anchorPrograms.lendingProtocolLookUpTableAccount)
+            anchorPrograms.lendingProtocolLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(anchorPrograms.lendingProtocolLookUpTableAddress)
+          if(!anchorPrograms.isLendingProtocolInitialized)
+            anchorPrograms.isLendingProtocolInitialized = true
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
-  function listenForLendingCEOAccountInitialization()
+  async function listenForLendingCEOAccountInitialization()
   {
-    //Subscribe to account changes
-    lendingProtocolCEOAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolCEOAccountPDA(),
-    (accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      //const lendingCEOAccount = await getLendingProtocolCEOAccount()
-      const lendingCEOAccount = anchorPrograms.lending.lendingProgram.account.lendingProtocolCeo.coder.accounts.decode("lendingProtocolCeo", accountInfo.data)
-      adminAccounts.isLendingCEOAccountReady = true
-      adminAccounts.lendingCEOAddressKey = lendingCEOAccount.address
-      adminAccounts.lendingCEOAddressString = lendingCEOAccount.address.toBase58()
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolCEOAccountWatcherId)
-      lendingProtocolCEOAccountWatcherId = undefined
-    })
+      try
+      {
+        //Subscribe to account changes
+        lendingProtocolCEOAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolCEOAccountPDA(),
+        (accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+        {
+          //Handle account change..
+          //const lendingCEOAccount = await getLendingProtocolCEOAccount()
+          const lendingCEOAccount = anchorPrograms.lending.lendingProgram.account.lendingProtocolCeo.coder.accounts.decode("lendingProtocolCeo", accountInfo.data)
+          adminAccounts.isLendingCEOAccountReady = true
+          adminAccounts.lendingCEOAddressKey = lendingCEOAccount.address
+          adminAccounts.lendingCEOAddressString = lendingCEOAccount.address.toBase58()
+          anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingProtocolCEOAccountWatcherId)
+          lendingProtocolCEOAccountWatcherId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 </script>

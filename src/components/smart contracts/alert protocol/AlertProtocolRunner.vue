@@ -13,6 +13,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import DeadMansBreakCheck from './DeadMansBreakCheck.vue'
+  import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 
   var deadMansBreakWatchId: any
   var siteUpdateAlertWatcherId: any
@@ -79,51 +80,98 @@
 
   async function listenForChatQualityOfLifeAccountsChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      deadMansBreakWatchId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getDeadMansBreakPDA(), async() => 
+      try
       {
-        //Handle account change...
-        const deadMansBreak = await getDeadMansBreak()
-        anchorPrograms.deadMansBreakTimeStamp = deadMansBreak.unixClockInTimeStamp
-        anchorPrograms.isDeadMansBreakTripped = isDeadMansBreakTripped()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        deadMansBreakWatchId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getDeadMansBreakPDA(), async() => 
+        {
+          //Handle account change...
+          const deadMansBreak = await getDeadMansBreak()
+          anchorPrograms.deadMansBreakTimeStamp = deadMansBreak.unixClockInTimeStamp
+          anchorPrograms.isDeadMansBreakTripped = isDeadMansBreakTripped()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForWebSiteUpdateNotices()
   {
-    //Subscribe to account changes
-    siteUpdateAlertWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getSiteUpdateAlertPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      const siteUpdateAlertAccount = await getSiteUpdateAlertAccount()
-      if(alertCounter == undefined)
-        alertCounter = siteUpdateAlertAccount.siteUpdateCount
-      else if(alertCounter.lt(siteUpdateAlertAccount.siteUpdateCount))
+      try
       {
-        alertCounter = siteUpdateAlertAccount.siteUpdateCount
-        anchorPrograms.hasWebSiteBeenUpdated = true
+        //Subscribe to account changes
+        siteUpdateAlertWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getSiteUpdateAlertPDA(), async() => 
+        {
+          //Handle account change..
+          const siteUpdateAlertAccount = await getSiteUpdateAlertAccount()
+          if(alertCounter == undefined)
+            alertCounter = siteUpdateAlertAccount.siteUpdateCount
+          else if(alertCounter.lt(siteUpdateAlertAccount.siteUpdateCount))
+          {
+            alertCounter = siteUpdateAlertAccount.siteUpdateCount
+            anchorPrograms.hasWebSiteBeenUpdated = true
+          }
+        })
+
+        break
       }
-    })
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForAlertCEOAccountInitialization()
   {
-    //Subscribe to account changes
-    alertProtocolCEOAccountWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getAlertProtocolCEOAccountPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      const alertCEOAccount = await getAlertProtocolCEOAccount()
-      adminAccounts.isAlertCEOAccountReady = true
-      adminAccounts.alertCEOAddress = alertCEOAccount.address.toBase58()
-      anchorPrograms.alert.alertProgram.provider.connection.removeAccountChangeListener(alertProtocolCEOAccountWatcherId)
-      alertProtocolCEOAccountWatcherId = undefined
-    })
+      try
+      {
+        //Subscribe to account changes
+        alertProtocolCEOAccountWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getAlertProtocolCEOAccountPDA(), async() => 
+        {
+          //Handle account change..
+          const alertCEOAccount = await getAlertProtocolCEOAccount()
+          adminAccounts.isAlertCEOAccountReady = true
+          adminAccounts.alertCEOAddress = alertCEOAccount.address.toBase58()
+          anchorPrograms.alert.alertProgram.provider.connection.removeAccountChangeListener(alertProtocolCEOAccountWatcherId)
+          alertProtocolCEOAccountWatcherId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 </script>

@@ -103,6 +103,7 @@
   import { commentSections } from '/src/assets/globalStates/chat/CommentSections.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import * as anchor from "@coral-xyz/anchor"
 
   const props = defineProps(['featured', 'container', 'logo', 'dark', 'colorName', 'connectButton', 'colorHexValue'])
@@ -587,21 +588,39 @@
       lendingUserLookUpTableWatcherId = undefined
     }
 
-    //Subscribe to account changes
-    lendingUserLookUpTableWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.lendingUserLookUpTableAddress, (accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      const lookupTableState = anchor.web3.AddressLookupTableAccount.deserialize(accountInfo.data);
-      const lookupTableAccountInstance = new anchor.web3.AddressLookupTableAccount({
-        key: connectedWallet.lendingUserLookUpTableAddress,
-        state: lookupTableState
-      })
+      try
+      {
+        //Subscribe to account changes
+        lendingUserLookUpTableWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.lendingUserLookUpTableAddress, (accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+        {
+          //Handle account change..
+          const lookupTableState = anchor.web3.AddressLookupTableAccount.deserialize(accountInfo.data);
+          const lookupTableAccountInstance = new anchor.web3.AddressLookupTableAccount({
+            key: connectedWallet.lendingUserLookUpTableAddress,
+            state: lookupTableState
+          })
 
-      connectedWallet.lendingUserLookUpTableAccount = lookupTableAccountInstance;
-      [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
+          connectedWallet.lendingUserLookUpTableAccount = lookupTableAccountInstance;
+          [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
             connectedWallet.publicKey,
             connectedWallet.selectedLendingUserAccountIndex)
-    })
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForLendingUserTempPriceAccountChanges()
@@ -613,12 +632,30 @@
       lendingUserTempPriceAccountWatcherId = undefined
     }
 
-    //Subscribe to account changes
-    lendingUserTempPriceAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getPriceAccountPDA(connectedWallet.publicKey), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
-    })
+      try
+      {
+        //Subscribe to account changes
+        lendingUserTempPriceAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getPriceAccountPDA(connectedWallet.publicKey), async() => 
+        {
+          //Handle account change..
+          connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   function openPopOver(e: Event) 

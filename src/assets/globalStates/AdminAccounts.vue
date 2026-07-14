@@ -71,7 +71,6 @@
     //Key: Token Mint Address, Value: Assocated Token Address
     [tokenAddressStrings.usdsTokenMintAddress, solvencyWalletATAKeys.usdsATA],
     [tokenAddressStrings.usdcTokenMintAddress, solvencyWalletATAKeys.usdcATA],
-    [tokenAddressStrings.solTokenMintAddress, solvencyWalletATAKeys.solATA],
     [tokenAddressStrings.wethTokenMintAddress, solvencyWalletATAKeys.wethATA],
     [tokenAddressStrings.wbtcTokenMintAddress, solvencyWalletATAKeys.wbtcATA]
   ])

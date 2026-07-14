@@ -52,6 +52,7 @@
   import { customUserNameHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 
   var claimQueueWatchId: any
   var claimStatsWatchId: any
@@ -270,316 +271,508 @@
 
   async function listenForM4AFeeTokenAccount()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      isM4AFeeTokenAccountReadyWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4ATokenFeePDA(anchorPrograms.usdcFeeTokenAddress), async() => 
+      try
       {
-        //Handle account change...
-        anchorPrograms.isM4AFeeTokenAccountReady = true
-        anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(isM4AFeeTokenAccountReadyWatchId)
-        isM4AFeeTokenAccountReadyWatchId = undefined
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        isM4AFeeTokenAccountReadyWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4ATokenFeePDA(anchorPrograms.usdcFeeTokenAddress), async() => 
+        {
+          //Handle account change...
+          anchorPrograms.isM4AFeeTokenAccountReady = true
+          anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(isM4AFeeTokenAccountReadyWatchId)
+          isM4AFeeTokenAccountReadyWatchId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForM4AProtocolChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      isM4AProtocolReadyWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolPDA(), async() => 
+      try
       {
-        //Handle account change...
-        if(!anchorPrograms.isM4AProtocolReady)
+        //Subscribe to account changes
+        isM4AProtocolReadyWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolPDA(), async() => 
         {
-          const m4aProtocol = await getM4AProtocol()
-          anchorPrograms.m4aProtocolInitiatorAddress = m4aProtocol.m4AProtocolInitiatorAddress.toBase58() //note the .m4A weird anchor capitialization
-          anchorPrograms.isM4AProtocolReady = true
-        }
+          //Handle account change...
+          if(!anchorPrograms.isM4AProtocolReady)
+          {
+            const m4aProtocol = await getM4AProtocol()
+            anchorPrograms.m4aProtocolInitiatorAddress = m4aProtocol.m4AProtocolInitiatorAddress.toBase58() //note the .m4A weird anchor capitialization
+            anchorPrograms.isM4AProtocolReady = true
+          }
 
-        await getStateAccounts()
-        claims.data = await getQueueClaims()//Todo refresh data instead of fetching again
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
-      anchorPrograms.isM4AProtocolReady = false
+          await getStateAccounts()
+          claims.data = await getQueueClaims()//Todo refresh data instead of fetching again
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+        {
+          console.error(error)
+          anchorPrograms.isM4AProtocolReady = false
+        }
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForClaimQueueChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      claimQueueWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimQueuePDA(), async() => 
+      try
       {
-        //Handle account change...
-        claimQueue.data = await getClaimQueue()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        claimQueueWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimQueuePDA(), async() => 
+        {
+          //Handle account change...
+          claimQueue.data = await getClaimQueue()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForClaimStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      claimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        claims.data = await getQueueClaims()
-        claimStats.data = await getClaimStats()
-        await getAllSubmitters()
-        await getAllPatients()
-        setM4AProtocolLeaderBoard()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        claimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimStatsPDA(), async() => 
+        {
+          //Handle account change...
+          claims.data = await getQueueClaims()
+          claimStats.data = await getClaimStats()
+          await getAllSubmitters()
+          await getAllPatients()
+          setM4AProtocolLeaderBoard()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForClaimAndProcessorStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      claimAndProcessorStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimAndProcessorStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        claims.data = await getQueueClaims()
-        processors.data = await getProcessors()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        claimAndProcessorStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimAndProcessorStatsPDA(), async() => 
+        {
+          //Handle account change...
+          claims.data = await getQueueClaims()
+          processors.data = await getProcessors()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForProcessorStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      processorStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getProcessorStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        anchorPrograms.areM4AProtocolStatsReady = true
-        processors.data = await getProcessors()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        processorStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getProcessorStatsPDA(), async() => 
+        {
+          //Handle account change...
+          anchorPrograms.areM4AProtocolStatsReady = true
+          processors.data = await getProcessors()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForSubmitterStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      submitterStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getSubmitterStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        await getAllSubmitters()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        submitterStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getSubmitterStatsPDA(), async() => 
+        {
+          //Handle account change...
+          await getAllSubmitters()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForPatientStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      patientStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getPatientStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        await getAllPatients()
-        setM4AProtocolLeaderBoard()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        patientStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getPatientStatsPDA(), async() => 
+        {
+          //Handle account change...
+          await getAllPatients()
+          setM4AProtocolLeaderBoard()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForHospitalStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      hospitalStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getHospitalStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        hospitalStats.data = await getHospitalStats()
-        hospitals.data = await getAllHospitalsAndUpdateStateMap()
+        //Subscribe to account changes
+        hospitalStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getHospitalStatsPDA(), async() => 
+        {
+          //Handle account change...
+          hospitalStats.data = await getHospitalStats()
+          hospitals.data = await getAllHospitalsAndUpdateStateMap()
 
-        //Get claims with updated hospitals
-        claims.data = await getQueueClaims()
+          //Get claims with updated hospitals
+          claims.data = await getQueueClaims()
 
-        //Get insurance company record table data with updated hospitals
-        insuranceCompanies.data = await getAllInsuranceCompanies()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+          //Get insurance company record table data with updated hospitals
+          insuranceCompanies.data = await getAllInsuranceCompanies()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
     
   async function listenForInsuranceCompanyStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      insuranceCompanyStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getInsuranceCompanyStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        insuranceCompanyStats.data = await getInsuranceCompanyStats()
-        insuranceCompanies.data = await getAllInsuranceCompanies()
+        //Subscribe to account changes
+        insuranceCompanyStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getInsuranceCompanyStatsPDA(), async() => 
+        {
+          //Handle account change...
+          insuranceCompanyStats.data = await getInsuranceCompanyStats()
+          insuranceCompanies.data = await getAllInsuranceCompanies()
 
-        //Get claim que table data with updated insurance companies
-        claims.data = await getQueueClaims()
+          //Get claim que table data with updated insurance companies
+          claims.data = await getQueueClaims()
 
-        //Get insurance company record table data with updated hospitals
-        hospitals.data = await getAllHospitalsAndUpdateStateMap()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+          //Get insurance company record table data with updated hospitals
+          hospitals.data = await getAllHospitalsAndUpdateStateMap()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForPatientRecordStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      patientRecordStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getPatientRecordStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        patientRecordsHashMap.map = await setPatientRecordsHashMap()
-        claims.data = await getQueueClaims()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        patientRecordStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getPatientRecordStatsPDA(), async() => 
+        {
+          //Handle account change...
+          patientRecordsHashMap.map = await setPatientRecordsHashMap()
+          claims.data = await getQueueClaims()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForHospitalAndInsuranceRecordStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      hospitalAndInsuranceRecordStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getHospitalAndInsuranceRecordStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        insuranceCompanies.data = await getAllInsuranceCompanies()//Needed to update show records number
-        hospitals.data = await getAllHospitalsAndUpdateStateMap()//Needed to update show records number
+        //Subscribe to account changes
+        hospitalAndInsuranceRecordStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getHospitalAndInsuranceRecordStatsPDA(), async() => 
+        {
+          //Handle account change...
+          insuranceCompanies.data = await getAllInsuranceCompanies()//Needed to update show records number
+          hospitals.data = await getAllHospitalsAndUpdateStateMap()//Needed to update show records number
 
-        hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
-        insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
-        claims.data = await getQueueClaims()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+          hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
+          insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
+          claims.data = await getQueueClaims()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForProcessedClaimStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      processedClaimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getProcessedClaimStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        await getAllSubmitters()
-        await getAllPatients()
-        processedClaimStats.data = await getProcessedClaimStats()
-        hospitals.data = await getAllHospitalsAndUpdateStateMap()
-        insuranceCompanies.data = await getAllInsuranceCompanies()
-        processedClaims.data = await getProcessedClaims()
-        patientRecordsHashMap.map = await setPatientRecordsHashMap()
-        hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
-        insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
-        processors.data = await getProcessors()
-        setM4AProtocolLeaderBoard()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        processedClaimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getProcessedClaimStatsPDA(), async() => 
+        {
+          //Handle account change...
+          await getAllSubmitters()
+          await getAllPatients()
+          processedClaimStats.data = await getProcessedClaimStats()
+          hospitals.data = await getAllHospitalsAndUpdateStateMap()
+          insuranceCompanies.data = await getAllInsuranceCompanies()
+          processedClaims.data = await getProcessedClaims()
+          patientRecordsHashMap.map = await setPatientRecordsHashMap()
+          hospitalRecordsHashMap.map = await setHospitalRecordsHashMap()
+          insuranceCompanyRecordsHashMap.map = await setInsuranceCompanyRecordsHashMap()
+          processors.data = await getProcessors()
+          setM4AProtocolLeaderBoard()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForUnfinishedClaimStatChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      unfinishedClaimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getUnfinishedClaimStatsPDA(), async() => 
+      try
       {
-        //Handle account change...
-        patientRecordsHashMap.map = await setPatientRecordsHashMap()
-        processedClaims.data = await getProcessedClaims()
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        unfinishedClaimStatsWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getUnfinishedClaimStatsPDA(), async() => 
+        {
+          //Handle account change...
+          patientRecordsHashMap.map = await setPatientRecordsHashMap()
+          processedClaims.data = await getProcessedClaims()
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForM4ACEOAccountInitialization()
   {
-    //Subscribe to account changes
-    m4aProtocolCEOAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolCEOAccountPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      const m4aCEOAccount = await getM4AProtocolCEOAccount()
-      adminAccounts.isM4ACEOAccountReady = true
-      adminAccounts.m4aCEOAddress = m4aCEOAccount.address.toBase58()
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolCEOAccountWatcherId)
-      m4aProtocolCEOAccountWatcherId = undefined
-    })
+      try
+      {
+        //Subscribe to account changes
+        m4aProtocolCEOAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolCEOAccountPDA(), async() => 
+        {
+          //Handle account change..
+          const m4aCEOAccount = await getM4AProtocolCEOAccount()
+          adminAccounts.isM4ACEOAccountReady = true
+          adminAccounts.m4aCEOAddress = m4aCEOAccount.address.toBase58()
+          anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolCEOAccountWatcherId)
+          m4aProtocolCEOAccountWatcherId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 
   async function listenForM4ATreasurerAccountInitialization()
   {
-    //Subscribe to account changes
-    m4aProtocolTreasurerAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolTreasurerAccountPDA(), async() => 
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Handle account change..
-      const m4aTreasurerAccount = await getM4AProtocolTreasurerAccount()
-      adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
-      anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolTreasurerAccountWatcherId)
-      m4aProtocolTreasurerAccountWatcherId = undefined
-    })
+      try
+      {
+        //Subscribe to account changes
+        m4aProtocolTreasurerAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolTreasurerAccountPDA(), async() => 
+        {
+          //Handle account change..
+          const m4aTreasurerAccount = await getM4AProtocolTreasurerAccount()
+          adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
+          anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolTreasurerAccountWatcherId)
+          m4aProtocolTreasurerAccountWatcherId = undefined
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
+    }
   }
 </script>
 

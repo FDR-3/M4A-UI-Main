@@ -7,20 +7,21 @@
   import { LAMPORTS_PER_SOL } from "@solana/web3.js"
   import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token"
   import { getTokenReservePDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { getSOLBalanceWrapper, getTokenAccountBalanceWrapper } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+  import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 
-  /*const tokenReserveUSDSATA = tokenReserveFontEndInfoHashMap.get(tokenIds.usdsTokenId)
-  const tokenReserveUSDCATA = tokenReserveFontEndInfoHashMap.get(tokenIds.usdcTokenMintAddress)
-  const tokenReserveSOLATA = tokenReserveFontEndInfoHashMap.get(tokenIds.solTokenMintAddress)
-  const tokenReserveWEthATA = tokenReserveFontEndInfoHashMap.get(tokenIds.wethTokenMintAddress)
-  const tokenReserveWBtcATA = tokenReserveFontEndInfoHashMap.get(tokenIds.wbtcTokenMintAddress)*/
+  const tokenReserveUSDSATA = tokenReserveFontEndInfoHashMap.get(tokenIds.usdsTokenId).ata
+  const tokenReserveUSDCATA = tokenReserveFontEndInfoHashMap.get(tokenIds.usdcTokenId).ata
+  const tokenReserveSOLATA = tokenReserveFontEndInfoHashMap.get(tokenIds.solTokenId).ata
+  const tokenReserveWEthATA = tokenReserveFontEndInfoHashMap.get(tokenIds.wethTokenId).ata
+  const tokenReserveWBtcATA = tokenReserveFontEndInfoHashMap.get(tokenIds.wbtcTokenId).ata
 
   //The ATA addresses can be harded coded in once you know the addresses
-  var tokenReserveUSDSATA: any
+  /*var tokenReserveUSDSATA: any
   var tokenReserveUSDCATA: any
   var tokenReserveSOLATA: any
   var tokenReserveWEthATA: any
-  var tokenReserveWBtcATA: any
+  var tokenReserveWBtcATA: any*/
   
   var tokenReserveUSDSATAWatcherId: any
   var tokenReserveUSDCATAWatcherId: any
@@ -32,7 +33,7 @@
   {
     //The ATA address can be harded coded in once you know the address
     //Token Reserve USDS ATA
-    let tokenReserveUSDSPDA = getTokenReservePDA(tokenAddressKeys.usdsTokenMintAddress)
+    /*let tokenReserveUSDSPDA = getTokenReservePDA(tokenAddressKeys.usdsTokenMintAddress)
     //console.log(tokenReserveUSDSPDA.toString())
     tokenReserveUSDSATA = await Token.getAssociatedTokenAddress
     (
@@ -42,11 +43,11 @@
       tokenReserveUSDSPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveUSDSATA.toString())
+    console.log(tokenReserveUSDSATA.toString())*/
     try
     {
       //Get Token Reserve USDS Balance
-      const tokenReserveUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveUSDSATA)
+      const tokenReserveUSDSAccount = await getTokenAccountBalanceWrapper(tokenReserveUSDSATA)
       tokenReserveBalancesHashMap.map.set(tokenIds.usdsTokenId, Number(tokenReserveUSDSAccount.value.uiAmountString))
       await listenForTokenReserveUSDSChanges()
     }
@@ -56,7 +57,7 @@
     }
 
     //Token Reserve USDC ATA
-    let tokenReserveUSDCPDA = getTokenReservePDA(tokenAddressKeys.usdcTokenMintAddress)
+    /*let tokenReserveUSDCPDA = getTokenReservePDA(tokenAddressKeys.usdcTokenMintAddress)
     //console.log(tokenReserveUSDCPDA.toString())
     tokenReserveUSDCATA = await Token.getAssociatedTokenAddress
     (
@@ -66,11 +67,11 @@
       tokenReserveUSDCPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveUSDCATA.toString())
+    console.log(tokenReserveUSDCATA.toString())*/
     try
     {
       //Get Token Reserve USDC Balance
-      const tokenReserveUSDCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveUSDCATA)
+      const tokenReserveUSDCAccount = await getTokenAccountBalanceWrapper(tokenReserveUSDCATA)
       tokenReserveBalancesHashMap.map.set(tokenIds.usdcTokenId, Number(tokenReserveUSDCAccount.value.uiAmountString))
       await listenForTokenReserveUSDCChanges()
     }
@@ -80,7 +81,7 @@
     }
 
     //Token Reserve SOL ATA
-    let tokenReserveSOLPDA = getTokenReservePDA(tokenAddressKeys.solTokenMintAddress)
+    /*let tokenReserveSOLPDA = getTokenReservePDA(tokenAddressKeys.solTokenMintAddress)
     //console.log(tokenReserveSOLPDA.toString())
     tokenReserveSOLATA = await Token.getAssociatedTokenAddress
     (
@@ -90,11 +91,11 @@
       tokenReserveSOLPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveSOLATA.toString())
+    console.log(tokenReserveSOLATA.toString())*/
     try
     {
       //Get Token Reserve SOL Balance
-      const tokenReserveSOLAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveSOLATA)
+      const tokenReserveSOLAccount = await getTokenAccountBalanceWrapper(tokenReserveSOLATA)
       tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, Number(tokenReserveSOLAccount.value.uiAmountString))
       await listenForTokenReserveSOLChanges()
     }
@@ -104,7 +105,7 @@
     }
 
     //Token Reserve WEth ATA
-    let tokenReserveWEthPDA = getTokenReservePDA(tokenAddressKeys.wethTokenMintAddress)
+    /*let tokenReserveWEthPDA = getTokenReservePDA(tokenAddressKeys.wethTokenMintAddress)
     //console.log(tokenReserveWEthPDA.toString())
     tokenReserveWEthATA = await Token.getAssociatedTokenAddress
     (
@@ -114,11 +115,11 @@
       tokenReserveWEthPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveWEthATA.toString())
+    console.log(tokenReserveWEthATA.toString())*/
     try
     {
       //Get Token Reserve WEth Balance
-      const tokenReserveWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveWEthATA)
+      const tokenReserveWEthAccount = await getTokenAccountBalanceWrapper(tokenReserveWEthATA)
       tokenReserveBalancesHashMap.map.set(tokenIds.wethTokenId, Number(tokenReserveWEthAccount.value.uiAmountString))
       await listenForTokenReserveWEthChanges()
     }
@@ -129,7 +130,7 @@
 
     //The ATA address can be harded coded in once you know the address
     //Token Reserve WBtc ATA
-    let tokenReserveWBtcPDA = getTokenReservePDA(tokenAddressKeys.wbtcTokenMintAddress)
+    /*let tokenReserveWBtcPDA = getTokenReservePDA(tokenAddressKeys.wbtcTokenMintAddress)
     //console.log(tokenReserveWBtcPDA.toString())
     tokenReserveWBtcATA = await Token.getAssociatedTokenAddress
     (
@@ -139,11 +140,11 @@
       tokenReserveWBtcPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveWBtcATA.toString())
+    console.log(tokenReserveWBtcATA.toString())*/
     try
     {
       //Get Token Reserve WBtc Balance
-      const tokenReserveWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveWBtcATA)
+      const tokenReserveWBtcAccount = await getTokenAccountBalanceWrapper(tokenReserveWBtcATA)
       tokenReserveBalancesHashMap.map.set(tokenIds.wbtcTokenId, Number(tokenReserveWBtcAccount.value.uiAmountString))
       await listenForTokenReserveWBtcChanges()
     }
@@ -184,92 +185,147 @@
 
   async function listenForTokenReserveUSDSChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      tokenReserveUSDSATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveUSDSATA, async() => 
+      try
       {
-        //Handle account change...
-        const tokenReserveUSDSAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveUSDSATA)
-        tokenReserveBalancesHashMap.map.set(tokenIds.usdsTokenId, tokenReserveUSDSAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        tokenReserveUSDSATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveUSDSATA, async() => 
+        {
+          //Handle account change...
+          const tokenReserveUSDSAccount = await getTokenAccountBalanceWrapper(tokenReserveUSDSATA)
+          tokenReserveBalancesHashMap.map.set(tokenIds.usdsTokenId, tokenReserveUSDSAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
   
   async function listenForTokenReserveUSDCChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      tokenReserveUSDCATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveUSDCATA, async() => 
+      try
       {
-        //Handle account change...
-        const tokenReserveUDSCAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveUSDCATA)
-        tokenReserveBalancesHashMap.map.set(tokenIds.usdcTokenId, tokenReserveUDSCAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        tokenReserveUSDCATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveUSDCATA, async() => 
+        {
+          //Handle account change...
+          const tokenReserveUDSCAccount = await getTokenAccountBalanceWrapper(tokenReserveUSDCATA)
+          tokenReserveBalancesHashMap.map.set(tokenIds.usdcTokenId, tokenReserveUDSCAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForTokenReserveSOLChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      tokenReserveSOLWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveSOLATA, async() => 
+      try
       {
-        //Handle account change...
-        const tokenReserveSOLBalance = await anchorPrograms.lending.lendingProgram.provider.connection.getBalance(tokenReserveSOLATA)
-        const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
-        tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, (tokenReserveSOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        tokenReserveSOLWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveSOLATA, async() => 
+        {
+          //Handle account change...
+          const tokenReserveSOLBalance = await getSOLBalanceWrapper(tokenReserveSOLATA)
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
+          tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, (tokenReserveSOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForTokenReserveWEthChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      tokenReserveWEthATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveWEthATA, async() => 
+      try
       {
-        //Handle account change...
-        const tokenReserveWEthAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveWEthATA)
-        tokenReserveBalancesHashMap.map.set(tokenIds.wethTokenId, tokenReserveWEthAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        tokenReserveWEthATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveWEthATA, async() => 
+        {
+          //Handle account change...
+          const tokenReserveWEthAccount = await getTokenAccountBalanceWrapper(tokenReserveWEthATA)
+          tokenReserveBalancesHashMap.map.set(tokenIds.wethTokenId, tokenReserveWEthAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 
   async function listenForTokenReserveWBtcChanges()
   {
-    try
+    for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
-      //Subscribe to account changes
-      tokenReserveWBtcATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveWBtcATA, async() => 
+      try
       {
-        //Handle account change...
-        const tokenReserveWBtcAccount = await anchorPrograms.lending.lendingProgram.provider.connection.getTokenAccountBalance(tokenReserveWBtcATA)
-        tokenReserveBalancesHashMap.map.set(tokenIds.wbtcTokenId, tokenReserveWBtcAccount.value.uiAmount.toFixed(2))
-      })
-    }
-    catch(error)
-    {
-      console.log(error)
+        //Subscribe to account changes
+        tokenReserveWBtcATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveWBtcATA, async() => 
+        {
+          //Handle account change...
+          const tokenReserveWBtcAccount = await getTokenAccountBalanceWrapper(tokenReserveWBtcATA)
+          tokenReserveBalancesHashMap.map.set(tokenIds.wbtcTokenId, tokenReserveWBtcAccount.value.uiAmount.toFixed(2))
+        })
+
+        break
+      }
+      catch(error: any)
+      {
+        if(!error.message.includes(ERROR_429))
+          console.error(error)
+        else
+        {
+          console.log(RETRY_MESSAGE + RETRY_TIME_OUT*i*2/1000)
+          await sleep(RETRY_TIME_OUT*i*2)
+        }
+      }
     }
   }
 </script>
