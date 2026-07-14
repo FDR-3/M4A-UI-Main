@@ -492,6 +492,7 @@
       (event?.target?.id != "newAccountButton") &&
       (event?.target?.id != "closeAccountNameEditButton") &&
       (event?.target?.id != "emojiBottomBar") &&
+      !event?.target?.classList.contains("jitoWarning") &&
       !event?.target?.classList.contains("native-input") &&
       !event?.target?.classList.contains("emojiSearchContainer") &&
       !event?.target?.classList.contains("emojiSearchOptions") &&

@@ -1996,7 +1996,14 @@
       const data: TipFloorData[] = await response.json()
 
       //4. Log or return the data
-      console.log("Current 50th Percentile Jito Tip:", Math.floor((data[0].landed_tips_50th_percentile * LAMPORTS_PER_SOL)))
+      console.log("Current 50th Percentile Jito Tip:", Number(data[0].landed_tips_50th_percentile.toFixed(9)))
+      anchorPrograms.jitoTipFloorAmount = data[0].landed_tips_50th_percentile
+
+      const dontShowJitoWarning = localStorage.getItem("dontShowJitoWarning") == "true"
+      if(!dontShowJitoWarning)
+        if(anchorPrograms.jitoTipFloorAmount >= 0.000100000)
+          anchorPrograms.jitoTipWarning = true
+
       return Math.floor((data[0].landed_tips_50th_percentile * LAMPORTS_PER_SOL))
 
     }

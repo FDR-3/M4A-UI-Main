@@ -1,6 +1,7 @@
 <template>
   <ion-page>
-    <Alerter v-if="anchorPrograms.hasWebSiteBeenUpdated"/>
+    <UpdateNotice v-if="anchorPrograms.hasWebSiteBeenUpdated"/>
+    <HighJitTipWarning v-if="anchorPrograms.jitoTipWarning"/>
     <Toast position="center" class="m4aToast">
       <template #message="slotProps">
         <div class="flexCenterColumn noClickEvent">
@@ -81,7 +82,8 @@
 <script setup lang="ts">
   import { ref, watch, provide } from 'vue'
   import { IonContent, IonPage, IonText } from '@ionic/vue'
-  import Alerter from '/src/components//smart contracts/alert protocol/UpdateNotice.vue'
+  import UpdateNotice from '/src/components/smart contracts/alert protocol/UpdateNotice.vue'
+  import HighJitTipWarning from '/src/components/smart contracts/lending protocol/HighJitoTipWarning.vue'
   import Toast from 'primevue/toast'
   import {TOAST_TIME_LEN_SECONDS } from '/src/assets/contracts/WalletHelper.vue'
   import TimerProgressBar from '/src/components/fancy/TimerProgressBar.vue'

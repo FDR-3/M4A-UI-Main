@@ -253,6 +253,7 @@
       const dataPcSectionValue = event?.target?.getAttribute('data-pc-section')
 
       if(!modalRef.value.contains(event?.target) &&
+      !event?.target?.classList.contains("jitoWarning") &&
       !event?.target?.classList.contains("lendingActionButton") &&
       !event?.target?.classList.contains("copyTokenMintAddressButton") &&
       !event?.target?.classList.contains("infoButtonPopover") &&

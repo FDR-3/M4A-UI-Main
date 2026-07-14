@@ -90,6 +90,8 @@
     lendingProtocolLookUpTableAccount: undefined,
     isLendingProtocolInitialized: false,
     isLendingProtocolReady: false,
+    jitoTipFloorAmount: 0,
+    jitoTipWarning: false,
     blockChainTimeStamp: 0
   })
 

@@ -30,7 +30,7 @@
             <div style="margin-bottom: 8px">
               <InfoButton :infoMessage="stateHospitalTableInfoMSG"/>
             </div>
-            <h1 class="nMediumSmallMarginLeft">{{stateName}} Hospital List</h1>
+            <h1 class="">{{stateName}} Hospital List</h1>
           </div>
           
           <div class="flexCenterRowWidth" style="gap: 100px">
