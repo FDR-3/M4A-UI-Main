@@ -314,7 +314,7 @@
       const tokenAmount = solvencyInsuranceTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenId)
       if(tokenAmount)
       {
-        unprocessedTableData[i].wallet = Number(tokenAmount)
+        unprocessedTableData[i].wallet = Number(tokenAmount.replace(/,/g, ''))
         unprocessedTableData[i].walletString = tokenAmount
       }
       else
@@ -387,7 +387,7 @@
       const tokenAmount = solvencyInsuranceTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenId)
       if(tokenAmount)
       {
-        unprocessedTableData[i].wallet = Number(tokenAmount)
+        unprocessedTableData[i].wallet = Number(tokenAmount.replace(/,/g, ''))
         unprocessedTableData[i].walletString = tokenAmount
       }
       else

@@ -4,8 +4,8 @@
   import { tokenIds, tokenAddressKeys, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveFontEndInfoHashMap, tokenReserveBalancesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { LAMPORTS_PER_SOL } from "@solana/web3.js"
-  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token"
+  import { LAMPORTS_PER_SOL, AccountInfo } from "@solana/web3.js"
+  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, AccountLayout } from "@solana/spl-token"
   import { getTokenReservePDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getSOLBalanceWrapper, getTokenAccountBalanceWrapper } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
@@ -48,7 +48,7 @@
     {
       //Get Token Reserve USDS Balance
       const tokenReserveUSDSAccount = await getTokenAccountBalanceWrapper(tokenReserveUSDSATA)
-      tokenReserveBalancesHashMap.map.set(tokenIds.usdsTokenId, Number(tokenReserveUSDSAccount.value.uiAmountString))
+      tokenReserveBalancesHashMap.map.set(tokenIds.usdsTokenId, Number(tokenReserveUSDSAccount.value.uiAmount))
       await listenForTokenReserveUSDSChanges()
     }
     catch
@@ -72,7 +72,7 @@
     {
       //Get Token Reserve USDC Balance
       const tokenReserveUSDCAccount = await getTokenAccountBalanceWrapper(tokenReserveUSDCATA)
-      tokenReserveBalancesHashMap.map.set(tokenIds.usdcTokenId, Number(tokenReserveUSDCAccount.value.uiAmountString))
+      tokenReserveBalancesHashMap.map.set(tokenIds.usdcTokenId, Number(tokenReserveUSDCAccount.value.uiAmount))
       await listenForTokenReserveUSDCChanges()
     }
     catch
@@ -96,7 +96,7 @@
     {
       //Get Token Reserve SOL Balance
       const tokenReserveSOLAccount = await getTokenAccountBalanceWrapper(tokenReserveSOLATA)
-      tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, Number(tokenReserveSOLAccount.value.uiAmountString))
+      tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, Number(tokenReserveSOLAccount.value.uiAmount))
       await listenForTokenReserveSOLChanges()
     }
     catch
@@ -120,7 +120,7 @@
     {
       //Get Token Reserve WEth Balance
       const tokenReserveWEthAccount = await getTokenAccountBalanceWrapper(tokenReserveWEthATA)
-      tokenReserveBalancesHashMap.map.set(tokenIds.wethTokenId, Number(tokenReserveWEthAccount.value.uiAmountString))
+      tokenReserveBalancesHashMap.map.set(tokenIds.wethTokenId, Number(tokenReserveWEthAccount.value.uiAmount))
       await listenForTokenReserveWEthChanges()
     }
     catch
@@ -145,7 +145,7 @@
     {
       //Get Token Reserve WBtc Balance
       const tokenReserveWBtcAccount = await getTokenAccountBalanceWrapper(tokenReserveWBtcATA)
-      tokenReserveBalancesHashMap.map.set(tokenIds.wbtcTokenId, Number(tokenReserveWBtcAccount.value.uiAmountString))
+      tokenReserveBalancesHashMap.map.set(tokenIds.wbtcTokenId, Number(tokenReserveWBtcAccount.value.uiAmount))
       await listenForTokenReserveWBtcChanges()
     }
     catch
@@ -190,11 +190,21 @@
       try
       {
         //Subscribe to account changes
-        tokenReserveUSDSATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveUSDSATA, async() => 
+        tokenReserveUSDSATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveUSDSATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const tokenReserveUSDSAccount = await getTokenAccountBalanceWrapper(tokenReserveUSDSATA)
-          tokenReserveBalancesHashMap.map.set(tokenIds.usdsTokenId, tokenReserveUSDSAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          tokenReserveBalancesHashMap.map.set(tokenIds.usdsTokenId, uiAmount)
         })
 
         break
@@ -219,11 +229,21 @@
       try
       {
         //Subscribe to account changes
-        tokenReserveUSDCATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveUSDCATA, async() => 
+        tokenReserveUSDCATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveUSDCATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const tokenReserveUDSCAccount = await getTokenAccountBalanceWrapper(tokenReserveUSDCATA)
-          tokenReserveBalancesHashMap.map.set(tokenIds.usdcTokenId, tokenReserveUDSCAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          tokenReserveBalancesHashMap.map.set(tokenIds.usdcTokenId, uiAmount)
         })
 
         break
@@ -248,12 +268,15 @@
       try
       {
         //Subscribe to account changes
-        tokenReserveSOLWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveSOLATA, async() => 
+        tokenReserveSOLWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveSOLATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const tokenReserveSOLBalance = await getSOLBalanceWrapper(tokenReserveSOLATA)
           const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
-          tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, (tokenReserveSOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+          if(accountInfo.lamports)
+            tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, (accountInfo.lamports / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+          else
+            tokenReserveBalancesHashMap.map.set(tokenIds.solTokenId, (0).toFixed(decimalAmount))
         })
 
         break
@@ -278,11 +301,21 @@
       try
       {
         //Subscribe to account changes
-        tokenReserveWEthATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveWEthATA, async() => 
+        tokenReserveWEthATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveWEthATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const tokenReserveWEthAccount = await getTokenAccountBalanceWrapper(tokenReserveWEthATA)
-          tokenReserveBalancesHashMap.map.set(tokenIds.wethTokenId, tokenReserveWEthAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.wethTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          tokenReserveBalancesHashMap.map.set(tokenIds.wethTokenId, uiAmount)
         })
 
         break
@@ -307,11 +340,21 @@
       try
       {
         //Subscribe to account changes
-        tokenReserveWBtcATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveWBtcATA, async() => 
+        tokenReserveWBtcATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(tokenReserveWBtcATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const tokenReserveWBtcAccount = await getTokenAccountBalanceWrapper(tokenReserveWBtcATA)
-          tokenReserveBalancesHashMap.map.set(tokenIds.wbtcTokenId, tokenReserveWBtcAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.wbtcTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          tokenReserveBalancesHashMap.map.set(tokenIds.wbtcTokenId, uiAmount)
         })
 
         break

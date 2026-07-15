@@ -86,6 +86,7 @@
     currentStatementMonthName: undefined, //monthList[newDate.getMonth()].monthName,
     currentStatementMonthNumber: undefined, //newDate.getMonth() + 1,
     currentStatementYear: undefined, //newDate.getFullYear(),
+    maxTabsPerLendingAccount: 0,
     lendingProtocolLookUpTableAddress: undefined,
     lendingProtocolLookUpTableAccount: undefined,
     isLendingProtocolInitialized: false,

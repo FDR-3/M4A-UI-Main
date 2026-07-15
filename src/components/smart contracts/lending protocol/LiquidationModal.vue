@@ -467,11 +467,29 @@
     }
   })
 
-  watch(connectedWallet, async() =>
+  //Json string of wallet to detect object property changes
+  const walletWatch = computed(() =>
+  {
+    return JSON.stringify(
+    {
+      addressString: connectedWallet.addressString,
+      selectedLendingUserAccountIndex: connectedWallet.selectedLendingUserAccountIndex
+    })
+  })
+
+  watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
     if(liquidating.value)
     {
-      const balance = connectedWallet.tokenBalanceMap.get(borrowPositionToRepaySelect.value.repaymentTokenMintAddress.toString())
+      let newWallet = JSON.parse(newJSONObjectString)
+      let oldWallet= JSON.parse(oldJSONObjectString)
+
+      //Only want this running if the connected Wallet Address String is changing and modal is visible
+      if((newWallet.addressString == oldWallet.addressString
+      && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
+        return
+
+      const balance = connectedWallet.tokenBalanceMap.get(borrowPositionToRepaySelect.value.repaymentTokenId)
       if(balance)
         liquidatorWalletBalance.value = Number(balance)
       else
@@ -650,7 +668,7 @@
         payableUserDebt.value = Number(selectedBorrowedAmount) * 0.5
     }
 
-    const balance = connectedWallet.tokenBalanceMap.get(borrowPositionToRepaySelect.value.repaymentTokenMintAddress.toString())
+    const balance = connectedWallet.tokenBalanceMap.get(borrowPositionToRepaySelect.value.repaymentTokenId)
     if(balance)
       liquidatorWalletBalance.value = Number(balance)
     else

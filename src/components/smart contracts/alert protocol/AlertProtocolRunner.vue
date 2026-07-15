@@ -10,6 +10,7 @@
   getDeadMansBreakPDA,
   getSiteUpdateAlertPDA,
   getAlertProtocolCEOAccountPDA } from '/src/assets/contracts/Solana/AlertProtocol.vue'
+  import { AccountInfo } from "@solana/web3.js"
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import DeadMansBreakCheck from './DeadMansBreakCheck.vue'
@@ -85,10 +86,11 @@
       try
       {
         //Subscribe to account changes
-        deadMansBreakWatchId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getDeadMansBreakPDA(), async() => 
+        deadMansBreakWatchId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getDeadMansBreakPDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const deadMansBreak = await getDeadMansBreak()
+          const deadMansBreak = anchorPrograms.alert.alertProgram.account.deadMansBreakAlert.coder.accounts.decode("deadMansBreakAlert", accountInfo.data)
           anchorPrograms.deadMansBreakTimeStamp = deadMansBreak.unixClockInTimeStamp
           anchorPrograms.isDeadMansBreakTripped = isDeadMansBreakTripped()
         })
@@ -115,10 +117,11 @@
       try
       {
         //Subscribe to account changes
-        siteUpdateAlertWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getSiteUpdateAlertPDA(), async() => 
+        siteUpdateAlertWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getSiteUpdateAlertPDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change..
-          const siteUpdateAlertAccount = await getSiteUpdateAlertAccount()
+          const siteUpdateAlertAccount = anchorPrograms.alert.alertProgram.account.siteUpdateAlert.coder.accounts.decode("siteUpdateAlert", accountInfo.data)
           if(alertCounter == undefined)
             alertCounter = siteUpdateAlertAccount.siteUpdateCount
           else if(alertCounter.lt(siteUpdateAlertAccount.siteUpdateCount))
@@ -150,10 +153,11 @@
       try
       {
         //Subscribe to account changes
-        alertProtocolCEOAccountWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getAlertProtocolCEOAccountPDA(), async() => 
+        alertProtocolCEOAccountWatcherId = anchorPrograms.alert.alertProgram.provider.connection.onAccountChange(getAlertProtocolCEOAccountPDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change..
-          const alertCEOAccount = await getAlertProtocolCEOAccount()
+          const alertCEOAccount = anchorPrograms.alert.alertProgram.account.alertProtocolCeo.coder.accounts.decode("alertProtocolCeo", accountInfo.data)
           adminAccounts.isAlertCEOAccountReady = true
           adminAccounts.alertCEOAddress = alertCEOAccount.address.toBase58()
           anchorPrograms.alert.alertProgram.provider.connection.removeAccountChangeListener(alertProtocolCEOAccountWatcherId)

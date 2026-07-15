@@ -84,7 +84,7 @@
   import { computed, ref, toRefs, onMounted, onUnmounted, watch } from "vue"
   import { onClickOutside, useClipboard } from "@vueuse/core"
   import { IonButton, IonLabel, IonPopover, IonText } from '@ionic/vue'
-  import { PublicKey } from "@solana/web3.js"
+  import { PublicKey, AccountInfo } from "@solana/web3.js"
   import { useWallet } from 'solana-wallets-vue'
   import { navigation, MenuIndex } from '/src/assets/globalStates/Navigation.vue'
   import WalletConnectButton from '/src/components/navbar/SolanaWalletButton/WalletConnectButton.vue'
@@ -593,7 +593,7 @@
       try
       {
         //Subscribe to account changes
-        lendingUserLookUpTableWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.lendingUserLookUpTableAddress, (accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+        lendingUserLookUpTableWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.lendingUserLookUpTableAddress, (accountInfo: AccountInfo<Buffer>) => 
         {
           //Handle account change..
           const lookupTableState = anchor.web3.AddressLookupTableAccount.deserialize(accountInfo.data);
@@ -637,10 +637,14 @@
       try
       {
         //Subscribe to account changes
-        lendingUserTempPriceAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getPriceAccountPDA(connectedWallet.publicKey), async() => 
+        lendingUserTempPriceAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getPriceAccountPDA(connectedWallet.publicKey),
+        (accountInfo: AccountInfo<Buffer>) => 
         {
           //Handle account change..
-          connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
+          if(!accountInfo || accountInfo.data.length == 0)
+            connectedWallet.isTempPriceAccountAlive = false
+          else
+            connectedWallet.isTempPriceAccountAlive = true
         })
 
         break

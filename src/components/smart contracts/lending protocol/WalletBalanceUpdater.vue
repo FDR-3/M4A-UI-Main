@@ -8,8 +8,8 @@
     solvencyInsuranceTreasuryWalletBalancesHashMap } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { LAMPORTS_PER_SOL } from "@solana/web3.js"
-  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
+  import { LAMPORTS_PER_SOL, AccountInfo } from "@solana/web3.js"
+  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, AccountLayout } from '@solana/spl-token'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { getSOLBalanceWrapper, getTokenAccountBalanceWrapper } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
@@ -63,7 +63,9 @@
       //Get HODL USDS Balance
       const hodlUSDSAccount = await getTokenAccountBalanceWrapper(hodlTreasuryUSDSWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
-      hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdsTokenMintAddress, hodlUSDSAccount.value.uiAmount.toFixed(decimalAmount))
+      hodlTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, hodlUSDSAccount.value.uiAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount }))
       await listenForHODLTreasuryUSDSWalletChanges()
     }
     catch
@@ -85,7 +87,9 @@
       //Get Solvency USDS Balance
       const solvencyUSDSAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryUSDSWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, solvencyUSDSAccount.value.uiAmount.toFixed(decimalAmount))
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, solvencyUSDSAccount.value.uiAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount }))
       await listenForSolvencyTreasuryUSDSWalletChanges()
     }
     catch
@@ -108,7 +112,9 @@
       //Get HODL USDC Balance
       const hodlUDSCAccount = await getTokenAccountBalanceWrapper(hodlTreasuryUSDCWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
-      hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdcTokenMintAddress, hodlUDSCAccount.value.uiAmount.toFixed(decimalAmount))
+      hodlTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, hodlUDSCAccount.value.uiAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount }))
       await listenForHODLTreasuryUSDCWalletChanges()
     }
     catch
@@ -130,7 +136,9 @@
       //Get Solvency USDC Balance
       const solvencyUDSCAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryUSDCWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, solvencyUDSCAccount.value.uiAmount.toFixed(decimalAmount))
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, solvencyUDSCAccount.value.uiAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount }))
       await listenForSolvencyTreasuryUSDCWalletChanges()
     }
     catch
@@ -145,7 +153,9 @@
       //Get Solvency SOL Balance
       const solvencySOLBalance = await getSOLBalanceWrapper(adminAccounts.solvencyTreasuryAddress)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (solvencySOLBalance / LAMPORTS_PER_SOL).toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount }))
       await listenForSolvencyTreasurySOLWalletChanges()
     }
     catch
@@ -168,7 +178,9 @@
       //Get Solvency WEth Balance
       const solvencyWEthAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryWEthWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.wethTokenId)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, solvencyWEthAccount.value.uiAmount.toFixed(decimalAmount))
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, solvencyWEthAccount.value.uiAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount }))
       await listenForSolvencyTreasuryWEthWalletChanges()
     }
     catch
@@ -191,7 +203,9 @@
       //Get Solvency WBtc Balance
       const solvencyWBtcAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryWBtcWalletATA)
       const decimalAmount = tokenDecimalHashMap.get(tokenIds.wbtcTokenId)
-      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, solvencyWBtcAccount.value.uiAmount.toFixed(decimalAmount))
+      solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, solvencyWBtcAccount.value.uiAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount }))
       await listenForSolvencyTreasuryWBtcWalletChanges()
     }
     catch
@@ -283,7 +297,7 @@
 
     if(newWallet.addressString == SYSTEM_PROGRAM_ADDRESS_STRING)
     {
-      connectedWallet.tokenBalanceMap = new Map<string, string>()
+      connectedWallet.tokenBalanceMap = new Map<number, string>()
       return
     }
 
@@ -330,7 +344,7 @@
     {
       //Get User USDS Wallet Balance
       const userUSDSWalletAccount = await getTokenAccountBalanceWrapper(userUSDSWalletATA)
-      connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdsTokenMintAddress, userUSDSWalletAccount.value.uiAmount)
+      connectedWallet.tokenBalanceMap.set(tokenIds.usdsTokenId, userUSDSWalletAccount.value.uiAmount)
       await listenForUserUSDSWalletChanges()
     }
     catch
@@ -350,7 +364,7 @@
     {
       //Get User USDC Wallet Balance
       const userUSDCWalletAccount = await getTokenAccountBalanceWrapper(userUSDCWalletATA)
-      connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdcTokenMintAddress, userUSDCWalletAccount.value.uiAmount)
+      connectedWallet.tokenBalanceMap.set(tokenIds.usdcTokenId, userUSDCWalletAccount.value.uiAmount)
       await listenForUserUSDCWalletChanges()
     }
     catch
@@ -362,7 +376,7 @@
     {
       //Get User SOL Wallet Balance
       const userSolWalletBalance = await getSOLBalanceWrapper(connectedWallet.publicKey)
-      connectedWallet.tokenBalanceMap.set(tokenAddressStrings.solTokenMintAddress, userSolWalletBalance / LAMPORTS_PER_SOL)
+      connectedWallet.tokenBalanceMap.set(tokenIds.solTokenId, userSolWalletBalance / LAMPORTS_PER_SOL)
       await listenForUserSOLWalletChanges()
     }
     catch(error)
@@ -382,7 +396,7 @@
     {
       //Get User WEth Wallet Balance
       const userWEthWalletAccount = await getTokenAccountBalanceWrapper(userWEthWalletATA)
-      connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wethTokenMintAddress, userWEthWalletAccount.value.uiAmount)
+      connectedWallet.tokenBalanceMap.set(tokenIds.wethTokenId, userWEthWalletAccount.value.uiAmount)
       await listenForUserWEthWalletChanges()
     }
     catch
@@ -402,7 +416,7 @@
     {
       //Get User WBtc Balance
       const userWBtcWalletAccount = await getTokenAccountBalanceWrapper(userWBtcWalletATA)
-      connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wbtcTokenMintAddress, userWBtcWalletAccount.value.uiAmount)
+      connectedWallet.tokenBalanceMap.set(tokenIds.wbtcTokenId, userWBtcWalletAccount.value.uiAmount)
       await listenForUserWBtcWalletChanges()
     }
     catch
@@ -418,11 +432,23 @@
       try
       {
         //Subscribe to account changes
-        hodlUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDSWalletATA, async() => 
+        hodlUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDSWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const hodlUSDSAccount = await getTokenAccountBalanceWrapper(hodlTreasuryUSDSWalletATA)
-          hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdsTokenMintAddress, hodlUSDSAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          hodlTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, uiAmount.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }))
         })
 
         break
@@ -447,11 +473,23 @@
       try
       {
         //Subscribe to account changes
-        hodlUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDCWalletATA, async() => 
+        hodlUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(hodlTreasuryUSDCWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const hodlUSDCAccount = await getTokenAccountBalanceWrapper(hodlTreasuryUSDCWalletATA)
-          hodlTreasuryWalletBalancesHashMap.map.set(tokenAddressStrings.usdcTokenMintAddress, hodlUSDCAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          hodlTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, uiAmount.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }))
         })
 
         break
@@ -476,11 +514,23 @@
       try
       {
         //Subscribe to account changes
-        solvencyUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDSWalletATA, async() => 
+        solvencyUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDSWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const solvencyUSDSAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryUSDSWalletATA)
-          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, solvencyUSDSAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdsTokenId, uiAmount.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }))
         })
 
         break
@@ -505,11 +555,23 @@
       try
       {
         //Subscribe to account changes
-        solvencyUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDCWalletATA, async() => 
+        solvencyUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryUSDCWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const solvencyUDSCAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryUSDCWalletATA)
-          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, solvencyUDSCAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.usdcTokenId, uiAmount.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }))
         })
 
         break
@@ -534,12 +596,19 @@
       try
       {
         //Subscribe to account changes
-        solvencySOLWalletWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(adminAccounts.solvencyTreasuryAddress, async() => 
+        solvencySOLWalletWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(adminAccounts.solvencyTreasuryAddress,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const solvencySOLBalance = await getSOLBalanceWrapper(adminAccounts.solvencyTreasuryAddress)
           const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
-          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (solvencySOLBalance / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+          if(accountInfo.lamports)
+            solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (accountInfo.lamports / LAMPORTS_PER_SOL).toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }))
+          else
+            solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.solTokenId, (0).toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }))
         })
 
         break
@@ -564,11 +633,23 @@
       try
       {
         //Subscribe to account changes
-        solvencyWEthWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryWEthWalletATA, async() => 
+        solvencyWEthWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryWEthWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const solvencyWEthAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryWEthWalletATA)
-          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, solvencyWEthAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.wethTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wethTokenId, uiAmount.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }))
         })
 
         break
@@ -593,11 +674,23 @@
       try
       {
         //Subscribe to account changes
-        solvencyWBtcWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryWBtcWalletATA, async() => 
+        solvencyWBtcWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(solvencyTreasuryWBtcWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const solvencyWBtcAccount = await getTokenAccountBalanceWrapper(solvencyTreasuryWBtcWalletATA)
-          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, solvencyWBtcAccount.value.uiAmount.toFixed(2))
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.wbtcTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          solvencyInsuranceTreasuryWalletBalancesHashMap.map.set(tokenIds.wbtcTokenId, uiAmount.toLocaleString('en-US', {
+            minimumFractionDigits: decimalAmount,
+            maximumFractionDigits: decimalAmount }))
         })
 
         break
@@ -630,11 +723,21 @@
       try
       {
         //Subscribe to account changes
-        userUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUSDSATA, async() => 
+        userUSDSWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUSDSATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const userUSDSAccount = await getTokenAccountBalanceWrapper(userUSDSATA)
-          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdsTokenMintAddress, userUSDSAccount.value.uiAmount)
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdsTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+
+          connectedWallet.tokenBalanceMap.set(tokenIds.usdsTokenId, uiAmount)
         })
 
         break
@@ -667,11 +770,21 @@
       try
       {
         //Subscribe to account changes
-        userUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUsdcWalletATA, async() => 
+        userUSDCWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userUsdcWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const userUsdcWalletAccount = await getTokenAccountBalanceWrapper(userUsdcWalletATA)
-          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.usdcTokenMintAddress, userUsdcWalletAccount.value.uiAmount)
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.usdcTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          connectedWallet.tokenBalanceMap.set(tokenIds.usdcTokenId, uiAmount)
         })
 
         break
@@ -696,11 +809,15 @@
       try
       {
         //Subscribe to account changes
-        userSOLWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.publicKey, async() => 
+        userSOLWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(connectedWallet.publicKey,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const userSolWalletBalance = await getSOLBalanceWrapper(connectedWallet.publicKey)
-          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.solTokenMintAddress, userSolWalletBalance / LAMPORTS_PER_SOL)
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.solTokenId)
+          if(accountInfo.lamports)
+            connectedWallet.tokenBalanceMap.set(tokenIds.solTokenId, (accountInfo.lamports / LAMPORTS_PER_SOL).toFixed(decimalAmount))
+          else
+            connectedWallet.tokenBalanceMap.set(tokenIds.solTokenId, (0).toFixed(decimalAmount))
         })
 
         break
@@ -733,11 +850,21 @@
       try
       {
         //Subscribe to account changes
-        userWEthWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userWEthWalletATA, async() => 
+        userWEthWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userWEthWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const userWEthWalletAccount = await getTokenAccountBalanceWrapper(userWEthWalletATA)
-          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wethTokenMintAddress, userWEthWalletAccount.value.uiAmount)
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.wethTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          connectedWallet.tokenBalanceMap.set(tokenIds.wethTokenId, uiAmount)
         })
 
         break
@@ -770,11 +897,21 @@
       try
       {
         //Subscribe to account changes
-        userWBtcWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userWBtcWalletATA, async() => 
+        userWBtcWalletATAWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(userWBtcWalletATA,
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const userWBtcWalletAccount = await getTokenAccountBalanceWrapper(userWBtcWalletATA)
-          connectedWallet.tokenBalanceMap.set(tokenAddressStrings.wbtcTokenMintAddress, userWBtcWalletAccount.value.uiAmount)
+          const tokenAccount = AccountLayout.decode(accountInfo.data)
+          const view = new DataView
+          (
+            tokenAccount.amount.buffer, 
+            tokenAccount.amount.byteOffset, 
+            tokenAccount.amount.byteLength
+          )
+          const decimalAmount = tokenDecimalHashMap.get(tokenIds.wbtcTokenId)
+          const uiAmount = Number(view.getBigUint64(0, true)) / Math.pow(10, decimalAmount)
+          
+          connectedWallet.tokenBalanceMap.set(tokenIds.wbtcTokenId, uiAmount)
         })
 
         break

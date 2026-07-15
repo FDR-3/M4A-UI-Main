@@ -204,18 +204,6 @@
       startHealthFactorCalculation()
     }
   })
-
-  watch(connectedWallet, async() =>
-  {
-    if(repaying.value)
-    {
-      const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
-      if(balance)
-        userWalletBalance.value = Number(balance)
-      else
-        userWalletBalance.value = 0
-    }
-  })
   
   //Json string of wallet to detect object property changes
   const walletWatch = computed(() =>
@@ -239,7 +227,7 @@
       && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex))
         return
 
-      const balance = connectedWallet.tokenBalanceMap.get(selectedTokenMintAddress.toString())
+      const balance = connectedWallet.tokenBalanceMap.get(selectedTokenId)
       if(balance)
         userWalletBalance.value = Number(balance)
       else
@@ -311,7 +299,7 @@
         accountList.value = userAccountList
     }
 
-    const balance = connectedWallet.tokenBalanceMap.get(tokenMintAddress)
+    const balance = connectedWallet.tokenBalanceMap.get(tokenId)
     if(balance)
       userWalletBalance.value = Number(balance)
     else

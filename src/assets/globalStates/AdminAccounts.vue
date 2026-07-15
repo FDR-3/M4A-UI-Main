@@ -77,12 +77,12 @@
   
   export const hodlTreasuryWalletBalancesHashMap = reactive(
   {
-    map: new Map<string, string>()
+    map: new Map<number, string>()
   })
 
   export const solvencyInsuranceTreasuryWalletBalancesHashMap = reactive(
   {
-    map: new Map<string, string>()
+    map: new Map<number, string>()
   })
 
   export const tvl = reactive(

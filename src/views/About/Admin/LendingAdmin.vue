@@ -1,40 +1,54 @@
 <template>
-  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop">
-    <div class="smallMarginTop">
-      <h2>Current Statement Month And Year:</h2>
-      <div class="flexCenterRow preserveWhiteSpace nMediumMarginTop">
-        <div v-if="anchorPrograms.isLendingProtocolInitialized">
-          <h2>{{ anchorPrograms.currentStatementMonthName + ", " + anchorPrograms.currentStatementYear }}</h2>
+  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop flexCenterRow">
+    <div>
+      <div class="smallMarginTop">
+        <h2>Current Statement Month And Year</h2>
+        <div class="flexCenterRow preserveWhiteSpace nMediumMarginTop">
+          <div v-if="anchorPrograms.isLendingProtocolInitialized">
+            <h2>{{ anchorPrograms.currentStatementMonthName + ", " + anchorPrograms.currentStatementYear }}</h2>
+          </div>
+          <div v-else>
+            <h2>Loading</h2>
+          </div>
         </div>
-        <div v-else>
-          <h2>Loading</h2>
+        <ion-text>Change Current Statement Month And Year</ion-text>
+      </div>
+      <div class=" flexCenterColumn">
+        <div style="width: 90%">
+          <Select
+          class="tinyMarginTop tinyMarginBottom"
+          v-model="monthSelect" 
+          :options="monthList" 
+          optionLabel="monthName" 
+          optionValue="monthNumber" 
+          placeholder="Select Month"
+          appendTo="self">
+          </Select>
+          <ion-input
+          v-model="statementYearInput"
+          fill="outline"
+          placeholder="Enter Statement Year"
+          type="number"
+          step="1"
+          min="2022">
+          </ion-input>
+          <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentStatementMonthAndYear()" style="width:77px" :disabled="statementYearInput == '' || noChangeDetected">
+            Update
+          </ion-button>
         </div>
       </div>
-      <ion-text>Change Current Statement Month And Year</ion-text>
     </div>
-    <div class=" flexCenterColumn">
-      <div style="width: 90%">
-        <Select
-        class="tinyMarginTop tinyMarginBottom"
-        v-model="monthSelect" 
-        :options="monthList" 
-        optionLabel="monthName" 
-        optionValue="monthNumber" 
-        placeholder="Select Month"
-        appendTo="self">
-        </Select>
-        <ion-input
-        v-model="statementYearInput"
-        fill="outline"
-        placeholder="Enter Statement Year"
-        type="number"
-        step="1"
-        min="2022">
-        </ion-input>
-        <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentStatementMonthAndYear()" style="width:77px" :disabled="statementYearInput == '' || noChangeDetected">
-          Update
-        </ion-button>
-      </div>
+    <div>
+      <h2>Max Tabs</h2>
+      <ion-input
+      v-model="maxTabsPerLendingAccount"
+      fill="outline"
+      placeholder="Enter Max Tab Amount"
+      type="number"
+      step="1"
+      min="0">
+      </ion-input>
+      <ion-button @click="updateMaxTabAmount()" :disabled="anchorPrograms.maxTabsPerLendingAccount==maxTabsPerLendingAccount">Update</ion-button>
     </div>
   </div>
 
@@ -191,6 +205,7 @@
   
   var monthSelect = ref()
   var statementYearInput = ref("")
+  var maxTabsPerLendingAccount = ref(0)
 
   var borrowAPY = ref(5)
   var solvencyInsurance = ref(1)
@@ -316,6 +331,29 @@
     catch(error)
     {
       toastPreTransactionError(error, toast, "update_current_statement_month_and_year")
+    }
+  }
+
+  async function updateMaxTabAmount()
+  {
+
+    try
+    {
+      var instructionsToSend = []
+      var lookUpTableAccounts = []
+
+      instructionsToSend.push(await anchorPrograms.lending.lendingProgram.methods.updateMaxTabAmount(maxTabsPerLendingAccount.value).instruction())
+
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      const tx = await sendVersionedLendingProtocolTransaction(instructionsToSend, lookUpTableAccounts)
+
+      await confirmLendingTransaction(tx, toast, "update_max_tab_amount")
+    }
+    catch(error)
+    {
+      toastPreTransactionError(error, toast, "update_max_tab_amount")
     }
   }
 </script>

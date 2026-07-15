@@ -32,6 +32,7 @@
   import PriceUpdater from './PriceUpdater.vue'
   import WalletBalanceUpdater from './WalletBalanceUpdater.vue'
   import TokenReserveBalanceUpdater from './TokenReserveBalanceUpdater.vue'
+  import { AccountInfo } from "@solana/web3.js"
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 
   var lendingProtocolWatcherId: any
@@ -50,6 +51,7 @@
       anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
       anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
       anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
+      anchorPrograms.maxTabsPerLendingAccount = lendingProtocol.maxTabsPerLendingAccount
       anchorPrograms.lendingProtocolLookUpTableAddress = lendingProtocol.lookUpTableAddress
       anchorPrograms.lendingProtocolLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(anchorPrograms.lendingProtocolLookUpTableAddress)
       anchorPrograms.isLendingProtocolInitialized = true
@@ -260,7 +262,7 @@
       {
         //Subscribe to account changes
         lendingProtocolWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolPDA(),
-        async(accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+        async(accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change..
           const lendingProtocol = anchorPrograms.lending.lendingProgram.account.lendingProtocol.coder.accounts.decode("lendingProtocol", accountInfo.data)
@@ -268,6 +270,7 @@
           anchorPrograms.currentStatementMonthName = monthList[lendingProtocol.currentStatementMonth-1].monthName
           anchorPrograms.currentStatementMonthNumber = lendingProtocol.currentStatementMonth
           anchorPrograms.currentStatementYear = lendingProtocol.currentStatementYear
+          anchorPrograms.maxTabsPerLendingAccount = lendingProtocol.maxTabsPerLendingAccount
           anchorPrograms.lendingProtocolLookUpTableAddress = lendingProtocol.lookUpTableAddress
 
           if(!anchorPrograms.lendingProtocolLookUpTableAccount)
@@ -299,10 +302,9 @@
       {
         //Subscribe to account changes
         lendingProtocolCEOAccountWatcherId = anchorPrograms.lending.lendingProgram.provider.connection.onAccountChange(getLendingProtocolCEOAccountPDA(),
-        (accountInfo: { data: Uint8Array<ArrayBufferLike> }) => 
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change..
-          //const lendingCEOAccount = await getLendingProtocolCEOAccount()
           const lendingCEOAccount = anchorPrograms.lending.lendingProgram.account.lendingProtocolCeo.coder.accounts.decode("lendingProtocolCeo", accountInfo.data)
           adminAccounts.isLendingCEOAccountReady = true
           adminAccounts.lendingCEOAddressKey = lendingCEOAccount.address

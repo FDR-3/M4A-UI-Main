@@ -47,6 +47,7 @@
   import { polls, pollVoteRecords } from '/src/assets/globalStates/chat/Polls.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { AccountInfo } from "@solana/web3.js"
   import M4AChatUpdater from './M4AChatUpdater.vue'
   import PLIChatUpdater from './PLIChatUpdater.vue'
   import AboutChatUpdater from './AboutChatUpdater.vue'
@@ -275,10 +276,11 @@
       try
       {
         //Subscribe to account changes
-        isChatProtocolReadyWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolPDA(), async() => 
+        isChatProtocolReadyWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolPDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          const chatProtocol = await getChatProtocol()
+          const chatProtocol = anchorPrograms.chat.chatProgram.account.chatProtocol.coder.accounts.decode("chatProtocol", accountInfo.data)
           anchorPrograms.chatProtocolInitiatorAddress = chatProtocol.chatProtocolInitiatorAddress.toBase58()
           anchorPrograms.isChatProtocolReady = true
 
@@ -308,7 +310,7 @@
       try
       {
         //Subscribe to account changes
-        isChatFeeTokenAccountReadyWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatTokenFeePDA(anchorPrograms.usdcFeeTokenAddress), async() => 
+        isChatFeeTokenAccountReadyWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatTokenFeePDA(anchorPrograms.usdcFeeTokenAddress), () => 
         {
           //Handle account change...
           anchorPrograms.isChatFeeTokenAccountReady = true
@@ -368,10 +370,11 @@
       try
       {
         //Subscribe to account changes
-        m4aChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getM4AChatPDA(), async() => 
+        m4aChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getM4AChatPDA(),
+        async(accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          m4aChat.data = await getM4AChat()
+          m4aChat.data = anchorPrograms.chat.chatProgram.account.m4AChat.coder.accounts.decode("m4AChat", accountInfo.data)
           anchorPrograms.m4aChatInitiatorAddress = m4aChat.data.chatInitiatorAddress.toBase58()
           anchorPrograms.isM4AChatReady = true
 
@@ -404,10 +407,11 @@
       try
       {
         //Subscribe to account changes
-        pliChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPLIChatPDA(), async() => 
+        pliChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getPLIChatPDA(),
+        async(accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          pliChat.data = await getPLIChat()
+          pliChat.data = anchorPrograms.chat.chatProgram.account.pliChat.coder.accounts.decode("pliChat", accountInfo.data)
           anchorPrograms.pliChatInitiatorAddress = pliChat.data.chatInitiatorAddress.toBase58()
           anchorPrograms.isPLIChatReady = true
 
@@ -440,10 +444,11 @@
       try
       {
         //Subscribe to account changes
-        aboutChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getAboutChatPDA(), async() => 
+        aboutChatWatchId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getAboutChatPDA(),
+        async(accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          aboutChat.data = await getAboutChat()
+          aboutChat.data = anchorPrograms.chat.chatProgram.account.aboutChat.coder.accounts.decode("aboutChat", accountInfo.data)
           anchorPrograms.aboutChatInitiatorAddress = aboutChat.data.chatInitiatorAddress.toBase58()
           anchorPrograms.isAboutChatReady = true
 
@@ -644,10 +649,11 @@
       try
       {
         //Subscribe to account changes
-        chatProtocolCEOAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolCEOAccountPDA(), async() => 
+        chatProtocolCEOAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolCEOAccountPDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change..
-          const chatCEOAccount = await getChatProtocolCEOAccount()
+          const chatCEOAccount = anchorPrograms.chat.chatProgram.account.chatProtocolCeo.coder.accounts.decode("chatProtocolCeo", accountInfo.data)
           adminAccounts.isChatCEOAccountReady = true
           adminAccounts.chatCEOAddress = chatCEOAccount.address.toBase58()
           anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolCEOAccountWatcherId)
@@ -676,10 +682,11 @@
       try
       {
         //Subscribe to account changes
-        chatProtocolTreasurerAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolTreasurerAccountPDA(), async() => 
+        chatProtocolTreasurerAccountWatcherId = anchorPrograms.chat.chatProgram.provider.connection.onAccountChange(getChatProtocolTreasurerAccountPDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change..
-          const chatTreasurerAccount = await getChatProtocolTreasurerAccount()
+          const chatTreasurerAccount = anchorPrograms.chat.chatProgram.account.chatProtocolTreasurer.coder.accounts.decode("chatProtocolTreasurer", accountInfo.data)
           adminAccounts.chatTreasurerAddress = chatTreasurerAccount.address.toBase58()
           anchorPrograms.chat.chatProgram.provider.connection.removeAccountChangeListener(chatProtocolTreasurerAccountWatcherId)
           chatProtocolTreasurerAccountWatcherId = undefined

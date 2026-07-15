@@ -337,10 +337,10 @@
       const decimalAmount = tokenDecimalHashMap.get(unprocessedTableData[i].tokenId)
 
       //Set Wallet Amounts
-      const tokenAmount = hodlTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenMintAddressString)
+      const tokenAmount = hodlTreasuryWalletBalancesHashMap.map.get(unprocessedTableData[i].tokenId)
       if(tokenAmount)
       {
-        unprocessedTableData[i].wallet = Number(tokenAmount)
+        unprocessedTableData[i].wallet = Number(tokenAmount.replace(/,/g, ''))
         unprocessedTableData[i].walletString = tokenAmount
       }
       else

@@ -52,6 +52,7 @@
   import { customUserNameHashMap } from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { AccountInfo } from "@solana/web3.js"
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
 
   var claimQueueWatchId: any
@@ -306,12 +307,13 @@
       try
       {
         //Subscribe to account changes
-        isM4AProtocolReadyWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolPDA(), async() => 
+        isM4AProtocolReadyWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolPDA(),
+        async(accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
           if(!anchorPrograms.isM4AProtocolReady)
           {
-            const m4aProtocol = await getM4AProtocol()
+            const m4aProtocol = anchorPrograms.m4a.m4aProgram.account.m4AProtocol.coder.accounts.decode("m4AProtocol", accountInfo.data)
             anchorPrograms.m4aProtocolInitiatorAddress = m4aProtocol.m4AProtocolInitiatorAddress.toBase58() //note the .m4A weird anchor capitialization
             anchorPrograms.isM4AProtocolReady = true
           }
@@ -345,10 +347,11 @@
       try
       {
         //Subscribe to account changes
-        claimQueueWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimQueuePDA(), async() => 
+        claimQueueWatchId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getClaimQueuePDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change...
-          claimQueue.data = await getClaimQueue()
+          claimQueue.data = anchorPrograms.m4a.m4aProgram.account.claimQueue.coder.accounts.decode("claimQueue", accountInfo.data)
         })
 
         break
@@ -719,10 +722,11 @@
       try
       {
         //Subscribe to account changes
-        m4aProtocolCEOAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolCEOAccountPDA(), async() => 
+        m4aProtocolCEOAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolCEOAccountPDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change..
-          const m4aCEOAccount = await getM4AProtocolCEOAccount()
+          const m4aCEOAccount = anchorPrograms.m4a.m4aProgram.account.m4AProtocolCeo.coder.accounts.decode("m4AProtocolCeo", accountInfo.data)
           adminAccounts.isM4ACEOAccountReady = true
           adminAccounts.m4aCEOAddress = m4aCEOAccount.address.toBase58()
           anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolCEOAccountWatcherId)
@@ -751,10 +755,11 @@
       try
       {
         //Subscribe to account changes
-        m4aProtocolTreasurerAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolTreasurerAccountPDA(), async() => 
+        m4aProtocolTreasurerAccountWatcherId = anchorPrograms.m4a.m4aProgram.provider.connection.onAccountChange(getM4AProtocolTreasurerAccountPDA(),
+        (accountInfo: AccountInfo<Buffer>) =>
         {
           //Handle account change..
-          const m4aTreasurerAccount = await getM4AProtocolTreasurerAccount()
+          const m4aTreasurerAccount = anchorPrograms.m4a.m4aProgram.account.m4AProtocolTreasurer.coder.accounts.decode("m4AProtocolTreasurer", accountInfo.data)
           adminAccounts.m4aTreasurerAddress = m4aTreasurerAccount.address.toBase58()
           anchorPrograms.m4a.m4aProgram.provider.connection.removeAccountChangeListener(m4aProtocolTreasurerAccountWatcherId)
           m4aProtocolTreasurerAccountWatcherId = undefined
