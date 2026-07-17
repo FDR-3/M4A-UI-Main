@@ -155,6 +155,7 @@
     confirmLendingTransaction,
     parseProgramErrorCode,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { tokenReserveFontEndInfoHashMap, priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
@@ -297,7 +298,11 @@
     generateOwnersSelectList()
     generateSubMarketList()
     ownerSelect.value = rowData.owner.toString()
-    destinationSubMarketSelect.value = rowData.subMarketIndex
+    if((connectedWallet.addressString == adminAccounts.hodlTreasuryAddress.toString() ||
+    connectedWallet.addressString == adminAccounts.singlePayerTreasuryAddress.toString()))
+      destinationSubMarketSelect.value = 1
+    else
+      destinationSubMarketSelect.value = rowData.subMarketIndex
     initialSubMarketOwnerAddress = rowData.owner
     initialSubMarketIndex = rowData.subMarketIndex
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex

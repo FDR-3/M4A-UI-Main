@@ -757,11 +757,11 @@
             previousLendingUserAvailableSubMarketList[k].subMarketIndex == availableStatementsBySubMarketData.subMarketIndex)
               previousEntryFound = true
 
-          list = previousLendingUserAvailableSubMarketList
-
           if(!previousEntryFound)
           {
+            list = previousLendingUserAvailableSubMarketList
             list.push(availableStatementsBySubMarketData)
+            list = list.sort((a: any, b: any) => { return (a.tokenId - b.tokenId) || (a.subMarketIndex - b.subMarketIndex) })
             availableStableCoinStatementsBySubMarketsHashMap.set(owner + userAccountIndex, list) 
           }
         }
@@ -853,11 +853,11 @@
             previousLendingUserAvailableSubMarketList[k].subMarketIndex == availableStatementsBySubMarketData.subMarketIndex)
               previousEntryFound = true
 
-          list = previousLendingUserAvailableSubMarketList
-
           if(!previousEntryFound)
           {
+            list = previousLendingUserAvailableSubMarketList
             list.push(availableStatementsBySubMarketData)
+            list = list.sort((a: any, b: any) => { return (a.tokenId - b.tokenId) || (a.subMarketIndex - b.subMarketIndex) })
             availableCryptoCurrencyStatementsBySubMarketsHashMap.set(owner + userAccountIndex, list) 
           }
         }

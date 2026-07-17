@@ -394,15 +394,11 @@
       const errorMatch2 = error.message.match(/"Custom":(\d+)/)
       
       if(errorMatch1)
-      {
         if(errorMatch1[1])
           idlError = program.idl.errors.find((error: { code: number }) => error.code === parseInt(errorMatch1[1]))
-      }
       else if(errorMatch2)
-      {
         if(errorMatch2[1])
           idlError = program.idl.errors.find((error: { code: number }) => error.code === parseInt(errorMatch2[1]))
-      }
     }
     else if(typeof errorCode === 'number')
     {

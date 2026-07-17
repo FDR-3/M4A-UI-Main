@@ -1,5 +1,5 @@
 <template>
-  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop flexCenterRow">
+  <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString" class="thickBorder smallMarginTop flexCenterRow" style="gap: 44px">
     <div>
       <div class="smallMarginTop">
         <h2>Current Statement Month And Year</h2>
@@ -38,7 +38,7 @@
         </div>
       </div>
     </div>
-    <div>
+    <div class="mediumMarginRight">
       <h2>Max Tabs</h2>
       <ion-input
       v-model="maxTabsPerLendingAccount"
@@ -46,9 +46,9 @@
       placeholder="Enter Max Tab Amount"
       type="number"
       step="1"
-      min="0">
+      min="10">
       </ion-input>
-      <ion-button @click="updateMaxTabAmount()" :disabled="anchorPrograms.maxTabsPerLendingAccount==maxTabsPerLendingAccount">Update</ion-button>
+      <ion-button color="dark" @click="updateMaxTabAmount()" :disabled="anchorPrograms.maxTabsPerLendingAccount==maxTabsPerLendingAccount">Update</ion-button>
     </div>
   </div>
 
@@ -205,7 +205,7 @@
   
   var monthSelect = ref()
   var statementYearInput = ref("")
-  var maxTabsPerLendingAccount = ref(0)
+  var maxTabsPerLendingAccount = ref(anchorPrograms.maxTabsPerLendingAccount)
 
   var borrowAPY = ref(5)
   var solvencyInsurance = ref(1)

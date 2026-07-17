@@ -1,7 +1,7 @@
 <template>
   <div v-if="isBrowsingAllUsers">
     <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false)">
-      <ion-label color="green">Return</ion-label>
+      <ion-label color="green">Charts</ion-label>
     </ion-button>
     <LendingLeaderBoardTable
     @viewPortfolio="viewPortfolio"
