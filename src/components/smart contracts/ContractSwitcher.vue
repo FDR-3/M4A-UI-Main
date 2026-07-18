@@ -33,7 +33,7 @@
     </div>
   </ion-popover>
   <h5>Lending Protocol</h5>
-  <ion-button @click="openLendingContractSelectPopover($event)" slot="start" class="contractPickerButton" :color="colorName">
+  <ion-button @click="openLendingContractSelectPopover($event)" slot="start" class="contractPickerButton mediumMarginBottom" :color="colorName">
     <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
       <ion-label color="dark">{{ lendingContractText }}</ion-label>
       <div>
@@ -48,7 +48,6 @@
       </ion-button>
     </div>
   </ion-popover>
-  
 </template>
 
 <script setup lang="ts">
@@ -161,9 +160,10 @@
   .contractPickerButton
   {
     font-weight: bold;
+    width: 100%;
     margin-top: -5px;
-    border-radius: 7px;
-    box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
+    --border-radius: 7px;
+    --box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
   }
 
   .contractPickerButton:hover

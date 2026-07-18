@@ -121,14 +121,14 @@
     text-decoration: underline;
     text-decoration-color: var(--ion-color-light);
     text-decoration-thickness: 2px;
-    border-radius: 12px;
-    box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
+    --border-radius: 12px;
+    --box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
   }
 
   #lilNavSelector
   {
-    border-radius: 12px;
-    box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
+    --border-radius: 12px;
+    --box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
   }
 
   #lilNavChevron
