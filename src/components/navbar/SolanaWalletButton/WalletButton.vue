@@ -134,6 +134,7 @@
       connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.addressString = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.isConnected = false
+      connectedWallet.selectedLendingUserAccountIndex = 0
       connectedWallet.lendingUserLookUpTableAddress = undefined
       connectedWallet.lendingUserLookUpTableAccount = undefined
       connectedWallet.missingLUTAddresses = []
@@ -144,6 +145,7 @@
     { 
       connectedWallet.publicKey = publicKey.value
       connectedWallet.addressString = publicKey.value.toBase58()
+      connectedWallet.selectedLendingUserAccountIndex = Number(localStorage.getItem("selectedLendingAccountIndex" + connectedWallet.addressString)) || 0
       connectedWallet.isConnected = true
 
       if(lendingUserHashMap.map)
@@ -268,6 +270,7 @@
       connectedWallet.submitterAddressOfClaimBeingProcessed = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.addressString = SYSTEM_PROGRAM_ADDRESS_STRING
       connectedWallet.isConnected = false,
+      connectedWallet.selectedLendingUserAccountIndex = 0
       connectedWallet.lendingUserLookUpTableAddress = undefined
       connectedWallet.lendingUserLookUpTableAccount = undefined
       connectedWallet.missingLUTAddresses = []
@@ -278,6 +281,7 @@
     {
       connectedWallet.publicKey = publicKey.value
       connectedWallet.addressString = publicKey.value.toBase58()
+      connectedWallet.selectedLendingUserAccountIndex = Number(localStorage.getItem("selectedLendingAccountIndex" + connectedWallet.addressString)) || 0
       connectedWallet.isConnected = true
 
       connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)

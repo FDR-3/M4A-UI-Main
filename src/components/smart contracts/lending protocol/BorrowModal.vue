@@ -346,7 +346,7 @@
   async function updateStoredSelectedAccount()
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelect.value.toString())
   }
 
   function calculateHealthFactorValues(timeStamp: number)

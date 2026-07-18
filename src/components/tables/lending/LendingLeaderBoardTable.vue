@@ -946,7 +946,7 @@
     if(event.value.owner == connectedWallet.addressString)
     {
       connectedWallet.selectedLendingUserAccountIndex = event.value.accountIndex
-      localStorage.setItem("selectedLendingAccountIndex", event.value.accountIndex.toString())
+      localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, event.value.accountIndex.toString())
     }
 
     //Closes popover

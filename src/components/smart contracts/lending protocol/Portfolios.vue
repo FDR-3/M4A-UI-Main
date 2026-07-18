@@ -606,7 +606,7 @@
     if(connectedWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
     {
       searchAddress.value = connectedWallet.addressString
-      accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
+      accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
       if(lendingUserMonthlyStatementsHashMap.map)
       {
@@ -975,7 +975,7 @@
       if(searchAddress.value == connectedWallet.addressString)
       {
         connectedWallet.selectedLendingUserAccountIndex = accountSelected
-        localStorage.setItem("selectedLendingAccountIndex", accountSelected.toString())
+        localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelected.toString())
       }
 
       resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
@@ -991,7 +991,7 @@
     if(addressToCheck.value == connectedWallet.addressString)
     {
       connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-      localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+      localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelect.value.toString())
     }
 
     stableCoin7DayProjectionRateAmount.value = "0"

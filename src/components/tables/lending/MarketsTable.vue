@@ -399,8 +399,7 @@
     checkForLendingUserAssets()
     updateTokenReserveRelatedMarketData()
     
-    accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
-    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value 
+    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
   })
 
   watch(subMarketByTokenIdAndOwnerHashMap,() =>
@@ -411,8 +410,6 @@
   watch(lendingUserAccountsHashMap,() =>
   {
     setLendingUserAccountList()
-    accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
-    connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
   })
 
   watch(lendingUserTabAccountListHashMap,() =>
@@ -447,8 +444,7 @@
     if(newWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)
     {
       setLendingUserAccountList()
-      accountSelect.value = Number(localStorage.getItem("selectedLendingAccountIndex")) || 0
-      connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
+      accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
       checkForLendingUserAssets()
     }
     else
@@ -482,7 +478,7 @@
       {
         accountSelect.value = 0
         connectedWallet.selectedLendingUserAccountIndex = 0
-        localStorage.setItem("selectedLendingAccountIndex", '0')
+        localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, '0')
       }
     }
   }
@@ -755,7 +751,7 @@
   function updateStoredSelectedUserAccountIndex()
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelect.value.toString())
     checkForLendingUserAssets()
   }
 

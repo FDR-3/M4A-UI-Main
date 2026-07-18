@@ -765,7 +765,7 @@
     accountName.value = `Generic Liquidator ${userAccountList.length + 1}`
     previousAccountSelect = accountSelect.value
     accountSelect.value = userAccountList.length
-    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelect.value.toString())
 
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     addingAdditionalLendingAccount.value = true
@@ -774,7 +774,7 @@
   function cancelAddingAdditionalLendingAccount()
   {
     accountSelect.value = previousAccountSelect
-    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelect.value.toString())
 
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
     addingAdditionalLendingAccount.value = false
@@ -783,7 +783,7 @@
   function updateStoredSelectedAccount()
   {
     connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
-    localStorage.setItem("selectedLendingAccountIndex", accountSelect.value.toString())
+    localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelect.value.toString())
     checkForSameLiquidatorAsLiquidati()
   }
 
