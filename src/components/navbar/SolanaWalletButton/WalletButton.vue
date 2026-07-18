@@ -119,7 +119,6 @@
 
   var lendingUserLookUpTableWatcherId: any
   var lendingUserTempPriceAccountWatcherId: any
-  
 
   onMounted(async() =>
   {
@@ -250,11 +249,7 @@
 
   watch(publicKey, async() =>
   {
-    if(lendingUserLookUpTableWatcherId != undefined)
-    {
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserLookUpTableWatcherId)
-      lendingUserLookUpTableWatcherId = undefined
-    }
+    //Price accounts are by Wallet public keys, not by account indexes
     if(lendingUserTempPriceAccountWatcherId != undefined)
     {
       anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserTempPriceAccountWatcherId)
@@ -284,35 +279,6 @@
       connectedWallet.publicKey = publicKey.value
       connectedWallet.addressString = publicKey.value.toBase58()
       connectedWallet.isConnected = true
-
-      if(lendingUserHashMap.map)
-      {
-        const lendingUserAccount = lendingUserHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
-        if(lendingUserAccount)
-        {
-          connectedWallet.lendingUserLookUpTableAddress = lendingUserAccount.lookUpTableAddress
-          connectedWallet.lendingUserLookUpTableAccount = await getAddressLookUpTableProgramAccountWrapper(connectedWallet.lendingUserLookUpTableAddress);
-          [connectedWallet.missingLUTAddresses, connectedWallet.missingLUTAddressDescriptions] = determineMissingLUTAddresses(connectedWallet.lendingUserLookUpTableAccount,
-            connectedWallet.publicKey,
-            connectedWallet.selectedLendingUserAccountIndex)
-          connectedWallet.hasGoodEnding = true
-          await listenForLendingUserLookUpTableChanges()
-        }
-        else
-        {
-          connectedWallet.lendingUserLookUpTableAddress = undefined
-          connectedWallet.lendingUserLookUpTableAccount = undefined
-          connectedWallet.missingLUTAddresses = []
-          connectedWallet.missingLUTAddressDescriptions = []
-        }
-      }
-      else
-      {
-        connectedWallet.lendingUserLookUpTableAddress = undefined
-        connectedWallet.lendingUserLookUpTableAccount = undefined
-        connectedWallet.missingLUTAddresses = []
-        connectedWallet.missingLUTAddressDescriptions = []
-      }
 
       connectedWallet.isTempPriceAccountAlive = await isTempPriceAccountAlive(connectedWallet.publicKey)
       await listenForLendingUserTempPriceAccountChanges()
@@ -512,7 +478,8 @@
           connectedWallet.publicKey,
           connectedWallet.selectedLendingUserAccountIndex)
         connectedWallet.hasGoodEnding = true
-        await listenForLendingUserLookUpTableChanges()
+        if(lendingUserLookUpTableWatcherId == undefined)
+          await listenForLendingUserLookUpTableChanges()
       }
       else
       {
@@ -581,13 +548,6 @@
 
   async function listenForLendingUserLookUpTableChanges()
   {
-    //Remove previous listener before starting another one if it exists
-    if(lendingUserLookUpTableWatcherId != undefined)
-    {
-      anchorPrograms.lending.lendingProgram.provider.connection.removeAccountChangeListener(lendingUserLookUpTableWatcherId)
-      lendingUserLookUpTableWatcherId = undefined
-    }
-
     for(var i=1; i<=MAX_RETRY_FETCH; i++)
     {
       try

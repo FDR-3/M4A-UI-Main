@@ -1395,8 +1395,6 @@
           addressesToExtend.push(monthlyStatementPDA)
       }*/
     }
-    //console.log("Lending User Look Up Table Address: " + lendingUserLookUpTableAddress?.toString())
-    //console.log("Lending User Look Up Table Instructions to Send: " + lendingUserLookUpTableInstructionsToSend.length)
 
     if(addressesToExtend.length > 0)
     {
@@ -1425,6 +1423,9 @@
     
     const lendingUserPDA = getLendingUserAccountPDA(lendingUserAddress, accountIndex)
     const expectedLendingUserTabs = lendingUserRemainingTabAccountListHashMap.map.get(lendingUserAddress.toString() + accountIndex.toString())
+
+    if(!expectedLendingUserTabs) //This will be empty after the account lookuptable watcher goes off for the first time
+      return [[], []]
 
     expectedLookUpTableAddresses.push(lendingUserPDA)
     expectedLookUpTableAddresses.push(...expectedLendingUserTabs.map((tab: { pubkey: PublicKey }) => tab.pubkey))

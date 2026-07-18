@@ -43,7 +43,7 @@
       tokenReserveUSDSPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveUSDSATA.toString())*/
+    console.log("USDS Token Reserve ATA: ", tokenReserveUSDSATA.toString())*/
     try
     {
       //Get Token Reserve USDS Balance
@@ -67,7 +67,7 @@
       tokenReserveUSDCPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveUSDCATA.toString())*/
+    console.log("USDC Token Reserve ATA: ", tokenReserveUSDCATA.toString())*/
     try
     {
       //Get Token Reserve USDC Balance
@@ -91,7 +91,7 @@
       tokenReserveSOLPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveSOLATA.toString())*/
+    console.log("SOL Token Reserve ATA: ", tokenReserveSOLATA.toString())*/
     try
     {
       //Get Token Reserve SOL Balance
@@ -115,7 +115,7 @@
       tokenReserveWEthPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveWEthATA.toString())*/
+    console.log("WEth Token Reserve ATA: ", tokenReserveWEthATA.toString())*/
     try
     {
       //Get Token Reserve WEth Balance
@@ -140,7 +140,7 @@
       tokenReserveWBtcPDA, //Token Reserve PDA
       true
     )
-    console.log(tokenReserveWBtcATA.toString())*/
+    console.log("Wbtc Token Reserve ATA: ", tokenReserveWBtcATA.toString())*/
     try
     {
       //Get Token Reserve WBtc Balance

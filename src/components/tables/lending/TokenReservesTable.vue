@@ -626,13 +626,15 @@
             tokenReserveSubMarketList.push(unProcessedTokenSubMarketList[j])
           }
         }
+        else
+          processedTableData[i].subMarketCount = 0
 
         tokenReserveSubMarketListHashMap.map.set(tokenMintAddressString, tokenReserveSubMarketList)
       }
       else
         processedTableData[i].subMarketCount = 0
     }
-
+  
     tvl.tokenReserveTVL = depositedValue
     totalBorrowedValue.value = borrowedValue
     tokenReserveTableData.value = processedTableData

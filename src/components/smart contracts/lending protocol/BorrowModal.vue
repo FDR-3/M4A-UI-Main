@@ -124,10 +124,11 @@
   import { anchorPrograms, SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { PublicKey } from "@solana/web3.js"
+  import { PublicKey, AddressLookupTableProgram } from "@solana/web3.js"
   import { copyAddress,
     copyTokenMintAddressText,
     confirmLendingTransaction,
+    doesKeyExistInLookUpTable,
     parseProgramErrorCode,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { userSignsLendingTransactions,
@@ -135,7 +136,8 @@
     getNeccessaryRefreshInstructionData,
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
-    closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    closeTempOraclePriceData,
+    getLendingUserTabAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { tokenReservesHashMap,
     tokenReserveFontEndInfoHashMap,
@@ -145,6 +147,7 @@
   import { subMarketLookUpTableByOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap,
     lendingUserTabAccountListHashMap,
+    lendingUserTabAccountsHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
@@ -442,6 +445,39 @@
     }
   }
 
+  function extendUserLUTForNewBorrowToken()
+  {
+    const lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
+    adminAccounts.lendingCEOAddressString +
+    subMarketSelect.value.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    //Add Lending User Tab Account to Lending User Look Up Table if it doesn't exist
+    if(!lendingUserTabAccount)
+    {
+      //Determine PDA for new LendingUserTabAccount that will be created
+      const lendingUserTabAccountPDA = getLendingUserTabAccountPDA(selectedTokenId,
+      adminAccounts.lendingCEOAddressKey,
+      subMarketSelect.value,
+      connectedWallet.publicKey,
+      accountSelect.value)
+
+      if(!doesKeyExistInLookUpTable(connectedWallet.lendingUserLookUpTableAccount, lendingUserTabAccountPDA))
+      {
+        const extendLookUpTableInstruction = AddressLookupTableProgram.extendLookupTable(
+          {
+            authority: connectedWallet.publicKey,
+            payer: connectedWallet.publicKey,
+            lookupTable: connectedWallet.lendingUserLookUpTableAddress,
+            addresses: [lendingUserTabAccountPDA]
+          })
+
+        return extendLookUpTableInstruction
+      }
+    }
+  }
+
   async function borrowTokens()
   {
     const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
@@ -454,7 +490,8 @@
       const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts, subMarketOwnerArray] =
       await getNeccessaryRefreshInstructionData(remainingTabAccounts, connectedWallet.publicKey, accountSelect.value)
 
-      //If user is borrowing from a token they have never interacted with before, add it to the array for price checks
+      //If user is borrowing from a token they have never interacted with before, add it to the array for price checks and extend their look up table with the new tab account
+      const isNewBorrowToken = !uniqueTokenIds.has(selectedTokenId)
       uniqueTokenIds.add(selectedTokenId)
 
       const uniqueTokenReserveRemainingAccounts = getTokenReserveRemainingAccounts(uniqueTokenIds)
@@ -489,6 +526,8 @@
 
       const computeUnitIncreaseInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
       instructionsToSend.push(computeUnitIncreaseInstruction)
+      if(isNewBorrowToken)
+        instructionsToSend.push(extendUserLUTForNewBorrowToken())
       instructionsToSend.push(...createMonthlyStatementInstructions)
       instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
       instructionsToSend.push(borrowInstruction)
