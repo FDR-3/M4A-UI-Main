@@ -23,7 +23,7 @@
     if(isProduction())
       connection = new Connection("https://m4a.io/Proxy", preflightCommitment)
     else
-      connection = DEV_MODE ? new Connection(clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
+      connection = DEV_MODE ? new Connection("https://m4a.io/Proxy"/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
       //connection = DEV_MODE ? new Connection("https://api.devnet.solana.com"/*Interchangeable with "clusterApiUrl("devnet")"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
 
     const provider = computed

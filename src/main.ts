@@ -70,9 +70,7 @@ const walletOptions =
     new KeystoneWalletAdapter(),
     new Coin98WalletAdapter(),
     new CloverWalletAdapter(),
-    new CoinbaseWalletAdapter(),
-    new PhantomWalletAdapter(),
-    new SolflareWalletAdapter()
+    new CoinbaseWalletAdapter()
   ],
   autoConnect: true
 }

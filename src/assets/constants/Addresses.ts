@@ -188,27 +188,27 @@ export const tokenDecimalHashMap: Map<number, number> = new Map(
   [tokenIds.wbtcTokenId,8]
 ])
 
-export function getMainnetTokenAddresses(devnetTokenAddresses: string[])
+export function getMainnetTokenAddresses(nonMainnetTokenAddresses: string[])
 {
   var mainnetTokenAddress = []
 
-  for(var i=0; i<devnetTokenAddresses.length; i++)
+  for(var i=0; i<nonMainnetTokenAddresses.length; i++)
   {
     //Check for Dev USDS Address
-    if(devnetTokenAddresses[i] == "5V413iK9J5wcLVrgj4TN93zTuNczGcsMbDVWewWWHpvA")
+    if(nonMainnetTokenAddresses[i] == "5V413iK9J5wcLVrgj4TN93zTuNczGcsMbDVWewWWHpvA")
       mainnetTokenAddress.push(jupiterPriceUpdateMainnetTokenAddressStrings.usdsTokenMintAddress)
     //Check for Dev USDC Address
-    else if(devnetTokenAddresses[i] == "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU")
+    else if(nonMainnetTokenAddresses[i] == "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU")
       mainnetTokenAddress.push(jupiterPriceUpdateMainnetTokenAddressStrings.usdcTokenMintAddress)
     //Check for Dev WEth Address
-    else if(devnetTokenAddresses[i] == "49omHmMjcWSy6b2yFb1RTaAN5zraDLpvx2LNCWX2opkZ")
+    else if(nonMainnetTokenAddresses[i] == "49omHmMjcWSy6b2yFb1RTaAN5zraDLpvx2LNCWX2opkZ")
       mainnetTokenAddress.push(jupiterPriceUpdateMainnetTokenAddressStrings.wethTokenMintAddress)
     //Check for Dev WBtc Address
-    else if(devnetTokenAddresses[i] == "EcNB579EvvgaGkqhZ6RHhryuivgJWUvqvYzr1c5KT9cV")
+    else if(nonMainnetTokenAddresses[i] == "EcNB579EvvgaGkqhZ6RHhryuivgJWUvqvYzr1c5KT9cV")
       mainnetTokenAddress.push(jupiterPriceUpdateMainnetTokenAddressStrings.wbtcTokenMintAddress)
     //SOL Address is same on Dev and Mainnet
     else
-      mainnetTokenAddress.push(devnetTokenAddresses[i])
+      mainnetTokenAddress.push(nonMainnetTokenAddresses[i])
   }
 
   return mainnetTokenAddress

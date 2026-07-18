@@ -7,6 +7,7 @@
       show-gridlines 
       size="small"
       :value="StableCoins"
+      :loading="!anchorPrograms.isLendingProtocolReady"
       :globalFilterFields="
       [
         'tokenId',
@@ -219,6 +220,7 @@
       v-model:filters="filters" 
       show-gridlines size="small" 
       :value="CryptoCurrency"
+      :loading="!anchorPrograms.isLendingProtocolReady"
       :globalFilterFields="
       [
         'tokenId',

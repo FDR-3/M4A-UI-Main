@@ -88,7 +88,7 @@
 
   function openGithub()
   {
-    window.open("https://github.com/FDR-3?tab=repositories", "_blank")
+    window.open("https://github.com/FDR-3", "_blank")
   }
 
   function openYoutube()
