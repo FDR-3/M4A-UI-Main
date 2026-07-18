@@ -319,7 +319,7 @@
   import { PublicKey } from "@solana/web3.js"
   import { copyAddress,
     copyFullAddressText,
-    copyTreasuryATAText,
+    copyTonkenReserveATAText,
     isValidSolanaPublicKey,
     confirmLendingTransaction,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
@@ -352,7 +352,7 @@
 
   var tokenReserveATAPopoverOpen = ref(false)
   var totalBorrowedValue = ref(0)
-  var copyTokenReserveATAButtonText = ref(copyTreasuryATAText)
+  var copyTokenReserveATAButtonText = ref(copyTonkenReserveATAText)
 
   var inputFeeRefs = ref(new Map())
 

@@ -289,6 +289,7 @@
   export const copyFullAddressText = "Copy Full Address"
   export const copyTokenMintAddressText = "Copy Token Mint Address"
   export const copyTreasuryATAText = "Copy Treasury ATA"
+  export const copyTonkenReserveATAText = "Copy Token Reserve ATA"
 
   export function copyAddress(buttonText: Ref, addressString: string)
   {

@@ -438,10 +438,10 @@
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
     let newWallet = JSON.parse(newJSONObjectString)
-    let oldWallet= JSON.parse(oldJSONObjectString)
+    let oldWallet = JSON.parse(oldJSONObjectString)
 
     //This is here because of the "watch(lendingUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily
-    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex)
       return
 
     if(newWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)

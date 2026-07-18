@@ -24,15 +24,19 @@
       </div>
     </ion-button>
     <ion-popover :is-open="popoverOpen" :event="event" @didDismiss="popoverOpen=false" side="bottom" size="cover">
-      <ion-button 
-        v-for="(navButton, index) in navButtons"
-        :color="colorName"
-        class="popOverButton"
-        :class="{ selected: navigation.navBarIndex === index }"
-        @click="setNavBarIndex(index)"
-      >
-        <ion-label class="lilNavTextSize" :class="navButton.labelClass" :color="navButton.textColor">{{ navButton.lilNavText }}</ion-label>
-      </ion-button>
+      <div class="flexCenterColumn">
+        <ion-button 
+          v-for="(navButton, index) in navButtons"
+          :color="colorName"
+          class="popOverButton tinyMarginTop"
+          :class="{ selected: navigation.navBarIndex === index,
+            tinyMarginBottom: index === navButtons.length - 1 }"
+          :style="{ '--box-shadow': navigation.navBarIndex === index ? `0px 0px 5px 8px ${buttonShadow}`: '' }"
+          @click="setNavBarIndex(index)"
+        >
+          <ion-label class="innerLilNavTextSize" :class="navButton.labelClass" :color="navButton.textColor">{{ navButton.lilNavText }}</ion-label>
+        </ion-button>
+      </div>
     </ion-popover>
   </div>
 </template>
@@ -116,6 +120,11 @@
     text-decoration-thickness: 2px
   }
 
+  .popOverButton
+  {
+    width: 80px !important
+  }
+
   ion-button.selected
   {
     text-decoration: underline;
@@ -140,6 +149,11 @@
   .lilNavTextSize
   {
     font-size: min(7vw, 15px)
+  }
+
+  .innerLilNavTextSize
+  {
+    font-size: min(7vw, 13px)
   }
 
   @media screen and (min-width: 1101px)

@@ -81,7 +81,7 @@ export function calculateTokenReserveSevenDaySupplyInterestFactor(timeStamp: num
     const tokenReserve = tokenReservesHashMap.map.get(tokenId)
 
     if(!tokenReserve)
-      return
+      return [0, 0]
 
     //Token Reserve Supply Interest Index = Old Supply Interest Index * (1 + Supply APY * Δt/Seconds in a Year)
     const oldTime = Number(tokenReserve.lastLendingActivityTimeStamp)

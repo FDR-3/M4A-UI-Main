@@ -348,7 +348,7 @@
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
     let newWallet = JSON.parse(newJSONObjectString)
-    let oldWallet= JSON.parse(oldJSONObjectString)
+    let oldWallet = JSON.parse(oldJSONObjectString)
 
     if(newWallet.addressString == oldWallet.addressString)
       return

@@ -541,10 +541,10 @@
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
     let newWallet = JSON.parse(newJSONObjectString)
-    let oldWallet= JSON.parse(oldJSONObjectString)
+    let oldWallet = JSON.parse(oldJSONObjectString)
 
     //Only want this running if the connected Wallet Address String is changing
-    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex )
+    if(newWallet.addressString == oldWallet.addressString && newWallet.selectedLendingUserAccountIndex == oldWallet.selectedLendingUserAccountIndex)
       return
 
     connectedWallet.lendingUserLUTAccountReady = false

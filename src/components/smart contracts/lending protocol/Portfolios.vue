@@ -596,7 +596,7 @@
   watch(walletWatch, async (newJSONObjectString, oldJSONObjectString) =>
   {
     let newWallet = JSON.parse(newJSONObjectString)
-    let oldWallet= JSON.parse(oldJSONObjectString)
+    let oldWallet = JSON.parse(oldJSONObjectString)
 
     //This is here because of the "watch(lendingUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily.
     //The isBrowisngAllUsers check keeps the leaderboard height from being messed up when changing the selected account index when the leader board isn't visible.

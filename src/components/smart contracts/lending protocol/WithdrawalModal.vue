@@ -240,7 +240,7 @@
     if(withdrawing.value)
     {
       let newWallet = JSON.parse(newJSONObjectString)
-      let oldWallet= JSON.parse(oldJSONObjectString)
+      let oldWallet = JSON.parse(oldJSONObjectString)
 
       //Only want this running if the connected Wallet Address String is changing and modal is visible
       if(!withdrawing.value ||

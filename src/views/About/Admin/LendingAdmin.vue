@@ -32,7 +32,7 @@
           step="1"
           min="2022">
           </ion-input>
-          <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentStatementMonthAndYear()" style="width:77px" :disabled="statementYearInput == '' || noChangeDetected">
+          <ion-button class="smallMarginBottom" color="dark" @click="updateCurrentStatementMonthAndYear()" style="width:77px" :disabled="statementYearInput == '' || noDateChangeDetected">
             Update
           </ion-button>
         </div>
@@ -173,7 +173,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, type Component, onMounted, computed} from 'vue'
+  import { ref, inject, type Component, onMounted, computed, watch } from 'vue'
   import { IonButton, IonInput, IonText, IonLabel } from '@ionic/vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
@@ -237,13 +237,34 @@
     }
   ]
 
-  const noChangeDetected = computed(() =>
+  const noDateChangeDetected = computed(() =>
   {
     if((anchorPrograms.currentStatementMonthNumber == monthSelect.value) &&
     (anchorPrograms.currentStatementYear.toString() == statementYearInput.value))
       return true
     else
       return false
+  })
+
+  //Json string of wallet to detect object property changes
+  const anchorProgramsWatch = computed(() =>
+  {
+    return JSON.stringify(
+    {
+      maxTabsPerLendingAccount: anchorPrograms.maxTabsPerLendingAccount
+    })
+  })
+
+  watch(anchorProgramsWatch, async (newJSONObjectString, oldJSONObjectString) =>
+  {
+      let newAnchorProgram = JSON.parse(newJSONObjectString)
+      let oldAnchorProgram = JSON.parse(oldJSONObjectString)
+
+      //Only want this running if the connected Wallet Address String is changing
+      if(newAnchorProgram.maxTabsPerLendingAccount == oldAnchorProgram.maxTabsPerLendingAccount)
+        return
+
+    maxTabsPerLendingAccount.value = anchorPrograms.maxTabsPerLendingAccount
   })
 
   onMounted(() =>

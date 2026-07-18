@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch} from 'vue'
+  import { ref, watch, provide } from 'vue'
   import { IonContent, IonPage } from '@ionic/vue'
   import UpdateNotice from '/src/components/smart contracts/alert protocol/UpdateNotice.vue'
   import NavBar from '/src/components/navbar/NavBar.vue'
@@ -47,9 +47,14 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
+  //This silences a warning for the Settings button, which isn't actually visible while in the Jesus section
+  const colorName = "yellow"
+  const colorHexValue = "#ffd700"
+  provide('colorHexValue', colorHexValue)
+  provide('colorName', colorName)
+
   const jesusTotalPages = 14
   const pageContent = ref()
-  const colorName = "yellow"
   const buttonShadow = "goldenrod"
 
   const pages = 

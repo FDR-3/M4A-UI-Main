@@ -534,7 +534,7 @@
       var sevenDayStableCoinProjectionValue = 0
       for(var i=0; i<stableCoinFeeArray.length; i++)
       {
-        [stableCoinFeeArray[i].tokenReserveSupplyInterestChangeIndex, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex]  = calculateTokenReserveSevenDaySupplyInterestFactor(unixData.timeStamp, stableCoinFeeArray[i].tokenId)
+        [stableCoinFeeArray[i].tokenReserveSupplyInterestChangeIndex, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex] = calculateTokenReserveSevenDaySupplyInterestFactor(unixData.timeStamp, stableCoinFeeArray[i].tokenId)
         if(stableCoinFeeArray[i].tokenReserveSupplyInterestChangeIndex && stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
           sevenDayStableCoinProjectionValue += calculateSubMarketSevenDayFeeAccrued(stableCoinFeeArray[i].tokenId, stableCoinFeeArray[i].tokenReserveSupplyInterestChangeIndex, stableCoinFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
