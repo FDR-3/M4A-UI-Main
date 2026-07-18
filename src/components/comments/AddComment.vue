@@ -143,7 +143,7 @@
         <ion-button v-else-if="!commentSectionInfo.isCommentSectionReady" :color="colorName" @click="createCommentSection()">
           <ion-label color="dark">Initialize This Comment Section</ion-label>
         </ion-button>
-        <ion-button v-else @click="postComment()" :color="colorName" :disabled="overByteSizeLimit || msg==''">
+        <ion-button v-else @click="postComment()" style="width: min(150px, 70vw)" :color="colorName" :disabled="overByteSizeLimit || msg==''">
           <ion-label color="dark">Post Comment</ion-label>
         </ion-button>
       </div>

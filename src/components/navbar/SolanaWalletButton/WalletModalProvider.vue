@@ -79,7 +79,6 @@
 </template>
 
 <script setup lang="ts">
-  import {  } from 'vue'
   import { IonLabel, IonText } from '@ionic/vue'
   import { useWallet }  from 'solana-wallets-vue'
   import { WalletReadyState } from "@solana/wallet-adapter-base"
@@ -90,14 +89,13 @@
 
   const props = defineProps(['featured', 'container', 'logo', 'dark', 'colorHexValue'])
 
-  const slots = useSlots();
+  const slots = useSlots()
   const modalPanel = ref(null) as Ref<HTMLElement | null>
   const modalOpened = ref(false)
   const openModal = () => (modalOpened.value = true)
   const closeModal = () => (modalOpened.value = false)
   const hasLogo = computed(() => !!slots.logo || !!props.logo)
 
-  
   const { wallets, select: selectWallet } = useWallet()
   const orderedWallets = computed(() => 
   {
