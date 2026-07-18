@@ -629,8 +629,8 @@
         Number(userTabAccounts[i].borrowInterestChangeIndex),
         timeStamp)
 
-        calculatedAssetValue += Number(userBalanceWithInterestEarned / Math.pow(10, decimalAmount)) * Number(price)
-        calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
+        calculatedAssetValue += userBalanceWithInterestEarned / Math.pow(10, decimalAmount) * Number(price)
+        calculatedDebtValue += userDebtWithInterestAccrued / Math.pow(10, decimalAmount) * Number(price)
       }
     
     const selectedBorrowedAmount = tabBorrowHashMap.get(borrowPositionToRepaySelect.value.repaymentTokenId.toString() +

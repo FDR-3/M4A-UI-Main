@@ -291,7 +291,7 @@
       subMarketSelect.value = subMarkets[0].subMarketIndex
 
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
-
+    
     if(lendingUserAccountsHashMap.map)
     {
       const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
@@ -315,11 +315,51 @@
     subMarketTokenName.value = tokenName
     repaying.value = true
 
+    setDefaultSubMarketTo1WithDebt(subMarkets)
     setInitialDebtBalance()
     stopInterestCalculation()
     startInterestCalculation()
     stopHealthFactorCalculation()
     startHealthFactorCalculation()
+  }
+
+  function setDefaultSubMarketTo1WithDebt(subMarkets: any[])
+  {
+    //Check if initial setting has debt
+    let tempLendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
+    adminAccounts.lendingCEOAddressString +
+    subMarketSelect.value.toString() +
+    connectedWallet.addressString +
+    accountSelect.value.toString())
+
+    if(tempLendingUserTabAccount)
+    {
+      const debt = Number(tempLendingUserTabAccount.borrowedAmount) / Math.pow(10, tokenDecimalAmount)//Convert from fixed point notation to decimal
+      if(debt > 0)
+        return
+    }
+
+    //Set initial submarket to one with debt for repayment
+    for(var i=0; i<subMarkets.length; i++)
+    {
+      let tempLendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
+      adminAccounts.lendingCEOAddressString +
+      subMarkets[i].subMarketIndex.toString() +
+      connectedWallet.addressString +
+      accountSelect.value.toString())
+
+      if(tempLendingUserTabAccount)
+      {
+        const debt = Number(tempLendingUserTabAccount.borrowedAmount) / Math.pow(10, tokenDecimalAmount)//Convert from fixed point notation to decimal
+        if(debt > 0)
+        {
+          subMarketSelect.value = subMarkets[i].subMarketIndex
+          return
+        }
+      }
+    }
+    
+    return
   }
 
   function openTokenPopover(e: Event) 
@@ -350,20 +390,16 @@
     if(!lendingUserTabAccountsHashMap.map || subMarketSelect.value == undefined)
       return
 
-    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
+    lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
     adminAccounts.lendingCEOAddressString +
     subMarketSelect.value.toString() +
     connectedWallet.addressString +
-    accountSelect.value.toString())
+    accountSelect.value.toString()))
 
     if(lendingUserTabAccount)
     {
       const decimalAmount = tokenDecimalHashMap.get(selectedTokenId)
-
-      if(lendingUserTabAccount)
-        userDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
-      else
-        userDebt.value = 0
+      userDebt.value = Number(lendingUserTabAccount.borrowedAmount) / Math.pow(10, decimalAmount)//Convert from fixed point notation to decimal
     }
     else
       userDebt.value = 0
@@ -405,8 +441,8 @@
         Number(userTabAccounts[i].borrowInterestChangeIndex),
         timeStamp)
 
-        calculatedAssetValue += Number(userBalanceWithInterestEarned / Math.pow(10, decimalAmount)) * Number(price)
-        calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
+        calculatedAssetValue += userBalanceWithInterestEarned / Math.pow(10, decimalAmount) * Number(price)
+        calculatedDebtValue += userDebtWithInterestAccrued / Math.pow(10, decimalAmount) * Number(price)
       }
     
     const priceOfSelectedToken = Number(priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice)

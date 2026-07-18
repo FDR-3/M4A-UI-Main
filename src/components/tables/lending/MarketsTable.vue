@@ -96,17 +96,6 @@
               <component :is="slotProps.data.asset.svg" style="width: 24px; margin-left: -11px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
-            <ion-popover 
-            :is-open="tokenPopoverOpen" 
-            :event="event" 
-            @didDismiss="tokenPopoverOpen=false"
-            side="top" 
-            alignment="center"
-            >
-              <ion-button class="copyTokenAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
-              </ion-button>
-            </ion-popover>
           </div>
         </template>
       </Column>
@@ -172,7 +161,7 @@
             <ion-text v-else-if="!anchorPrograms.isLendingProtocolReady" class="noWrapText">Loading</ion-text>
             <div v-else>
               <ion-button
-              v-if="depositedAssetAmount==0"
+              v-if="!hasDeposits"
               class="lendingActionButton"
               color="dark"
               @click="$emit('openDepositModal', slotProps.data.tokenId, slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
@@ -186,28 +175,6 @@
               @click="openActionsPopover($event, slotProps.data)">
                 Actions
               </ion-button>
-              <ion-popover
-              :is-open="actionsPopoverOpen" 
-              :event="event" 
-              @didDismiss="actionsPopoverOpen=false"
-              side="top" 
-              alignment="center"
-              >
-                <div class=" flexCenterColumn popoverContainer">
-                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                    <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
-                  </ion-button>
-                  <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
-                    <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
-                  </ion-button>
-                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
-                    <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
-                  </ion-button>
-                  <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
-                    <ion-label class="noClickEvent" color="dark">Repay</ion-label>
-                  </ion-button>
-                </div>
-              </ion-popover>
             </div>
           </div>
         </template>
@@ -317,7 +284,7 @@
             <ion-text v-else-if="!anchorPrograms.isLendingProtocolReady" class="noWrapText">Loading</ion-text>
             <div v-else>
               <ion-button
-              v-if="depositedAssetAmount==0"
+              v-if="!hasDeposits"
               class="lendingActionButton"
               color="dark"
               @click="$emit('openDepositModal', slotProps.data.tokenId, slotProps.data.tokenMintAddressString, slotProps.data.subMarketList)">
@@ -331,33 +298,51 @@
               @click="openActionsPopover($event, slotProps.data)">
                 Actions
               </ion-button>
-              <ion-popover
-              :is-open="actionsPopoverOpen" 
-              :event="event" 
-              @didDismiss="actionsPopoverOpen=false"
-              side="top" 
-              alignment="center"
-              >
-                <div class=" flexCenterColumn popoverContainer">
-                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
-                    <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
-                  </ion-button>
-                  <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
-                    <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
-                  </ion-button>
-                  <ion-button class="lendingActionButton" fill="clear" @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
-                    <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
-                  </ion-button>
-                  <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
-                    <ion-label class="noClickEvent" color="dark">Repay</ion-label>
-                  </ion-button>
-                </div>
-              </ion-popover>
+              
             </div>
           </div>
         </template>
       </Column>
     </DataTable>
+
+    <ion-popover 
+    :is-open="tokenPopoverOpen" 
+    :event="event" 
+    @didDismiss="tokenPopoverOpen=false"
+    side="top" 
+    alignment="center"
+    >
+      <ion-button class="copyTokenAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
+        <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
+      </ion-button>
+    </ion-popover>
+    
+    <ion-popover
+    :is-open="actionsPopoverOpen" 
+    :event="event" 
+    @didDismiss="actionsPopoverOpen=false"
+    side="top" 
+    alignment="center"
+    >
+      <div class=" flexCenterColumn popoverContainer">
+        <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
+          <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
+        </ion-button>
+        <ion-button v-if="event.depositBalance" class="lendingActionButton" fill="clear" @click="$emit('openWithdrawalModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
+          <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
+        </ion-button>
+        <ion-button v-if="(connectedWallet.addressString!=adminAccounts.hodlTreasuryAddress.toString() &&
+        connectedWallet.addressString!=adminAccounts.singlePayerTreasuryAddress.toString())"
+        class="lendingActionButton"
+        fill="clear"
+        @click="$emit('openBorrowModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
+          <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
+        </ion-button>
+        <ion-button v-if="event.borrowBalance" class="lendingActionButton" fill="clear" @click="$emit('openRepayModal', event.tokenId, event.tokenMintAddressString, event.userSpecificSubMarketList); actionsPopoverOpen=false">
+          <ion-label class="noClickEvent" color="dark">Repay</ion-label>
+        </ion-button>
+      </div>
+    </ion-popover>
   </div>
 </template>
 
@@ -403,7 +388,7 @@
   var accountNameEditInputRef = ref()
   var savedEmojiCursorPosition: any
   var overByteSizeLimit = ref()
-  var depositedAssetAmount = ref(0)
+  var hasDeposits = ref(false)
 
   const userLendingInfoMSG = "Create new accounts while making a deposit."
 
@@ -469,7 +454,7 @@
     else
     {
       setLendingUserAccountList()
-      depositedAssetAmount.value = 0
+      hasDeposits.value = false
     }
 
     checkForMainSubMarkets()
@@ -686,7 +671,7 @@
       return
 
     //Check for any assets to allow borrowing
-    var assetAmount = 0
+    var hasAssets = false
     const userTabAccounts = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value)
     
     if(userTabAccounts)
@@ -695,12 +680,12 @@
         const depositedAmount = Number(userTabAccounts[i].depositedAmount)
         if(depositedAmount != 0)
         {
-          assetAmount = depositedAmount
+          hasAssets = true
           break
         }
       }
 
-    depositedAssetAmount.value = assetAmount
+    hasDeposits.value = hasAssets
     
     if(!subMarketByTokenIdAndOwnerHashMap.map || subMarketByTokenIdAndOwnerHashMap?.map.size == 0)
       return
@@ -709,6 +694,7 @@
     for(var i=0; i<StableCoins.length; i++)
     {
       StableCoins[i].depositBalance = 0
+      StableCoins[i].borrowBalance = 0
 
       if(StableCoins[i].subMarketList)
       {
@@ -725,11 +711,11 @@
           {
             const depositBalance = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
             if(depositBalance)
-              StableCoins[i].depositBalance = depositBalance
+              StableCoins[i].depositBalance += depositBalance
 
             const borrowBalance = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
             if(borrowBalance)
-              StableCoins[i].borrowBalance = borrowBalance
+              StableCoins[i].borrowBalance += borrowBalance
           }
         }
       }
@@ -738,6 +724,7 @@
     for(var i=0; i<CryptoCurrency.length; i++)
     {
       CryptoCurrency[i].depositBalance = 0
+      CryptoCurrency[i].borrowBalance = 0
 
       if(CryptoCurrency[i].subMarketList)
       {
@@ -754,11 +741,11 @@
           {
             const depositBalance = Number(lendingUserTabAccount.depositedAmount) / Math.pow(10, decimalAmount)//Convert from fixed point notation to decimal
             if(depositBalance)
-              CryptoCurrency[i].depositBalance = depositBalance
+              CryptoCurrency[i].depositBalance += depositBalance
 
             const borrowBalance = Number(lendingUserTabAccount.borrowedAmount) / Math.pow(10, decimalAmount)//Convert from fixed point notation to decimal
             if(borrowBalance)
-              CryptoCurrency[i].borrowBalance = borrowBalance
+              CryptoCurrency[i].borrowBalance += borrowBalance
           }
         }
       }

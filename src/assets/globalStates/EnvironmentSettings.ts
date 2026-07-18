@@ -1,7 +1,7 @@
 export const DEV_MODE = true
 export const LOCAL_PRICE_ORACLE = false
 export const USE_JITO_BUNDLES = true //if LOCAL_PRICE_ORACLE is true, USE_JITO_BUNDLES should be false, can't use jito bundles on the local network, only testnet and mainnet https://docs.jito.wtf/lowlatencytxnsend/#api
-export const MAINTENANCE_MODE = false
+export const MAINTENANCE_MODE = true
 export const APPROVED_TESTERS = 
 [
   "Fdqu1muWocA5ms8VmTrUxRxxmSattrmpNraQ7RpPvzZg",
@@ -14,5 +14,7 @@ export const APPROVED_TESTERS =
   "C12QF84su2HVnLn2dFMqtKvxJ96GSVukZayDX6asgwWA",
   "CWn6hRVH7DQF4vH4jrCs2aDzLJDjbKj3UVrRUNZKAvGi",
   "DDZqw69QGs8g1GyAxSEh4yW8ZN5invueJXaTmeBxXT55",
-  "HkidFucZXKTFN2PKQT6HVvF8rUpSRR4HFQg72o1SJUVT"
+  "HkidFucZXKTFN2PKQT6HVvF8rUpSRR4HFQg72o1SJUVT",
+  "2TnxW9qAgPjHmHUXde6zgxNa8F4nY3kfDpdRJsT8HdPU",
+  "B9UiZdNg7j7qH1FhimSwkG5CY7D4K8WRpP1Zw4BgHBtb"
 ]

@@ -171,7 +171,7 @@
         <PortfolioChart
         :key="chartReRenderKey"
         :isStableCoin="true"
-        :depositedAssetAmount="depositedAssetAmount"
+        :hasDeposits="hasDeposits"
         :tokenId="monthlyStatement.tokenId"
         :subMarketOwnerAddress="monthlyStatement.subMarketOwnerAddress"
         :subMarketOwnerAddressTrimmed="monthlyStatement.subMarketOwnerAddressTrimmed"
@@ -249,7 +249,7 @@
         <PortfolioChart
         :key="chartReRenderKey"
         :isStableCoin="false"
-        :depositedAssetAmount="depositedAssetAmount"
+        :hasDeposits="hasDeposits"
         :tokenId="monthlyStatement.tokenId"
         :subMarketOwnerAddress="monthlyStatement.subMarketOwnerAddress"
         :subMarketOwnerAddressTrimmed="monthlyStatement.subMarketOwnerAddressTrimmed"
@@ -331,7 +331,7 @@
 
   var selectedYearHashMap = new Map<string, any>()
   var selectedUserChartDataHashMap = new Map<string, any>()
-  var depositedAssetAmount = ref()
+  var hasDeposits = ref(false)
 
   var stableCoin7DayProjectionRateAmount = ref("0")
   var stableCoin7DayProjectionRateValue = ref(0)
@@ -1073,7 +1073,7 @@
       return
 
     //Check for any assets to allow borrowing
-    var assetAmount = 0
+    var assetAmount = false
     const userTabAccounts = lendingUserTabAccountListHashMap.map.get(addressToCheck.value + accountSelect.value)
     
     if(userTabAccounts)
@@ -1082,12 +1082,12 @@
         const depositedAmount = Number(userTabAccounts[i].depositedAmount)
         if(depositedAmount != 0)
         {
-          assetAmount = depositedAmount
+          assetAmount = true
           break
         }
       }
 
-    depositedAssetAmount.value = assetAmount
+    hasDeposits.value = assetAmount
   }
 
   function updateStableCoinRealTimeValues(userTabIndex: number,

@@ -599,7 +599,7 @@
               tempData[i].healthFactorCaution = true
 
               //Used for sorting liquidatable Column
-              if(tempData[i].liquidatableColorStep < 1)
+              if(tempData[i].liquidatableColorStep < 1) //This is checking all of the accounts under one public key
                 tempData[i].liquidatableColorStep = 1
             }
 
@@ -608,7 +608,7 @@
               tempData[i].liquidatable = true
 
               //Used for sorting liquidatable Column
-              if(tempData[i].liquidatableColorStep < 2)
+              if(tempData[i].liquidatableColorStep < 2) //This is checking all of the accounts under one public key
                 tempData[i].liquidatableColorStep = 2
             }
           }
@@ -726,6 +726,12 @@
         setRankingColumn()
         break
       }
+      case "interestAccruedValue":
+      {
+        tableData.value = tableData.value.sort((a: any, b: any) => b.interestEarnedValue - a.interestAccruedValue)
+        setRankingColumn()
+        break
+      }
       case "borrowedValue":
       {
         tableData.value = tableData.value.sort((a: any, b: any) => b.borrowedValue - a.borrowedValue)
@@ -741,6 +747,12 @@
       case "liquidatedValue":
       {
         tableData.value = tableData.value.sort((a: any, b: any) => b.liquidatedValue - a.liquidatedValue)
+        setRankingColumn()
+        break
+      }
+      case "liquidatableColorStep":
+      {
+        tableData.value = tableData.value.sort((a: any, b: any) => b.liquidatableColorStep - a.liquidatableColorStep)
         setRankingColumn()
         break
       }

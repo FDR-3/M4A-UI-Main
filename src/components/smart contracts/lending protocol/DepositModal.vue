@@ -488,11 +488,11 @@
     if(!lendingUserTabAccountsHashMap.map)
       return
 
-    lendingUserTabAccount = lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
+    lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(selectedTokenId.toString() +
     adminAccounts.lendingCEOAddressString +
     subMarketSelect.value.toString() +
     connectedWallet.addressString +
-    accountSelect.value.toString())
+    accountSelect.value.toString()))
 
     if(lendingUserTabAccount)
       userBalance.value = Number(lendingUserTabAccount.depositedAmount / Math.pow(10, tokenDecimalAmount))//Convert from fixed point notation to decimal
@@ -536,8 +536,8 @@
         Number(userTabAccounts[i].borrowInterestChangeIndex),
         timeStamp)
 
-        calculatedAssetValue += Number(userBalanceWithInterestEarned / Math.pow(10, decimalAmount)) * Number(price)
-        calculatedDebtValue += Number(userDebtWithInterestAccrued / Math.pow(10, decimalAmount)) * Number(price)
+        calculatedAssetValue += userBalanceWithInterestEarned / Math.pow(10, decimalAmount) * Number(price)
+        calculatedDebtValue += userDebtWithInterestAccrued / Math.pow(10, decimalAmount) * Number(price)
       }
     
     const priceOfSelectedToken = Number(priceObjectMap.data[selectedTokenMintAddress.toString()].usdPrice)

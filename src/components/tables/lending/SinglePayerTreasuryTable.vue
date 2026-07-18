@@ -41,17 +41,6 @@
               <component :is="slotProps.data.asset.svg" style="width: 24px; margin-left: -11px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
-            <ion-popover 
-            :is-open="tokenPopoverOpen" 
-            :event="event" 
-            @didDismiss="tokenPopoverOpen=false"
-            side="top" 
-            alignment="center"
-            >
-              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
-              </ion-button>
-            </ion-popover>
           </div>
         </template>
       </Column>
@@ -124,17 +113,6 @@
               <component v-else :is="slotProps.data.asset.svg" style="width: 28px; height: 32px; margin-right: 5px"/>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
-            <ion-popover 
-            :is-open="tokenPopoverOpen" 
-            :event="event" 
-            @didDismiss="tokenPopoverOpen=false"
-            side="top" 
-            alignment="center"
-            >
-              <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
-                <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
-              </ion-button>
-            </ion-popover>
           </div>
         </template>
       </Column>
@@ -175,6 +153,18 @@
       </Column>
     </DataTable>
   </div>
+
+  <ion-popover 
+  :is-open="tokenPopoverOpen" 
+  :event="event" 
+  @didDismiss="tokenPopoverOpen=false"
+  side="top" 
+  alignment="center"
+  >
+    <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
+      <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
+    </ion-button>
+  </ion-popover>
 </template>
 
 <script setup lang="ts">
@@ -499,7 +489,8 @@
           sevenDayCryptoCurrencyProjectionValue += calculateSubMarketSevenDayFeeAccrued(cryptoCurrencyFeeArray[i].tokenId, cryptoCurrencyFeeArray[i].tokenReserveSupplyInterestChangeIndex, cryptoCurrencyFeeArray[i].tokenReserve7DaySupplyInterestChangeIndex)
       }
 
-      sevenDayProjectionRate.value = (sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue).toLocaleString('en-US', {
+      const sevenDayProjection = sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue < 0 ? 0 : sevenDayStableCoinProjectionValue + sevenDayCryptoCurrencyProjectionValue
+      sevenDayProjectionRate.value = (sevenDayProjection).toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }, 55)
