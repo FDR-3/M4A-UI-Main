@@ -571,6 +571,8 @@
         await confirmLendingTransaction(userTxs, toast, "borrow_tokens")
 
       stopHealthFactorCalculation()
+      borrowMax.value = false
+      borrowHalf.value = false
       borrowing.value = false
     }
     catch(error: any)

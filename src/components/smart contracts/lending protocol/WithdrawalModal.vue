@@ -723,8 +723,9 @@
       
       stopInterestCalculation()
       stopHealthFactorCalculation()
-      withdrawing.value = false
       withdrawMax.value = false
+      withdrawHalf.value = false
+      withdrawing.value = false
     }
     catch(error: any)
     {

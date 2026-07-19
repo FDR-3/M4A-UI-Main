@@ -324,9 +324,9 @@
           addingAdditionalLendingAccount.value = false
         }
 
-        depositing.value = false
         stopInterestCalculation()
         stopHealthFactorCalculation()
+        depositing.value = false  
         window.removeEventListener('click', handleClickOutside)
       }
     }

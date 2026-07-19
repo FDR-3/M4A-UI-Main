@@ -634,8 +634,9 @@
 
       stopInterestCalculation()
       stopHealthFactorCalculation()
-      repaying.value = false
       repayMax.value = false
+      repayHalf.value = false
+      repaying.value = false
     }
     catch(error)
     {

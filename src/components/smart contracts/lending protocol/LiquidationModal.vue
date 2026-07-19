@@ -1464,7 +1464,12 @@
       else
         await confirmLendingTransaction(userTxs, toast, liquidateFunctionCallName)
 
+      stopTabCalculation()
       stopHealthFactorCalculation()
+      addingAdditionalLendingAccount.value = false
+      repayMax.value = false
+      repayHalf.value = false
+      repayAmount.value = 0
       liquidating.value = false
     }
     catch(error: any)
