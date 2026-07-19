@@ -628,7 +628,7 @@
 
       //Get Lending User Look Up Table Account
       lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
-
+      
       if(totalDebtValue.value != 0)
       {
         const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts, subMarketOwnerArray] =
@@ -674,8 +674,6 @@
         .remainingAccounts([tempPriceRemainingAccount, adminAccounts.priceOracleRemainingAccount])
         .instruction()
 
-        const computeUnitIncreaseInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
-        instructionsToSend.push(computeUnitIncreaseInstruction)
         instructionsToSend.push(...createMonthlyStatementInstructions)
         instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
         instructionsToSend.push(withdrawInstruction)

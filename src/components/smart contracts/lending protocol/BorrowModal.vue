@@ -524,8 +524,6 @@
       .remainingAccounts([tempPriceRemainingAccount, adminAccounts.priceOracleRemainingAccount])
       .instruction()
 
-      const computeUnitIncreaseInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
-      instructionsToSend.push(computeUnitIncreaseInstruction)
       if(isNewBorrowToken)
         instructionsToSend.push(extendUserLUTForNewBorrowToken())
       instructionsToSend.push(...createMonthlyStatementInstructions)

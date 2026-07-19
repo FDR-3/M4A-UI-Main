@@ -25,6 +25,7 @@
         <ion-label class="magnifyingGlassEmoji noClickEvent">🔍</ion-label>
         <ion-label class="noClickEvent" color="white">{{ emojiPlaceHolderSearchValue }}</ion-label>
       </ion-button>
+      <div class="horizontalLine"></div>
     </div>
     <div v-else class="flexCenterRow emojiSearchContainer">
       <ion-input
@@ -48,7 +49,7 @@
       class="emojiButton" 
       fill="clear" 
       title="emojis" 
-      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(0); emojiSearchValue=''; emojiPlaceHolderSearchValue='          emoji search'">
+      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(0); emojiSearchValue=''; emojiPlaceHolderSearchValue='          Emoji Search'">
         🙂
       </ion-button>
       <ion-button 
@@ -56,7 +57,7 @@
       class="kaomojiButton noWrapText"
       fill="clear" 
       title="kaomojis" 
-      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(1); emojiSearchValue=''; emojiPlaceHolderSearchValue='      ascii art search'" 
+      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(1); emojiSearchValue=''; emojiPlaceHolderSearchValue='      Ascii Art Search'" 
       color="white">
         ( ͡• ͜ʖ ͡•)
       </ion-button>
@@ -65,7 +66,7 @@
       class="emojiButton" 
       fill="clear" 
       title="symbols" 
-      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(2); emojiSearchValue=''; emojiPlaceHolderSearchValue='      ascii symbol search'" 
+      @click="isEmojiSearchActive=false; emojiSelector.peopleEmojiFilterCount=-1; setTopMenuBarIndex(2); emojiSearchValue=''; emojiPlaceHolderSearchValue='      Ascii Symbol Search'" 
       color="white"
       >
         ©

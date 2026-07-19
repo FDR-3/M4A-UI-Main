@@ -1502,16 +1502,54 @@
     {
       const connection = anchorPrograms.lending.lendingProgram.provider.connection
       const { blockhash } = await connection.getLatestBlockhash()
-      const payerKey = connectedWallet.publicKey;
+      const payerKey = connectedWallet.publicKey
 
       //Hard Solana MTU limit is 1232 bytes.
       //We reserve a 64-byte buffer for the user's signature applied later
       const MAX_UNSIGNED_SIZE = 1232 - 64
 
-      //Helper function to pack a set of instructions into transactions
-      const packInstructions = (instructions: anchor.web3.TransactionInstruction[]): VersionedTransaction[] =>
+      //Max cap placeholder used strictly for accurate serialization size testing
+      const placeholderLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
+
+      //1. Run initial chunking without Jito Tip to determine sizes
+      let instructionsToChunk = [...instructionsToSend]
+      let chunks = chunkInstructions(instructionsToChunk)
+
+      //2. Only append Jito Tip and re-chunk if Jito bundles are explicitly enabled AND it is a multi-transaction bundle
+      if(USE_JITO_BUNDLES && chunks.length > 1)
       {
-        const unsignedTransactions: VersionedTransaction[] = []
+        console.log("Multi-transaction bundle detected with Jito enabled. Appending Jito Tip instruction...")
+        const jitoTipInstruction = await createJitoTipInstruction()
+        instructionsToChunk.push(jitoTipInstruction)
+        
+        //Re-chunk everything to ensure sizing rules are strictly followed with the new instruction
+        chunks = chunkInstructions(instructionsToChunk)
+      }
+
+      console.log(`User Instructions Packed into ${chunks.length} transaction chunk(s). Simulating...`)
+
+      //3. Simulate each final chunk and pack them into VersionedTransactions
+      const unsignedTransactions: VersionedTransaction[] = []
+      for(var i=0; i<chunks.length; i++)
+      {
+        const finalizedTx = await finalizeBatch(chunks[i])
+        unsignedTransactions.push(finalizedTx)
+      }
+
+      for(var i=0; i<unsignedTransactions.length; i++)
+      {
+        const unsignedTransactionSize = unsignedTransactions[i].serialize().length
+        console.log(`Unsigned Transaction size: ${unsignedTransactionSize}`)
+      }
+
+      //4. Send the optimized transactions to the wallet for a single-prompt batch sign
+      const signedTransactions = await anchorPrograms.lending.lendingProgram.provider.wallet.signAllTransactions(unsignedTransactions)
+      return signedTransactions
+
+      //Helper Functions 
+      function chunkInstructions(instructions: anchor.web3.TransactionInstruction[]): anchor.web3.TransactionInstruction[][]
+      {
+        const chunks: anchor.web3.TransactionInstruction[][] = []
         var currentBatch: anchor.web3.TransactionInstruction[] = []
 
         for(var i=0; i<instructions.length; i++)
@@ -1521,8 +1559,7 @@
 
           try
           {
-            //Test compilation adding the next instruction to our active batch
-            const testInstructions = [...currentBatch, nextInstruction]
+            const testInstructions = [placeholderLimitIx, ...currentBatch, nextInstruction]
             const testMessage = new TransactionMessage(
             {
               payerKey,
@@ -1545,112 +1582,34 @@
           }
 
           if(itFits)
-            //It fits! Append the instruction to the current transaction batch
             currentBatch.push(nextInstruction)
           else
+          {
+            if(currentBatch.length > 0)
+              chunks.push(currentBatch)
+            
+            currentBatch = [nextInstruction]
+            
+            const singleTxMessage = new TransactionMessage(
             {
-              //It doesn't fit. If we have a pending batch, serialize it first
-              if(currentBatch.length > 0)
-              {
-                const finalMessage = new TransactionMessage(
-                {
-                  payerKey,
-                  recentBlockhash: blockhash,
-                  instructions: currentBatch
-                }).compileToV0Message(lookUpTableAccounts)
-                
-                unsignedTransactions.push(new VersionedTransaction(finalMessage))
-              }
-              
-              //Start a brand new transaction batch with the instruction that overflowed
-              currentBatch = [nextInstruction]
-              
-              //Safety check: verify a single instruction doesn't break the bank on its own
-              const singleTxMessage = new TransactionMessage(
-              {
-                payerKey,
-                recentBlockhash: blockhash,
-                instructions: currentBatch
-              }).compileToV0Message(lookUpTableAccounts)
-              
-              if(new VersionedTransaction(singleTxMessage).serialize().length > MAX_UNSIGNED_SIZE)
-                throw new Error(`Instruction at index ${i} is too large to fit in a single transaction on its own!`)
-            }
+              payerKey,
+              recentBlockhash: blockhash,
+              instructions: [placeholderLimitIx, ...currentBatch]
+            }).compileToV0Message(lookUpTableAccounts)
+            
+            if(new VersionedTransaction(singleTxMessage).serialize().length > MAX_UNSIGNED_SIZE)
+              throw new Error(`Instruction at index ${i} is too large to fit in a single transaction on its own!`)
+          }
         }
 
-        //Don't leave the trailing final batch behind
         if(currentBatch.length > 0)
-        {
-          const finalMessage = new TransactionMessage({
-            payerKey,
-            recentBlockhash: blockhash,
-            instructions: currentBatch
-          }).compileToV0Message(lookUpTableAccounts)
-          
-          unsignedTransactions.push(new VersionedTransaction(finalMessage))
-        }
+          chunks.push(currentBatch)
 
-        return unsignedTransactions
+        return chunks
       }
 
-      //1. Run initial pack without Jito Tip
-      let finalInstructions = [...instructionsToSend]
-      let unsignedTransactions = packInstructions(finalInstructions)
-
-      //2. Only append Jito Tip and repack if Jito bundles are explicitly enabled AND it is a multi-transaction bundle
-      if(USE_JITO_BUNDLES && unsignedTransactions.length > 1)
-      {
-        console.log("Multi-transaction bundle detected with Jito enabled. Appending Jito Tip instruction...")
-        const jitoTipInstruction = await createJitoTipInstruction()
-        finalInstructions.push(jitoTipInstruction)
-        
-        //Repack everything to ensure sizing rules are strictly followed with the new instruction
-        unsignedTransactions = packInstructions(finalInstructions)
-      }
-
-      console.log(`User Instructions Packed into ${unsignedTransactions.length} transaction(s).`)
-
-      for(var i=0; i<unsignedTransactions.length; i++)
-      {
-        const unsignedTransactionSize = unsignedTransactions[i].serialize().length
-        console.log(`Usigned Transaction size: ${unsignedTransactionSize}`)
-      }
-
-      //Send the optimized transactions to the wallet for a single-prompt batch sign
-      const signedTransactions = await anchorPrograms.lending.lendingProgram.provider.wallet.signAllTransactions(unsignedTransactions)
-
-      return signedTransactions
-    }
-    catch(error)
-    {
-      throw error
-    }
-  }
-
-  /*export async function userSignsLendingTransactions(
-    instructionsToSend: anchor.web3.TransactionInstruction[], 
-    lookUpTableAccounts: AddressLookupTableAccount[]
-  ): Promise<VersionedTransaction[]>
-  {
-    try
-    {
-      const unsignedTransactions: VersionedTransaction[] = []
-      const connection = anchorPrograms.lending.lendingProgram.provider.connection
-      const { blockhash } = await connection.getLatestBlockhash()
-      const payerKey = connectedWallet.publicKey
-
-      //Hard Solana MTU limit is 1232 bytes minus a 64-byte signature buffer.
-      const MAX_UNSIGNED_SIZE = 1232 - 64
-
-      //Max cap placeholder used strictly for accurate serialization size testing
-      const placeholderLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
-
-      
-      //Helper function to simulate a complete batch, extract real CU data,
-      //and conditionally add the compute budget instruction only if it exceeds the default.
       async function finalizeBatch(batch: anchor.web3.TransactionInstruction[]): Promise<VersionedTransaction>
       {
-        //Always simulate with a high placeholder so it doesn't fail the simulation phase
         const simMessage = new TransactionMessage(
         {
           payerKey,
@@ -1659,115 +1618,58 @@
         }).compileToV0Message(lookUpTableAccounts)
 
         const simTx = new VersionedTransaction(simMessage)
-        const simulation = await connection.simulateTransaction(simTx)
+        const simulation = await connection.simulateTransaction(simTx, { sigVerify: false })
+
+        let batchWithCompute: anchor.web3.TransactionInstruction[] = []
 
         if(simulation.value.err)
         {
-          throw new Error(`Transaction simulation failed: ${JSON.stringify(simulation.value.logs)}`)
-        }
-
-        const unitsConsumed = simulation.value.unitsConsumed
-        if(unitsConsumed === undefined || unitsConsumed === null)
-          throw new Error("Simulation succeeded but failed to return unitsConsumed.")
-
-        //Add a 15% safety buffer
-        const optimalLimit = Math.ceil(unitsConsumed * 1.15)
-        
-        let finalInstructions: anchor.web3.TransactionInstruction[] = []
-
-        //Solana default transaction limit is 200,000 CUs. 
-        //Only inject the instruction if our optimal budget exceeds this threshold.
-        if(optimalLimit > 200_000)
-        {
-          console.log(`Compute budget (${optimalLimit}) exceeds default. Injecting custom limit instruction.`)
-          const optimizedLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: optimalLimit })
-          finalInstructions = [optimizedLimitIx, ...batch]
+          //The simulation fails cause the price oracle has to create the tempPriceAccount, I could make another endpoint on the price oracle api to help with simulation in the future
+          //Currently at most with new monthly statements, users will only have 2 Transactions, and the Jito bundle can handle up to 5. The temp price transaction doesn't have to be included in the bundle. The bundle has 30 seconds to execute after the temp price transaction executes.
+          //console.log(`Simulation failed (likely due to missing oracle state). Falling back to safe CU limits. Error:`, simulation.value.err)
+          
+          //Option B: Inject a generous hardcoded limit for safety (e.g., 900,000)
+          const fallbackLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 900_000 })
+          batchWithCompute = [fallbackLimitIx, ...batch]
         }
         else
         {
-          console.log(`Compute budget (${optimalLimit}) is within standard limits. Omitting budget instruction.`)
-          finalInstructions = [...batch]
+          const unitsConsumed = simulation.value.unitsConsumed
+          if(unitsConsumed === undefined || unitsConsumed === null)
+            throw new Error("Simulation succeeded but failed to return unitsConsumed.")
+
+          //Add a 15% safety buffer
+          const optimalLimit = Math.ceil(unitsConsumed * 1.15)
+
+          //Solana default transaction limit is 200,000 CUs. 
+          if(optimalLimit > 200_000)
+          {
+            console.log(`Compute budget (${optimalLimit}) exceeds default. Injecting custom limit instruction.`)
+            const optimizedLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: optimalLimit })
+            batchWithCompute = [optimizedLimitIx, ...batch]
+          }
+          else
+          {
+            console.log(`Compute budget (${optimalLimit}) is within standard limits. Omitting budget instruction.`)
+            batchWithCompute = [...batch]
+          }
         }
 
-        const finalMessage = new TransactionMessage({
+        const finalMessage = new TransactionMessage(
+        {
           payerKey,
           recentBlockhash: blockhash,
-          instructions: finalInstructions
+          instructions: batchWithCompute
         }).compileToV0Message(lookUpTableAccounts)
 
         return new VersionedTransaction(finalMessage)
       }
-
-      let currentBatch: anchor.web3.TransactionInstruction[] = []
-
-      for(let i=0; i<instructionsToSend.length; i++)
-      {
-        const nextInstruction = instructionsToSend[i]
-        var itFits
-
-        try
-        {
-          const testInstructions = [placeholderLimitIx, ...currentBatch, nextInstruction]
-          const testMessage = new TransactionMessage(
-          {
-            payerKey,
-            recentBlockhash: blockhash,
-            instructions: testInstructions
-          }).compileToV0Message(lookUpTableAccounts)
-
-          const testTx = new VersionedTransaction(testMessage)
-          const testSize = testTx.serialize().length
-
-          if(testSize <= MAX_UNSIGNED_SIZE)
-            itFits = true
-        }
-        catch(error)
-        {
-          var itFits = false
-        }
-
-        if(itFits)
-          currentBatch.push(nextInstruction)
-        else
-        {
-          if(currentBatch.length > 0)
-          {
-            const finalizedTx = await finalizeBatch(currentBatch)
-            unsignedTransactions.push(finalizedTx)
-          }
-          
-          currentBatch = [nextInstruction]
-          
-          //Safety check for an oversized single instruction
-          const singleTxMessage = new TransactionMessage(
-          {
-            payerKey,
-            recentBlockhash: blockhash,
-            instructions: [placeholderLimitIx, ...currentBatch]
-          }).compileToV0Message(lookUpTableAccounts)
-          
-          if(new VersionedTransaction(singleTxMessage).serialize().length > MAX_UNSIGNED_SIZE)
-            throw new Error(`Instruction at index ${i} is too large to fit in an isolated transaction chunk!`)
-        }
-      }
-
-      //Finalize the trailing batch, if any
-      if(currentBatch.length > 0)
-      {
-        const finalizedTx = await finalizeBatch(currentBatch)
-        unsignedTransactions.push(finalizedTx)
-      }
-
-      console.log(`Simulated and Packed ${unsignedTransactions.length} transaction(s).`)
-
-      const signedTransactions = await anchorPrograms.lending.lendingProgram.provider.wallet.signAllTransactions(unsignedTransactions)
-      return signedTransactions
     }
     catch(error)
     {
       throw error
     }
-  }*/
+  }
 
   export async function bundleProtocolPriceTransactions(tokenIds: number[], txs: VersionedTransaction[])
   {

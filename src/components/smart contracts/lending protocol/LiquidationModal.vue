@@ -1413,8 +1413,6 @@
         liquidateFunctionCallName = "liquidate_account_same_token"
       }
 
-      const computeUnitIncreaseInstruction = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
-      instructionsToSend.push(computeUnitIncreaseInstruction)
       instructionsToSend.push(...createLiquidatiMonthlyStatementInstructions)
       instructionsToSend.push(refreshLiquidatiHealthAndTokenReservesInstruction)
       instructionsToSend.push(...liquidatorLookUpTableInstructionsToSend)
@@ -1499,6 +1497,11 @@
   .primeSelect :deep(.p-select-optio)
   {
     font-size: min(3vw, 14px)
+  }
+  
+  .horizontalLine
+  {
+    width: auto
   }
 
   #liquidationModal
