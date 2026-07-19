@@ -162,6 +162,18 @@
   </div>
 
   <ion-popover 
+  :is-open="treasuryATAPopoverOpen" 
+  :event="event" 
+  @didDismiss="treasuryATAPopoverOpen=false"
+  side="top" 
+  alignment="center"
+  >
+    <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTreasuryATA()" @mouseleave="closeTreasuryATAPopover($event)">
+      <ion-label color="light">{{ copyTreasuryATAButtonText }}</ion-label>
+    </ion-button>
+  </ion-popover>
+
+  <ion-popover 
   :is-open="tokenMintAddressPopoverOpen" 
   :event="event" 
   @didDismiss="tokenMintAddressPopoverOpen=false"
