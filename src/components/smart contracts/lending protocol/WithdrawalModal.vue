@@ -107,7 +107,7 @@
       >
         Withdraw
       </ion-button>
-      <div class="nLargeMarginLeft tinyMarginTop nSmallMarginBottom">
+      <div v-if="connectedWallet.missingLUTAddresses.length >= 1" class="nLargeMarginLeft tinyMarginTop nSmallMarginBottom">
         <AddMissingUserLUTAddresses/>
       </div>
     </div>

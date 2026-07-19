@@ -6,8 +6,8 @@
       class="tokenReserveTableMinWidth"
       v-model:filters="filters"
       show-gridlines
-      sortField="tokenMintAddressString" 
-      :sortOrder="-1" 
+      sortField="tokenId" 
+      :sortOrder="1" 
       size="small" 
       :value="tokenReserveTableData"
       :loading="isLoading"
@@ -519,7 +519,7 @@
     var borrowedValue = 0
     var processedTableData = []
     var newTableData = cloneDeep(tokenReserves)
-
+    
     if(!newTableData.data)
       return
 
@@ -634,7 +634,7 @@
       else
         processedTableData[i].subMarketCount = 0
     }
-  
+
     tvl.tokenReserveTVL = depositedValue
     totalBorrowedValue.value = borrowedValue
     tokenReserveTableData.value = processedTableData

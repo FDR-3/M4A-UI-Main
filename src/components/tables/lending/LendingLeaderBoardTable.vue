@@ -25,6 +25,7 @@
         'owner',
         'depositedValueString',
         'interestEarnedValueString',
+        'interestAccruedValueString',
         'borrowedValueString',
         'repaidValueString',
         'liquidatorValueString',
@@ -728,7 +729,7 @@
       }
       case "interestAccruedValue":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.interestEarnedValue - a.interestAccruedValue)
+        tableData.value = tableData.value.sort((a: any, b: any) => b.interestAccruedValue - a.interestAccruedValue)
         setRankingColumn()
         break
       }

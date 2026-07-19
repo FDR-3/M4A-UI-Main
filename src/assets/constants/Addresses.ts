@@ -32,6 +32,8 @@ var TOKEN_RESERVE_SOL_ATA = ""
 var TOKEN_RESERVE_WETH_ATA = ""
 var TOKEN_RESERVE_WBTC_ATA = ""
 
+var JITO_TIP_ADDRESSES = []
+
 if(DEV_MODE)
 {
   //Devnet
@@ -63,11 +65,23 @@ if(DEV_MODE)
   SOLVENCY_WBTC_WALLET_ATA = "BA5mJDPnbQhgZi1F7ZZbm3PxipLKQEoeiDTB1tfjeSL4"
 
   //Testnet
-  TOKEN_RESERVE_USDS_ATA = "E7Kg1CrUyAiqPgDptvS9Ff9EsG9EMigUS2ob8ZXf3Uy2"
-  TOKEN_RESERVE_USDC_ATA = "BSF91aru22EiWPmfzDtWcf2GHbMMGYKA4c2DC6cURmBB"
-  TOKEN_RESERVE_SOL_ATA = "DtYfQXeFdEBPuFhMXvsxgTZNkDkp1NSHPqprmgdBG7zy"
-  TOKEN_RESERVE_WETH_ATA = "GXLcHXUfY31GUZr93iPY8NEaFYwvQX7tJdJA4p9BQj1K"
-  TOKEN_RESERVE_WBTC_ATA = "Bs2WQP4GnF6xmF2kCfXxA1CSoXtz4A2QnnbJGEZD9Pin"
+  TOKEN_RESERVE_USDS_ATA = "HGe16iPaWq3pZoaHF1e2z2vJw9LwR77im11nDoTk3uLs"
+  TOKEN_RESERVE_USDC_ATA = "9Mrj2qrusBoasAfqzKBcycno24nvXu67N9TK2zpFEsLA"
+  TOKEN_RESERVE_SOL_ATA = "8GDXDhjHk5W8aCUe9UNckG3gX9YayFUVtesuSVPohKk5"
+  TOKEN_RESERVE_WETH_ATA = "3Wpc2eKWkbGQF8GNDqQyitcq3cG4FCnkRVdQFHsVBeJM"
+  TOKEN_RESERVE_WBTC_ATA = "7myje6BMwzonfQxVA1sJybcQ2HDbK9uCkP6d4KcdUbRe"
+
+  JITO_TIP_ADDRESSES =
+  [
+    "F7ThiQUBYiEcyaxpmMuUeACdoiSLKg4SZZ8JSfpFNwAf",
+    "AzfhMPcx3qjbvCK3UUy868qmc5L451W341cpFqdL3EBe",
+    "4uRnem4BfVpZBv7kShVxUYtcipscgZMSHi3B9CSL6gAA",
+    "CwWZzvRgmxj9WLLhdoWUVrHZ1J8db3w2iptKuAitHqoC",
+    "84DrGKhycCUGfLzw8hXsUYX9SnWdh2wW3ozsTPrC5xyg",
+    "BkMx5bRzQeP6tUZgzEs3xeDWJfQiLYvNDqSgmGZKYJDq",
+    "7aewvu8fMf1DK4fKoMXKfs3h3wpAQ7r7D8T1C71LmMF",
+    "G2d63CEgKBdgtpYT2BuheYQ9HFuFCenuHLNyKVpqAuSD"
+  ]
 }
 else
 {
@@ -89,6 +103,18 @@ else
   TOKEN_RESERVE_SOL_ATA = SYSTEM_PROGRAM_ADDRESS_STRING
   TOKEN_RESERVE_WETH_ATA = SYSTEM_PROGRAM_ADDRESS_STRING
   TOKEN_RESERVE_WBTC_ATA = SYSTEM_PROGRAM_ADDRESS_STRING
+
+  JITO_TIP_ADDRESSES =
+  [
+    "ADuUkR4vqLUMWXxW9gh6D6L8pMSawimctcNZ5pGwDcEt",
+    "HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe",
+    "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL",
+    "3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT",
+    "ADaUMid9yfUytqMBgopwjb2DTLSokTSzL1zt6iGPaS49",
+    "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
+    "Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY",
+    "DfXygSm4jCyNCybVYYK6DwvWqjKee8pbDmJGcLWNDXjh"
+  ]
 }
 
 //Currently on @solana/spl-token version 1.8 as updating introduces npm vunlerabilities
@@ -171,9 +197,9 @@ export const tokenReserveATAKeys =
 
 export const tokenIds = 
 {
-  solTokenId: 1,
+  usdsTokenId: 1,
   usdcTokenId: 2,
-  usdsTokenId: 3,
+  solTokenId: 3,
   wethTokenId: 4,
   wbtcTokenId: 5
 }
@@ -214,28 +240,4 @@ export function getMainnetTokenAddresses(nonMainnetTokenAddresses: string[])
   return mainnetTokenAddress
 }
 
-//Mainnet
-/*export const JITO_TIP_ACCOUNTS =
-[
-  "ADuUkR4vqLUMWXxW9gh6D6L8pMSawimctcNZ5pGwDcEt",
-  "HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe",
-  "DttWaMuVvTiduZRnguLF7jNxTgiMBZ1hyAumKUiL2KRL",
-  "3AVi9Tg9Uo68tJfuvoKvqKNWKkC5wPdSSdeBnizKZ6jT",
-  "ADaUMid9yfUytqMBgopwjb2DTLSokTSzL1zt6iGPaS49",
-  "96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5",
-  "Cw8CFyM9FkoMi7K7Crf6HNQqf4uEMzpKw6QNghXLvLkY",
-  "DfXygSm4jCyNCybVYYK6DwvWqjKee8pbDmJGcLWNDXjh"
-]*/
-
-//Testnet
-export const JITO_TIP_ACCOUNTS =
-[
-  "F7ThiQUBYiEcyaxpmMuUeACdoiSLKg4SZZ8JSfpFNwAf",
-  "AzfhMPcx3qjbvCK3UUy868qmc5L451W341cpFqdL3EBe",
-  "4uRnem4BfVpZBv7kShVxUYtcipscgZMSHi3B9CSL6gAA",
-  "CwWZzvRgmxj9WLLhdoWUVrHZ1J8db3w2iptKuAitHqoC",
-  "84DrGKhycCUGfLzw8hXsUYX9SnWdh2wW3ozsTPrC5xyg",
-  "BkMx5bRzQeP6tUZgzEs3xeDWJfQiLYvNDqSgmGZKYJDq",
-  "7aewvu8fMf1DK4fKoMXKfs3h3wpAQ7r7D8T1C71LmMF",
-  "G2d63CEgKBdgtpYT2BuheYQ9HFuFCenuHLNyKVpqAuSD"
-]
+export const JITO_TIP_ACCOUNTS = JITO_TIP_ADDRESSES

@@ -56,7 +56,8 @@
       svg: markRaw(USDSSVG),
       source: () => {sourceUSDS()},
       ata: tokenReserveATAKeys.usdsATA,
-      tokenProgram: LegacyTokenProgramID
+      tokenProgram: LegacyTokenProgramID,
+      initialGlobalLimit:  100_000
     }],
     [tokenIds.usdcTokenId,
     {
@@ -66,7 +67,8 @@
       svg: markRaw(USDCSVG),
       source: () => {sourceUSDC()},
       ata: tokenReserveATAKeys.usdcATA,
-      tokenProgram: LegacyTokenProgramID
+      tokenProgram: LegacyTokenProgramID,
+      initialGlobalLimit:  100_000
     }],
     [tokenIds.solTokenId,
     {
@@ -76,7 +78,8 @@
       svg: markRaw(SOLSVG),
       source: () => {sourceSOL()},
       ata: tokenReserveATAKeys.solATA,
-      tokenProgram: LegacyTokenProgramID
+      tokenProgram: LegacyTokenProgramID,
+      initialGlobalLimit:  1_444
     }],
     [tokenIds.wethTokenId,
     {
@@ -86,7 +89,8 @@
       svg: markRaw(WETHSVG),
       source: () => {sourceWETH()},
       ata: tokenReserveATAKeys.wethATA,
-      tokenProgram: LegacyTokenProgramID
+      tokenProgram: LegacyTokenProgramID,
+      initialGlobalLimit:  53.77
     }],
     [tokenIds.wbtcTokenId,
     {
@@ -96,7 +100,8 @@
       svg: markRaw(WBTCSVG),
       source: () => {sourceWBTC()},
       ata: tokenReserveATAKeys.wbtcATA,
-      tokenProgram: LegacyTokenProgramID
+      tokenProgram: LegacyTokenProgramID,
+      initialGlobalLimit:  1.57
     }]
   ])
 

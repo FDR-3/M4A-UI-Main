@@ -98,7 +98,7 @@
         Close Temp Price Account
       </ion-button>
     </div>
-    <div v-else-if="anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady">
+    <div v-else-if="anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady" class="flexCenterColumn">
       <ion-button
         id="borrowModalButton"
         color="dark"
@@ -108,7 +108,7 @@
       >
         Borrow
       </ion-button>
-      <div class="nLargeMarginLeft tinyMarginTop nSmallMarginBottom">
+      <div v-if="connectedWallet.missingLUTAddresses.length >= 1" class="nLargeMarginLeft tinyMarginTop nSmallMarginBottom">
         <AddMissingUserLUTAddresses/>
       </div>
     </div>

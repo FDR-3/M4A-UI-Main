@@ -1,5 +1,5 @@
 <template>
-  <div v-if="connectedWallet.missingLUTAddresses.length >= 1">
+  <div>
     <div>
       <InfoButton :infoMessage="missingLUTAddressMSG" :openSide="'top'"/>
       <ion-button

@@ -425,7 +425,7 @@
   var decimalAmount: number
   var lendingUserTabAccount: any
   var userOriginalBalance = 0
-  var userCalculatedBalance = ref()
+  var userCalculatedBalance = ref(0)
   var balanceValueString = ref()
   var userOriginalInterestEarned = ref()
   var calculatedUserInterestEarned = ref()
@@ -433,7 +433,7 @@
   var sevenDayCalculatedUserInterestEarned = ref()
   var sevenDayInterestEarnedValueString = ref()
   var userOriginalDebt = ref()
-  var userCalculatedDebt = ref()
+  var userCalculatedDebt = ref(0)
   var debtValueString = ref()
  
   var activityDescriptions =

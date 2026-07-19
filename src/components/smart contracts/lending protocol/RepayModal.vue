@@ -94,16 +94,20 @@
       </ion-button>
     </div>
     <div v-else-if="anchorPrograms.isLendingProtocolReady && connectedWallet.lendingUserLUTAccountReady">
-      <ion-button
-        id="repayButton"
-        color="dark"
-        @click="repayTokens()"
-        class="mediumSmallMarginTop nTinyMarginBottom"
-        :disabled="repayAmount == 0"
-      >
-        Repay
-      </ion-button>
-      <div class="nLargeMarginLeft tinyMarginTop nSmallMarginBottom">
+      <div class="smallMarginTop nSmallMarginBottom">
+        <InfoButton :infoMessage="repayInfoMSG" :openSide="'top'"/>
+        <ion-button
+          id="repayButton"
+          color="dark"
+          @click="repayTokens()"
+   
+          :disabled="repayAmount == 0"
+        >
+          Repay
+        </ion-button>
+      </div>
+
+      <div v-if="connectedWallet.missingLUTAddresses.length >= 1" class="tinyMarginTop nSmallMarginBottom">
         <AddMissingUserLUTAddresses/>
       </div>
     </div>
@@ -138,6 +142,7 @@
     lendingUserTabAccountListHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import InfoButton from '/src/components/help/InfoButton.vue'
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
@@ -179,6 +184,8 @@
   var totalAssetValue = ref(0)
   var totalDebtValue = ref(0)
   var modalRef = ref()
+
+  const repayInfoMSG = "If your account is in a liquidatable state, IE: Your health factor is 0%, you must repay atleast 10% of your Debt position.\n\nThis prevents 'griefing', IE: Only repaying $1 (or just the smallest enough amount to be in a healthy state), front running the liquidator so their transaction fails and holding the protocol's solvency hostage! "
 
   var repayValue = computed ( () =>
   {

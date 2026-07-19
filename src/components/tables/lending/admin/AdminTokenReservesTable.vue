@@ -5,8 +5,8 @@
       class="tableMinWidth"
       v-model:filters="filters"
       show-gridlines
-      sortField="tokenMintAddress" 
-      :sortOrder="-1" 
+      sortField="tokenId" 
+      :sortOrder="1" 
       size="small" 
       :value="tokenReserveTableData"
       :loading="isLoading"

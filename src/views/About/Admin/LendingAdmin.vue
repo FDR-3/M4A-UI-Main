@@ -209,7 +209,7 @@
 
   var borrowAPY = ref(5)
   var solvencyInsurance = ref(1)
-  var globalLimitInput = ref(1_000_000)
+  var globalLimitInput = ref(100_000)
 
   var tokenProgramSelect = ref(LegacyTokenProgramID)
   var tokenProgramList = 
@@ -282,6 +282,7 @@
     tokenMintAddressInput.value = tokenInfo.publicKey
     tokenDecimalCountInput.value = tokenInfo.decimalAmount
     tokenProgramSelect.value = tokenInfo.tokenProgram
+    globalLimitInput.value = tokenInfo.initialGlobalLimit
 
     await addTokenReserve()
   }
