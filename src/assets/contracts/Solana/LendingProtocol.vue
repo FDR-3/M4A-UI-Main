@@ -1504,9 +1504,10 @@
       const { blockhash } = await connection.getLatestBlockhash()
       const payerKey = connectedWallet.publicKey
 
-      //Hard Solana MTU limit is 1232 bytes.
+      //Hard Solana MTU limit is 1232 bytes
       //We reserve a 64-byte buffer for the user's signature applied later
-      const MAX_UNSIGNED_SIZE = 1232 - 64
+      //We reserve a 42-byte buffer for setComputeLimit Instruction
+      const MAX_UNSIGNED_SIZE = 1232 - 42 - 64
 
       //Max cap placeholder used strictly for accurate serialization size testing
       const placeholderLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
@@ -1528,11 +1529,12 @@
 
       console.log(`User Instructions Packed into ${chunks.length} transaction chunk(s). Simulating...`)
 
-      //3. Simulate each final chunk and pack them into VersionedTransactions
+      //3. Append Compute Budget increase instruction to transactions. Simulation not possible since the temp price oracle account is required, even if we used the price oracle api to help simulate, once the transactions are more than 1, they won't fall in the same slot and will fail anyway.
+      //Maybe there will be a way around this in the future, but just adding a compute budget increase instruction to every transaction.
       const unsignedTransactions: VersionedTransaction[] = []
       for(var i=0; i<chunks.length; i++)
       {
-        const finalizedTx = await finalizeBatch(chunks[i])
+        const finalizedTx = prependSetComputeLimitInstruction(chunks[i])
         unsignedTransactions.push(finalizedTx)
       }
 
@@ -1608,9 +1610,9 @@
         return chunks
       }
 
-      async function finalizeBatch(batch: anchor.web3.TransactionInstruction[]): Promise<VersionedTransaction>
+      function prependSetComputeLimitInstruction(batch: anchor.web3.TransactionInstruction[]): VersionedTransaction
       {
-        const simMessage = new TransactionMessage(
+        /*const simMessage = new TransactionMessage(
         {
           payerKey,
           recentBlockhash: blockhash,
@@ -1618,11 +1620,14 @@
         }).compileToV0Message(lookUpTableAccounts)
 
         const simTx = new VersionedTransaction(simMessage)
-        const simulation = await connection.simulateTransaction(simTx, { sigVerify: false })
+        const simulation = await connection.simulateTransaction(simTx, { sigVerify: false })*/
 
         let batchWithCompute: anchor.web3.TransactionInstruction[] = []
 
-        if(simulation.value.err)
+        const setComputeUnitLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 900_000 })
+        batchWithCompute = [setComputeUnitLimitIx, ...batch]
+
+        /*if(simulation.value.err)
         {
           //The simulation fails cause the price oracle has to create the tempPriceAccount, I could make another endpoint on the price oracle api to help with simulation in the future
           //Currently at most with new monthly statements, users will only have 2 Transactions, and the Jito bundle can handle up to 5. The temp price transaction doesn't have to be included in the bundle. The bundle has 30 seconds to execute after the temp price transaction executes.
@@ -1653,7 +1658,7 @@
             console.log(`Compute budget (${optimalLimit}) is within standard limits. Omitting budget instruction.`)
             batchWithCompute = [...batch]
           }
-        }
+        }*/
 
         const finalMessage = new TransactionMessage(
         {

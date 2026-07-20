@@ -58,6 +58,12 @@
       minimumFractionDigits: tokenDecimalAmount,
       maximumFractionDigits: tokenDecimalAmount }) }}
     </ion-label>
+    <ion-label class="alignSelfLeft">Min Req Repayment: {{ healthFactor>0 ? (0).toLocaleString('en-US', {
+      minimumFractionDigits: tokenDecimalAmount,
+      maximumFractionDigits: tokenDecimalAmount }) : (0.1 * userDebt).toLocaleString('en-US', {
+      minimumFractionDigits: tokenDecimalAmount,
+      maximumFractionDigits: tokenDecimalAmount }) }}
+    </ion-label>
     <InputNumber
       v-model="repayAmount"
       :inputStyle="{'text-align': 'center'}"
@@ -68,17 +74,22 @@
       showButtons
       fluid
       @input="(event: { value: any }) => repayAmount = event.value"
-      @focus="repayMax=false; repayHalf=false"
+      @focus="repayMax=false; repayHalf=false; repay10Percent=false"
     />
     <div class="alignSelfLeft">
       <button style="background-color: transparent" @click="repayAmount=userWalletBalance < userDebt ? userWalletBalance : userDebt;
-        repayHalf=false; repayMax=true">
+        repayMax=true; repayHalf=false;  repay10Percent =false">
         <ion-label color="dark">Max</ion-label>
       </button>
 
       <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="repayAmount=userWalletBalance < userDebt*0.5 ? userWalletBalance : userDebt*0.5;
-        repayMax=false; repayHalf=true">
+        repayMax=false; repayHalf=true; repay10Percent=false">
         <ion-label color="dark">Half</ion-label>
+      </button>
+
+      <button class="mediumSmallMarginLeft" style="background-color: transparent" @click="repayAmount=userWalletBalance < userDebt*0.1 ? userWalletBalance : userDebt*0.1;
+        repayMax=false; repayHalf=false; repay10Percent=true">
+        <ion-label color="dark">10%</ion-label>
       </button>
     </div>
 
@@ -167,6 +178,7 @@
   var repaySVG = ref()
   var repayMax = ref(false)
   var repayHalf = ref(false)
+  var repay10Percent = ref(false)
   var subMarketTokenName = ref()
   var userWalletBalance = ref()
   var userDebt = ref(0)
@@ -183,6 +195,7 @@
   var copyTokenMintAddressButtonText = ref(copyTokenMintAddressText)
   var totalAssetValue = ref(0)
   var totalDebtValue = ref(0)
+  var healthFactor = ref(0)
   var modalRef = ref()
 
   const repayInfoMSG = "If your account is in a liquidatable state, IE: Your health factor is 0%, you must repay atleast 10% of your Debt position.\n\nThis prevents 'griefing', IE: Only repaying $1 (or just the smallest enough amount to be in a healthy state), front running the liquidator so their transaction fails and holding the protocol's solvency hostage! "
@@ -270,6 +283,7 @@
         stopHealthFactorCalculation()
         repayMax.value = false
         repayHalf.value = false
+        repay10Percent.value = false
         repaying.value = false
         window.removeEventListener('click', handleClickOutside)
       }
@@ -465,6 +479,17 @@
 
     totalAssetValue.value = calculatedAssetValue
     totalDebtValue.value = calculatedDebtValue
+
+    if(totalAssetValue.value != 0)
+    {
+      healthFactor.value = ((totalAssetValue.value * 0.8 - totalDebtValue.value)/(totalAssetValue.value * 0.8)) * 100
+      if(healthFactor.value < 0)
+        healthFactor.value = 0
+    }
+    else if(totalDebtValue.value == 0)
+      healthFactor.value = 100
+    else
+      healthFactor.value = 0
   }
 
   function startInterestCalculation()
@@ -540,10 +565,12 @@
     //Calculate interest accrued
     userDebt.value = userOriginalDebt * tokenReserve.newBorrowInterestChangeIndex / Number(lendingUserTabAccount.borrowInterestChangeIndex)
 
-    if(repayHalf.value)
-      repayAmount.value = userWalletBalance.value < userDebt.value * 0.5 ? userWalletBalance.value : userDebt.value * 0.5
     if(repayMax.value)
       repayAmount.value = userWalletBalance.value < userDebt.value ? userWalletBalance.value : userDebt.value
+    else if(repayHalf.value)
+      repayAmount.value = userWalletBalance.value < userDebt.value * 0.5 ? userWalletBalance.value : userDebt.value * 0.5
+    else if(repay10Percent.value)
+      repayAmount.value = userWalletBalance.value < userDebt.value * 0.1 ? userWalletBalance.value : userDebt.value * 0.1 
   }
 
   async function repayTokens()
@@ -579,7 +606,8 @@
         subMarketSelect.value,
         accountSelect.value,
         new anchor.BN(repayAmount.value * Math.pow(10, tokenDecimalAmount)),//convert to fixedpoint notation
-        repayMax.value
+        repayMax.value,
+        repay10Percent.value
       )
       .accounts({
         subMarketOwner: adminAccounts.lendingCEOAddressKey,
@@ -634,6 +662,7 @@
       stopHealthFactorCalculation()
       repayMax.value = false
       repayHalf.value = false
+      repay10Percent.value = false
       repaying.value = false
     }
     catch(error)

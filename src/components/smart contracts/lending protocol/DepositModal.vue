@@ -63,21 +63,22 @@
       </Select>
 
       <ion-input
-      v-else
-      v-model="accountName"
-      ref="accountNameEditInputRef"
-      id="accountNameEditInput"
-      class="mediumMarginTop smallMarginBottom"
-      :class="{ 'invalid': overByteSizeLimit }"
-      fill="outline"
-      :counter="true"
-      :counter-formatter="customFormatter"
-      :maxlength=MAX_ACCOUNT_NAME_LENGTH>
+        v-else
+        v-model="accountName"
+        ref="accountNameEditInputRef"
+        id="accountNameEditInput"
+        class="mediumMarginTop smallMarginBottom"
+        :class="{ 'invalid': overByteSizeLimit }"
+        fill="outline"
+        :counter="true"
+        :counter-formatter="customFormatter"
+        :maxlength="MAX_ACCOUNT_NAME_LENGTH"
+      >
         <EmojiButton
-        :marginTop="'4px'"
-        :colorHexValue="colorHexValue"
-        :openSide="'right'"
-        @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
+          :marginTop="'4px'"
+          :colorHexValue="colorHexValue"
+          :openSide="'right'"
+          @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
       </ion-input>
     </div>
 

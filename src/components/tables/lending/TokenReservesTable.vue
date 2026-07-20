@@ -876,7 +876,7 @@
 
   .subMarketTableMinWidth
   {
-    min-width: 1600px
+    min-width: 1620px
   }
 
   ion-input
