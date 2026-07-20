@@ -26,7 +26,7 @@
     else
     {
       if(isProduction())
-        rpcUrl.value = "https://m4a.io/TestNetProxy"
+        rpcUrl.value = clusterApiUrl("testnet")
       else
         rpcUrl.value = DEV_MODE ? "https://m4a.io/TestNetProxy"/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
         //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com"/*Interchangeable with clusterApiUrl("devnet")*/ : "https://solana-rpc.publicnode.com"
@@ -35,7 +35,7 @@
   else
   {
     if(isProduction())
-      rpcUrl.value = "https://m4a.io/TestNetProxy"
+      rpcUrl.value = clusterApiUrl("testnet")
     else
       rpcUrl.value = DEV_MODE ? "https://m4a.io/TestNetProxy"/*Interchangeable with "https://api.devnet.solana.com"*/ : "https://solana-rpc.publicnode.com"
       //rpcUrl.value = DEV_MODE ? "https://api.devnet.solana.com"/*Interchangeable with clusterApiUrl("devnet")*/ : "https://solana-rpc.publicnode.com"
