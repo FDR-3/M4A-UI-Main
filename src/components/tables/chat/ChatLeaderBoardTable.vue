@@ -151,6 +151,7 @@
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
+  import cloneDeep from 'lodash/cloneDeep'
   
   const emits = defineEmits(['viewSelectedUser'])
 
@@ -448,16 +449,10 @@
 
   function handleSort(event: any)
   {
-    if(previousSortField != sortField.value && event.sortField != "displayName")
+    if(previousSortField != sortField.value)
       setTimeout(() =>
       {
-        sortOrder.value = -1
-        previousSortField = event.sortField
-      }, 0)
-    else if(previousSortField != sortField.value && event.sortField == "displayName")
-      setTimeout(() =>
-      {
-        sortOrder.value = 1
+        sortOrder.value = event.sortField == "displayName" ? 1 : -1
         previousSortField = event.sortField
       }, 0)
 
@@ -473,22 +468,18 @@
       return
 
     const total = tableData.value.length
+    var tempTable = cloneDeep(tableData.value)
 
     for(var i=0; i<total; i++)
     {
       //If the table is Ascending (reversed from default), count backwards
-      if(sortOrder.value === 1)
-        if(reverse)
-          tableData.value[i].ranking = i + 1
-        else
-          tableData.value[i].ranking = total - i
-      else
-        if(reverse)
-          tableData.value[i].ranking = total - i
-        else
-          tableData.value[i].ranking = i + 1
+      const isAscending = sortOrder.value === 1
+      tempTable[i].ranking = (isAscending === reverse) ? i + 1 : total - i
     }
+
+    tableData.value = tempTable
   }
+
   function openUserPopover(e: Event, rowData: any) 
   {
     event.value = e
