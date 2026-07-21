@@ -195,116 +195,300 @@
     if(tableData.value == undefined)
       return
 
-    switch (sortField.value)
+    const order = sortOrder.value === 1 ? 1 : -1
+
+    const tieBreaker = (a: any, b: any) =>
     {
-      case"displayName":
+      const idA = a.owner || ""
+      const idB = b.owner || ""
+      
+      return idA.localeCompare(idB) * order
+    }
+
+    switch(sortField.value)
+    {
+      case "displayName":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => a.displayName.localeCompare(b.displayName))
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.displayName || ""
+          const bVal = b.displayName || ""
+          return aVal.localeCompare(bVal) * order
+        })
         setRankingColumn(true)
         break
       }
       case "voteMoneyEarned":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.voteMoneyEarned - a.voteMoneyEarned)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.voteMoneyEarned || 0
+          const bVal = b.voteMoneyEarned || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "netReceivedVoteScore":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.netReceivedVoteScore - a.netReceivedVoteScore)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.netReceivedVoteScore || 0
+          const bVal = b.netReceivedVoteScore || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "netCastedVoteScore":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.netCastedVoteScore - a.netCastedVoteScore)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.netCastedVoteScore || 0
+          const bVal = b.netCastedVoteScore || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "votesReceivedCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.votesReceivedCount - a.votesReceivedCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.votesReceivedCount || 0
+          const bVal = b.votesReceivedCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "upVoteReceivedCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.upVoteReceivedCount - a.upVoteReceivedCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.upVoteReceivedCount || 0
+          const bVal = b.upVoteReceivedCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "downVoteReceivedCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.downVoteReceivedCount - a.downVoteReceivedCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.downVoteReceivedCount || 0
+          const bVal = b.downVoteReceivedCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "votesCastedCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.votesCastedCount - a.votesCastedCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.votesCastedCount || 0
+          const bVal = b.votesCastedCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "upVoteCastedCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.upVoteCastedCount - a.upVoteCastedCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.upVoteCastedCount || 0
+          const bVal = b.upVoteCastedCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "downVoteCastedCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.downVoteCastedCount - a.downVoteCastedCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.downVoteCastedCount || 0
+          const bVal = b.downVoteCastedCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "commentAndReplyCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.commentAndReplyCount - a.commentAndReplyCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.commentAndReplyCount || 0
+          const bVal = b.commentAndReplyCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "editedCommentAndReplyCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.editedCommentAndReplyCount - a.editedCommentAndReplyCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.editedCommentAndReplyCount || 0
+          const bVal = b.editedCommentAndReplyCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "deletedCommentAndReplyCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.deletedCommentAndReplyCount - a.deletedCommentAndReplyCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.deletedCommentAndReplyCount || 0
+          const bVal = b.deletedCommentAndReplyCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "ceoStarredCommentAndReplyCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.ceoStarredCommentAndReplyCount - a.ceoStarredCommentAndReplyCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.ceoStarredCommentAndReplyCount || 0
+          const bVal = b.ceoStarredCommentAndReplyCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "ceoMarkedFEDCommentAndReplyCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.ceoMarkedFEDCommentAndReplyCount - a.ceoMarkedFEDCommentAndReplyCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.ceoMarkedFEDCommentAndReplyCount || 0
+          const bVal = b.ceoMarkedFEDCommentAndReplyCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       default:
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.voteMoneyEarned - a.voteMoneyEarned)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.voteMoneyEarned || 0
+          const bVal = b.voteMoneyEarned || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
     }
   }
 
-  function setRankingColumn(reverse = false)
+  function handleSort(event: any)
   {
-    for(var i=0; i<tableData.value.length; i++)
-      tableData.value[i].ranking = i + 1
+    if(previousSortField != sortField.value && event.sortField != "displayName")
+      setTimeout(() =>
+      {
+        sortOrder.value = -1
+        previousSortField = event.sortField
+      }, 0)
+    else if(previousSortField != sortField.value && event.sortField == "displayName")
+      setTimeout(() =>
+      {
+        sortOrder.value = 1
+        previousSortField = event.sortField
+      }, 0)
 
-    if(reverse)
-      sortOrder.value = -1
+    setTimeout(() =>
+    {
+      sortTable()
+    }, 0)
   }
 
+  function setRankingColumn(reverse = false)
+  {
+    if(tableData.value == undefined)
+      return
+
+    const total = tableData.value.length
+
+    for(var i=0; i<total; i++)
+    {
+      //If the table is Ascending (reversed from default), count backwards
+      if(sortOrder.value === 1)
+        if(reverse)
+          tableData.value[i].ranking = i + 1
+        else
+          tableData.value[i].ranking = total - i
+      else
+        if(reverse)
+          tableData.value[i].ranking = total - i
+        else
+          tableData.value[i].ranking = i + 1
+    }
+  }
   function openUserPopover(e: Event, rowData: any) 
   {
     event.value = e
@@ -337,19 +521,6 @@
     {
       emits("viewSelectedUser", event.value.userAddress)
     }, 100) 
-  }
-
-  function handleSort(event: any)
-  {
-    if(previousSortField != sortField.value)
-      setTimeout(() =>
-      {
-        sortOrder.value = event.sortOrder * -1
-      }, 0)
-
-    previousSortField = sortField.value
-
-    sortTable()
   }
 
   const filters = ref(

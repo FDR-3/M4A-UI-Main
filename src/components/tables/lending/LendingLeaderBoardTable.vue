@@ -707,62 +707,181 @@
     if(tableData.value == undefined)
       return
 
-    switch (sortField.value)
+    // Grab the current direction from PrimeVue (1 for Ascending, -1 for Descending)
+    const order = sortOrder.value === 1 ? 1 : -1
+
+    const tieBreaker = (a: any, b: any) =>
+    {
+      const idA = a.owner
+      const idB = b.owner
+      
+      // Multiplying by 'order' ensures the tied rows also flip completely backwards
+      return idA.localeCompare(idB) * order
+    }
+
+    switch(sortField.value)
     {
       case"displayName":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => a.displayName.localeCompare(b.displayName))
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          return a.displayName.localeCompare(b.displayName) * order
+        })
         setRankingColumn(true)
         break
       }
       case "depositedValue":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.depositedValue - a.depositedValue)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.depositedValue === b.depositedValue)
+            return tieBreaker(a, b)
+            
+          return (a.depositedValue - b.depositedValue) * order
+        })
         setRankingColumn()
         break
       }
       case "interestEarnedValue":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.interestEarnedValue - a.interestEarnedValue)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.interestEarnedValue === b.interestEarnedValue)
+            return tieBreaker(a, b)
+            
+          return (a.interestEarnedValue - b.interestEarnedValue) * order
+        })
         setRankingColumn()
         break
       }
       case "interestAccruedValue":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.interestAccruedValue - a.interestAccruedValue)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.interestAccruedValue === b.interestAccruedValue)
+            return tieBreaker(a, b)
+            
+          return (a.interestAccruedValue - b.interestAccruedValue) * order
+        })
         setRankingColumn()
         break
       }
       case "borrowedValue":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.borrowedValue - a.borrowedValue)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.borrowedValue === b.borrowedValue)
+            return tieBreaker(a, b)
+            
+          return (a.borrowedValue - b.borrowedValue) * order
+        })
         setRankingColumn()
         break
       }
       case "repaidValue":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.repaidValue - a.repaidValue)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.repaidValue === b.repaidValue)
+            return tieBreaker(a, b)
+            
+          return (a.repaidValue - b.repaidValue) * order
+        })
+        setRankingColumn()
+        break
+      }
+      case "liquidatorValue":
+      {
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.liquidatorValue === b.liquidatorValue)
+            return tieBreaker(a, b)
+            
+          return (a.liquidatorValue - b.liquidatorValue) * order
+        })
         setRankingColumn()
         break
       }
       case "liquidatedValue":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.liquidatedValue - a.liquidatedValue)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.liquidatedValue === b.liquidatedValue)
+            return tieBreaker(a, b)
+            
+          return (a.liquidatedValue - b.liquidatedValue) * order
+        })
         setRankingColumn()
         break
       }
       case "liquidatableColorStep":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.liquidatableColorStep - a.liquidatableColorStep)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.liquidatableColorStep === b.liquidatableColorStep)
+            return tieBreaker(a, b)
+            
+          return (a.liquidatableColorStep - b.liquidatableColorStep) * order
+        })
         setRankingColumn()
         break
       }
       default:
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.depositedValue - a.depositedValue)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.depositedValue === b.depositedValue)
+            return tieBreaker(a, b)
+            
+          return (a.depositedValue - b.depositedValue) * order
+        })
         setRankingColumn()
         break
       }
+    }
+  }
+
+  function handleSort(event: any)
+  {
+    if(previousSortField != sortField.value && event.sortField != "displayName")
+      setTimeout(() =>
+      {
+        sortOrder.value = -1
+        previousSortField = event.sortField
+      }, 0)
+    else if(previousSortField != sortField.value && event.sortField == "displayName")
+      setTimeout(() =>
+      {
+        sortOrder.value = 1
+        previousSortField = event.sortField
+      }, 0)
+
+    setTimeout(() =>
+    {
+      sortTable()
+    }, 0)
+  }
+
+  function setRankingColumn(reverse = false)
+  {
+    if(tableData.value == undefined)
+      return
+
+    const total = tableData.value.length
+
+    for(var i=0; i<total; i++)
+    {
+      //If the table is Ascending (reversed from default), count backwards
+      if(sortOrder.value === 1)
+        if(reverse)
+          tableData.value[i].ranking = i + 1
+        else
+          tableData.value[i].ranking = total - i
+      else
+        if(reverse)
+          tableData.value[i].ranking = total - i
+        else
+          tableData.value[i].ranking = i + 1
     }
   }
 
@@ -876,14 +995,7 @@
     }
   }
 
-  function setRankingColumn(reverse = false)
-  {
-    for(var i=0; i<tableData.value.length; i++)
-      tableData.value[i].ranking = i + 1
-
-    if(reverse)
-      sortOrder.value = -1
-  }
+  
 
   function openOwnerPopover(e: Event, rowData: any) 
   {
@@ -958,19 +1070,6 @@
     {
       emits("viewPortfolio", event.value.owner, event.value.accountIndex)
     }, 100) 
-  }
-
-  function handleSort(event: any)
-  {
-    if(previousSortField != sortField.value)
-      setTimeout(() =>
-      {
-        sortOrder.value = event.sortOrder * -1
-      }, 0)
-
-    previousSortField = sortField.value
-
-    sortTable()
   }
 
   const filters = ref(

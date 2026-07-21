@@ -231,90 +231,239 @@
     if(tableData.value == undefined)
       return
 
-    switch (sortField.value)
+    const order = sortOrder.value === 1 ? 1 : -1
+
+    const tieBreaker = (a: any, b: any) =>
     {
-      case"displayName":
+      const idA = a.owner || ""
+      const idB = b.owner || ""
+      
+      return idA.localeCompare(idB) * order
+    }
+
+    switch(sortField.value)
+    {
+      case "displayName":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => a.displayName.localeCompare(b.displayName))
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.displayName || ""
+          const bVal = b.displayName || ""
+          return aVal.localeCompare(bVal) * order
+        })
         setRankingColumn(true)
         break
       }
       case "approvedClaimAmount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.approvedClaimAmount - a.approvedClaimAmount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.approvedClaimAmount || 0
+          const bVal = b.approvedClaimAmount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "approvedClaimCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.approvedClaimCount - a.approvedClaimCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.approvedClaimCount || 0
+          const bVal = b.approvedClaimCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "patientCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.patientCount - a.patientCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.patientCount || 0
+          const bVal = b.patientCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "submittedClaimCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.submittedClaimCount - a.submittedClaimCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.submittedClaimCount || 0
+          const bVal = b.submittedClaimCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "submittedAppealCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.submittedAppealCount - a.submittedAppealCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.submittedAppealCount || 0
+          const bVal = b.submittedAppealCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "deniedClaimCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.deniedClaimCount - a.deniedClaimCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.deniedClaimCount || 0
+          const bVal = b.deniedClaimCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "deniedAppealCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.deniedAppealCount - a.deniedAppealCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.deniedAppealCount || 0
+          const bVal = b.deniedAppealCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "maxDeniedClaimCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.maxDeniedClaimCount - a.maxDeniedClaimCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.maxDeniedClaimCount || 0
+          const bVal = b.maxDeniedClaimCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "undeniedClaimCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.undeniedClaimCount - a.undeniedClaimCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.undeniedClaimCount || 0
+          const bVal = b.undeniedClaimCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       case "revokedApprovalCount":
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.revokedApprovalCount - a.revokedApprovalCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.revokedApprovalCount || 0
+          const bVal = b.revokedApprovalCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
       default:
       {
-        tableData.value = tableData.value.sort((a: any, b: any) => b.approvedClaimCount - a.approvedClaimCount)
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          const aVal = a.approvedClaimCount || 0
+          const bVal = b.approvedClaimCount || 0
+
+          if(aVal === bVal)
+            return tieBreaker(a, b)
+            
+          return (aVal - bVal) * order
+        })
         setRankingColumn()
         break
       }
     }
   }
 
+  function handleSort(event: any)
+  {
+    if(previousSortField != sortField.value && event.sortField != "displayName")
+      setTimeout(() =>
+      {
+        sortOrder.value = -1
+        previousSortField = event.sortField
+      }, 0)
+    else if(previousSortField != sortField.value && event.sortField == "displayName")
+      setTimeout(() =>
+      {
+        sortOrder.value = 1
+        previousSortField = event.sortField
+      }, 0)
+
+    setTimeout(() =>
+    {
+      sortTable()
+    }, 0)
+  }
+
   function setRankingColumn(reverse = false)
   {
-    for(var i=0; i<tableData.value.length; i++)
-      tableData.value[i].ranking = i + 1
+    if(tableData.value == undefined)
+      return
 
-    if(reverse)
-      sortOrder.value = -1
+    const total = tableData.value.length
+
+    for(var i=0; i<total; i++)
+    {
+      //If the table is Ascending (reversed from default), count backwards
+      if(sortOrder.value === 1)
+        if(reverse)
+          tableData.value[i].ranking = i + 1
+        else
+          tableData.value[i].ranking = total - i
+      else
+        if(reverse)
+          tableData.value[i].ranking = total - i
+        else
+          tableData.value[i].ranking = i + 1
+    }
   }
 
   function openSubmitterPopover(e: Event, rowData: any) 
@@ -345,19 +494,6 @@
     {
       emits("viewSelectedSubmitter", event.value.submitterAddress)
     }, 100) 
-  }
-
-  function handleSort(event: any)
-  {
-    if(previousSortField != sortField.value)
-      setTimeout(() =>
-      {
-        sortOrder.value = event.sortOrder * -1
-      }, 0)
-
-    previousSortField = sortField.value
-
-    sortTable()
   }
 
   const filters = ref(
