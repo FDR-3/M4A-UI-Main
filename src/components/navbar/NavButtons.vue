@@ -6,7 +6,7 @@
       :color="colorName"
       class="navButton bigNavButtons"
       :class="{ selected: navigation.navBarIndex === index }"
-      @click="setNavBarIndex(index)"
+      @click="handleNavClick(index, navButton.url)"
     >
       <ion-label :class="navButton.labelClass" :color="navButton.textColor">{{ navButton.text }}</ion-label>
     </ion-button>
@@ -32,7 +32,7 @@
           :class="{ selected: navigation.navBarIndex === index,
             tinyMarginBottom: index === navButtons.length - 1 }"
           :style="{ '--box-shadow': navigation.navBarIndex === index ? `0px 0px 5px 8px ${buttonShadow}`: '' }"
-          @click="setNavBarIndex(index)"
+          @click="handleNavClick(index, navButton.url)"
         >
           <ion-label class="innerLilNavTextSize" :class="navButton.labelClass" :color="navButton.textColor">{{ navButton.lilNavText }}</ion-label>
         </ion-button>
@@ -71,6 +71,17 @@
   {
     event= e
     popoverOpen.value = true
+  }
+
+  function handleNavClick(index: number, url: string)
+  {
+    setNavBarIndex(index)
+
+    const urlIsMarketsSubPath = window.location.pathname == "/M4A/Markets-Portfolios" || window.location.pathname == "/M4A/Markets-LendingLeaderBoard"
+    if(url != "/M4A/Markets")
+      window.history.pushState({}, '', url)
+    else if(!urlIsMarketsSubPath)
+      window.history.pushState({}, '', url)
   }
 
   function setNavBarIndex(navBarindex: number)

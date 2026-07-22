@@ -1,7 +1,7 @@
 //These hash maps are used for jumping to different comment sections with the comment section jumper buttons
 //in the comment sections, ideas, and feds tables
 import { navigation } from '/src/assets/globalStates/Navigation.vue'
-  import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
+import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
 
 export const commentSectionPreFixNameHashTable = new Map<string, number>(
 [
@@ -109,72 +109,72 @@ export  const commentSectionNameHashTable = new Map<string, [number, number]>(
 ])
 
 export function jumpToCommentSection(rowData: any)
+{
+  const menuValue = commentSectionPreFixNameHashTable.get(rowData.commentSectionNamePrefix)
+
+  //Set menu value to jump to
+  if(menuValue)
   {
-    const menuValue = commentSectionPreFixNameHashTable.get(rowData.commentSectionNamePrefix)
+    navigation.menuIndex = menuValue
+    localStorage.setItem("navigationMenuIndex", navigation.menuIndex)
+  }
 
-    //Set menu value to jump to
-    if(menuValue)
+  //Jump to Map comment section
+  if(rowData.commentSectionName.includes("Country: "))
+  {
+    const countryAndStateIndex = rowData.commentSectionName.match(/\d+/g)
+
+    if(countryAndStateIndex)
     {
-      navigation.menuIndex = menuValue
-      localStorage.setItem("navigationMenuIndex", navigation.menuIndex)
+      const COUNTRY_INDEX = 0
+      const STATE_INDEX = 1
+      const M4A_MAP_NAV_BAR_INDEX = 3
+
+      mapSelection.countryIndex = countryAndStateIndex[COUNTRY_INDEX]
+      mapSelection.stateIndex = countryAndStateIndex[STATE_INDEX]
+      mapSelection.isStateSelected = true
+      mapSelection.selectedStateName = rowData.stateName
+      mapSelection.zoomLong = rowData.zoomLong
+      mapSelection.zoomLat = rowData.zoomLat
+      localStorage.setItem("mapCountryIndex", mapSelection.countryIndex)
+      localStorage.setItem("mapStateIndex", mapSelection.stateIndex)
+      localStorage.setItem("mapIsStateSelected", mapSelection.isStateSelected)
+      localStorage.setItem("mapSelectedStateName", mapSelection.selectedStateName)
+      localStorage.setItem("mapDefaultLongitude", mapSelection.zoomLong)
+      localStorage.setItem("mapDefaultLatitude", mapSelection.zoomLat)
+
+      navigation.navBarIndex = M4A_MAP_NAV_BAR_INDEX
+      navigation.pageIndex = 0
+      localStorage.setItem("navigationNavbarIndex", M4A_MAP_NAV_BAR_INDEX.toString())
+      localStorage.setItem("navigationPageIndex", "0")
     }
-
-    //Jump to Map comment section
-    if(rowData.commentSectionName.includes("Country: "))
+  }
+  //Jump regular comment section
+  else
+  {
+    const navbarAndPageValues = commentSectionNameHashTable.get(rowData.commentSectionName)
+    if(navbarAndPageValues)
     {
-      const countryAndStateIndex = rowData.commentSectionName.match(/\d+/g)
+      navigation.navBarIndex = navbarAndPageValues[0]
+      navigation.pageIndex = navbarAndPageValues[1]
+      localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex)
+      localStorage.setItem("navigationPageIndex", navigation.pageIndex)
 
-      if(countryAndStateIndex)
+      if(rowData.commentSectionName == "Road Map")
       {
-        const COUNTRY_INDEX = 0
-        const STATE_INDEX = 1
-        const M4A_MAP_NAV_BAR_INDEX = 3
-
-        mapSelection.countryIndex = countryAndStateIndex[COUNTRY_INDEX]
-        mapSelection.stateIndex = countryAndStateIndex[STATE_INDEX]
-        mapSelection.isStateSelected = true
-        mapSelection.selectedStateName = rowData.stateName
-        mapSelection.zoomLong = rowData.zoomLong
-        mapSelection.zoomLat = rowData.zoomLat
-        localStorage.setItem("mapCountryIndex", mapSelection.countryIndex)
-        localStorage.setItem("mapStateIndex", mapSelection.stateIndex)
-        localStorage.setItem("mapIsStateSelected", mapSelection.isStateSelected)
-        localStorage.setItem("mapSelectedStateName", mapSelection.selectedStateName)
-        localStorage.setItem("mapDefaultLongitude", mapSelection.zoomLong)
-        localStorage.setItem("mapDefaultLatitude", mapSelection.zoomLat)
-
-        navigation.navBarIndex = M4A_MAP_NAV_BAR_INDEX
-        navigation.pageIndex = 0
-        localStorage.setItem("navigationNavbarIndex", M4A_MAP_NAV_BAR_INDEX.toString())
-        localStorage.setItem("navigationPageIndex", "0")
-      }
-    }
-    //Jump regular comment section
-    else
-    {
-      const navbarAndPageValues = commentSectionNameHashTable.get(rowData.commentSectionName)
-      if(navbarAndPageValues)
-      {
-        navigation.navBarIndex = navbarAndPageValues[0]
-        navigation.pageIndex = navbarAndPageValues[1]
-        localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex)
-        localStorage.setItem("navigationPageIndex", navigation.pageIndex)
-
-        if(rowData.commentSectionName == "Road Map")
-        {
-          mapSelection.countryIndex = -1
-          mapSelection.stateIndex = -1
-          mapSelection.isStateSelected = false
-          mapSelection.selectedStateName = ""
-          mapSelection.zoomLong = 0
-          mapSelection.zoomLat = 0
-          localStorage.setItem("mapCountryIndex", "-1")
-          localStorage.setItem("mapStateIndex", "-1")
-          localStorage.setItem("mapIsStateSelected", "false")
-          localStorage.setItem("mapSelectedStateName", "")
-          localStorage.setItem("mapDefaultLatitude", "0")
-          localStorage.setItem("mapDefaultLongitude", "0")
-        }
+        mapSelection.countryIndex = -1
+        mapSelection.stateIndex = -1
+        mapSelection.isStateSelected = false
+        mapSelection.selectedStateName = ""
+        mapSelection.zoomLong = 0
+        mapSelection.zoomLat = 0
+        localStorage.setItem("mapCountryIndex", "-1")
+        localStorage.setItem("mapStateIndex", "-1")
+        localStorage.setItem("mapIsStateSelected", "false")
+        localStorage.setItem("mapSelectedStateName", "")
+        localStorage.setItem("mapDefaultLatitude", "0")
+        localStorage.setItem("mapDefaultLongitude", "0")
       }
     }
   }
+}

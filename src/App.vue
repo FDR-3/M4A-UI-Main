@@ -38,7 +38,7 @@
           
             <!--The ion-menu-toggle tag is used when you want elements to close the menu when they are clicked-->
             <ion-menu-toggle>
-              <ion-button v-if="connectedWallet.hasHadCustomName" :color="colorName" @click="moveToCommentSectionJumper()" router-link="/M4A" router-direction="root">
+              <ion-button v-if="connectedWallet.hasHadCustomName" :color="colorName" @click="moveToCommentSectionJumper()" router-link="/M4A/CommentSectionJumper" router-direction="root">
                 <ion-label color="dark">Comment Section Jumper</ion-label>
               </ion-button>
             </ion-menu-toggle>
@@ -122,7 +122,7 @@
     {
       id: 'M4A_Button',
       title: 'Medicare For All',
-      url: '/M4A',
+      url: '/M4A/110',
       src: "https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNrLh7NJcvyILZuPHpomK5CU6N2bAltaz03cTW",
       svg: Bandaid,
       color: "success",

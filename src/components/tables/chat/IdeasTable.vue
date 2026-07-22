@@ -127,7 +127,7 @@
                 v-if="slotProps.data.commentSectionName!='CEO'"
                 class="actionButton" color="dark"
                 @click="jumpToCommentSection(slotProps.data)"
-                :router-link="'/' + slotProps.data.commentSectionNamePrefix"
+                :router-link="'/' + slotProps.data.commentSectionNamePrefix + (slotProps.data.commentSectionName=='Overview' ? '/110' : '')"
                 router-direction="root"
               >
                 Jump To

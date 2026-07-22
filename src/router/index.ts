@@ -11,10 +11,9 @@ const routes: Array<RouteRecordRaw> = [
       component: () => import('../views/Menu/JesusPages.vue')
   },
   {
-      path: '/M4A',
-      component: () => import('../views/Menu/M4APages.vue')
+    path: '/M4A/:pathMatch(.*)*',
+    component: () => import('../views/Menu/M4APages.vue')
   },
-  
   {
       path: '/PLI',
       component: () => import('../views/Menu/PLIPages.vue')

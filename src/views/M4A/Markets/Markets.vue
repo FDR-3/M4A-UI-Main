@@ -16,13 +16,17 @@
       <div class="backTable" ref="backTableRef" :style="{display: display2ndTable}">
         <h2>Lending Protocol Running On<br>Testnet</h2>
 
-        <div class="flexCenterRow nTinyMarginTop">
-          <InfoButton :infoMessage="portfolioChartInfoMSG"/>
-          <h1 id="protfolioHeader">Portfolios</h1>
+        <div class="flexCenterRow nMediumMarginTop">
+          <div v-if="!isBrowingUsers" class="flexCenterRow">
+            <InfoButton :infoMessage="portfolioChartInfoMSG"/>
+            <h1 id="flippedPortfolioHeader">Portfolios</h1>
+          </div>
+          <h1 v-else id="flippedPortfolioHeader">Lending Leader Board</h1>
         </div>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Markets</ion-button>
         <Portfolios :portfolioReRenderHelper="portfolioReRenderHelper"
+          @isBrowsingUsers="(isBrowsingUsersFlag: boolean) => isBrowingUsers = isBrowsingUsersFlag"
           @openDepositModal="openDepositModal"
           @openWithdrawalModal="openWithdrawModal"
           @openBorrowModal="openBorrowModal"
@@ -67,10 +71,11 @@
   var borrowModal = ref()
   var repayModal = ref()
   var liquidationModal = ref()
+  var isBrowingUsers = ref(false)
 
   var portfolioReRenderHelper = ref(0)
 
-  const portfolioChartInfoMSG = "Interest earned and accrued is updated in the charts after a user does any lending activity, IE: depositing, repaying, etc."
+  const portfolioChartInfoMSG = "Values in the charts are updated after a user does any lending activity, IE: depositing, repaying, etc."
   
   const activeContainerHeight = ref('auto')
   const frontTableRef = ref<HTMLElement | null>(null)
@@ -96,13 +101,36 @@
 
   onMounted(async () =>
   {
-    flipped = localStorage.getItem("marketTableSelect") || ""
-    if (flipped === "") {
+    if(window.location.pathname == "/M4A/Markets")
+      flipped = localStorage.getItem("marketTableSelect") || ""
+    else
+    {
+      flipped = "flipped"
+      localStorage.setItem("marketTableSelect", flipped)
+    }
+    
+    if(flipped === "")
+    {
       display1stTable.value = ""
       display2ndTable.value = "none"
-    } else {
+    }
+    else
+    {
       display1stTable.value = "none"
       display2ndTable.value = ""
+
+      if(window.location.pathname == "/M4A/Markets")
+      {
+        const isBrowsingAllUsers = localStorage.getItem("isBrowsingAllLendingUsers") == "true" || false
+        if(isBrowsingAllUsers)
+          window.history.pushState({}, '', "/M4A/Markets-LendingLeaderBoard")
+        else
+          window.history.pushState({}, '', "/M4A/Markets-Portfolios")
+      }
+      else if(window.location.pathname == "/M4A/Markets-LendingLeaderBoard")
+        window.history.pushState({}, '', "/M4A/Markets-LendingLeaderBoard")
+      else if(window.location.pathname == "/M4A/Markets-Portfolios")
+        window.history.pushState({}, '', "/M4A/Markets-Portfolios")
     }
 
     //Initialize Observers to watch for inner component size modifications dynamically
@@ -137,6 +165,11 @@
       flipped = "flipped"
       display2ndTable.value = "block"
       localStorage.setItem("marketTableSelect", flipped)
+      const isBrowsingAllUsers = localStorage.getItem("isBrowsingAllLendingUsers") == "true" || false
+      if(isBrowsingAllUsers)
+        window.history.pushState({}, '', "/M4A/Markets-LendingLeaderBoard")
+      else
+        window.history.pushState({}, '', "/M4A/Markets-Portfolios")
       
       // Recalculate heights mid-flip animation sequence
       handleHeightUpdate()
@@ -152,6 +185,7 @@
       flipped = ""
       display1stTable.value = "block"
       localStorage.setItem("marketTableSelect", flipped)
+      window.history.pushState({}, '', "/M4A/Markets")
       
       handleHeightUpdate()
 

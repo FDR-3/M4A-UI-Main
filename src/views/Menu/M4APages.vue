@@ -80,7 +80,8 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, provide } from 'vue'
+  import { ref, watch, provide, onMounted } from 'vue'
+  import { useRoute } from 'vue-router'
   import { IonContent, IonPage, IonText } from '@ionic/vue'
   import UpdateNotice from '/src/components/smart contracts/alert protocol/UpdateNotice.vue'
   import HighJitTipWarning from '/src/components/smart contracts/lending protocol/HighJitoTipWarning.vue'
@@ -103,10 +104,16 @@
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
   const pageContent = ref()
-
+  const route = useRoute()
   const colorName = "green"
   const buttonShadow = "lightgreen"
   const colorHexValue = "#39bd39"
+
+  navigation.menuIndex = MenuIndex.M4A
+  localStorage.setItem("navigationMenuIndex", MenuIndex.M4A.toString())
+
+  provide('colorName', colorName)
+  provide('colorHexValue', colorHexValue)
 
   const pages = 
   [
@@ -121,53 +128,87 @@
   [
     {
       id: "hundredTenButton",
-      labelClass: 'rainbowText',
+      labelClass: "rainbowText",
       text: "110%\r\nOpen Sourced",
       lilNavText: "110%",
-      textColor: ""
+      textColor: "",
+      url: "/M4A/110"
     },
     {
-      id: 'marketButton',
+      id: "marketButton",
       labelClass: '',
       text: "Markets",
       lilNavText: "Markets",
-      textColor: "dark"
+      textColor: "dark",
+      url: "/M4A/Markets"
     },
     {
-      id: 'treasuryButton',
+      id: "treasuryButton",
       labelClass: '',
       text: "Treasury",
       lilNavText: "Treasury",
-      textColor: "dark"
+      textColor: "dark",
+      url: "/M4A/Treasury"
     },
     {
-      id: 'mapButton',
+      id: "mapButton",
       labelClass: '',
       text: "Claims/\r\nMap",
       lilNavText: "Claims",
-      textColor: "dark"
+      textColor: "dark",
+      url: "/M4A/Claims&Map"
     },
     {
-      id: 'queueButton',
+      id: "queueButton",
       labelClass: '',
       text: "Queue",
       lilNavText: "Queue",
-      textColor: "dark"
+      textColor: "dark",
+      url: "/M4A/Queue"
     }
   ]
 
-  //Added for extra robustness after redeploying new contract or clearing local storage
-  navigation.menuIndex = MenuIndex.M4A
-  //navigation.navBarIndex = 0
-  //navigation.pageIndex = 0
-  localStorage.setItem("navigationMenuIndex", MenuIndex.M4A.toString())
-  //localStorage.setItem("navigationNavbarIndex", "0")
-  //localStorage.setItem("navigationPageIndex", "0")
+  onMounted(() => 
+  {
+    const pathname = window.location.pathname
+    const portfolioMatch = pathname.match(/^\/M4A\/Markets-Portfolios-([a-zA-Z0-9]+)-(\d+)$/)
 
-  //Provide the colorName for the Video Voter Component
-  provide('colorName', colorName)
-  //Provide the colorName for the Video Voter Component
-  provide('colorHexValue', colorHexValue)
+    if(route.path == "/M4A/110")
+    {
+      navigation.navBarIndex = 0
+      navigation.pageIndex = 0
+      localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex.toString())
+      localStorage.setItem("navigationPageIndex", "0")
+    }
+    else if(route.path == "/M4A/Markets" || route.path == "/M4A/Markets-Portfolios" || route.path == "/M4A/Markets-LendingLeaderBoard" || portfolioMatch)
+    {
+      navigation.navBarIndex = 1
+      navigation.pageIndex = 0
+      localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex.toString())
+      localStorage.setItem("navigationPageIndex", "0")
+    }
+    else if(route.path == "/M4A/Treasury")
+    {
+      navigation.navBarIndex = 2
+      navigation.pageIndex = 0
+      localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex.toString())
+      localStorage.setItem("navigationPageIndex", "0")
+    }
+    else if(route.path == "/M4A/Claims&Map")
+    {
+      navigation.navBarIndex = 3
+      navigation.pageIndex = 0
+      localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex.toString())
+      localStorage.setItem("navigationPageIndex", "0")
+    }
+    else if(route.path == "/M4A/Queue")
+    {
+      navigation.navBarIndex = 4
+      navigation.pageIndex = 0
+      localStorage.setItem("navigationNavbarIndex", navigation.navBarIndex.toString())
+      localStorage.setItem("navigationPageIndex", "0")
+    }
+  })
 
   watch(navigation, () => 
   {

@@ -304,7 +304,8 @@
     'openWithdrawalModal',
     'openBorrowModal',
     'openRepayModal',
-    'openLiquidationModal'
+    'openLiquidationModal',
+    'isBrowsingUsers'
   ])
 
   var displayName = ref()
@@ -540,10 +541,46 @@
 
   onMounted(async() =>
   {
-    isBrowsingAllUsers.value = localStorage.getItem("isBrowsingAllLendingUsers") == "true" || false
-
     searchAddress.value = connectedWallet.addressString
     addressToCheck.value = searchAddress.value
+
+    const pathname = window.location.pathname
+    const portfolioMatch = pathname.match(/^\/M4A\/Markets-Portfolios-([a-zA-Z0-9]+)-(\d+)$/)
+
+    if(pathname == "/M4A/Markets")
+    {
+      isBrowsingAllUsers.value = localStorage.getItem("isBrowsingAllLendingUsers") == "true" || false
+      if(!isBrowsingAllUsers.value)
+        setTimeout(()=>
+        {
+          window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + connectedWallet.selectedLendingUserAccountIndex)
+        }, 100)
+    }
+    else if(pathname == "/M4A/Markets-Portfolios")
+    {
+      isBrowsingAllUsers.value = false
+      localStorage.setItem("isBrowsingAllLendingUsers", isBrowsingAllUsers.value.toString())
+      setTimeout(()=>
+      {
+        window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + connectedWallet.selectedLendingUserAccountIndex)
+      }, 100)
+    }
+    else if(portfolioMatch)
+    {
+      addressToCheck.value = portfolioMatch[1]
+      checkNewAddress()
+
+      isBrowsingAllUsers.value = false
+      localStorage.setItem("isBrowsingAllLendingUsers", isBrowsingAllUsers.value.toString())
+    }
+    else if(pathname == "/M4A/Markets-LendingLeaderBoard")
+    {
+      isBrowsingAllUsers.value = true
+      localStorage.setItem("isBrowsingAllLendingUsers", isBrowsingAllUsers.value.toString())
+    }
+
+    emits('isBrowsingUsers', isBrowsingAllUsers.value)
+
     isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
@@ -625,6 +662,11 @@
     }
 
     addressToCheck.value = searchAddress.value
+    if(!isBrowsingAllUsers.value)
+      setTimeout(()=>
+      {
+        window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + connectedWallet.selectedLendingUserAccountIndex)
+      }, 100)
     isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
 
     displayName.value = getUserDisplayName(searchAddress.value)
@@ -673,6 +715,11 @@
   watch(() => props.portfolioReRenderHelper, (() => 
   {
     chartReRenderKey.value += 1
+    if(!isBrowsingAllUsers.value)
+      setTimeout(()=>
+      {
+        window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + accountSelect.value)
+      }, 100)
   }))
 
   function setRainbowAnimatedGradient(ctx: any, chartArea:any)
@@ -772,8 +819,8 @@
     var tempHashMap = new Map<string, any>()
 
     const isTreasuryAddress = searchAddress.value == adminAccounts.singlePayerTreasuryAddress.toString() ||
-                              searchAddress.value == adminAccounts.hodlTreasuryAddress.toString() ||
-                              searchAddress.value == adminAccounts.solvencyTreasuryAddress.toString()
+      searchAddress.value == adminAccounts.hodlTreasuryAddress.toString() ||
+      searchAddress.value == adminAccounts.solvencyTreasuryAddress.toString()
 
     function processStatementList(statementList: any, availableYearsHashMap: any)
     {
@@ -961,6 +1008,10 @@
       return
 
     searchAddress.value = addressToCheck.value
+    setTimeout(()=>
+    {
+      window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + accountSelected)
+    }, 100)
     displayName.value = getUserDisplayName(searchAddress.value)
     possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
 
@@ -1053,7 +1104,7 @@
     cryptoLifeTimeInterestEarnedAmount.value = "0"
     cryptoLifeTimeInterestEarnedValue.value = 0
 
-    document.getElementById("protfolioHeader")?.scrollIntoView() 
+    document.getElementById("portfolioHeader")?.scrollIntoView() 
   }
 
   function emitOpenLiquidationModal(accountOwner: string, accountIndex: number)
@@ -1064,7 +1115,20 @@
   function setIsBrowsingAllLendingUsers(flag: boolean)
   {
     isBrowsingAllUsers.value = flag
+
+    emits('isBrowsingUsers', isBrowsingAllUsers.value)
+
+    if(!isBrowsingAllUsers.value)
+      setTimeout(()=>
+      {
+        window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + accountSelect.value)
+      }, 100)
+
     localStorage.setItem("isBrowsingAllLendingUsers", flag.toString())
+    if(flag)
+      window.history.pushState({}, '', "/M4A/Markets-LendingLeaderBoard")
+    else
+      window.history.pushState({}, '', "/M4A/Markets-Portfolios")
   }
 
   function checkForLendingUserAssets()
