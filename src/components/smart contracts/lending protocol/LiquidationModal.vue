@@ -219,7 +219,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, watch, computed, onUpdated } from 'vue'
+  import { onUnmounted, ref, inject, watch, computed, onUpdated } from 'vue'
   import { IonButton, IonText, IonLabel, IonInput, IonIcon, IonRadio, IonRadioGroup, } from '@ionic/vue'
   import { close } from 'ionicons/icons'
   import Select from 'primevue/select'
@@ -458,6 +458,19 @@
       }
   })
 
+  onUnmounted(() =>
+  {
+    stopTabCalculation()
+    stopHealthFactorCalculation()
+    if(addingAdditionalLendingAccount.value)
+      cancelAddingAdditionalLendingAccount()
+    repayMax.value = false
+    repayHalf.value = false
+    repayAmount.value = 0
+    liquidating.value = false
+    window.removeEventListener('click', handleClickOutside)
+  })
+  
   watch(lendingUserTabAccountListHashMap, async() =>
   {
     if(liquidating.value)
@@ -526,15 +539,15 @@
       !dataPcSectionValue?.includes('button container') &&  //Keep transaction toast near close button from closing modal
       !event?.target?.closest('path'))) //Keep transaction toast close button from sometimes closing modal
       {
-          stopTabCalculation()
-          stopHealthFactorCalculation()
-          if(addingAdditionalLendingAccount.value)
-            cancelAddingAdditionalLendingAccount()
-          repayMax.value = false
-          repayHalf.value = false
-          repayAmount.value = 0
-          liquidating.value = false
-          window.removeEventListener('click', handleClickOutside)
+        stopTabCalculation()
+        stopHealthFactorCalculation()
+        if(addingAdditionalLendingAccount.value)
+          cancelAddingAdditionalLendingAccount()
+        repayMax.value = false
+        repayHalf.value = false
+        repayAmount.value = 0
+        liquidating.value = false
+        window.removeEventListener('click', handleClickOutside)
       }
     }
   }
@@ -1542,22 +1555,9 @@
     gap: 10px
   }
 
-  .inProgressCircle 
+  .horizontalLine
   {
-    width: 20px;
-    height: 20px;
-    border: thin solid v-bind(colorHexValue);
-  }
-
-  .finishedCircle 
-  {
-    width: 20px;
-    height: 20px;
-    background-color: v-bind(colorHexValue);
-  }
-
-  .progressBarStep
-  {
-    width: 20px
+    margin-left: -20px;
+    margin-right: -20px
   }
 </style>

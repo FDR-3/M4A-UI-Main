@@ -119,7 +119,17 @@ ion-textarea
 {
   width: 100%;
   height: 1px;
-  margin-left: -20px;
-  margin-right: -20px;
-  background-color: #ffffff
+
+  background-color: light-dark(#000000, #ffffff)
+}
+
+.lendingActionPopoverContainer
+{
+  border: thin solid var(--ion-color-dark);
+  border-radius: 4px
+}
+
+ .lendingActionPopoverContainer > ion-popover
+{
+  --width: min(94vw, 144px)
 }

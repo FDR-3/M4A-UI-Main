@@ -28,13 +28,13 @@
       <ion-button
       id="checkNewAddressButton"
       @click="isValidPublicKey=isValidSolanaPublicKey(addressToCheck); checkNewAddress()"
-      color="green"
+      fill="clear" class="thinBorder" style="border-radius: 4px"
       >
-        Check New Address
+        <ion-label color="green">Check New Address</ion-label>
       </ion-button>
 
-      <ion-button color="green" @click="setIsBrowsingAllLendingUsers(true)">
-        Browse All Users
+      <ion-button fill="clear" class="thinBorder" style="border-radius: 4px" @click="setIsBrowsingAllLendingUsers(true)">
+        <ion-label color="green">Browse All Users</ion-label>
       </ion-button>
     </div>
   </div>
@@ -549,12 +549,15 @@
 
     if(pathname == "/M4A/Markets")
     {
+      const flipped = localStorage.getItem("marketTableSelect") || ""
       isBrowsingAllUsers.value = localStorage.getItem("isBrowsingAllLendingUsers") == "true" || false
-      if(!isBrowsingAllUsers.value)
-        setTimeout(()=>
-        {
-          window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + connectedWallet.selectedLendingUserAccountIndex)
-        }, 100)
+
+      if(flipped == "flipped")
+        if(!isBrowsingAllUsers.value)
+          setTimeout(()=>
+          {
+            window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + connectedWallet.selectedLendingUserAccountIndex)
+          }, 100)
     }
     else if(pathname == "/M4A/Markets-Portfolios")
     {
@@ -568,7 +571,8 @@
     else if(portfolioMatch)
     {
       addressToCheck.value = portfolioMatch[1]
-      checkNewAddress()
+      accountSelect.value = parseInt(portfolioMatch[2], 10)
+      checkNewAddress(accountSelect.value)
 
       isBrowsingAllUsers.value = false
       localStorage.setItem("isBrowsingAllLendingUsers", isBrowsingAllUsers.value.toString())
@@ -582,7 +586,8 @@
     emits('isBrowsingUsers', isBrowsingAllUsers.value)
 
     isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
-    accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
+    if(!portfolioMatch)
+      accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
     setLendingUserAccountList()
     checkForLendingUserAssets()
@@ -634,6 +639,7 @@
   {
     let newWallet = JSON.parse(newJSONObjectString)
     let oldWallet = JSON.parse(oldJSONObjectString)
+    var accountExists = false
 
     //This is here because of the "watch(lendingUserMonthlyStatementsHashMap, () =>" line. Don't want to the chart being updated twice unnecessarily.
     //The isBrowisngAllUsers check keeps the leaderboard height from being messed up when changing the selected account index when the leader board isn't visible.
@@ -645,14 +651,30 @@
       searchAddress.value = connectedWallet.addressString
       accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
 
+      addressToCheck.value = searchAddress.value
+      const flipped = localStorage.getItem("marketTableSelect") || "" //This flipped checked is needed when a wallet is already connected on the Market page, and you hit the refresh button
+      if(flipped == "flipped")
+        if(!isBrowsingAllUsers.value)
+          setTimeout(()=>
+          {
+            window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + connectedWallet.selectedLendingUserAccountIndex)
+          }, 100)
+      isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
+
+      displayName.value = getUserDisplayName(searchAddress.value)
+      possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
+
+      setLendingUserAccountList()
+      checkForLendingUserAssets()
+
       if(lendingUserMonthlyStatementsHashMap.map)
       {
-        userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+        userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
         userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
         if(userMonthlyStatementStableCoinList.value?.length)
           resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
 
-        userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
+        userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
         userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
         if(userMonthlyStatementCryptoCurrencyList.value?.length)
           resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
@@ -661,21 +683,8 @@
       }
     }
 
-    addressToCheck.value = searchAddress.value
-    if(!isBrowsingAllUsers.value)
-      setTimeout(()=>
-      {
-        window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + connectedWallet.selectedLendingUserAccountIndex)
-      }, 100)
-    isValidPublicKey.value = isValidSolanaPublicKey(addressToCheck.value)
-
-    displayName.value = getUserDisplayName(searchAddress.value)
-    possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
-
-    setLendingUserAccountList()
-    checkForLendingUserAssets()
-
-    chartReRenderKey.value += 1
+    if(accountExists)
+      chartReRenderKey.value += 1
   })
 
   watch(lendingUserAccountsHashMap, () =>
@@ -1044,6 +1053,11 @@
       connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
       localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelect.value.toString())
     }
+
+    setTimeout(()=>
+    {
+      window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + accountSelect.value)
+    }, 100)
 
     stableCoin7DayProjectionRateAmount.value = "0"
     stableCoin7DayProjectionRateValue.value = 0

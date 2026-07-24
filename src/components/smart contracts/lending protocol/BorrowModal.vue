@@ -117,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, watch, computed } from 'vue'
+  import { onUnmounted, ref, inject, watch, computed } from 'vue'
   import { IonButton, IonText, IonPopover, IonLabel } from '@ionic/vue'
   import Select from 'primevue/select'
   import InputNumber from 'primevue/inputnumber'
@@ -201,6 +201,15 @@
       return (0).toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })   
+  })
+
+  onUnmounted(() =>
+  {
+    stopHealthFactorCalculation()
+    borrowMax.value = false
+    borrowHalf.value = false
+    borrowing.value = false
+    window.removeEventListener('click', handleClickOutside)
   })
 
   watch(tokenReserveBalancesHashMap, () =>

@@ -142,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, inject, watch, computed, onUpdated, type Component } from 'vue'
+  import { onUnmounted, ref, inject, watch, computed, onUpdated, type Component } from 'vue'
   import { IonButton, IonText, IonPopover, IonLabel, IonInput, IonIcon } from '@ionic/vue'
   import { close } from 'ionicons/icons'
   import Select from 'primevue/select'
@@ -227,6 +227,17 @@
         maximumFractionDigits: 2 })   
   })
 
+  onUnmounted(() =>
+  {
+    if(addingAdditionalLendingAccount.value)
+      cancelAddingAdditionalLendingAccount()
+
+    stopInterestCalculation()
+    stopHealthFactorCalculation()
+    depositing.value = false  
+    window.removeEventListener('click', handleClickOutside)
+  })
+  
   watch(lendingUserTabAccountListHashMap, async() =>
   {
     if(depositing.value)//Don't start another count down if on another modal since the deposit modal is still mounted even when not visible
@@ -320,10 +331,7 @@
       !event?.target?.closest('path'))) //Keep transaction toast close button from sometimes closing modal
       {
         if(addingAdditionalLendingAccount.value)
-        {
           cancelAddingAdditionalLendingAccount()
-          addingAdditionalLendingAccount.value = false
-        }
 
         stopInterestCalculation()
         stopHealthFactorCalculation()

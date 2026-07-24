@@ -1955,5 +1955,23 @@
     }
   }
 
+  export function getUserPriorInteractedWithSubMarkets(subMarketList: any[], accountIndex: number)
+  {
+    const userPriorInteractedWithSubMarkets = []
+    const userTabs = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountIndex)
+
+    for(var i=0; i<subMarketList.length; i++)
+      for(var j=0; j<userTabs.length; j++)
+        if((subMarketList[i].tokenId == userTabs[j].tokenId) &&
+        (subMarketList[i].subMarketOwnerAddress.toString() == userTabs[j].subMarketOwnerAddress.toString()) &&
+        (subMarketList[i].subMarketIndex == userTabs[j].subMarketIndex))
+          userPriorInteractedWithSubMarkets.push(subMarketList[i])
+
+    if(userPriorInteractedWithSubMarkets.length == 0)
+      userPriorInteractedWithSubMarkets.push(subMarketList[0])
+    
+    return userPriorInteractedWithSubMarkets
+  }
+
   export default getLendingProtocolCEOAccount
 </script>

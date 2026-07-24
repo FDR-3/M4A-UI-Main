@@ -77,10 +77,12 @@
   {
     setNavBarIndex(index)
 
+    const pathname = window.location.pathname
+    const portfolioMatch = pathname.match(/^\/M4A\/Markets-Portfolios-([a-zA-Z0-9]+)-(\d+)$/)
     const urlIsMarketsSubPath = window.location.pathname == "/M4A/Markets-Portfolios" || window.location.pathname == "/M4A/Markets-LendingLeaderBoard"
     if(url != "/M4A/Markets")
       window.history.pushState({}, '', url)
-    else if(!urlIsMarketsSubPath)
+    else if(!urlIsMarketsSubPath && !portfolioMatch)
       window.history.pushState({}, '', url)
   }
 

@@ -357,4 +357,9 @@
   {
     text-align: center
   }
+
+  .horizontalLine
+  {
+    background-color: #ffffff
+  }
 </style>

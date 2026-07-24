@@ -18,6 +18,7 @@
         'percentChange24h',
         'supplyAPYString',
         'borrowAPYString',
+        'baseBorrowAPYString',
         'useFixedBorrowAPYString',
         'utilizationRateString',
         'depositsString',
@@ -31,12 +32,11 @@
           <p>A 3% SubMarket and 1% Solvency fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
           <p>IE: If you have $100 of USDC deposited for a year, and the supply APY remains at exactly 10% for the whole year (Not likely at all)</p>
           <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) - $0.10(fee) = $109.60</p>
-          <!--<a href="https://www.youtube.com/@fdr-3" target="_blank">Where does the money come from that users are earning on their deposits?</a>-->
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Market Search     ">
             <ion-icon class="tableSearchIcon" slot="start" :icon="search"></ion-icon>
           </ion-input>
 
-          <div v-if="hasAtleast1Account" class="nMediumSmallMarginBottom">
+          <div v-if="accountList?.length > 0" class="nMediumSmallMarginBottom">
             <div class="flexCenterRow">
               <div class="smallMarginRight">
                 <InfoButton :infoMessage="userLendingInfoMSG"/>
@@ -74,10 +74,10 @@
                 @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
               </ion-input>
 
-              <ion-button v-if="editingAccountName" fill="clear" @click="editingAccountName=false; $emit('marketTableHeightChange', true, editingAccountName)">
+              <ion-button v-if="editingAccountName" fill="clear" @click="editingAccountName=false">
                 <ion-icon :src="close" color="dark"></ion-icon>
               </ion-button>
-              <ion-button v-else fill="clear" @click="setInputFocus(); editingAccountName=true; $emit('marketTableHeightChange', true, editingAccountName)">
+              <ion-button v-else fill="clear" @click="setInputFocus(); editingAccountName=true">
                 <ion-icon :src="pencil" color="dark"></ion-icon>
               </ion-button>
             </div>
@@ -103,7 +103,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="slotProps.data.chain.source()">
-              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
+              <component :is="slotProps.data.chain.svg" style="margin-left: -15px; margin-right: -11px"></component>
             </ion-button>
             <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
           </div>
@@ -129,14 +129,19 @@
           {{slotProps.data.borrowAPYString }}
         </template>
       </Column>
+      <Column field="baseBorrowAPY" header="Base Borrow APY%" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.baseBorrowAPYString }}
+        </template>
+      </Column>
       <Column field="useFixedBorrowApy" header="Fixed Borrow APY" style="width: 0%" sortable>
         <template #body="slotProps">
           <ion-text :color="slotProps.data.useFixedBorrowApy ? 'green' : 'red'">{{slotProps.data.useFixedBorrowAPYString }}</ion-text>
         </template>
       </Column>
-      <Column field="utilizationRate" header="Utilization Rate%" style="width: 0%" sortable>
+      <Column field="globalLimit" header="Global Deposit Limit" style="width: 0%" sortable>
         <template #body="slotProps">
-          {{slotProps.data.utilizationRateString }}
+          {{slotProps.data.globalLimitString }}
         </template>
       </Column>
       <Column field="deposits" header="Deposits" style="width: 0%" sortable>
@@ -149,9 +154,9 @@
           {{slotProps.data.borrowsString }}
         </template>
       </Column>
-      <Column field="globalLimit" header="Global Deposit Limit" style="width: 0%" sortable>
+      <Column field="utilizationRate" header="Utilization Rate%" style="width: 0%" sortable>
         <template #body="slotProps">
-          {{slotProps.data.globalLimitString }}
+          {{slotProps.data.utilizationRateString }}
         </template>
       </Column>
       <Column header="Actions" style="width: 0%">
@@ -198,6 +203,7 @@
         'percentChange24h',
         'supplyAPYString',
         'borrowAPYString',
+        'baseBorrowAPYString',
         'useFixedBorrowAPYString',
         'utilizationRateString',
         'depositsString',
@@ -215,8 +221,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="openTokenPopover($event, slotProps.data)" style="margin-left: -8px">
-                <component v-if="slotProps.data.asset.name=='Sol'" :is="slotProps.data.asset.svg" style="width: 44px; margin-left: -8px; height: 32px; margin-right: -4px"/>
-                <component v-else :is="slotProps.data.asset.svg" style="width: 28px; height: 32px; margin-right: 5px"/>
+                <component :is="slotProps.data.asset.svg" style="width: 28px; height: 32px; margin-right: 5px"/>
               <ion-label color="dark">{{ slotProps.data.asset.name }}</ion-label>
             </ion-button>
           </div>
@@ -226,7 +231,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight">
             <ion-button fill="clear" @click="slotProps.data.chain.source()">
-              <component :is="slotProps.data.chain.svg" style="width: 35px; margin-left: -15px; margin-right: -11px"></component>
+              <component :is="slotProps.data.chain.svg" style="margin-left: -15px; margin-right: -11px"></component>
             </ion-button>
             <span class="nTinyMarginLeft">{{ slotProps.data.chain.name }}</span>
           </div>
@@ -252,14 +257,19 @@
           {{slotProps.data.borrowAPYString }}
         </template>
       </Column>
+      <Column field="baseBorrowAPY" header="Base Borrow APY%" style="width: 0%" sortable>
+        <template #body="slotProps">
+          {{slotProps.data.baseBorrowAPYString }}
+        </template>
+      </Column>
       <Column field="useFixedBorrowApy" header="Fixed Borrow APY" style="width: 0%" sortable>
         <template #body="slotProps">
           <ion-text :color="slotProps.data.useFixedBorrowApy ? 'green' : 'red'">{{slotProps.data.useFixedBorrowAPYString }}</ion-text>
         </template>
       </Column>
-      <Column field="utilizationRate" header="Utilization Rate%" style="width: 0%" sortable>
+      <Column field="globalLimit" header="Global Deposit Limit" style="width: 0%" sortable>
         <template #body="slotProps">
-          {{slotProps.data.utilizationRateString }}
+          {{slotProps.data.globalLimitString }}
         </template>
       </Column>
       <Column field="deposits" header="Deposits" style="width: 0%" sortable>
@@ -272,9 +282,9 @@
           {{slotProps.data.borrowsString }}
         </template>
       </Column>
-      <Column field="globalLimit" header="Global Deposit Limit" style="width: 0%" sortable>
+      <Column field="utilizationRate" header="Utilization Rate%" style="width: 0%" sortable>
         <template #body="slotProps">
-          {{slotProps.data.globalLimitString }}
+          {{slotProps.data.utilizationRateString }}
         </template>
       </Column>
       <Column header="Actions" style="width: 0%">
@@ -324,7 +334,7 @@
     side="top" 
     alignment="center"
     >
-      <div class=" flexCenterColumn popoverContainer">
+      <div class="flexCenterColumn lendingActionPopoverContainer">
         <ion-button class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', event.tokenId, event.tokenMintAddressString, event.subMarketList); actionsPopoverOpen=false">
           <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
         </ion-button>
@@ -343,6 +353,18 @@
         </ion-button>
       </div>
     </ion-popover>
+  </div>
+
+  <div class="mobileContainer">
+    <MobileMarkets
+    :mobileMarketData="mobileMarketData"
+    :userLendingInfoMSG="userLendingInfoMSG"
+    :accountList="accountList"
+    :hasDeposits="hasDeposits"
+    @openDepositModal="(tokenId, tokenMintAddressString, subMarketList) => $emit('openDepositModal', tokenId, tokenMintAddressString, subMarketList)"
+    @openWithdrawalModal="(tokenId, tokenMintAddressString, userSpecificSubMarketList) => $emit('openWithdrawalModal', tokenId, tokenMintAddressString, userSpecificSubMarketList)"
+    @openBorrowModal="(tokenId, tokenMintAddressString, userSpecificSubMarketList) => $emit('openBorrowModal', tokenId, tokenMintAddressString, userSpecificSubMarketList)"
+    @openRepayModal="(tokenId, tokenMintAddressString, userSpecificSubMarketList) => $emit('openRepayModal', tokenId, tokenMintAddressString, userSpecificSubMarketList)"/>
   </div>
 </template>
 
@@ -367,13 +389,15 @@
   import { tokenReservesHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { subMarketByTokenIdAndOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { lendingUserAccountsHashMap, lendingUserTabAccountsHashMap, lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { getUserPriorInteractedWithSubMarkets } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
+  import MobileMarkets from './MobileMarkets.vue'
 
   const toast = inject('toast')
   const colorHexValue = inject('colorHexValue')
 
-  const emits = defineEmits(['openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal', 'marketTableHeightChange'])
+  const emits = defineEmits(['openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal'])
 
   var tokenPopoverOpen = ref(false)
   var actionsPopoverOpen = ref(false)
@@ -382,7 +406,6 @@
 
   var accountSelect = ref(0)
   var accountList = ref()
-  var hasAtleast1Account = ref()
   var editingAccountName = ref(false)
   var accountName = ref()
   var accountNameEditInputRef = ref()
@@ -391,6 +414,11 @@
   var hasDeposits = ref(false)
 
   const userLendingInfoMSG = "Create new accounts while making a deposit."
+
+  var mobileMarketData = computed(() =>
+  {
+    return [...StableCoins, ...CryptoCurrency]
+  })
 
   onMounted(() =>
   {
@@ -462,23 +490,26 @@
     {
       const userAccountList = lendingUserAccountsHashMap.map.get(connectedWallet.addressString)
       if(userAccountList)
-      {
         accountList.value = userAccountList
-        hasAtleast1Account.value = true
-        emits("marketTableHeightChange", true, editingAccountName.value)
-      }
-      else
-      {
-        hasAtleast1Account.value = false
-        emits("marketTableHeightChange", false, editingAccountName.value)
-      }
 
       //Prevents starting on the wrong index when starting new contract deployments due to saved local storage values.
-      if(!hasAtleast1Account.value)
+      if(!userAccountList)
       {
         accountSelect.value = 0
         connectedWallet.selectedLendingUserAccountIndex = 0
         localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, '0')
+      }
+    }
+
+    if(accountList.value?.length)
+    {
+      const exists = accountList.value.some((account: { userAccountIndex: number }) => account.userAccountIndex === accountSelect.value)
+
+      if(!exists)
+      {
+        accountSelect.value = accountList.value[0].userAccountIndex
+        connectedWallet.selectedLendingUserAccountIndex = accountSelect.value
+        localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelect.value.toString())
       }
     }
   }
@@ -498,6 +529,10 @@
           maximumFractionDigits: 2 }) + '%'
           StableCoins[i].borrowAPY = tokenReserve.borrowApy / 100 //Convert to decimal from fixed point notation
           StableCoins[i].borrowAPYString = StableCoins[i].borrowAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          StableCoins[i].baseBorrowAPY = tokenReserve.baseBorrowApy / 100 //Convert to decimal from fixed point notation
+          StableCoins[i].baseBorrowAPYString = StableCoins[i].baseBorrowAPY.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 }) + '%'
           StableCoins[i].useFixedBorrowApy = tokenReserve.useFixedBorrowApy
@@ -521,6 +556,7 @@
         {
           StableCoins[i].supplyAPYString = "N/A"
           StableCoins[i].borrowAPYString = "N/A"
+          StableCoins[i].baseBorrowAPYString = "N/A"
           StableCoins[i].utilizationRateString = "N/A"
           StableCoins[i].depositsString = "N/A"
           StableCoins[i].borrowsString = "N/A"
@@ -531,6 +567,7 @@
       {
         StableCoins[i].supplyAPYString = "N/A"
         StableCoins[i].borrowAPYString = "N/A"
+        StableCoins[i].baseBorrowAPYString = "N/A"
         StableCoins[i].utilizationRateString = "N/A"
         StableCoins[i].depositsString = "N/A"
         StableCoins[i].borrowsString = "N/A"
@@ -551,6 +588,10 @@
           maximumFractionDigits: 2 }) + '%'
           CryptoCurrency[i].borrowAPY = tokenReserve.borrowApy / 100 //Convert to decimal from fixed point notation
           CryptoCurrency[i].borrowAPYString = CryptoCurrency[i].borrowAPY.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) + '%'
+          CryptoCurrency[i].baseBorrowAPY = tokenReserve.baseBorrowApy / 100 //Convert to decimal from fixed point notation
+          CryptoCurrency[i].baseBorrowAPYString = CryptoCurrency[i].baseBorrowAPY.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 }) + '%'
           CryptoCurrency[i].useFixedBorrowApy = tokenReserve.useFixedBorrowApy
@@ -574,6 +615,7 @@
         {
           CryptoCurrency[i].supplyAPYString = "N/A"
           CryptoCurrency[i].borrowAPYString = "N/A"
+          CryptoCurrency[i].baseBorrowAPYString = "N/A"
           CryptoCurrency[i].utilizationRateString = "N/A"
           CryptoCurrency[i].depositsString = "N/A"
           CryptoCurrency[i].borrowsString = "N/A"
@@ -584,6 +626,7 @@
       {
         CryptoCurrency[i].supplyAPYString = "N/A"
         CryptoCurrency[i].borrowAPYString = "N/A"
+        CryptoCurrency[i].baseBorrowAPYString = "N/A"
         CryptoCurrency[i].utilizationRateString = "N/A"
         CryptoCurrency[i].depositsString = "N/A"
         CryptoCurrency[i].borrowsString = "N/A"
@@ -815,29 +858,11 @@
     event.value.tokenId = rowData.tokenId
     event.value.tokenMintAddressString = rowData.tokenMintAddressString
     event.value.subMarketList = rowData.subMarketList
-    event.value.userSpecificSubMarketList = getUserPriorInteractionSubMarkets(rowData.subMarketList)
+    event.value.userSpecificSubMarketList = getUserPriorInteractedWithSubMarkets(rowData.subMarketList, accountSelect.value)
     event.value.depositBalance = rowData.depositBalance
     event.value.borrowBalance = rowData.borrowBalance
 
     actionsPopoverOpen.value = true
-  }
-
-  function getUserPriorInteractionSubMarkets(subMarketList: any[])
-  {
-    const userPriorInteractedWithSubMarkets = []
-    const userTabs = lendingUserTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value)
-
-    for(var i=0; i<subMarketList.length; i++)
-      for(var j=0; j<userTabs.length; j++)
-        if((subMarketList[i].tokenId == userTabs[j].tokenId) &&
-        (subMarketList[i].subMarketOwnerAddress.toString() == userTabs[j].subMarketOwnerAddress.toString()) &&
-        (subMarketList[i].subMarketIndex == userTabs[j].subMarketIndex))
-          userPriorInteractedWithSubMarkets.push(subMarketList[i])
-
-    if(userPriorInteractedWithSubMarkets.length == 0)
-      userPriorInteractedWithSubMarkets.push(subMarketList[0])
-    
-    return userPriorInteractedWithSubMarkets
   }
 
   function setInputFocus()
@@ -879,7 +904,7 @@
 
 <style scoped>
 
-ion-input
+  ion-input
   {
     --highlight-color: var(--ion-color-green)
   }
@@ -898,12 +923,6 @@ ion-input
   .container
   {
     margin-bottom: 77px
-  }
-
-  .popoverContainer
-  {
-    border: thin solid var(--ion-color-dark);
-    border-radius: 4px
   }
 
   #tableTitle
@@ -928,5 +947,28 @@ ion-input
     height: 32px;
     min-height: 22px;
     --highlight-color: v-bind(colorHexValue) !important
+  }
+
+  @media screen and (min-width: 1580.1px) 
+  { 
+    .tableContainer
+    {
+      display: block
+    }
+    .mobileContainer
+    {
+      display: none
+    }
+  }
+  @media screen and (max-width: 1580px) 
+  { 
+    .tableContainer
+    {
+      display: none
+    }
+    .mobileContainer
+    {
+      display: block
+    }
   }
 </style>

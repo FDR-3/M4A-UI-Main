@@ -9,10 +9,9 @@
 
       <div class="flexCenterColumn">
         <div class="flexCenterRow">
-          <ion-button fill="clear" @click="openTokenPopover($event)">
-            <img v-if="tokenMintAddressString==tokenAddressStrings.solTokenMintAddress" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; height: 35px; ; max-height: 40px; margin-right: -7px"/>
-            <component v-else :is="tokenSVG"style="width: 44px; height: 35px; max-height: 40px"></component>
-            <ion-text color="dark">{{ tokenName }}</ion-text>
+          <ion-button fill="clear" class="smallMarginBottom" @click="openTokenPopover($event)">
+            <component :is="tokenSVG" style="width: 44px; height: 35px; max-height: 40px"></component>
+            <ion-text color="dark" class="bold">{{ tokenName }}</ion-text>
           </ion-button>
         </div>
 
@@ -73,10 +72,9 @@
     </div>
 
     <div class="vChartLayout">
-      <ion-button fill="clear" @click="openTokenPopover($event)">
-        <img v-if="tokenMintAddressString==tokenAddressStrings.solTokenMintAddress"src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48" style="width: 60px; height: 35px; ; max-height: 40px; margin-right: -7px"/>
-        <component v-else :is="tokenSVG" style="width: 44px; height: 35px; max-height: 40px"></component>
-        <ion-text color="dark">{{ tokenName }}</ion-text>
+      <ion-button fill="clear" class="nTinyMarginBottom" @click="openTokenPopover($event)">
+        <component :is="tokenSVG" style="width: 44px; height: 35px; max-height: 40px"></component>
+        <ion-text color="dark" class="bold">{{ tokenName }}</ion-text>
       </ion-button>
       
       <br>
@@ -340,7 +338,7 @@
   side="top" 
   alignment="center"
   >
-    <div class=" flexCenterColumn popoverContainer">
+    <div class=" flexCenterColumn lendingActionPopoverContainer">
       <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
       $emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
         <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
@@ -898,12 +896,6 @@
   h5
   {
     font-size: min(4vw, 25px)
-  }
-
-  .popoverContainer
-  {
-    border: thin solid var(--ion-color-dark);
-    border-radius: 4px
   }
   
   .yearSelect

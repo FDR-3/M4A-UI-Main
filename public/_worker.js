@@ -1,7 +1,7 @@
-const PROXY_URL = "https://m4a.io/Proxy"
-const TEST_NET_PROXY_URL = "https://m4a.io/TestNetProxy"
-const JITO_TIP_PROXY_URL = "https://m4a.io/JitoTipProxy"
-const JUPITER_PRICE_PROXY_URL = "https://m4a.io/JupiterPriceProxy"
+const PROXY_PATH = "/Proxy"
+const TEST_NET_PROXY_PATH = "/TestNetProxy"
+const JITO_TIP_PROXY_PATH = "/JitoTipProxy"
+const JUPITER_PRICE_PROXY_PATH = "/JupiterPriceProxy"
 const ORIGIN = "https://m4a.io"
 
 const mintAddresses =
@@ -20,26 +20,27 @@ export default
   {
     try
     {
-      if(request.url == PROXY_URL || request.url == TEST_NET_PROXY_URL || request.url == JITO_TIP_PROXY_URL || request.url == JUPITER_PRICE_PROXY_URL)
+      //Using URL natively handles ws://, wss://, https://, trailing slashes, and query params safely
+      const urlObj = new URL(request.url)
+      const pathname = urlObj.pathname
+
+      if(pathname == PROXY_PATH || pathname == TEST_NET_PROXY_PATH || pathname == JITO_TIP_PROXY_PATH || pathname == JUPITER_PRICE_PROXY_PATH)
       {
-        const origin = request.headers.get("origin");
-        const referer = request.headers.get("referer");
+        const origin = request.headers.get("origin")
+        const referer = request.headers.get("referer")
 
         //This stops requests from unauthorized web browsers
-        //If an Origin is provided (cross-origin request), verify it's allowed
         if(origin && origin !== ORIGIN && origin !== "http://localhost:8100")
           return new Response(`Origin: ${origin}\nOnly requests from https://m4a.io can use this end point.`, { status: 403 })
 
-        //If NO Origin is provided (same-origin request, or direct cURL/Postman)
-        //We can optionally check the Referer header to prevent abuse from external scripts
         if(!origin)
           if(referer && !referer.startsWith(ORIGIN) && !referer.startsWith("http://localhost:8100"))
-            return new Response(`Unauthorized Referer: ${referer}`, { status: 403 });
+            return new Response(`Unauthorized Referer: ${referer}`, { status: 403 })
 
         var TARGET_URL = ""
         var API_KEY = ""
 
-        if(request.url == PROXY_URL)
+        if(pathname == PROXY_PATH)
         {
           if(!env.HELIUS_API_KEY)
             return new Response("HELIUS API key is missing.", { status: 500 })
@@ -51,7 +52,7 @@ export default
 
           API_KEY = env.HELIUS_API_KEY
         }
-        else if(request.url == TEST_NET_PROXY_URL)
+        else if(pathname == TEST_NET_PROXY_PATH)
         {
           if(!env.QUICK_NODE_TEST_URL)
             return new Response("QUICK_NODE_TEST_URL is missing.", { status: 500 })
@@ -59,12 +60,12 @@ export default
           TARGET_URL = ""
           API_KEY = env.QUICK_NODE_TEST_URL
         }
-        else if(request.url == JITO_TIP_PROXY_URL)
+        else if(pathname == JITO_TIP_PROXY_PATH)
         {
           TARGET_URL = "https://bundles.jito.wtf/api/v1/bundles/tip_floor"
           API_KEY = "" //No API key needed for Jito Tip Floor
         }
-        else if(request.url == JUPITER_PRICE_PROXY_URL)
+        else if(pathname == JUPITER_PRICE_PROXY_PATH)
         {
           TARGET_URL = `https://api.jup.ag/price/v3?ids=${mintAddresses.join(',')}`
           API_KEY = "" //API key added in header below
@@ -93,17 +94,22 @@ export default
         }
 
         const newHeaders = new Headers(request.headers)
-        newHeaders.set("referer", "m4a.io")
+        
+        //CRITICAL: WAFs drop connections if referer is not a valid URI structure. "m4a.io" is invalid.
+        newHeaders.set("referer", "https://m4a.io/")
+        
+        //CRITICAL: Delete the copied 'm4a.io' host header so Cloudflare natively assigns 'mainnet.helius-rpc.com'
+        newHeaders.delete("host")
 
-        if(request.url == JUPITER_PRICE_PROXY_URL)
+        if(pathname == JUPITER_PRICE_PROXY_PATH)
           newHeaders.set("x-api-key", env.JUPITER_API_KEY)
 
-        //Set up fetch options, but PREVENT passing a body if it's a GET request (like Jito)
+        //Set up fetch options, but PREVENT passing a body if it's a GET request
         const fetchOptions = {
           method: method,
           headers: newHeaders
         }
-        
+
         if(method !== "GET" && method !== "HEAD" && request.body)
           fetchOptions.body = request.body
 
@@ -111,17 +117,16 @@ export default
         const response = await fetch(Request_URL, fetchOptions)
 
         //Detect if this is a WebSocket request for Solana web3.js
-        const upgradeHeader = request.headers.get("Upgrade");
-        const isWebSocket = upgradeHeader && upgradeHeader.toLowerCase() === "websocket";
-        
+        const upgradeHeader = request.headers.get("Upgrade")
+        const isWebSocket = upgradeHeader && upgradeHeader.toLowerCase() === "websocket"
+
         //If it is a WebSocket connection, return the raw response immediately. 
-        //Do NOT wrap it in a new Response or add CORS headers (WebSockets don't use standard CORS).
         if(isWebSocket || response.status === 101)
           return response
 
         //Create a new response to add our headers
         const newResponse = new Response(response.body, response)
-        newResponse.headers.set("Access-Control-Allow-Origin", '*') //Set CORS header on the final response
+        newResponse.headers.set("Access-Control-Allow-Origin", '*')
 
         return newResponse 
       }
