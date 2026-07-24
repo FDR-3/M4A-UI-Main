@@ -53,17 +53,22 @@
           </h3>
         </div>
 
-        <Select
-        v-if="!editingAccountName"
-        class="accountSelect"
-        v-model="accountSelect" 
-        :options="accountList" 
-        optionLabel="accountName" 
-        optionValue="userAccountIndex" 
-        placeholder="Select Account"
-        appendTo="self"
-        @change="updateStoredSelectedAccount()">
-        </Select>
+        <div style="display: flex; flex-direction: column">
+          <div>
+            <ion-label>Account Name</ion-label>
+          </div>
+          <Select
+          v-if="!editingAccountName"
+          class="accountSelect"
+          v-model="accountSelect" 
+          :options="accountList" 
+          optionLabel="accountName" 
+          optionValue="userAccountIndex" 
+          placeholder="Select Account"
+          appendTo="self"
+          @change="updateStoredSelectedAccount()">
+          </Select>
+        </div>
 
         <div>
           <h2 class="underLine yellow">Life Time Interest Earned</h2>
@@ -80,9 +85,12 @@
     </div>
 
     <div class="topVHeaderDisplay thinBorderBottom" style="justify-content:space-around !important">
+      <div class="mediumMarginTop">
+        <ion-label>Account Name</ion-label>
+      </div>
       <Select
       v-if="!editingAccountName"
-      class="accountSelect mediumMarginTop"
+      class="accountSelect "
       v-model="accountSelect" 
       :options="accountList" 
       optionLabel="accountName" 

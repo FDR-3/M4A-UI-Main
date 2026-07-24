@@ -1,11 +1,13 @@
 <template>
   <div class="thickBorder">
-    <h2>Earn interest on deposits while helping to push the USA to universal health care like every other fucking first world country not named the United States of America</h2>
-    <p>A 3% SubMarket and 1% Solvency fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
-    <p>IE: If you have $100 of USDC deposited for a year, and the supply APY remains at exactly 10% for the whole year (Not likely at all)</p>
-    <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) - $0.10(fee) = $109.60</p>
+    <h2 style="padding-left: 5px; padding-right: 5px">Earn interest on deposits while helping to push the USA to universal health care like every other fucking first world country not named the United States of America</h2>
+    <div class="horizontalLine"></div>
+    <p style="padding-left: 5px; padding-right: 5px">A 3% SubMarket and 1% Solvency fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
+    <p style="padding-left: 5px; padding-right: 5px">IE: If you have $100 of USDC deposited for a year, and the supply APY remains at exactly 10% for the whole year (Not likely at all)</p>
+    <p style="padding-left: 5px; padding-right: 5px">After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) - $0.10(fee) = $109.60</p>
+    <div class="horizontalLine smallMarginBottom"></div>
 
-    <div class="mobileTopControlsContainer">
+    <div class="mobileTopControlsContainer nSmallMarginBottom">
       <div v-if="accountList?.length > 0">
         <div class="flexCenterRow">
           <div>

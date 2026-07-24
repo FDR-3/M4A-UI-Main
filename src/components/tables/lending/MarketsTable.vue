@@ -29,6 +29,7 @@
       <template #header>
         <div>
           <h2>Earn interest on deposits while helping to push the USA to universal health care like every other fucking first world country not named the United States of America</h2>
+          <div class="horizontalLine"></div>
           <p>A 3% SubMarket and 1% Solvency fee on interest earned is collected for the <span color="green">M4A</span> Treasury</p>
           <p>IE: If you have $100 of USDC deposited for a year, and the supply APY remains at exactly 10% for the whole year (Not likely at all)</p>
           <p>After a year, you would have your $100(deposit) + $10(interest earned) - $0.30(fee) - $0.10(fee) = $109.60</p>
@@ -38,46 +39,51 @@
 
           <div v-if="accountList?.length > 0" class="nMediumSmallMarginBottom">
             <div class="flexCenterRow">
-              <div class="smallMarginRight">
+              <div>
                 <InfoButton :infoMessage="userLendingInfoMSG"/>
               </div>
 
-              <Select
-              v-if="!editingAccountName"
-              id="accountSelect"
-              class="standardFontSize mediumMarginTop"
-              style="margin-bottom: 17px"
-              v-model="accountSelect" 
-              :options="accountList" 
-              optionLabel="accountName" 
-              optionValue="userAccountIndex" 
-              placeholder="Select Account"
-              appendTo="self"
-              @change="updateStoredSelectedUserAccountIndex()">
-              </Select>
+              <div style="display: flex; flex-direction: column">
+                <div class="smallMarginTop">
+                  <ion-label>Account Name</ion-label>
+                </div>
+                <Select
+                v-if="!editingAccountName"
+                id="accountSelect"
+                class="standardFontSize"
+                style="margin-bottom: 17px"
+                v-model="accountSelect" 
+                :options="accountList" 
+                optionLabel="accountName" 
+                optionValue="userAccountIndex" 
+                placeholder="Select Account"
+                appendTo="self"
+                @change="updateStoredSelectedUserAccountIndex()">
+                </Select>
+                
+                <ion-input
+                v-else
+                v-model="accountName"
+                ref="accountNameEditInputRef"
+                id="accountNameEditInput"
+                :class="{ 'invalid': overByteSizeLimit }"
+                style="margin-bottom: 22px"
+                fill="outline"
+                :counter="true"
+                :counter-formatter="customFormatter"
+                :maxlength=MAX_ACCOUNT_NAME_LENGTH>
+                  <EmojiButton
+                  :marginTop="'4px'"
+                  :colorHexValue="colorHexValue"
+                  :openSide="'right'"
+                  @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
+                </ion-input>
+              </div>
 
-              <ion-input
-              v-else
-              v-model="accountName"
-              ref="accountNameEditInputRef"
-              id="accountNameEditInput"
-              class="mediumMarginTop mediumMarginBottom"
-              :class="{ 'invalid': overByteSizeLimit }"
-              fill="outline"
-              :counter="true"
-              :counter-formatter="customFormatter"
-              :maxlength=MAX_ACCOUNT_NAME_LENGTH>
-                <EmojiButton
-                :marginTop="'4px'"
-                :colorHexValue="colorHexValue"
-                :openSide="'right'"
-                @emojiSelected="(emoji: String) => insertEmoji(emoji)"/>
-              </ion-input>
-
-              <ion-button v-if="editingAccountName" fill="clear" @click="editingAccountName=false">
+              <ion-button v-if="editingAccountName" class="nMediumSmallMarginLeft" fill="clear" @click="editingAccountName=false">
                 <ion-icon :src="close" color="dark"></ion-icon>
               </ion-button>
-              <ion-button v-else fill="clear" @click="setInputFocus(); editingAccountName=true">
+              <ion-button v-else class="nSmallMarginLeft" fill="clear" @click="setInputFocus(); editingAccountName=true">
                 <ion-icon :src="pencil" color="dark"></ion-icon>
               </ion-button>
             </div>
@@ -903,7 +909,6 @@
 </script>
 
 <style scoped>
-
   ion-input
   {
     --highlight-color: var(--ion-color-green)
@@ -920,11 +925,6 @@
     --width: min(94vw, 144px)
   }
 
-  .container
-  {
-    margin-bottom: 77px
-  }
-
   #tableTitle
   {
     margin: 20px
@@ -939,6 +939,13 @@
   {
     height: 35px;
     padding-left: 16px
+  }
+
+  .horizontalLine
+  {
+    width: auto;
+    margin-left: -10px;
+    margin-right: -10px
   }
 
   #accountNameEditInput
