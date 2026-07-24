@@ -1624,7 +1624,7 @@
 
         let batchWithCompute: anchor.web3.TransactionInstruction[] = []
 
-        const setComputeUnitLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 900_000 })
+        const setComputeUnitLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
         batchWithCompute = [setComputeUnitLimitIx, ...batch]
 
         /*if(simulation.value.err)

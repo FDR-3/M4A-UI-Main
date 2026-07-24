@@ -110,8 +110,8 @@
 
         <div class="tokenChainContainer">
           <h4 class="flexCenterRow ">
-            Token:
             <ion-button fill="clear" @click="openTokenPopover($event, mobileMarketData[tokenSelect-1])">
+              <ion-text color="dark" class="tokenNameText">Token:</ion-text>
               <component :is="mobileMarketData[tokenSelect-1]?.asset.svg" class="bigMobileTokenSVG"/> 
               <ion-text color="dark" class="tokenNameText">{{ mobileMarketData[tokenSelect-1]?.asset.name }}</ion-text>
             </ion-button>
@@ -123,15 +123,19 @@
           </h4>
         </div>
 
-        <div class="nMediumMarginTop tokenAddress">
-          <ion-label class="nSmallMarginTop">Token Address: {{ mobileMarketData[tokenSelect-1]?.tokenMintAddressString }}</ion-label>
+        <div class="nMediumLargeMarginTop tokenAddress">
+          <ion-button class=" " fill="clear" @click="openTokenPopover($event, mobileMarketData[tokenSelect-1])">
+            <ion-label color="dark" >Token Address: {{ mobileMarketData[tokenSelect-1]?.tokenMintAddressString }}</ion-label>
+          </ion-button>
         </div>
 
         <div class="nMediumMarginTop trimmedTokenAddress">
-          <ion-label class="nSmallMarginTop">Token Address: {{ trimmedTokenAddress }}</ion-label>
+          <ion-button fill="clear" @click="openTokenPopover($event, mobileMarketData[tokenSelect-1])">
+            <ion-label color="dark" class="nSmallMarginTop">Token Address: {{ trimmedTokenAddress }}</ion-label>
+          </ion-button>
         </div>
 
-        <div class="horizontalLine"></div>
+        <div class="tokenAddressHorizontalLine"></div>
 
         <div class="market-stats-box">
           <div>
@@ -217,7 +221,7 @@
     side="top" 
     alignment="center"
     >
-      <ion-button class="copyTokenAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
+      <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
         <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
       </ion-button>
     </ion-popover>
@@ -546,7 +550,14 @@
     }
   }
 
-  @media screen and (min-width: 500.1px) 
+  .tokenAddressHorizontalLine
+  {
+    width: 100%;
+    height: 1px;
+    background-color: light-dark(#000000, #ffffff)
+  }
+
+  @media screen and (min-width: 540.1px) 
   { 
     .tokenAddress
     {
@@ -555,9 +566,13 @@
     .trimmedTokenAddress
     {
       display: none
+    }
+    .tokenAddressHorizontalLine
+    {
+      margin-top: -5px
     }
   }
-  @media screen and (max-width: 500px) 
+  @media screen and (max-width: 540px) 
   { 
     .tokenAddress
     {
@@ -566,6 +581,10 @@
     .trimmedTokenAddress
     {
       display: block
+    }
+    .tokenAddressHorizontalLine
+    {
+      margin-top: -15px
     }
   }
 </style>

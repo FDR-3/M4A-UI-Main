@@ -328,7 +328,7 @@
     side="top" 
     alignment="center"
     >
-      <ion-button class="copyTokenAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
+      <ion-button class="copyAddressButton" color="green" @click="passByRefWrapperCopyTokenMintAddress()" @mouseleave="closeTokenPopover($event)">
         <ion-label color="light">{{ copyTokenMintAddressButtonText }}</ion-label>
       </ion-button>
     </ion-popover>
