@@ -16,14 +16,14 @@
         </div>
 
         <ion-radio-group v-model="radioGroupSelection" @ionChange="handleRadioChange($event)">
-          <ion-radio :color="colorName" value="Extrnode" label-placement="end">{{ defaultRPCName }}</ion-radio><br>
+          <ion-radio :color="colorName" value="Helius" label-placement="end">{{ defaultRPCName }}</ion-radio><br>
           <ion-radio :color="colorName" value="Custom" label-placement="end">Custom</ion-radio><br>
         </ion-radio-group>
         <ion-input
           v-model="rpcString"
           fill="outline"
           :style="{ '--highlight-color': colorHexValue }"
-          :disabled="radioGroupSelection==='Extrnode'">
+          :disabled="radioGroupSelection==='Helius'">
             <ion-button v-if="radioGroupSelection==='Custom'" slot="end" :color="colorName" @click="saveCustomRPCEndPoint()">Save</ion-button>
         </ion-input>
       </ion-content>
@@ -46,7 +46,7 @@
   const colorName = inject('colorName') as string
   const colorHexValue = inject('colorHexValue') as string
 
-  var radioGroupSelection = ref("Extrnode")
+  var radioGroupSelection = ref("Helius")
   var defaultRPCName = ref("")
   var rpcString = ref("")
   var isSettingsModalOpen = ref(false)
@@ -54,13 +54,13 @@
   onMounted(() =>
   {
     const rpcSetting = localStorage.getItem("rpcSetting") || ""
-    if(rpcSetting == "Extrnode" || rpcSetting == "")
+    if(rpcSetting == "Helius" || rpcSetting == "")
     {
-      radioGroupSelection.value = "Extrnode"
+      radioGroupSelection.value = "Helius"
       if(isProduction())
       {
         rpcString.value = "https://m4a.io/proxyCORS"
-        defaultRPCName.value = "Extrnode"
+        defaultRPCName.value = "Helius"
       }
       else
       {
@@ -89,14 +89,14 @@
   {
     radioGroupSelection.value = event.detail.value
     
-    if(radioGroupSelection.value == "Extrnode")
+    if(radioGroupSelection.value == "Helius")
     {
-      localStorage.setItem("rpcSetting", "Extrnode")
+      localStorage.setItem("rpcSetting", "Helius")
 
       if(isProduction())
-        rpcString.value = "https://m4a.io/proxyCORS"
+        rpcString.value = "https://m4a.io/MainNetProxy"
       else
-        rpcString.value = DEV_MODE ? "https://api.devnet.solana.com" : "https://solana-rpc.publicnode.com"
+        rpcString.value = DEV_MODE ? "https://m4a.io/TestNetProxy" : "https://m4a.io/MainNetProxy"
 
       toastRPCChangeSuccess(toast, rpcString.value)
     }

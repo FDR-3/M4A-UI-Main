@@ -23,11 +23,11 @@
     //connection = new Connection("https://api.devnet.solana.com"/*Interchangeable with "clusterApiUrl("devnet")"*/, preflightCommitment)
     
     //It isn't neccessary to run the alert protocol against mainnet. This saves on requests just using devnet and no RPC provider since this contract is just for triggering alerts.
-    if(isProduction())
-      connection = new Connection("https://m4a.io/Proxy", preflightCommitment)
+    connection = new Connection("https://m4a.io/DevNetProxy", preflightCommitment)
+    /*if(isProduction())
+      connection = new Connection("https://m4a.io/DevNetProxy", preflightCommitment)
     else
-      connection = DEV_MODE ? new Connection("https://m4a.io/Proxy"/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
-      //connection = DEV_MODE ? new Connection("https://api.devnet.solana.com"/*Interchangeable with "clusterApiUrl("devnet")"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
+      connection = new Connection("https://m4a.io/DevNetProxy", preflightCommitment)*/
     
     const provider = computed
     (

@@ -26,10 +26,10 @@ export function isBrowserFireFox()
 
 var explorerString = ""
 
-if(DEV_MODE)
+//if(DEV_MODE)
   explorerString = "devnet"
-else
-  explorerString = "mainnet"
+//else
+  //explorerString = "mainnet"
 
 export function openCommentInSolanaExplorer(
 commentSectionNamePrefix: string,

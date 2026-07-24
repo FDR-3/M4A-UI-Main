@@ -6,7 +6,6 @@
   import idl1 from "/src/assets/contracts/Solana/M4AProtocol.json"
   //import idl2 from "/src/assets/contracts/Solana/M4AProtocol2.json"
   import { M4AProtocol } from "./m4a.ts"//including the type doesn't seem to help with auto complete/IDE suggestions when programing in the front end, not sure how to fix that
-  import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import { isProduction } from '/src/assets/helperFunctions/browserHelper.ts'
 
   const preflightCommitment = "processed"
@@ -20,11 +19,11 @@
   { 
     const wallet = useAnchorWallet()
 
-    if(isProduction())
-      connection = new Connection("https://m4a.io/Proxy", preflightCommitment)
+    connection = new Connection("https://m4a.io/DevNetProxy", preflightCommitment)
+    /*if(isProduction())
+      connection = new Connection("https://m4a.io/DevNetProxy", preflightCommitment)
     else
-      connection = DEV_MODE ? new Connection("https://m4a.io/Proxy"/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
-      //connection = DEV_MODE ? new Connection("https://api.devnet.solana.com"/*Interchangeable with "clusterApiUrl("devnet")"*/, preflightCommitment) : new Connection("https://solana-rpc.publicnode.com", preflightCommitment)
+      connection = new Connection("https://m4a.io/DevNetProxy", preflightCommitment)*/
 
     const provider = computed
     (

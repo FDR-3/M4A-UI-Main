@@ -2,7 +2,7 @@
 <script async setup lang="ts">
   import { onUnmounted } from 'vue'
   import { tokenAddressStrings, jupiterPriceUpdateMainnetTokenAddressStrings } from '/src/assets/constants/Addresses.ts'
-  import { StableCoins, CryptoCurrency  } from '/src/components/tables/lending/Assets.vue'
+  import { StableCoins, CryptoCurrency } from '/src/components/tables/lending/Assets.vue'
   import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
   
