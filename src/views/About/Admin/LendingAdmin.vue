@@ -157,10 +157,10 @@
   tokenSVG: Component,
   tokenName:string,
   solvencyInsuranceFeeRate: number,
-  fixedBorrowAPY: number,
+  baseBorrowAPY: number,
   useFixedBorrowApy: boolean,
   globalLimit: number) =>
-  editTokenReserveModal.openEditTokenReserveModal(tokenId, tokenMintAddress, tokenSVG, tokenName, solvencyInsuranceFeeRate, fixedBorrowAPY, useFixedBorrowApy, globalLimit)"/>
+  editTokenReserveModal.openEditTokenReserveModal(tokenId, tokenMintAddress, tokenSVG, tokenName, solvencyInsuranceFeeRate, baseBorrowAPY, useFixedBorrowApy, globalLimit)"/>
   <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString && anchorPrograms.isLendingProtocolInitialized">
     <MintTestToken/>
     <CloseTempPriceAccount/>

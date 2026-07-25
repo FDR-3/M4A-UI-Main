@@ -39,7 +39,7 @@
 
     <InputNumber
       id="editTokenReserveInput"
-      v-model="fixedBorrowAPYPercentage"
+      v-model="baseBorrowAPYPercentage"
       :inputStyle="{'text-align': 'center'}"
       suffix="%"
       inputId="percent"
@@ -102,7 +102,7 @@
   const colorHexValue = inject('colorHexValue') as string
 
   var solvencyInsuranceFeeRatePercentage = ref()
-  var fixedBorrowAPYPercentage = ref()
+  var baseBorrowAPYPercentage = ref()
   var editingTokenReserve = ref(false)
   var editTokenReserveSVG = ref()
   var tokenReserveTokenName = ref()
@@ -161,7 +161,7 @@
   tokenSVG: Component,
   tokenName:string,
   solvencyInsuranceFeeRate: number,
-  fixedBorrowAPY: number,
+  baseBorrowAPY: number,
   useFixedBorrowApy: boolean,
   globalLimit: number)
   {
@@ -172,7 +172,7 @@
     editTokenReserveSVG.value = tokenSVG
     tokenReserveTokenName.value = tokenName
     solvencyInsuranceFeeRatePercentage.value = solvencyInsuranceFeeRate
-    fixedBorrowAPYPercentage.value = fixedBorrowAPY
+    baseBorrowAPYPercentage.value = baseBorrowAPY
     useFixedBorrowAPYSelect.value = useFixedBorrowApy
     globalLimitInput.value = globalLimit
     editingTokenReserve.value = true
@@ -205,7 +205,7 @@
 
       const updateTokenReserveInstruction = await anchorPrograms.lending.lendingProgram.methods.updateTokenReserve
       (
-        fixedBorrowAPYPercentage.value * 100,//convert to fixedpoint notation
+        baseBorrowAPYPercentage.value * 100,//convert to fixedpoint notation
         useFixedBorrowAPYSelect.value,
         new anchor.BN(globalLimitInput.value * Math.pow(10, decimalAmount)),//convert to fixedpoint notation
         solvencyInsuranceFeeRatePercentage.value * 100,//convert to fixedpoint notation

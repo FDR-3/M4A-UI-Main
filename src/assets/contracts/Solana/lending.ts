@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/lending_protocol.json`.
  */
 export type LendingProtocol = {
-  "address": "2RYYqg5qpA5NWCn7gb9iobaDr6zmhn2XdLtTXdBGr4qh",
+  "address": "LendVMybdnkGL9yX9VFJamrtCSzL3izpUoB9JDhSU6M",
   "metadata": {
     "name": "lendingProtocol",
     "version": "0.1.0",
@@ -198,7 +198,7 @@ export type LendingProtocol = {
           "type": "u8"
         },
         {
-          "name": "fixedBorrowApy",
+          "name": "baseBorrowApy",
           "type": "u16"
         },
         {
@@ -365,7 +365,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -451,7 +451,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -512,17 +512,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -850,7 +850,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -936,7 +936,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -997,17 +997,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -1260,7 +1260,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -1321,17 +1321,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -1631,7 +1631,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -1717,7 +1717,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -1778,17 +1778,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -1967,7 +1967,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -2002,7 +2002,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -2088,7 +2088,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -2143,7 +2143,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -2204,17 +2204,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -2275,17 +2275,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -2358,39 +2358,6 @@ export type LendingProtocol = {
       ],
       "accounts": [
         {
-          "name": "lendingUserAddress"
-        },
-        {
-          "name": "ceo",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  108,
-                  101,
-                  110,
-                  100,
-                  105,
-                  110,
-                  103,
-                  80,
-                  114,
-                  111,
-                  116,
-                  111,
-                  99,
-                  111,
-                  108,
-                  67,
-                  69,
-                  79
-                ]
-              }
-            ]
-          }
-        },
-        {
           "name": "priceValidator",
           "pda": {
             "seeds": [
@@ -2449,7 +2416,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lendingUserAddress"
+                "path": "signer"
               }
             ]
           }
@@ -2604,12 +2571,12 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
@@ -2727,7 +2694,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -3057,7 +3024,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -3143,7 +3110,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -3204,17 +3171,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -4083,7 +4050,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "repayment_token_reserve.token_id",
+                "path": "repaymentTokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -4138,7 +4105,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "liquidation_token_reserve.token_id",
+                "path": "liquidationTokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -4199,17 +4166,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "repayment_token_reserve.token_id",
+                "path": "repaymentTokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -4270,17 +4237,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "liquidation_token_reserve.token_id",
+                "path": "liquidationTokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -4707,7 +4674,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -4768,17 +4735,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -5198,7 +5165,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -5253,7 +5220,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -5314,17 +5281,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -5385,17 +5352,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -6069,7 +6036,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -6155,7 +6122,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -6216,17 +6183,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -6397,6 +6364,10 @@ export type LendingProtocol = {
         },
         {
           "name": "payOffLoan",
+          "type": "bool"
+        },
+        {
+          "name": "pay10Percent",
           "type": "bool"
         }
       ]
@@ -6585,6 +6556,94 @@ export type LendingProtocol = {
       ]
     },
     {
+      "name": "updateMaxTabAmount",
+      "discriminator": [
+        49,
+        242,
+        167,
+        41,
+        175,
+        136,
+        48,
+        111
+      ],
+      "accounts": [
+        {
+          "name": "lendingProtocol",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "ceo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  101,
+                  110,
+                  100,
+                  105,
+                  110,
+                  103,
+                  80,
+                  114,
+                  111,
+                  116,
+                  111,
+                  99,
+                  111,
+                  108,
+                  67,
+                  69,
+                  79
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "newMaxTabAmount",
+          "type": "u8"
+        }
+      ]
+    },
+    {
       "name": "updateTokenReserve",
       "discriminator": [
         4,
@@ -6701,7 +6760,7 @@ export type LendingProtocol = {
       ],
       "args": [
         {
-          "name": "fixedBorrowApy",
+          "name": "baseBorrowApy",
           "type": "u16"
         },
         {
@@ -6868,7 +6927,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -6954,7 +7013,7 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -7015,17 +7074,17 @@ export type LendingProtocol = {
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_month",
+                "path": "lendingProtocol.currentStatementMonth",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "lending_protocol.current_statement_year",
+                "path": "lendingProtocol.currentStatementYear",
                 "account": "lendingProtocol"
               },
               {
                 "kind": "account",
-                "path": "token_reserve.token_id",
+                "path": "tokenReserve.tokenId",
                 "account": "tokenReserve"
               },
               {
@@ -7459,151 +7518,156 @@ export type LendingProtocol = {
     },
     {
       "code": 6009,
-      "name": "invalidSolvencyInsuranceFeeRate",
-      "msg": "The solvency insurance fee on interest earned rate can't be greater than 100%"
+      "name": "invalidBaseBorrowApy",
+      "msg": "The base borrow apy can't be greater than 5%"
     },
     {
       "code": 6010,
+      "name": "invalidSolvencyInsuranceFeeRate",
+      "msg": "The solvency insurance fee on interest earned rate can't be greater than 4%"
+    },
+    {
+      "code": 6011,
       "name": "missingLendingUserLookUpTable",
       "msg": "You must include a Look Up Table Address when a user initializes their Lending User Account"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "incorrectOrderOfTabAccounts",
       "msg": "You must provide the sub user's tab accounts ordered by user_tab_account_index"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "oracleDataStale",
       "msg": "Oracle price was stale"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "oraclePriceNotFound",
       "msg": "Oracle price not found"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "unexpectedLendingStatsAccount",
       "msg": "Unexpected Lending Stats PDA detected"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "unexpectedTokenReserveAccount",
       "msg": "Unexpected Token Reserve Account PDA detected"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "unexpectedSubMarketAccount",
       "msg": "Unexpected SubMarket Account PDA detected"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "unexpectedLendingUserAccount",
       "msg": "Unexpected Lending User Account PDA detected"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "unexpectedTabAccount",
       "msg": "Unexpected Tab Account PDA detected"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "unexpectedMonthlyStatementAccount",
       "msg": "Unexpected Monthly Statement Account PDA detected"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "unexpectedOraclePriceValidatorAccount",
       "msg": "Unexpected Oracle Price Validator PDA detected"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "unexpectedOraclePriceDataAccount",
       "msg": "Unexpected Oracle Price Data PDA detected"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "invalidTokenAccount",
       "msg": "Invalid Token Account"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "invalidTokenAccountMint",
       "msg": "Invalid Token Account Mint"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "invalidTokenAccountOwner",
       "msg": "Invalid Token Account Owner"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "lendingUserAccountNameTooLong",
       "msg": "Lending User Account name can't be longer than 25 characters"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "globalLimitExceeded",
       "msg": "You can't deposit more than the global limit"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "insufficientFunds",
       "msg": "You can't withdraw more funds than you've deposited"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "insufficientLiquidity",
       "msg": "Not enough liquidity in the Token Reserve for this withdraw or borrow"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "tooManyFunds",
       "msg": "You can't pay back more funds than you've borrowed"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "missingTokenReserveAccountForRefresh",
       "msg": "Expected Token Reserve missing for user refresh"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "staleTokenReserveOrLendingUser",
       "msg": "Token Reserve or lending user health data was stale"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "griefingRepayment",
       "msg": "You must repay atleast 10% of the borrow position if the account is in an unhealthy state. This prevents 'griefing'"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "liquidationExposure",
       "msg": "You can't withdraw or borrow an amount that would cause your borrow liabilities to exceed 70% of deposited collateral"
     },
     {
-      "code": 6034,
+      "code": 6035,
       "name": "notLiquidatable",
       "msg": "You can't liquidate an account whose borrow liabilities aren't 80% or more of their deposited collateral"
     },
     {
-      "code": 6035,
+      "code": 6036,
       "name": "overLiquidation",
       "msg": "You can't repay more than 50% of a liquidati's debt position"
     },
     {
-      "code": 6036,
+      "code": 6037,
       "name": "notInsolvent",
       "msg": "You can't zero out an account whose borrow liabilities aren't 100% or more of their deposited collateral"
     },
     {
-      "code": 6037,
+      "code": 6038,
       "name": "duplicateSubMarket",
       "msg": "Duplicate SubMarket Detected"
     },
     {
-      "code": 6038,
+      "code": 6039,
       "name": "tooManyTabAccounts",
       "msg": "Each Lending User Account can have no more than 5 Tab Accounts. Please make new account"
     }
@@ -7621,6 +7685,10 @@ export type LendingProtocol = {
           {
             "name": "currentStatementYear",
             "type": "u16"
+          },
+          {
+            "name": "maxTabsPerLendingAccount",
+            "type": "u8"
           },
           {
             "name": "lookUpTableAddress",
@@ -7803,7 +7871,7 @@ export type LendingProtocol = {
             "type": "u64"
           },
           {
-            "name": "monthlySubMarketFeesGeneratedAmount",
+            "name": "monthlyFeesGeneratedAmount",
             "type": "u64"
           },
           {
@@ -7811,15 +7879,7 @@ export type LendingProtocol = {
             "type": "u64"
           },
           {
-            "name": "monthlySolvencyInsuranceFeesGeneratedAmount",
-            "type": "u64"
-          },
-          {
             "name": "monthlySolvencyInsuranceFeesCollectedAmount",
-            "type": "u64"
-          },
-          {
-            "name": "monthlyLiquidationFeesGeneratedAmount",
             "type": "u64"
           },
           {
@@ -7931,27 +7991,7 @@ export type LendingProtocol = {
             "type": "u64"
           },
           {
-            "name": "subMarketFeesGeneratedAmount",
-            "type": "u64"
-          },
-          {
-            "name": "subMarketFeesCollectedAmount",
-            "type": "u64"
-          },
-          {
-            "name": "solvencyInsuranceFeesGeneratedAmount",
-            "type": "u64"
-          },
-          {
-            "name": "solvencyInsuranceFeesCollectedAmount",
-            "type": "u64"
-          },
-          {
-            "name": "liquidationFeesGeneratedAmount",
-            "type": "u64"
-          },
-          {
-            "name": "liquidationFeesCollectedAmount",
+            "name": "feesGeneratedAmount",
             "type": "u64"
           },
           {
@@ -8231,7 +8271,7 @@ export type LendingProtocol = {
             "type": "u16"
           },
           {
-            "name": "fixedBorrowApy",
+            "name": "baseBorrowApy",
             "type": "u16"
           },
           {
@@ -8263,23 +8303,11 @@ export type LendingProtocol = {
             "type": "u128"
           },
           {
-            "name": "subMarketFeesGeneratedAmount",
-            "type": "u128"
-          },
-          {
             "name": "solvencyInsuranceFeeRate",
             "type": "u16"
           },
           {
-            "name": "solvencyInsuranceFeesGeneratedAmount",
-            "type": "u128"
-          },
-          {
             "name": "uncollectedSolvencyInsuranceFeesAmount",
-            "type": "u128"
-          },
-          {
-            "name": "liquidationFeesGeneratedAmount",
             "type": "u128"
           },
           {

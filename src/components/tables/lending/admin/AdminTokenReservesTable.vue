@@ -17,7 +17,7 @@
         'tokenReserveATA',
         'supplyAPYString',
         'borrowAPYString',
-        'fixedBorrowAPYString',
+        'baseBorrowAPYString',
         'useFixedBorrowApy',
         'utilizationRateString',
         'solvencyInsuranceFeeRateString',
@@ -64,9 +64,9 @@
           {{slotProps.data.borrowAPYString }}
         </template>
       </Column>
-      <Column field="fixedBorrowAPY" header="Fixed Borrow APY%" style="width: 0%" sortable>
+      <Column field="baseBorrowAPY" header="Base Borrow APY%" style="width: 0%" sortable>
         <template #body="slotProps">
-          {{slotProps.data.fixedBorrowAPYString }}
+          {{slotProps.data.baseBorrowAPYString }}
         </template>
       </Column>
       <Column field="useFixedBorrowApy" header="Use Fixed Borrow APY%" style="width: 0%" sortable></Column>
@@ -130,7 +130,7 @@
                 event.svg,
                 event.name,
                 event.solvencyInsuranceFeeRate,
-                event.fixedBorrowAPY,
+                event.baseBorrowAPY,
                 event.useFixedBorrowApy,
                 event.globalLimit)"
               >
@@ -252,7 +252,7 @@
     event.value.svg = rowData.svg
     event.value.name = rowData.name
     event.value.solvencyInsuranceFeeRate = rowData.solvencyInsuranceFeeRate
-    event.value.fixedBorrowAPY = rowData.fixedBorrowAPY
+    event.value.baseBorrowAPY = rowData.baseBorrowAPY
     event.value.useFixedBorrowApy = rowData.useFixedBorrowApy
     event.value.globalLimit = rowData.globalLimit
     actionsPopoverOpen.value = true
@@ -293,8 +293,8 @@
       processedTableData[i].borrowAPYString = processedTableData[i].borrowAPY.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) + '%'
-      processedTableData[i].fixedBorrowAPY = processedTableData[i].fixedBorrowApy / 100 //Convert to decimal from fixed point notation
-      processedTableData[i].fixedBorrowAPYString = processedTableData[i].fixedBorrowAPY.toLocaleString('en-US', {
+      processedTableData[i].baseBorrowAPY = processedTableData[i].baseBorrowApy / 100 //Convert to decimal from fixed point notation
+      processedTableData[i].baseBorrowAPYString = processedTableData[i].baseBorrowAPY.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 }) + '%'
       processedTableData[i].utilizationRate = processedTableData[i].utilizationRate / 100 //Convert to decimal from fixed point notation 
