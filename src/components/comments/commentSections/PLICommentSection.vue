@@ -4,7 +4,7 @@
     <ion-button v-if="connectedWallet.addressString==adminAccounts.chatCEOAddress" :color="colorName" @click="setCommentSectionFlag(false)"><ion-label color="dark">Enable Comment Section</ion-label></ion-button>
     This Comment Section Has Been Disabled :X
   </div>
-  <div v-else>
+  <div v-else class="smallMarginBottom">
     <AddComment v-if="!hidenCommentSections.hidden && commentSectionName!=undefined && feeFreeLink!=undefined"
     :key="commentSectionName + commentSectionNamePrefix"
     :colorName="colorName"
@@ -35,7 +35,6 @@
       />
     </div>
   </div>
-  <div class="extraSpace"></div>
 </template>
 
 <script setup lang="ts">
@@ -341,10 +340,5 @@
   #sortButton
   {
     margin-bottom: 10px
-  }
-
-  .extraSpace
-  {
-    height: 200px
   }
 </style>
