@@ -15,7 +15,6 @@
           </ion-button>
         </div>
 
-        
         <div class="nSmallMarginTop smallMarginBottom">
           <div class="showTrimmedAddress"><ion-text>SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br></div>
           <div class="showNonTrimmedAddress"><ion-text>SubMarket Owner: {{ subMarketOwnerAddress }}</ion-text><br></div>
