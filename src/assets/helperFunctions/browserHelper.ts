@@ -40,17 +40,17 @@ postOwnerAddress: PublicKey)
   if(navigation.menuIndex == MenuIndex.M4A)
   {
     const postPDA = getM4ACommentPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
   else if(navigation.menuIndex == MenuIndex.PLI)
   {
     const postPDA = getPLICommentPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
   else if(navigation.menuIndex == MenuIndex.About)
   {
     const postPDA = getAboutCommentPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
 }
 
@@ -63,17 +63,17 @@ postOwnerAddress: PublicKey)
   if(navigation.menuIndex == MenuIndex.M4A)
   {
     const postPDA = getM4AReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
   else if(navigation.menuIndex == MenuIndex.PLI)
   {
     const postPDA = getPLIReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
   else if(navigation.menuIndex == MenuIndex.About)
   {
     const postPDA = getAboutReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
 }
 
@@ -86,17 +86,17 @@ postOwnerAddress: PublicKey)
   if(navigation.menuIndex == MenuIndex.M4A)
   {
     const postPDA = getM4ALv3ReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
   else if(navigation.menuIndex == MenuIndex.PLI)
   {
     const postPDA = getPLILv3ReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
   else if(navigation.menuIndex == MenuIndex.About)
   {
     const postPDA = getAboutLv3ReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
 }
 
@@ -109,16 +109,16 @@ postOwnerAddress: PublicKey)
   if(navigation.menuIndex == MenuIndex.M4A)
   {
     const postPDA = getM4ALv4ReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
   else if(navigation.menuIndex == MenuIndex.PLI)
   {
     const postPDA = getPLILv4ReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
   else if(navigation.menuIndex == MenuIndex.About)
   {
     const postPDA = getAboutLv4ReplyPDA(commentSectionNamePrefix, commentSectionName, chatAccountPostCountIndex, postOwnerAddress).toBase58()
-    window.open(`https://explorer.solana.com/address/${postPDA}?cluster=${explorerString}`, "_blank")
+    window.open(`https://solscan.io/account/${postPDA}?cluster=${explorerString}`, "_blank")
   }
 }
