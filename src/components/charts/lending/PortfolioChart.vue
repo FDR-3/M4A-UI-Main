@@ -20,7 +20,9 @@
           <div class="showTrimmedAddress"><ion-text>SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br></div>
           <div class="showNonTrimmedAddress"><ion-text>SubMarket Owner: {{ subMarketOwnerAddress }}</ion-text><br></div>
           <ion-text>SubMarket Index: {{ subMarketIndex }}</ion-text><br>
-          <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text>
+          <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text><br>
+          <ion-text>Supply APY: {{ supplyAPY }}%</ion-text><br>
+          <ion-text>Borrow APY: {{ borrowAPY }}%</ion-text>
         </div>
 
         <ion-text>Balance:
@@ -82,6 +84,8 @@
       <ion-text>SubMarket Owner: {{ subMarketOwnerAddressTrimmed }}</ion-text><br>
       <ion-text>SubMarket Index: {{ subMarketIndex }}</ion-text><br>
       <ion-text>Fee on Interest Earned: {{ subMarketFee }}%</ion-text><br>
+      <ion-text>Supply APY: {{ supplyAPY }}%</ion-text><br>
+      <ion-text>Borrow APY: {{ borrowAPY }}%</ion-text>
 
       <div class="unStackedBalanceDebt">
         <br><ion-text>Balance:
@@ -419,6 +423,8 @@
   var subMarketSelectOption: any[] = []
 
   var tokenReserve: any
+  var supplyAPY = ref("0.00")
+  var borrowAPY = ref("0.00")
   var tokenMintAddressString: string
   var decimalAmount: number
   var lendingUserTabAccount: any
@@ -770,6 +776,9 @@
     tokenReserve.newBorrowInterestChangeIndex = Number(tokenReserve.borrowInterestChangeIndex) * borrowCompoundingFactor
 
     tokenReserve.sevenDaySupplyInterestChangeIndex = tokenReserve.newSupplyInterestChangeIndex * sevenDaySupplyCompoundingFactor
+
+    supplyAPY.value = (supplyApy * 100).toFixed(2) //convert to % form
+    borrowAPY.value = (borrowApy * 100).toFixed(2) //convert to % form
   }
 
   function calculateUserInterest()
