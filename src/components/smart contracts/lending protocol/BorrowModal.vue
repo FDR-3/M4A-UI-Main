@@ -93,7 +93,7 @@
 
     <div v-if="connectedWallet.isTempPriceAccountAlive" class="flexCenterColumn">
       <br>
-      <ion-text>Your temp price data account is alive. You must close it before you can call the borrow function.</ion-text>
+      <ion-text>{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
       <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
         Close Temp Price Account
       </ion-button>
@@ -137,7 +137,8 @@
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
     closeTempOraclePriceData,
-    getLendingUserTabAccountPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    getLendingUserTabAccountPDA,
+    TEMP_PRICE_ACCOUNT_ALIVE_MSG } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { tokenReservesHashMap,
     tokenReserveFontEndInfoHashMap,

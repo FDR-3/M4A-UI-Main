@@ -6,7 +6,7 @@
   >
     <div v-if="connectedWallet.isTempPriceAccountAlive"
     class="flexCenterColumn">
-      <ion-text>Your temp price data account is alive. You must close it before you can call the liquidate function.</ion-text>
+      <ion-text>{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
       <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
         Close Temp Price Account
       </ion-button>
@@ -257,7 +257,8 @@
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
     getOraclePriceValidatorPDA,
-    closeTempOraclePriceData } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    closeTempOraclePriceData,
+    TEMP_PRICE_ACCOUNT_ALIVE_MSG } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'

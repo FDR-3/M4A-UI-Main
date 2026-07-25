@@ -42,6 +42,8 @@
   import { LOCAL_PRICE_ORACLE, USE_JITO_BUNDLES } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import cloneDeep from 'lodash/cloneDeep'
 
+  export const TEMP_PRICE_ACCOUNT_ALIVE_MSG = "Your temp price data account is alive. You must close it before you can call the borrow function. Wait atleast 30 seconds after submitting your transaction before manually trying to close your Temp Price Account incase there is a delay."
+
   export async function getLendingProtocol()
   {
     console.log("Getting Lending Protocol")
