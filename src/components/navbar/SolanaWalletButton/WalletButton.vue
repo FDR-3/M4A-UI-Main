@@ -605,7 +605,7 @@
         (accountInfo: AccountInfo<Buffer>) => 
         {
           //Handle account change..
-          if(!accountInfo || accountInfo.data.length == 0)
+          if(accountInfo.lamports == 0)
             connectedWallet.isTempPriceAccountAlive = false
           else
             connectedWallet.isTempPriceAccountAlive = true
