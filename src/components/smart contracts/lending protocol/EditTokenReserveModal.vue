@@ -7,8 +7,7 @@
   >
     <div class="nMediumSmallMarginTop tinyMarginBottom flexCenterRow">
       <ion-button fill="clear" @click="openTokenPopover($event)">
-        <img v-if="selectedTokenMintAddressString==tokenAddressStrings.solTokenMintAddress"  style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component v-else :is="editTokenReserveSVG" style="width: 44px"></component>
+        <component :is="editTokenReserveSVG" style="width: 44px"></component>
         <ion-text color="dark">{{ tokenReserveTokenName }}</ion-text><br>
       </ion-button>
       <ion-popover

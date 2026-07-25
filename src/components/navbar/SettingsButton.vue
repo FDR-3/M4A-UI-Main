@@ -47,7 +47,7 @@
   const colorHexValue = inject('colorHexValue') as string
 
   var radioGroupSelection = ref("Helius")
-  var defaultRPCName = ref("")
+  var defaultRPCName = ref("Helius")
   var rpcString = ref("")
   var isSettingsModalOpen = ref(false)
 
@@ -57,16 +57,11 @@
     if(rpcSetting == "Helius" || rpcSetting == "")
     {
       radioGroupSelection.value = "Helius"
+
       if(isProduction())
-      {
-        rpcString.value = "https://m4a.io/proxyCORS"
-        defaultRPCName.value = "Helius"
-      }
+        rpcString.value = "https://m4a.io/MainNetProxy"
       else
-      {
-        rpcString.value = "https://api.devnet.solana.com"
-        defaultRPCName.value = "Solana Fondation"
-      }
+        rpcString.value = DEV_MODE ? "https://m4a.io/TestNetProxy" : "https://m4a.io/MainNetProxy"
     }
     else if(rpcSetting == "Custom")
     {
@@ -132,7 +127,7 @@
   {
     --width: 90%;      /* How wide the box is */
     --max-width: 400px; /* Prevents it from being too huge on desktop */
-    --height: 50%; /* Adjusts height to your settings content */
+    --height: 30%; /* Adjusts height to your settings content */
     --border-radius: 16px;
     --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4)
   }

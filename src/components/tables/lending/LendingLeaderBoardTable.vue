@@ -185,8 +185,7 @@
             <template #body="slotProps">
               <div class="">
                 <ion-button fill="clear" class="marginZero" @click="openTokenPopover($event, slotProps.data)">
-                  <img v-if="slotProps.data.tokenId==tokenIds.solTokenId" style="width: 40px; height: 32px; margin-left: -17px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-                  <Component v-else style="width: 32px; height: 28px; margin-left: -17px" :is="slotProps.data.tokenSVG"></Component>
+                  <Component style="width: 32px; height: 28px; margin-left: -17px" :is="slotProps.data.tokenSVG"></Component>
                   <ion-label class="noWrapText" color="dark" style="font-size: 9px">{{ slotProps.data.tokenName }}</ion-label>
                 </ion-button>
                 <ion-popover 

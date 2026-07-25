@@ -3,13 +3,13 @@
   import USDSSVG from '/src/assets/cryptoIcons/usds-svg.vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
-  import WETHSVG from '/src/assets/cryptoIcons/weth-svg.vue'
-  import WBTCSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
+  import WEthSVG from '/src/assets/cryptoIcons/weth-svg.vue'
+  import WBtcSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
   import { sourceUSDS,
     sourceUSDC,
     sourceSOL,
-    sourceWETH,
-    sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
+    sourceWEth,
+    sourceWBtc } from '/src/assets/helperFunctions/sources.ts'
   import { tokenAddressStrings,
     tokenIds,
     hodlWalletATAStrings,
@@ -109,9 +109,9 @@
       solvencyATA: solvencyWalletATAStrings.wethATA,
       asset: 
       {
-        name: "WETH",
-        svg: WETHSVG,
-        source: () => {sourceWETH()}
+        name: "WEth",
+        svg: WEthSVG,
+        source: () => {sourceWEth()}
       },
       price: '-',
       percentChange24h: '-',
@@ -131,9 +131,9 @@
       solvencyATA: solvencyWalletATAStrings.wbtcATA,
       asset: 
       {
-        name: "WBTC",
-        svg: WBTCSVG,
-        source: () => {sourceWBTC()}
+        name: "WBtc",
+        svg: WBtcSVG,
+        source: () => {sourceWBtc()}
       },
       price: '-',
       percentChange24h: '-',

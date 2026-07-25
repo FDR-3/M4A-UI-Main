@@ -48,8 +48,7 @@
       </Select>
 
       <div class="flexCenterRow tinyMarginTop">
-        <img v-if="repaymentTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress" style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component v-else :is="borrowSVG" style="width: 44px"></component>
+        <component :is="borrowSVG" style="width: 44px"></component>
         <ion-label>Borrowed Amount: {{ selectedBorrowedAmount }}</ion-label>
       </div>
 
@@ -112,8 +111,7 @@
       </Select>
 
       <div class="flexCenterRow tinyMarginTop">
-        <img v-if="liquidationTokenMintAddress?.toString()==tokenAddressStrings.solTokenMintAddress" style="width: 50px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-        <component v-else :is="depositSVG" style="width: 44px"></component>
+        <component :is="depositSVG" style="width: 44px"></component>
         <ion-label>Deposited Amount: {{ selectedDepositedAmount }}</ion-label>
       </div>
       

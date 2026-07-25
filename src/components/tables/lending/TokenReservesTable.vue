@@ -58,8 +58,7 @@
         <template #body="slotProps">
           <div class="flexCenterRowHeight" >
             <ion-button style="margin-left: -11px; margin-right: -5px" fill="clear" @click="openTokenReserveATAPopover($event, slotProps.data)">
-              <img v-if="slotProps.data.tokenId==tokenIds.solTokenId" style="width: 40px; height: 32px; margin-left: -8px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-              <component v-else :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
+              <component :is="slotProps.data.svg" style="width: 24px; margin-right: 5px"></component>
               <ion-label color="dark">{{ slotProps.data.name }}</ion-label>
             </ion-button>
             <ion-popover 
@@ -139,8 +138,7 @@
         <div>
 
           <div class="flexCenterRow">
-            <img v-if="selectedTokenId==tokenIds.solTokenId" style="width: 70px; margin-left: -22px; margin-right: -5px" src="https://2yhveg6ijh.ufs.sh/f/ePibqLYvGazNK556N4bl1PJwYXusWpUSNEyfCRGd6HjzKB48"/>
-            <component v-else :is="subMarketTokenSVG" style="width: 40px; height: 40px; margin-right: 10px"></component>
+            <component :is="subMarketTokenSVG" style="width: 40px; height: 40px; margin-right: 10px"></component>
             <h2>{{subMarketTokenName}} SubMarkets</h2>
           </div>
 

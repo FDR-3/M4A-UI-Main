@@ -3,8 +3,8 @@
   import USDSSVG from '/src/assets/cryptoIcons/usds-svg.vue'
   import USDCSVG from '/src/assets/cryptoIcons/usdc-svg.vue'
   import SOLSVG from '/src/assets/cryptoIcons/sol-svg.vue'
-  import WETHSVG from '/src/assets/cryptoIcons/weth-svg.vue'
-  import WBTCSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
+  import WEthSVG from '/src/assets/cryptoIcons/weth-svg.vue'
+  import WBtcSVG from '/src/assets/cryptoIcons/wbtc-svg.vue'
   import { LegacyTokenProgramID,
     TokenProgram2022ID,
     tokenIds,
@@ -14,8 +14,8 @@
   import { sourceUSDS,
     sourceUSDC,
     sourceSOL,
-    sourceWETH,
-    sourceWBTC } from '/src/assets/helperFunctions/sources.ts'
+    sourceWEth,
+    sourceWBtc } from '/src/assets/helperFunctions/sources.ts'
   import { PublicKey } from "@solana/web3.js"
 
   export const tokenReserves = reactive(
@@ -83,22 +83,22 @@
     }],
     [tokenIds.wethTokenId,
     {
-      name: "WETH",
+      name: "WEth",
       publicKey: tokenAddressKeys.wethTokenMintAddress,
       decimalAmount: tokenDecimalHashMap.get(tokenIds.wethTokenId),
-      svg: markRaw(WETHSVG),
-      source: () => {sourceWETH()},
+      svg: markRaw(WEthSVG),
+      source: () => {sourceWEth()},
       ata: tokenReserveATAKeys.wethATA,
       tokenProgram: LegacyTokenProgramID,
       initialGlobalLimit:  53.77
     }],
     [tokenIds.wbtcTokenId,
     {
-      name: "WBTC",
+      name: "WBtc",
       publicKey: tokenAddressKeys.wbtcTokenMintAddress,
       decimalAmount: tokenDecimalHashMap.get(tokenIds.wbtcTokenId),
-      svg: markRaw(WBTCSVG),
-      source: () => {sourceWBTC()},
+      svg: markRaw(WBtcSVG),
+      source: () => {sourceWBtc()},
       ata: tokenReserveATAKeys.wbtcATA,
       tokenProgram: LegacyTokenProgramID,
       initialGlobalLimit:  1.57

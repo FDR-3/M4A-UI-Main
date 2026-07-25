@@ -153,15 +153,15 @@
           </div>
 
           <div>
-            <ion-text>Supply APY%: {{ mobileMarketData[tokenSelect-1]?.supplyAPYString }}</ion-text>
+            <ion-text>Supply APY: {{ mobileMarketData[tokenSelect-1]?.supplyAPYString }}</ion-text>
           </div>
 
           <div>
-            <ion-text>Borrow APY%: {{ mobileMarketData[tokenSelect-1]?.borrowAPYString }}</ion-text>
+            <ion-text>Borrow APY: {{ mobileMarketData[tokenSelect-1]?.borrowAPYString }}</ion-text>
           </div>
 
           <div>
-            <ion-text>Base Borrow APY%: {{ mobileMarketData[tokenSelect-1]?.baseBorrowAPYString }}</ion-text>
+            <ion-text>Base Borrow APY: {{ mobileMarketData[tokenSelect-1]?.baseBorrowAPYString }}</ion-text>
           </div>
 
           <div>
@@ -182,7 +182,7 @@
           </div>
 
           <div>
-            <ion-text>Utilization Rate%: {{ mobileMarketData[tokenSelect-1]?.utilizationRateString }}</ion-text>
+            <ion-text>Utilization Rate: {{ mobileMarketData[tokenSelect-1]?.utilizationRateString }}</ion-text>
           </div>
         </div>
 

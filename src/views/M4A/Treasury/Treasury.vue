@@ -85,7 +85,7 @@
   let frontObserver: ResizeObserver | null = null
   let backObserver: ResizeObserver | null = null
 
-  const tvlInfoMSG = "M4A Protocol Total Value Locked is calculated by adding the deposit value of all of the Token Reserves, the wallet balances of the Solvency Treasurer, and the Stable Coin wallet balances of the HODL Treasurer."
+  const tvlInfoMSG = "M4A Protocol Total Value Locked is calculated by adding the deposit value of all of the Token Reserves, the wallet balances of the Solvency Treasury, and the Stable Coin wallet balances of the HODL Treasury."
 
   function handleHeightUpdate()
   {
