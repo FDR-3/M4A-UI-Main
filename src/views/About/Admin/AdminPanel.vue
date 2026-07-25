@@ -65,7 +65,7 @@
     :isPollTableDataLoading="isPollTableDataLoading"
     :pollTableData="pollTableData"
   />
-
+  
   <LendingAdmin v-if="adminPanelSelect==2 &&
     (connectedWallet.addressString==adminAccounts.lendingCEOAddressString ||
      connectedWallet.addressString==adminAccounts.singlePayerTreasuryAddress.toString() ||

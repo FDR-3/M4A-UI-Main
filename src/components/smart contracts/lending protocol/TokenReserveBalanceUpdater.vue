@@ -140,7 +140,7 @@
       tokenReserveWBtcPDA, //Token Reserve PDA
       true
     )
-    console.log("Wbtc Token Reserve ATA: ", tokenReserveWBtcATA.toString())*/
+    console.log("WBtc Token Reserve ATA: ", tokenReserveWBtcATA.toString())*/
     try
     {
       //Get Token Reserve WBtc Balance

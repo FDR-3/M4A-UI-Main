@@ -25,7 +25,11 @@ export default
       const urlObj = new URL(request.url)
       const pathname = urlObj.pathname
 
-      if(pathname == MAIN_NET_PROXY_PATH || pathname == TEST_NET_PROXY_PATH || pathname == JITO_TIP_PROXY_PATH || pathname == JUPITER_PRICE_PROXY_PATH)
+      if(pathname == MAIN_NET_PROXY_PATH ||
+        pathname == DEV_NET_PROXY_PATH ||
+        pathname == TEST_NET_PROXY_PATH ||
+        pathname == JITO_TIP_PROXY_PATH ||
+        pathname == JUPITER_PRICE_PROXY_PATH)
       {
         const origin = request.headers.get("origin")
         const referer = request.headers.get("referer")
@@ -49,7 +53,7 @@ export default
           TARGET_URL = "https://mainnet.helius-rpc.com/?api-key="
           API_KEY = env.HELIUS_API_KEY
         }
-        if(pathname == DEV_NET_PROXY_PATH)
+        else if(pathname == DEV_NET_PROXY_PATH)
         {
           if(!env.HELIUS_API_KEY)
             return new Response("HELIUS API key is missing.", { status: 500 })

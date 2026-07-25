@@ -65,7 +65,7 @@
           Init USDC Token Reserve
         </ion-button>
         <ion-button color="dark" style="width: 280px; height: 45px" @click="addTokenReserveQuick(tokenIds.solTokenId)">
-          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.solTokenId).svg" style="width: 48px; margin-left: -20px; margin-right: -8px"></component>
+          <component :is="tokenReserveFontEndInfoHashMap.get(tokenIds.solTokenId).svg" style="width: 34px; margin-left: -10px"></component>
           Init SOL Token Reserve
         </ion-button>
         <ion-button color="dark" style="width: 240px; height: 45px" @click="addTokenReserveQuick(tokenIds.wethTokenId)">

@@ -57,7 +57,7 @@
       tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
       adminAccounts.hodlTreasuryAddress //Wallet Public Key
     )
-    console.log(hodlTreasuryUSDSWalletATA.toString())*/
+    console.log("HODL USDS ATA: ", hodlTreasuryUSDSWalletATA.toString())*/
     try
     {
       //Get HODL USDS Balance
@@ -81,7 +81,7 @@
       tokenAddressKeys.usdsTokenMintAddress, //Token Mint Address
       adminAccounts.solvencyTreasuryAddress //Wallet Public Key
     )
-    console.log(solvencyTreasuryUSDSWalletATA.toString())*/
+    console.log("Solvency USDS ATA: ", solvencyTreasuryUSDSWalletATA.toString())*/
     try
     {
       //Get Solvency USDS Balance
@@ -106,7 +106,7 @@
       tokenAddressKeys.usdcTokenMintAddress, //Token Mint Address
       adminAccounts.hodlTreasuryAddress //Wallet Public Key
     )
-    console.log(hodlTreasuryUSDCWalletATA.toString())*/
+    console.log("HODL USDC ATA: ", hodlTreasuryUSDCWalletATA.toString())*/
     try
     {
       //Get HODL USDC Balance
@@ -130,7 +130,7 @@
       tokenAddressKeys.usdcTokenMintAddress, //Token Mint Address
       adminAccounts.solvencyTreasuryAddress //Wallet Public Key
     )
-    console.log(solvencyTreasuryUSDCWalletATA.toString())*/
+    console.log("Solvency USDC ATA: ", solvencyTreasuryUSDCWalletATA.toString())*/
     try
     {
       //Get Solvency USDC Balance
@@ -172,7 +172,7 @@
       tokenAddressKeys.wethTokenMintAddress, //Token Mint Address
       adminAccounts.solvencyTreasuryAddress //Wallet Public Key
     )
-    console.log(solvencyTreasuryWEthWalletATA.toString())*/
+    console.log("Solvency WEth ATA: ", solvencyTreasuryWEthWalletATA.toString())*/
     try
     {
       //Get Solvency WEth Balance
@@ -197,7 +197,7 @@
       tokenAddressKeys.wbtcTokenMintAddress, //Token Mint Address
       adminAccounts.solvencyTreasuryAddress //Wallet Public Key
     )
-    console.log(solvencyTreasuryWBtcWalletATA.toString())*/
+    console.log("Solvency WBtc ATA: ", solvencyTreasuryWBtcWalletATA.toString())*/
     try
     {
       //Get Solvency WBtc Balance
