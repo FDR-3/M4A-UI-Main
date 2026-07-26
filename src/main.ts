@@ -28,6 +28,7 @@ import '/src/assets/css/layout.css'
 import '/src/assets/css/poopText.css'
 import '/src/assets/css/primeVue.css'
 import '/src/assets/css/rainbowText.css'
+import '/src/assets/css/purpleBlueText.css'
 import '/src/assets/css/style.css'
 
 //import 'primevue/resources/themes/saga-blue/theme.css'       //theme

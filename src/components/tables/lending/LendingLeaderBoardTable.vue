@@ -23,9 +23,10 @@
         'id',
         'displayName',
         'owner',
-        'depositedValueString',
+        'feesGeneratedValueString',
         'interestEarnedValueString',
         'interestAccruedValueString',
+        'depositedValueString',
         'borrowedValueString',
         'repaidValueString',
         'liquidatorValueString',
@@ -103,6 +104,14 @@
           </ion-popover>
         </template>
       </Column>
+      <Column field="feesGeneratedValue" style="width: 0%" class="purpleBlueText" sortable>
+        <template #header>
+          <span class="purpleBlueText">Fees Generated Value</span>
+        </template>
+        <template #body="slotProps">
+          {{ slotProps.data.feesGeneratedValueString }}
+        </template>
+      </Column>
       <Column field="interestEarnedValue" style="width: 0%" class="rainbowText" sortable>
         <template #header>
           <span class="rainbowText">Interest Earned Value</span>
@@ -152,12 +161,12 @@
         </template>
       </Column>
       <template #expansion="slotProps">
-        <DataTable id="lendingLeaderBoardInnerTable" :value="slotProps.data.accountList" style="font-size: 5px">
+        <DataTable id="lendingLeaderBoardInnerTable" :value="slotProps.data.accountList">
           <Column field="accountName" header="Account" style="width: 0%" sortable>
             <template #body="slotProps">
               <ion-button fill="clear" @click="openViewPortfolioPopover($event, slotProps.data)">
                 <ion-label :color="slotProps.data.healthFactor>=70 ? 'green' : slotProps.data.healthFactor>=30 ? 'yellow' : 'red'"
-                class="noWrapText nMediumSmallMarginLeft" style="font-size: 11px">{{ slotProps.data.accountName }}</ion-label>
+                class="noWrapText nMediumSmallMarginLeft" style="font-size: min(4vw, 10px)">{{ slotProps.data.accountName }}</ion-label>
               </ion-button>
               <ion-popover
               class="popoverWidth"
@@ -186,7 +195,7 @@
               <div class="">
                 <ion-button fill="clear" class="marginZero" @click="openTokenPopover($event, slotProps.data)">
                   <Component style="width: 32px; height: 28px; margin-left: -17px" :is="slotProps.data.tokenSVG"></Component>
-                  <ion-label class="noWrapText" color="dark" style="font-size: 9px">{{ slotProps.data.tokenName }}</ion-label>
+                  <ion-label color="dark" style="font-size: min(4vw, 10px)">{{ slotProps.data.tokenName }}</ion-label>
                 </ion-button>
                 <ion-popover 
                 :is-open="tokenPopoverOpen" 
@@ -204,6 +213,22 @@
                   </div>
                 </ion-popover>
               </div>
+            </template>
+          </Column>
+          <Column field="newFeesGeneratedAmount" style="width: 0%" class="purpleBlueText" sortable>
+            <template #header>
+              <span class="purpleBlueText">Fees Generated Amount</span>
+            </template>
+            <template #body="slotProps">
+              {{ slotProps.data.newFeesGeneratedAmountString }}
+            </template>
+          </Column>
+          <Column field="feesGeneratedValue" style="width: 0%" class="purpleBlueText" sortable>
+            <template #header>
+              <span class="purpleBlueText">Fees Generated Value</span>
+            </template>
+            <template #body="slotProps">
+              {{ slotProps.data.feesGeneratedValueString }}
             </template>
           </Column>
           <Column field="newInterestEarnedAmount" style="width: 0%" class="rainbowText" sortable>
@@ -314,6 +339,7 @@
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { tokenIds, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
+  import { trimLendingAccountNameIfNeed } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
@@ -340,8 +366,8 @@
   var tableData = ref()
   var subTableData = ref()
   var isLoading = ref(true)
-  var previousSortField = "depositedValue"
-  var sortField = ref("depositedValue")
+  var previousSortField = "feesGeneratedValue"
+  var sortField = ref("feesGeneratedValue")
   var sortOrder = ref(-1)
   var totalNumberOfTopRows = 0
   var totalNumberOfSubRows = 0
@@ -441,6 +467,7 @@
 
       for(var i=0; i<tempData.length; i++)
       {
+        var ownerOverallAccountFeesGeneratedTotalValue = 0
         var ownerOverallAccountInterestEarnedTotalValue = 0
         var ownerOverallAccountInterestAccruedTotalValue = 0
         var ownerOverallAccountDepositedTotalValue = 0
@@ -466,11 +493,25 @@
             //Remarking SVG Raw to prevent overhead and warnings in console
             tempData[i].accountList[j].tokenSVG = markRaw(tempData[i].accountList[j].tokenSVG)
 
-            const newInterestEarnedAmount = calculateUserNewInterestEarnedAmount(tempData[i].accountList[j])
+            const [newInterestEarnedAmount, newFeesGeneratedAmount] = calculateUserNewInterestEarnedAmount(tempData[i].accountList[j])
+            
+            //Calculate New Fees Generated Amount
+            tempData[i].accountList[j].newFeesGeneratedAmount = Number((tempData[i].accountList[j].feesGeneratedAmount +
+            newFeesGeneratedAmount).toFixed(decimalAmount))
+            tempData[i].accountList[j].newFeesGeneratedAmountString = tempData[i].accountList[j].newFeesGeneratedAmount.toFixed(decimalAmount)
+            //Calculate New Fees Generated Value
+            calculatedValue = tempData[i].accountList[j].newFeesGeneratedAmount * priceData.usdPrice
+            tempData[i].accountList[j].feesGeneratedValue = calculatedValue
+            tempData[i].accountList[j].feesGeneratedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })
+            ownerOverallAccountFeesGeneratedTotalValue += Number(calculatedValue.toFixed(2))
+
+            //Calculate New Interest Earned Amount
             tempData[i].accountList[j].newInterestEarnedAmount = Number((tempData[i].accountList[j].interestEarnedAmount +
             newInterestEarnedAmount).toFixed(decimalAmount))
             tempData[i].accountList[j].newInterestEarnedAmountString = tempData[i].accountList[j].newInterestEarnedAmount.toFixed(decimalAmount)
-            //Calculate Interest Earned Value
+            //Calculate New Interest Earned Value
             calculatedValue = tempData[i].accountList[j].newInterestEarnedAmount * priceData.usdPrice
             tempData[i].accountList[j].interestEarnedValue = calculatedValue
             tempData[i].accountList[j].interestEarnedValueString = '$' + calculatedValue.toLocaleString('en-US', {
@@ -478,11 +519,12 @@
             maximumFractionDigits: 2 })
             ownerOverallAccountInterestEarnedTotalValue += Number(calculatedValue.toFixed(2))
 
+            //Calculate New Interest Accrued Amount
             const newInterestAccruedAmount = calculateUserNewInterestAccruedAmount(tempData[i].accountList[j])
             tempData[i].accountList[j].newInterestAccruedAmount = Number((tempData[i].accountList[j].interestAccruedAmount +
             newInterestAccruedAmount).toFixed(decimalAmount))
             tempData[i].accountList[j].newInterestAccruedAmountString = tempData[i].accountList[j].newInterestAccruedAmount.toFixed(decimalAmount)
-            //Calculate Interest Accrued Value
+            //Calculate New Interest Accrued Value
             calculatedValue = tempData[i].accountList[j].newInterestAccruedAmount * priceData.usdPrice
             tempData[i].accountList[j].interestAccruedValue = calculatedValue
             tempData[i].accountList[j].interestAccruedValueString = '$' + calculatedValue.toLocaleString('en-US', {
@@ -490,10 +532,11 @@
             maximumFractionDigits: 2 })
             ownerOverallAccountInterestAccruedTotalValue += Number(calculatedValue.toFixed(2))
 
+            //Calculate New Deposited Amount
             tempData[i].accountList[j].newDepositedAmount = Number((tempData[i].accountList[j].depositedAmount +
             newInterestEarnedAmount).toFixed(decimalAmount))
             tempData[i].accountList[j].newDepositedAmountString = tempData[i].accountList[j].newDepositedAmount.toFixed(decimalAmount)
-            //Calculate Deposited Value
+            //Calculate New Deposited Value
             calculatedValue = tempData[i].accountList[j].newDepositedAmount * priceData.usdPrice
             tempData[i].accountList[j].depositedValue = calculatedValue
             tempData[i].accountList[j].depositedValueString = '$' + calculatedValue.toLocaleString('en-US', {
@@ -501,10 +544,11 @@
             maximumFractionDigits: 2 })
             ownerOverallAccountDepositedTotalValue += Number(calculatedValue.toFixed(2))
 
+            //Calculate New Borrowed Amount
             tempData[i].accountList[j].newBorrowedAmount = Number((tempData[i].accountList[j].borrowedAmount +
             newInterestAccruedAmount).toFixed(decimalAmount))
             tempData[i].accountList[j].newBorrowedAmountString = tempData[i].accountList[j].newBorrowedAmount.toFixed(decimalAmount)
-            //Calculate Borrowed Value
+            //Calculate New Borrowed Value
             calculatedValue = tempData[i].accountList[j].newBorrowedAmount * priceData.usdPrice
             tempData[i].accountList[j].borrowedValue = calculatedValue
             tempData[i].accountList[j].borrowedValueString = '$' + calculatedValue.toLocaleString('en-US', {
@@ -614,6 +658,12 @@
           }
         }
 
+        //Set Total Fees Generated Value
+        tempData[i].feesGeneratedValue = ownerOverallAccountFeesGeneratedTotalValue
+        tempData[i].feesGeneratedValueString = '$' + ownerOverallAccountFeesGeneratedTotalValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
+
         //Set Total Interest Earned Value
         tempData[i].interestEarnedValue = ownerOverallAccountInterestEarnedTotalValue
         tempData[i].interestEarnedValueString = '$' + ownerOverallAccountInterestEarnedTotalValue.toLocaleString('en-US', {
@@ -685,7 +735,7 @@
       return
 
     for(var i=0; i<tableData.value.length; i++)
-      tableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(tableData.value[i].owner)
+      tableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(tableData.value[i].owner, true)
   }
 
   function updateLeaderBoardAccountNames()
@@ -697,7 +747,8 @@
       for(var j=0; j<tableData.value[i].accountList.length; j++)
       {
         const lendingUserAccount = lendingUserHashMap.map.get(tableData.value[i].owner + tableData.value[i].accountList[j].accountIndex.toString())
-        tableData.value[i].accountList[j].accountName = lendingUserAccount.accountName
+        
+        tableData.value[i].accountList[j].accountName = trimLendingAccountNameIfNeed(lendingUserAccount.accountName)
       }
   }
 
@@ -729,14 +780,14 @@
         setRankingColumn(true)
         break
       }
-      case "depositedValue":
+      case "feesGeneratedValue":
       {
         tableData.value = tableData.value.sort((a: any, b: any) =>
         {
-          if(a.depositedValue === b.depositedValue)
+          if(a.feesGeneratedValue === b.feesGeneratedValue)
             return tieBreaker(a, b)
             
-          return (a.depositedValue - b.depositedValue) * order
+          return (a.feesGeneratedValue - b.feesGeneratedValue) * order
         })
         setRankingColumn()
         break
@@ -761,6 +812,18 @@
             return tieBreaker(a, b)
             
           return (a.interestAccruedValue - b.interestAccruedValue) * order
+        })
+        setRankingColumn()
+        break
+      }
+      case "depositedValue":
+      {
+        tableData.value = tableData.value.sort((a: any, b: any) =>
+        {
+          if(a.depositedValue === b.depositedValue)
+            return tieBreaker(a, b)
+            
+          return (a.depositedValue - b.depositedValue) * order
         })
         setRankingColumn()
         break
@@ -904,7 +967,7 @@
   function calculateUserNewInterestEarnedAmount(leaderBoardAccountDataRow: any)
   {
     if(!tokenReservesHashMapCopy)
-      return
+      return [0,0]
 
     const tokenReserve = tokenReservesHashMapCopy.get(leaderBoardAccountDataRow.tokenId)
     const subMarket = subMarketsHashMap.map.get(leaderBoardAccountDataRow.tokenId.toString() +
@@ -940,12 +1003,14 @@
 
     const newBalanceBeforeFee = (userBalance * tokenReserve.newSupplyInterestChangeIndex / Number(lendingUserTabAccount.supplyInterestChangeIndex))
     const interestEarnedBeforeFees = newBalanceBeforeFee - userBalance
-    var interestEarnedAfterFees = interestEarnedBeforeFees - (interestEarnedBeforeFees * subMarketFee / 100) - (interestEarnedBeforeFees * solvencyInsuranceFee / 100)
+    var feesGenerated = (interestEarnedBeforeFees * subMarketFee / 100) + (interestEarnedBeforeFees * solvencyInsuranceFee / 100)
+    var interestEarnedAfterFees = interestEarnedBeforeFees - feesGenerated
     
     const decimalAmount = tokenDecimalHashMap.get(leaderBoardAccountDataRow.tokenId)
+    feesGenerated = Number(feesGenerated.toFixed(decimalAmount))
     interestEarnedAfterFees = Number(interestEarnedAfterFees.toFixed(decimalAmount))
     
-    return interestEarnedAfterFees
+    return [interestEarnedAfterFees, feesGenerated]
   }
 
   function calculateUserNewInterestAccruedAmount(leaderBoardAccountDataRow: any)
@@ -1100,12 +1165,12 @@
 
   #lendingLeaderBoardInnerTable :deep(th)
   {
-    font-size: min(4vw, 10px)
+    font-size: min(4vw, 9px)
   }
 
   #lendingLeaderBoardInnerTable :deep(td)
   {
-    font-size: min(4vw, 11px)
+    font-size: min(4vw, 10px)
   }
 
   .popoverWidth::part(content)

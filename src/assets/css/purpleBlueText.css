@@ -1,0 +1,16 @@
+.purpleBlueText 
+{
+  background: repeating-linear-gradient(90deg, #8a2be2 0%, #557fcc 16%, #557fcc 33%, #8a2be2 50.0%);
+  background-size: 150% auto;
+  background-clip: text;
+  color: transparent;
+  animation: purpleBlueAnimation 1.8s linear infinite
+}
+
+@keyframes purpleBlueAnimation 
+{
+  to 
+  {
+    background-position: 150% center
+  }
+}

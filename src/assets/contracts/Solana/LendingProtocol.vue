@@ -527,13 +527,17 @@
           {
             owner: lendingUserOwnerAddress,
             accountIndex: lendingUserAccountIndex,
-            accountName: lendingUserAccount.accountName,
+            accountName: trimLendingAccountNameIfNeed(lendingUserAccount.accountName),
             tokenId: tokenId,
             subMarketOwnerAddress: subMarketOwnerAddress,
             subMarketIndex: subMarketIndex,
             trimmedSubMarketOwnerAddress: trimAddress(subMarketOwnerAddress),
             tokenSVG: tokenFrontEndProperties.svg,
             tokenName: tokenFrontEndProperties.name,
+            feesGeneratedAmount: Number(lendingUserTabAccount.feesGeneratedAmount) / Math.pow(10, decimalAmount),
+            feesGeneratedAmountString: (Number(lendingUserTabAccount.feesGeneratedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            feesGeneratedValue: 0,
+            feesGeneratedValueString: "$0.00",
             interestEarnedAmount: Number(lendingUserTabAccount.interestEarnedAmount) / Math.pow(10, decimalAmount),
             interestEarnedAmountString: (Number(lendingUserTabAccount.interestEarnedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             interestEarnedValue: 0,
@@ -578,13 +582,17 @@
           {
             owner: lendingUserOwnerAddress,
             accountIndex: lendingUserAccountIndex,
-            accountName: lendingUserAccount.accountName,
+            accountName: trimLendingAccountNameIfNeed(lendingUserAccount.accountName),
             tokenId: tokenId,
             subMarketOwnerAddress: subMarketOwnerAddress,
             subMarketIndex: lendingUserTabAccount.subMarketIndex,
             trimmedSubMarketOwnerAddress: trimAddress(subMarketOwnerAddress),
             tokenSVG: tokenFrontEndProperties.svg,
             tokenName: tokenFrontEndProperties.name,
+            feesGeneratedAmount: Number(lendingUserTabAccount.feesGeneratedAmount) / Math.pow(10, decimalAmount),
+            feesGeneratedAmountString: (Number(lendingUserTabAccount.feesGeneratedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
+            feesGeneratedValue: 0,
+            feesGeneratedValueString: "$0.00",
             interestEarnedAmount: Number(lendingUserTabAccount.interestEarnedAmount) / Math.pow(10, decimalAmount),
             interestEarnedAmountString: (Number(lendingUserTabAccount.interestEarnedAmount) / Math.pow(10, decimalAmount)).toFixed(decimalAmount),
             interestEarnedValue: 0,
@@ -615,13 +623,15 @@
             liquidatedValueString: "$0.00"
           }
 
-          var displayName = getCustomOrTrimmedUserDisplayName(lendingUserOwnerAddress)
+          var displayName = getCustomOrTrimmedUserDisplayName(lendingUserOwnerAddress, true)
 
           var newOwnerEntry = 
           {
             id: leaderBoardData.length + 1,
             owner: lendingUserOwnerAddress,
             displayName: displayName,
+            feesGeneratedValue: 0,
+            feesGeneratedValueString: "$0.00",
             interestEarnedValue: 0,
             interestEarnedValueString: "$0.00",
             interestAccruedValue: 0,
@@ -650,6 +660,14 @@
     lendingUserTabAccountListHashMap.map = userTabListHashMap
     lendingUserRemainingTabAccountListHashMap.map = userRemainingAccountsTabListHashMap
     lendingLeaderBoardTable.data = leaderBoardData
+  }
+
+  export function trimLendingAccountNameIfNeed(accountName: String)
+  {
+    if(accountName.length > 14) 
+      return accountName.slice(0, 11) + '...'
+    else
+      return accountName
   }
 
   async function getLendingUserTabsWrapper()

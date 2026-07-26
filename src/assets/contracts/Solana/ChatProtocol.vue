@@ -331,7 +331,7 @@
     }
   }
 
-  export function getCustomOrTrimmedUserDisplayName(userAddress: string | PublicKey)
+  export function getCustomOrTrimmedUserDisplayName(userAddress: string | PublicKey, limitCharacters = false)
   {
     if (typeof userAddress === "string") 
     {
@@ -342,7 +342,13 @@
         if(chatAccount)
         {
           if(chatAccount.useCustomName)
-            return chatAccount.userName
+            if(!limitCharacters)
+              return chatAccount.userName
+            else
+              if(chatAccount.userName.length > 25) 
+                return chatAccount.userName.slice(0, 22) + '...'
+              else
+                return chatAccount.userName
           else
             return trimAddress(userAddress)
         }
@@ -363,7 +369,13 @@
         if(chatAccount)
         {
           if(chatAccount.useCustomName)
-            return chatAccount.userName
+            if(!limitCharacters)
+              return chatAccount.userName
+            else
+              if(chatAccount.userName.length > 25) 
+                return chatAccount.userName.slice(0, 22) + '...'
+              else
+                return chatAccount.userName
           else
             return trimAddress(userAddressString)
         }
@@ -437,7 +449,7 @@
       const voteMoneyEarned = Number(chatAccounts.data[i].account.receivedUpVoteScore) * .01
       const tempData = 
       {
-        displayName: getCustomOrTrimmedUserDisplayName(chatAccounts.data[i].account.userAddress.toBase58()),
+        displayName: getCustomOrTrimmedUserDisplayName(chatAccounts.data[i].account.userAddress.toBase58(), true),
         userAddress: chatAccounts.data[i].account.userAddress.toBase58(),
         voteMoneyEarned: voteMoneyEarned,
         voteMoneyEarnedString: '$' + voteMoneyEarned.toLocaleString('en-US', {

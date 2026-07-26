@@ -17,7 +17,7 @@
       <div class="mediumMarginTop">
           <ion-text color="white">The Site has been Updated</ion-text><br>
           <ion-text color="white">Reload Browser for Newest UI/UX</ion-text><br>
-          <ion-text color="white">See Github for Latest Code Changes/Notes</ion-text><br>
+          <ion-text color="white">See Github M4A-UI-Main Commits for Latest Code Changes/Notes</ion-text><br>
       </div>
       <div>
         <ion-button title="Github" fill="clear" @click="openGithub()">
@@ -45,7 +45,7 @@
 
     function openGithub()
     {
-      window.open("https://github.com/FDR-3?tab=repositories", "_blank")
+      window.open("https://github.com/FDR-3/M4A-UI-Main/commits", "_blank")
     }
 
     function refreshPage()

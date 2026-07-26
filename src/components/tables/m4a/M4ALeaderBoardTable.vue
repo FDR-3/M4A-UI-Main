@@ -224,7 +224,7 @@
       return
 
     for(var i=0; i<tableData.value.length; i++)
-      tableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(tableData.value[i].submitterAddress)
+      tableData.value[i].displayName = getCustomOrTrimmedUserDisplayName(tableData.value[i].submitterAddress, true)
   }
 
   function sortTable()

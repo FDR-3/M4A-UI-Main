@@ -157,13 +157,13 @@
   onMounted(() => 
   {
     //Check path to set menu for hard resets
-    if(route.path == "/Jesus")
+    if(route.path.includes("/Jesus"))
     {
       navigation.menuIndex = MenuIndex.Jesus
       currentMenuIndex = MenuIndex.Jesus
       colorName.value = "yellow"
     }
-    else if(route.path == "/M4A")
+    else if(route.path.includes("/M4A"))
     {
       navigation.menuIndex = MenuIndex.M4A
       currentMenuIndex = MenuIndex.M4A
@@ -171,7 +171,7 @@
       colorHexValue.value = "#39bd39"
       buttonShadow.value = "lightgreen"
     }
-    else if(route.path == "/PLI")
+    else if(route.path.includes("/PLI"))
     {
       navigation.menuIndex = MenuIndex.PLI
       currentMenuIndex = MenuIndex.PLI
@@ -179,7 +179,7 @@
       colorHexValue.value = "#557fcc"
       buttonShadow.value = "skyblue"
     }
-    else if(route.path == "/About")
+    else if(route.path.includes("/About"))
     {
       navigation.menuIndex = MenuIndex.About
       currentMenuIndex = MenuIndex.About
