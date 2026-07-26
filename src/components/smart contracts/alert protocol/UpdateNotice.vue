@@ -18,7 +18,7 @@
           <ion-text color="white">The Site has been Updated</ion-text><br>
           <ion-text color="white">Reload Browser for Newest UI/UX</ion-text><br>
           <ion-text color="white">See Github M4A-UI-Main Commits for Latest Code Changes/Notes</ion-text><br>
-          <ion-text color="white">You can click the 3 dot (...) "Show description" button on a commit to see the all notes</ion-text>
+          <ion-text color="white">You can click the 3 dots (...) "Show description" button on a commit to see all the notes</ion-text>
       </div>
       <div>
         <ion-button title="Github" fill="clear" @click="openGithub()">
