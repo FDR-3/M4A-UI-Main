@@ -749,7 +749,7 @@
         const subMarketIndex = lendingUserMonthlyStatementAccount.subMarketIndex
         const owner = lendingUserMonthlyStatementAccount.owner.toString()
         const userAccountIndex = lendingUserMonthlyStatementAccount.userAccountIndex.toString()
-        const subMarket= subMarketsHashMap.map.get(tokenId + subMarketOwnerAddress + subMarketIndex.toString())
+        const subMarket = subMarketsHashMap.map.get(tokenId + subMarketOwnerAddress + subMarketIndex.toString())
 
         //Set User Available SubMarket Hash Map
         var availableStatementsBySubMarketData = 
@@ -845,7 +845,7 @@
         const subMarketIndex = lendingUserMonthlyStatementAccount.subMarketIndex
         const owner = lendingUserMonthlyStatementAccount.owner.toString()
         const userAccountIndex = lendingUserMonthlyStatementAccount.userAccountIndex.toString()
-        const subMarket= subMarketsHashMap.map.get(tokenId + subMarketOwnerAddress + subMarketIndex.toString())
+        const subMarket = subMarketsHashMap.map.get(tokenId + subMarketOwnerAddress + subMarketIndex.toString())
 
         //Set User Available SubMarket Hash Map
         var availableStatementsBySubMarketData = 

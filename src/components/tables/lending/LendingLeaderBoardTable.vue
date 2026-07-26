@@ -204,9 +204,10 @@
                 side="top" 
                 alignment="center"
                 >
-                  <div class="flexCenterColumn" style="margin: 5px" @mouseleave="closeTokenPopover($event)"> 
+                  <div class="flexCenterColumn" style="margin: 5px"> 
                     <ion-text class="wrapText">SubMarket Owner: {{ event.trimmedSubMarketOwnerAddress }}</ion-text><br>
                     <ion-text>SubMarket Index: {{ event.subMarketIndex }}</ion-text>
+                    <ion-text>Fee on Interest Earned: {{ event.feeOnInterestEarnedRate }}</ion-text>
                     <ion-button class="copyAddressButton thinBorder" color="light" @click="passByRefWrapperCopyTokenMintAddress()">
                       <ion-label color="green">{{ copyTokenMintAddressButtonText }}</ion-label>
                     </ion-button>
@@ -490,6 +491,13 @@
           const priceData = priceObjectMap.data[tokenMintAddressString]
           if(priceData)
           {
+            //Set SubMarket Fee on data
+            //If the Submarket fee is edited, the lending stats watcher won't catch this, so setting here
+            const subMarket = subMarketsHashMap.map.get(tempData[i].accountList[j].tokenId.toString() +
+            tempData[i].accountList[j].subMarketOwnerAddress +
+            tempData[i].accountList[j].subMarketIndex.toString())
+            tempData[i].accountList[j].feeOnInterestEarnedRate = subMarket.feeOnInterestEarnedRate.toFixed(2) + '%',
+
             //Remarking SVG Raw to prevent overhead and warnings in console
             tempData[i].accountList[j].tokenSVG = markRaw(tempData[i].accountList[j].tokenSVG)
 
@@ -1048,8 +1056,6 @@
     }
   }
 
-  
-
   function openOwnerPopover(e: Event, rowData: any) 
   {
     event.value = e
@@ -1075,14 +1081,9 @@
     event.value.tokenMintAddressString = tokenIdHashMap.map.get(rowData.tokenId)
     event.value.trimmedSubMarketOwnerAddress = rowData.trimmedSubMarketOwnerAddress
     event.value.subMarketIndex = rowData.subMarketIndex
+    event.value.feeOnInterestEarnedRate = rowData.feeOnInterestEarnedRate
 
     tokenPopoverOpen.value = true
-  }
-
-  function closeTokenPopover(e: Event) 
-  {
-    event.value = e
-    tokenPopoverOpen.value = false
   }
 
   function passByRefWrapperCopyTokenMintAddress()
