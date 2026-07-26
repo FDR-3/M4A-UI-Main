@@ -80,7 +80,8 @@
         :options="mobileMarketData" 
         optionLabel="asset.name" 
         optionValue="tokenId" 
-        placeholder="Select Token">
+        placeholder="Select Token"
+        appendTo="self">
           <!-- 1. Customize the selected value display -->
           <template #value="slotProps">
             <!-- If an item is selected, find it via our computed property -->
