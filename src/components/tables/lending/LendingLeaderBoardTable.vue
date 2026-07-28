@@ -485,6 +485,7 @@
         {
           const decimalAmount = tokenDecimalHashMap.get(tempData[i].accountList[j].tokenId)
           var calculatedValue = 0
+          var flooredValue = 0.00
           subRowCount += 1
 
           const tokenMintAddressString = tokenIdHashMap.map.get(tempData[i].accountList[j].tokenId)
@@ -509,11 +510,12 @@
             tempData[i].accountList[j].newFeesGeneratedAmountString = tempData[i].accountList[j].newFeesGeneratedAmount.toFixed(decimalAmount)
             //Calculate New Fees Generated Value
             calculatedValue = tempData[i].accountList[j].newFeesGeneratedAmount * priceData.usdPrice
+            flooredValue = Math.floor(calculatedValue * 100) / 100
             tempData[i].accountList[j].feesGeneratedValue = calculatedValue
-            tempData[i].accountList[j].feesGeneratedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            tempData[i].accountList[j].feesGeneratedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountFeesGeneratedTotalValue += Number(calculatedValue.toFixed(2))
+            ownerOverallAccountFeesGeneratedTotalValue += flooredValue
 
             //Calculate New Interest Earned Amount
             tempData[i].accountList[j].newInterestEarnedAmount = Number((tempData[i].accountList[j].interestEarnedAmount +
@@ -521,11 +523,12 @@
             tempData[i].accountList[j].newInterestEarnedAmountString = tempData[i].accountList[j].newInterestEarnedAmount.toFixed(decimalAmount)
             //Calculate New Interest Earned Value
             calculatedValue = tempData[i].accountList[j].newInterestEarnedAmount * priceData.usdPrice
+            flooredValue = Math.floor(calculatedValue * 100) / 100
             tempData[i].accountList[j].interestEarnedValue = calculatedValue
-            tempData[i].accountList[j].interestEarnedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            tempData[i].accountList[j].interestEarnedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountInterestEarnedTotalValue += Number(calculatedValue.toFixed(2))
+            ownerOverallAccountInterestEarnedTotalValue += flooredValue
 
             //Calculate New Interest Accrued Amount
             const newInterestAccruedAmount = calculateUserNewInterestAccruedAmount(tempData[i].accountList[j])
@@ -534,11 +537,12 @@
             tempData[i].accountList[j].newInterestAccruedAmountString = tempData[i].accountList[j].newInterestAccruedAmount.toFixed(decimalAmount)
             //Calculate New Interest Accrued Value
             calculatedValue = tempData[i].accountList[j].newInterestAccruedAmount * priceData.usdPrice
+            flooredValue = Math.floor(calculatedValue * 100) / 100
             tempData[i].accountList[j].interestAccruedValue = calculatedValue
-            tempData[i].accountList[j].interestAccruedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            tempData[i].accountList[j].interestAccruedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountInterestAccruedTotalValue += Number(calculatedValue.toFixed(2))
+            ownerOverallAccountInterestAccruedTotalValue += flooredValue
 
             //Calculate New Deposited Amount
             tempData[i].accountList[j].newDepositedAmount = Number((tempData[i].accountList[j].depositedAmount +
@@ -546,11 +550,12 @@
             tempData[i].accountList[j].newDepositedAmountString = tempData[i].accountList[j].newDepositedAmount.toFixed(decimalAmount)
             //Calculate New Deposited Value
             calculatedValue = tempData[i].accountList[j].newDepositedAmount * priceData.usdPrice
+            flooredValue = Math.floor(calculatedValue * 100) / 100
             tempData[i].accountList[j].depositedValue = calculatedValue
-            tempData[i].accountList[j].depositedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            tempData[i].accountList[j].depositedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountDepositedTotalValue += Number(calculatedValue.toFixed(2))
+            ownerOverallAccountDepositedTotalValue += flooredValue
 
             //Calculate New Borrowed Amount
             tempData[i].accountList[j].newBorrowedAmount = Number((tempData[i].accountList[j].borrowedAmount +
@@ -558,35 +563,39 @@
             tempData[i].accountList[j].newBorrowedAmountString = tempData[i].accountList[j].newBorrowedAmount.toFixed(decimalAmount)
             //Calculate New Borrowed Value
             calculatedValue = tempData[i].accountList[j].newBorrowedAmount * priceData.usdPrice
+            flooredValue = Math.floor(calculatedValue * 100) / 100
             tempData[i].accountList[j].borrowedValue = calculatedValue
-            tempData[i].accountList[j].borrowedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            tempData[i].accountList[j].borrowedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountBorrowedTotalValue += Number(calculatedValue.toFixed(2))
+            ownerOverallAccountBorrowedTotalValue += flooredValue
 
             //Calculate Repaid Value
             calculatedValue = tempData[i].accountList[j].repaidAmount * priceData.usdPrice
+            flooredValue = Math.floor(calculatedValue * 100) / 100
             tempData[i].accountList[j].repaidValue = calculatedValue
-            tempData[i].accountList[j].repaidValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            tempData[i].accountList[j].repaidValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountRepaidTotalValue += Number(calculatedValue.toFixed(2))
+            ownerOverallAccountRepaidTotalValue += flooredValue
 
             //Calculate Liquidator Value
             calculatedValue = tempData[i].accountList[j].liquidatorAmount * priceData.usdPrice
+            flooredValue = Math.floor(calculatedValue * 100) / 100
             tempData[i].accountList[j].liquidatorValue = calculatedValue
-            tempData[i].accountList[j].liquidatorValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            tempData[i].accountList[j].liquidatorValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountLiquidatorTotalValue += Number(calculatedValue.toFixed(2))
+            ownerOverallAccountLiquidatorTotalValue += flooredValue
 
             //Calculate Liquidated Value
             calculatedValue = tempData[i].accountList[j].liquidatedAmount * priceData.usdPrice
+            flooredValue = Math.floor(calculatedValue * 100) / 100
             tempData[i].accountList[j].liquidatedValue = calculatedValue
-            tempData[i].accountList[j].liquidatedValueString = '$' + calculatedValue.toLocaleString('en-US', {
+            tempData[i].accountList[j].liquidatedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountLiquidatedTotalValue += Number(calculatedValue.toFixed(2))
+            ownerOverallAccountLiquidatedTotalValue += flooredValue
 
             //Calculate Health Factor
             const ownerAddressString = tempData[i].owner
