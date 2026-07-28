@@ -1366,11 +1366,13 @@
     {
       const hospital = hospitals[i].account
       const state = stateTempHashMap.get(hospital.countryIndex.toString() + hospital.stateIndex.toString())
+      hospital.id = Number(hospital.id)
 
       if(state)
       {
         //Update State Hash Map Entry
         state.hospitalList.push(hospital)
+        state.hospitalList = state.hospitalList.sort((a: any, b: any) => b.id - a.id)
         state.approvedClaimAmount = state.approvedClaimAmount.add(hospital.approvedClaimAmount)
         state.approvedClaimCount = state.approvedClaimCount.add(hospital.approvedClaimCount)
         state.deniedClaimCount = state.deniedClaimCount.add(hospital.deniedClaimCount)
