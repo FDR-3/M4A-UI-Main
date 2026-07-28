@@ -827,19 +827,23 @@
     const price = priceObjectMap.data[tokenMintAddressString].usdPrice
     if(price)
     {
-      balanceValueString.value = (userCalculatedBalance.value * Number(price)).toLocaleString('en-US', {
+      var flooredValue = Math.floor(userCalculatedBalance.value * Number(price) * 100) / 100
+      balanceValueString.value = flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      debtValueString.value = (userCalculatedDebt.value * Number(price)).toLocaleString('en-US', {
+      flooredValue = Math.floor(userCalculatedDebt.value * Number(price) * 100) / 100
+      debtValueString.value = flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      interestEarnedValueString.value = (calculatedUserInterestEarned.value * Number(price)).toLocaleString('en-US', {
+      flooredValue = Math.floor(calculatedUserInterestEarned.value * Number(price) * 100) / 100
+      interestEarnedValueString.value = flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      sevenDayInterestEarnedValueString.value = (sevenDayCalculatedUserInterestEarned.value * Number(price)).toLocaleString('en-US', {
+      flooredValue = Math.floor(sevenDayCalculatedUserInterestEarned.value * Number(price) * 100) / 100
+      sevenDayInterestEarnedValueString.value = flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
     }

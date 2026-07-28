@@ -18,7 +18,7 @@
         <ion-button fill="clear" style="width: 15%" class="nTinyMarginLeft" @click="giveUXWingTreeCredit()">
           <Tree class="svgSize"/>
         </ion-button>
-        <ion-text style="margin-left: 7px">+</ion-text>
+        <ion-text>+</ion-text>
         <div class="nMediumSmallMarginBottom">
           <div class="nMediumSmallMarginBottom">
             <ion-text style="line-height: -10px; font-size: min(22px, 11vw)">1</ion-text><br>
