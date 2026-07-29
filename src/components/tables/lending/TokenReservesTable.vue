@@ -550,7 +550,7 @@
       var depositCalculatedValue = 0
 
       if(priceData)
-        depositCalculatedValue = (depositedBalance * priceData.usdPrice)
+        depositCalculatedValue = Math.floor(depositedBalance * priceData.usdPrice * 100) / 100
 
       processedTableData[i].depositedAmountString = Number(depositedBalance).toLocaleString('en-US', {
           minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
@@ -565,7 +565,7 @@
       var borrowCalculatedValue = 0
 
       if(priceData)
-        borrowCalculatedValue = (borrowedBalance * priceData.usdPrice)
+        borrowCalculatedValue = Math.floor(borrowedBalance * priceData.usdPrice * 100) / 100
 
       processedTableData[i].borrowedAmountString = Number(borrowedBalance).toLocaleString('en-US', {
           minimumFractionDigits: processedTableData[i].tokenDecimalAmount,

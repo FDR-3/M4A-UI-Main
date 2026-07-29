@@ -325,7 +325,7 @@
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
       if(priceData)
-        calculatedValue = (totalAmount * priceData.usdPrice)
+        calculatedValue = Math.floor(totalAmount * priceData.usdPrice * 100) / 100
 
       value += calculatedValue
 
@@ -400,7 +400,7 @@
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
       if(priceData)
-        calculatedValue = (totalAmount * priceData.usdPrice)
+        calculatedValue = Math.floor(totalAmount * priceData.usdPrice * 100) / 100
 
       value += calculatedValue
 

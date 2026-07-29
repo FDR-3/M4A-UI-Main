@@ -338,8 +338,8 @@
       if(!priceData)
         return
 
-      const treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
-      const tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
+      const treasuryCalculatedValue = Math.floor(treasuryTotalAmount * priceData.usdPrice * 100) / 100
+      const tvlContributionCalculatedValue = Math.floor(tvlContributionTotalAmount * priceData.usdPrice * 100) / 100
 
       treasuryValue += treasuryCalculatedValue
       tvlContributionValue += tvlContributionCalculatedValue
@@ -411,8 +411,8 @@
       if(!priceData)
         return
 
-      const treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
-      const tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
+      const treasuryCalculatedValue = Math.floor(treasuryTotalAmount * priceData.usdPrice * 100) / 100
+      const tvlContributionCalculatedValue = Math.floor(tvlContributionTotalAmount * priceData.usdPrice * 100) / 100
 
       treasuryValue += treasuryCalculatedValue
       tvlContributionValue += tvlContributionCalculatedValue
