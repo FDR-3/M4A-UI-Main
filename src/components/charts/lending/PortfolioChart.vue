@@ -824,6 +824,9 @@
     sevenDayCalculatedUserInterestEarned.value = sevenDayInterestEarnedBeforeFee - (sevenDayInterestEarnedBeforeFee * props.subMarketFee / 100)
     sevenDayCalculatedUserInterestEarned.value = sevenDayCalculatedUserInterestEarned.value < 0 ? (0).toFixed(decimalAmount) : sevenDayCalculatedUserInterestEarned.value.toFixed(decimalAmount)
 
+    var unRoundedInterestEarnedValue
+    var unRoundedSevenDayInterestEarnedValue
+
     const price = priceObjectMap.data[tokenMintAddressString].usdPrice
     if(price)
     {
@@ -837,12 +840,14 @@
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      flooredValue = Math.floor(calculatedUserInterestEarned.value * Number(price) * 100) / 100
+      unRoundedInterestEarnedValue = calculatedUserInterestEarned.value * Number(price)
+      flooredValue = Math.floor(unRoundedInterestEarnedValue * 100) / 100
       interestEarnedValueString.value = flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      flooredValue = Math.floor(sevenDayCalculatedUserInterestEarned.value * Number(price) * 100) / 100
+      unRoundedSevenDayInterestEarnedValue = sevenDayCalculatedUserInterestEarned.value * Number(price)
+      flooredValue = Math.floor(unRoundedSevenDayInterestEarnedValue * 100) / 100
       sevenDayInterestEarnedValueString.value = flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
@@ -857,14 +862,17 @@
       debtValueString.value = zeroValueString
       interestEarnedValueString.value = zeroValueString
       sevenDayInterestEarnedValueString.value = zeroValueString
+
+      unRoundedInterestEarnedValue = 0
+      unRoundedSevenDayInterestEarnedValue = 0
     }
 
     emits('interestEarned',
     props.userTabIndex,
     Number(sevenDayCalculatedUserInterestEarned.value.replace(/,/g, '')),
-    Number(sevenDayInterestEarnedValueString.value.replace(/,/g, '')),
+    unRoundedSevenDayInterestEarnedValue,
     Number(calculatedUserInterestEarned.value.replace(/,/g, '')),
-    Number(interestEarnedValueString.value.replace(/,/g, '')))
+    unRoundedInterestEarnedValue)
   }
 
   function startInterestCalculation()

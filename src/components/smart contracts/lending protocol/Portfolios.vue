@@ -1208,11 +1208,13 @@
     stableCoin7DayProjectionRateAmount.value = sevenDayCalculatedUserInterestEarned.toLocaleString('en-US', {
           minimumFractionDigits: highestTokenDecimalAmount,
           maximumFractionDigits: highestTokenDecimalAmount })
-    stableCoin7DayProjectionRateValue.value = sevenDayInterestEarnedValue
+    var flooredValue = Math.floor(sevenDayInterestEarnedValue * 100) / 100
+    stableCoin7DayProjectionRateValue.value = flooredValue
     stableCoinLifeTimeInterestEarnedAmount.value = calculatedUserInterestEarned.toLocaleString('en-US', {
           minimumFractionDigits: highestTokenDecimalAmount,
           maximumFractionDigits: highestTokenDecimalAmount })
-    stableCoinLifeTimeInterestEarnedValue.value = interestEarnedValue
+    flooredValue = Math.floor(interestEarnedValue * 100) / 100
+    stableCoinLifeTimeInterestEarnedValue.value = flooredValue
   }
 
   function updateCryptoRealTimeValues(userTabIndex: number,
@@ -1247,11 +1249,13 @@
     crypto7DayProjectionRateAmount.value = sevenDayCalculatedUserInterestEarned.toLocaleString('en-US', {
           minimumFractionDigits: highestTokenDecimalAmount,
           maximumFractionDigits: highestTokenDecimalAmount })
-    crypto7DayProjectionRateValue.value = sevenDayInterestEarnedValue
+    var flooredValue = Math.floor(sevenDayInterestEarnedValue * 100) / 100
+    crypto7DayProjectionRateValue.value = flooredValue
     cryptoLifeTimeInterestEarnedAmount.value = calculatedUserInterestEarned.toLocaleString('en-US', {
           minimumFractionDigits: highestTokenDecimalAmount,
           maximumFractionDigits: highestTokenDecimalAmount })
-    cryptoLifeTimeInterestEarnedValue.value = interestEarnedValue
+    flooredValue = Math.floor(interestEarnedValue * 100) / 100
+    cryptoLifeTimeInterestEarnedValue.value = flooredValue
   }
 
   /*async function editLendingUserAccountName()
