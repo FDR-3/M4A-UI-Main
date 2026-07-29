@@ -515,7 +515,7 @@
             tempData[i].accountList[j].feesGeneratedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountFeesGeneratedTotalValue += flooredValue
+            ownerOverallAccountFeesGeneratedTotalValue += calculatedValue
 
             //Calculate New Interest Earned Amount
             tempData[i].accountList[j].newInterestEarnedAmount = Number((tempData[i].accountList[j].interestEarnedAmount +
@@ -528,7 +528,7 @@
             tempData[i].accountList[j].interestEarnedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountInterestEarnedTotalValue += flooredValue
+            ownerOverallAccountInterestEarnedTotalValue += calculatedValue
 
             //Calculate New Interest Accrued Amount
             const newInterestAccruedAmount = calculateUserNewInterestAccruedAmount(tempData[i].accountList[j])
@@ -542,7 +542,7 @@
             tempData[i].accountList[j].interestAccruedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountInterestAccruedTotalValue += flooredValue
+            ownerOverallAccountInterestAccruedTotalValue += calculatedValue
 
             //Calculate New Deposited Amount
             tempData[i].accountList[j].newDepositedAmount = Number((tempData[i].accountList[j].depositedAmount +
@@ -555,7 +555,7 @@
             tempData[i].accountList[j].depositedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountDepositedTotalValue += flooredValue
+            ownerOverallAccountDepositedTotalValue += calculatedValue
 
             //Calculate New Borrowed Amount
             tempData[i].accountList[j].newBorrowedAmount = Number((tempData[i].accountList[j].borrowedAmount +
@@ -568,7 +568,7 @@
             tempData[i].accountList[j].borrowedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountBorrowedTotalValue += flooredValue
+            ownerOverallAccountBorrowedTotalValue += calculatedValue
 
             //Calculate Repaid Value
             calculatedValue = tempData[i].accountList[j].repaidAmount * priceData.usdPrice
@@ -577,7 +577,7 @@
             tempData[i].accountList[j].repaidValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountRepaidTotalValue += flooredValue
+            ownerOverallAccountRepaidTotalValue += calculatedValue
 
             //Calculate Liquidator Value
             calculatedValue = tempData[i].accountList[j].liquidatorAmount * priceData.usdPrice
@@ -586,7 +586,7 @@
             tempData[i].accountList[j].liquidatorValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountLiquidatorTotalValue += flooredValue
+            ownerOverallAccountLiquidatorTotalValue += calculatedValue
 
             //Calculate Liquidated Value
             calculatedValue = tempData[i].accountList[j].liquidatedAmount * priceData.usdPrice
@@ -595,7 +595,7 @@
             tempData[i].accountList[j].liquidatedValueString = '$' + flooredValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 })
-            ownerOverallAccountLiquidatedTotalValue += flooredValue
+            ownerOverallAccountLiquidatedTotalValue += calculatedValue
 
             //Calculate Health Factor
             const ownerAddressString = tempData[i].owner
@@ -676,50 +676,58 @@
         }
 
         //Set Total Fees Generated Value
-        tempData[i].feesGeneratedValue = ownerOverallAccountFeesGeneratedTotalValue
-        tempData[i].feesGeneratedValueString = '$' + ownerOverallAccountFeesGeneratedTotalValue.toLocaleString('en-US', {
+        var flooredValue = Math.floor(ownerOverallAccountFeesGeneratedTotalValue * 100) / 100
+        tempData[i].feesGeneratedValue = flooredValue
+        tempData[i].feesGeneratedValueString = '$' + flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Interest Earned Value
-        tempData[i].interestEarnedValue = ownerOverallAccountInterestEarnedTotalValue
-        tempData[i].interestEarnedValueString = '$' + ownerOverallAccountInterestEarnedTotalValue.toLocaleString('en-US', {
+        flooredValue = Math.floor(ownerOverallAccountInterestEarnedTotalValue * 100) / 100
+        tempData[i].interestEarnedValue = flooredValue
+        tempData[i].interestEarnedValueString = '$' + flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Interest Accrued Value
-        tempData[i].interestAccruedValue = ownerOverallAccountInterestAccruedTotalValue
-        tempData[i].interestAccruedValueString = '$' + ownerOverallAccountInterestAccruedTotalValue.toLocaleString('en-US', {
+        flooredValue = Math.floor(ownerOverallAccountInterestAccruedTotalValue * 100) / 100
+        tempData[i].interestAccruedValue = flooredValue
+        tempData[i].interestAccruedValueString = '$' + flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Deposited Value
-        tempData[i].depositedValue = ownerOverallAccountDepositedTotalValue
-        tempData[i].depositedValueString = '$' + ownerOverallAccountDepositedTotalValue.toLocaleString('en-US', {
+        flooredValue = Math.floor(ownerOverallAccountDepositedTotalValue * 100) / 100
+        tempData[i].depositedValue = flooredValue
+        tempData[i].depositedValueString = '$' + flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Borrowed Value
-        tempData[i].borrowedValue = ownerOverallAccountBorrowedTotalValue
-        tempData[i].borrowedValueString = '$' + ownerOverallAccountBorrowedTotalValue.toLocaleString('en-US', {
+        flooredValue = Math.floor(ownerOverallAccountBorrowedTotalValue * 100) / 100
+        tempData[i].borrowedValue = flooredValue
+        tempData[i].borrowedValueString = '$' + flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Repaid Value
-        tempData[i].repaidValue = ownerOverallAccountRepaidTotalValue
-        tempData[i].repaidValueString = '$' + ownerOverallAccountRepaidTotalValue.toLocaleString('en-US', {
+        flooredValue = Math.floor(ownerOverallAccountRepaidTotalValue * 100) / 100
+        tempData[i].repaidValue = flooredValue
+        tempData[i].repaidValueString = '$' + flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Liquidator Value
-        tempData[i].liquidatorValue = ownerOverallAccountLiquidatorTotalValue
-        tempData[i].liquidatorValueString = '$' + ownerOverallAccountLiquidatorTotalValue.toLocaleString('en-US', {
+        flooredValue = Math.floor(ownerOverallAccountLiquidatorTotalValue * 100) / 100
+        tempData[i].liquidatorValue = flooredValue
+        tempData[i].liquidatorValueString = '$' + flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
         //Set Total Liquidated Value
-        tempData[i].liquidatedValue = ownerOverallAccountLiquidatedTotalValue
-        tempData[i].liquidatedValueString = '$' + ownerOverallAccountLiquidatedTotalValue.toLocaleString('en-US', {
+        flooredValue = Math.floor(ownerOverallAccountLiquidatedTotalValue * 100) / 100
+        tempData[i].liquidatedValue = flooredValue
+        tempData[i].liquidatedValueString = '$' + flooredValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
       }
