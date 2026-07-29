@@ -46,7 +46,7 @@
         <div>
           <h2 class="underLine yellow">7 Day Projection Rate</h2>
           <h3 class="nMediumMarginTop">Value:
-            $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toLocaleString('en-US', {
+            $<span class="rainbowText">{{ total7DayProjectionRateValue.toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2 }) }}
             </span> A Week
@@ -73,7 +73,7 @@
         <div>
           <h2 class="underLine yellow">Life Time Interest Earned</h2>
           <h3 class="nMediumMarginTop">Value:
-            $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toLocaleString('en-US', {
+            $<span class="rainbowText">{{ totalLifeTimeInterestEarnedValue.toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2 }) }}
             </span>
@@ -103,7 +103,7 @@
       <div>
         <h2 class="underLine yellow">7 Day Projection Rate</h2>
         <h3 class="nMediumMarginTop">Value:
-          $<span class="rainbowText">{{ (stableCoin7DayProjectionRateValue + crypto7DayProjectionRateValue).toLocaleString('en-US', {
+          $<span class="rainbowText">{{ total7DayProjectionRateValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}
           </span> A Week
@@ -113,7 +113,7 @@
       <div>
         <h2 class="underLine nSmallMarginTop yellow">Life Time Interest Earned</h2>
         <h3 class="nMediumMarginTop">Value:
-          $<span class="rainbowText">{{ (stableCoinLifeTimeInterestEarnedValue + cryptoLifeTimeInterestEarnedValue).toLocaleString('en-US', {
+          $<span class="rainbowText">{{ totalLifeTimeInterestEarnedValue.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}
           </span>
@@ -344,13 +344,27 @@
 
   var stableCoin7DayProjectionRateAmount = ref("0")
   var stableCoin7DayProjectionRateValue = ref(0)
+  var stableCoin7DayProjectionRateValueUnRounded = ref(0)
   var stableCoinLifeTimeInterestEarnedAmount = ref("0")
   var stableCoinLifeTimeInterestEarnedValue = ref(0)
+  var stableCoinLifeTimeInterestEarnedValueUnRounded = ref(0)
 
   var crypto7DayProjectionRateAmount = ref("0")
   var crypto7DayProjectionRateValue = ref(0)
+  var crypto7DayProjectionRateValueUnRounded = ref(0)
   var cryptoLifeTimeInterestEarnedAmount = ref("0")
   var cryptoLifeTimeInterestEarnedValue = ref(0)
+  var cryptoLifeTimeInterestEarnedValueUnRounded = ref(0)
+
+  const total7DayProjectionRateValue = computed (() =>
+  {
+    return Math.floor((stableCoin7DayProjectionRateValueUnRounded.value + crypto7DayProjectionRateValueUnRounded.value) * 100) / 100
+  })
+
+  const totalLifeTimeInterestEarnedValue = computed (() =>
+  {
+    return Math.floor((stableCoinLifeTimeInterestEarnedValueUnRounded.value + cryptoLifeTimeInterestEarnedValueUnRounded.value) * 100) / 100
+  })
 
   const enrichedStableCoinMonthlyStatementList = computed(() =>
   {
@@ -1210,11 +1224,13 @@
           maximumFractionDigits: highestTokenDecimalAmount })
     var flooredValue = Math.floor(sevenDayInterestEarnedValue * 100) / 100
     stableCoin7DayProjectionRateValue.value = flooredValue
+    stableCoin7DayProjectionRateValueUnRounded.value = sevenDayInterestEarnedValue
     stableCoinLifeTimeInterestEarnedAmount.value = calculatedUserInterestEarned.toLocaleString('en-US', {
           minimumFractionDigits: highestTokenDecimalAmount,
           maximumFractionDigits: highestTokenDecimalAmount })
     flooredValue = Math.floor(interestEarnedValue * 100) / 100
     stableCoinLifeTimeInterestEarnedValue.value = flooredValue
+    stableCoinLifeTimeInterestEarnedValueUnRounded.value = interestEarnedValue
   }
 
   function updateCryptoRealTimeValues(userTabIndex: number,
@@ -1251,11 +1267,13 @@
           maximumFractionDigits: highestTokenDecimalAmount })
     var flooredValue = Math.floor(sevenDayInterestEarnedValue * 100) / 100
     crypto7DayProjectionRateValue.value = flooredValue
+    crypto7DayProjectionRateValueUnRounded.value = sevenDayInterestEarnedValue
     cryptoLifeTimeInterestEarnedAmount.value = calculatedUserInterestEarned.toLocaleString('en-US', {
           minimumFractionDigits: highestTokenDecimalAmount,
           maximumFractionDigits: highestTokenDecimalAmount })
     flooredValue = Math.floor(interestEarnedValue * 100) / 100
     cryptoLifeTimeInterestEarnedValue.value = flooredValue
+    cryptoLifeTimeInterestEarnedValueUnRounded.value = interestEarnedValue
   }
 
   /*async function editLendingUserAccountName()
