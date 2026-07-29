@@ -569,7 +569,19 @@
           }
 
           leaderBoardData[existingOwnerIndex].accountList.push(newAccountEntry)
-          leaderBoardData[existingOwnerIndex].accountList = leaderBoardData[existingOwnerIndex].accountList.sort((a: any, b: any) => a.accountIndex - b.accountIndex)
+          leaderBoardData[existingOwnerIndex].accountList = leaderBoardData[existingOwnerIndex].accountList.sort((a: any, b: any) =>
+          {
+            //1. Compare by accountIndex first
+            if(a.accountIndex !== b.accountIndex)
+              return a.accountIndex - b.accountIndex
+            
+            //2. If accountIndex is the same, compare by tokenId
+            if(a.tokenId !== b.tokenId)
+              return a.tokenId - b.tokenId
+            
+            //3. If tokenId is also the same, compare by subMarketIndex
+            return a.subMarketIndex - b.subMarketIndex;
+          })
         }
         else
         {
