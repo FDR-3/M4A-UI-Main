@@ -155,122 +155,58 @@
     </div>
 
     <div class="normalChartLegend">
-      <div class="flexCenterColumn">
-        <div class="chartLegend">
-          <div 
-          v-for="(dataset, index) in chartData?.datasets" 
-          :key="index" 
-          class="legendItem"
-          @click="toggleDataset(index, chartRef)"
-          >
-            <div class="swatchWrapper">
-              <div 
-                v-if="dataset.label=='Balance'" 
-                class="swatch animatedRainbow">
-              </div>
-              <div 
-                v-else-if="dataset.label=='Interest Earned'" 
-                class="swatch rainbowBackGround">
-              </div>
-              <div 
-                v-else-if="dataset.label=='Debt'" 
-                class="swatch animatedPoop">
-              </div>
-              <div 
-                v-else-if="dataset.label=='Interest Accrued'" 
-                class="swatch poopBackGround">
-              </div>
-              <div 
-                v-else 
-                class="swatch" 
-                :style="{ backgroundColor: dataset.backgroundColor }"
-              ></div>
-            </div>
-            <span 
-              class="legendLabel" 
-              :class="{'hiddenLabel': legenHiddenArray[index] }"
-            >
-              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="midChartLegend">
-      <!--Render First 4 Legend Items-->
+      <!--Render First 5 Legend Items-->
       <div class="flexCenterRow" style="gap: 10px">
         <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(0, 4)" 
+        v-for="(dataset, index) in chartData?.datasets.slice(0, 5)" 
         :key="index" 
         class="legendItem"
         @click="toggleDataset(index, chartRef)"
         >
-          <div class="swatchWrapper">
-            <div 
-              v-if="dataset.label=='Balance'" 
-              class="swatch animatedRainbow">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Interest Earned'" 
-              class="swatch rainbowBackGround">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Debt'" 
-              class="swatch animatedPoop">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Interest Accrued'" 
-              class="swatch poopBackGround">
-            </div>
-            <div 
-              v-else 
-              class="swatch" 
-              :style="{ backgroundColor: dataset.backgroundColor }">
-            </div>
+          <div 
+            v-if="dataset.label=='Fees Generated'" 
+            class="swatch animatedPurpleBlueY">
+          </div>
+          <div 
+            v-else-if="dataset.label=='Balance'" 
+            class="swatch animatedRainbowX">
+          </div>
+          <div 
+            v-else-if="dataset.label=='Interest Earned'" 
+            class="swatch animatedRainbowY">
+          </div>
+          <div 
+            v-else-if="dataset.label=='Debt'" 
+            class="swatch animatedPoopX">
+          </div>
+          <div 
+            v-else="dataset.label=='Interest Accrued'" 
+            class="swatch animatedPoopY">
           </div>
           <span 
             class="legendLabel" 
             :class="{'hiddenLabel': legenHiddenArray[index] }"
           >
             <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
-        </span>
+          </span>
         </div>
       </div>
-      <!--Render Next 4 Legend Items, Skipping First 4-->
+      <!--Render Next 4 Legend Items, Skipping First 5-->
       <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
         <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(4, 8)" 
-        :key="index + 4" 
+        v-for="(dataset, index) in chartData?.datasets.slice(5, 9)" 
+        :key="index + 5" 
         class="legendItem"
-        @click="toggleDataset(index+4, chartRef)"
+        @click="toggleDataset(index+5, chartRef)"
         >
-          <div class="swatchWrapper">
-            <div 
-              v-if="dataset.label=='Balance'" 
-              class="swatch animatedRainbow">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Interest Earned'" 
-              class="swatch rainbowBackGround">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Debt'" 
-              class="swatch animatedPoop">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Interest Accrued'" 
-              class="swatch poopBackGround">
-            </div>
-            <div 
-              v-else 
-              class="swatch" 
-              :style="{ backgroundColor: dataset.backgroundColor }">
-            </div>
+          <div 
+            class="swatch" 
+            :style="{ backgroundColor: dataset.backgroundColor }">
           </div>
+      
           <span 
             class="legendLabel" 
-            :class="{'hiddenLabel': legenHiddenArray[index+4] }"
+            :class="{'hiddenLabel': legenHiddenArray[index+5] }"
           >
             <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
           </span>
@@ -279,40 +215,66 @@
       <!--Render Remaining Legend Items, Skipping First 8-->
       <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
         <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(8)" 
-        :key="index + 8" 
+        v-for="(dataset, index) in chartData?.datasets.slice(9)" 
+        :key="index + 9" 
         class="legendItem"
-        @click="toggleDataset(index+8, chartRef)"
-        >
-          <div class="swatchWrapper">
-            <div 
-              v-if="dataset.label=='Balance'" 
-              class="swatch animatedRainbow">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Interest Earned'" 
-              class="swatch rainbowBackGround">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Debt'" 
-              class="swatch animatedPoop">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Interest Accrued'" 
-              class="swatch poopBackGround">
-            </div>
-            <div 
-              v-else 
-              class="swatch" 
-              :style="{ backgroundColor: dataset.backgroundColor }">
-            </div>
+        @click="toggleDataset(index+9, chartRef)"
+        >  
+          <div 
+            class="swatch" 
+            :style="{ backgroundColor: dataset.backgroundColor }">
           </div>
           <span 
             class="legendLabel" 
-            :class="{'hiddenLabel': legenHiddenArray[index+8] }"
+            :class="{'hiddenLabel': legenHiddenArray[index+9] }"
           >
             <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
           </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobileChartLegend">
+      <div class="flexCenterColumn">
+        <div class="chartLegend">
+          <div 
+          v-for="(dataset, index) in chartData?.datasets" 
+          :key="index" 
+          class="legendItem"
+          @click="toggleDataset(index, chartRef)"
+          >
+              <div 
+                v-if="dataset.label=='Fees Generated'" 
+                class="swatch animatedPurpleBlueY">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Balance'" 
+                class="swatch animatedRainbowX">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Interest Earned'" 
+                class="swatch animatedRainbowY">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Debt'" 
+                class="swatch animatedPoopX">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Interest Accrued'" 
+                class="swatch animatedPoopY">
+              </div>
+              <div 
+                v-else 
+                class="swatch" 
+                :style="{ backgroundColor: dataset.backgroundColor }">
+              </div>
+            <span 
+              class="legendLabel" 
+              :class="{'hiddenLabel': legenHiddenArray[index] }"
+            >
+              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -952,35 +914,42 @@
     justify-content: center
   }
 
-  .animatedRainbow
+  .animatedRainbowX
   {
     background: repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
     background-size: 150% auto;
-    animation: rainbowXAnimation 1.8s linear infinite
+    animation: xAnimation 1.8s linear infinite
   }
 
-  .rainbowBackGround
+  .animatedRainbowY
   {
     background: repeating-linear-gradient(0deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
     background-size: auto 200%;
-    animation: rainbowYAnimation 1.8s linear infinite
+    animation: yAnimation 1.8s linear infinite
   }
 
-  .animatedPoop
+  .animatedPoopX
   {
     background: repeating-linear-gradient(90deg, #851717 0%, #0f8332 25%, #851717 50.0%);
     background-size: 150% auto;
-    animation: rainbowXAnimation 1.8s linear infinite
+    animation: xAnimation 1.8s linear infinite
   }
 
-  .poopBackGround
+  .animatedPoopY
   {
     background: repeating-linear-gradient(0deg, #851717 0%, #0f8332 25%, #851717 50.0%);
     background-size: auto 200%;
-    animation: rainbowYAnimation 1.8s linear infinite
+    animation: yAnimation 1.8s linear infinite
   }
 
-  @keyframes rainbowXAnimation
+  .animatedPurpleBlueY
+  {
+    background: repeating-linear-gradient(0deg, #8a2be2 0%, #557fcc 25%, #8a2be2 50.0%);
+    background-size: auto 200%;
+    animation: yAnimation 1.8s linear infinite
+  }
+
+  @keyframes xAnimation
   {
     to
     {
@@ -988,7 +957,7 @@
     }
   }
 
-  @keyframes rainbowYAnimation
+  @keyframes yAnimation
   {
     to
     {
@@ -1074,10 +1043,9 @@
     .normalChartLegend
     {
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      flex-direction: column
     }
-    .midChartLegend
+    .verticalChartLegend
     {
       display: none
     }
@@ -1088,16 +1056,16 @@
       gap: 10px
     }
   }
-  @media screen and (min-width: 795.1px) and (max-width: 1800px)
+  @media screen and (min-width: 795.1px)
   { 
     .normalChartLegend
     {
-      display: none
-    }
-    .midChartLegend
-    {
       display: flex;
       flex-direction: column
+    }
+    .mobileChartLegend
+    {
+      display: none
     }
     .chartLegend
     {
@@ -1110,12 +1078,12 @@
   { 
     .normalChartLegend
     {
+      display: none
+    }
+    .mobileChartLegend
+    {
       display: flex;
       flex-direction: column
-    }
-    .midChartLegend
-    {
-      display: none
     }
     .chartLegend
     {

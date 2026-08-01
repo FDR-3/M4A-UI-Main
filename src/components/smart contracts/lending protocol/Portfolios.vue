@@ -438,6 +438,17 @@
     datasets:
     [
       {
+        type: 'bar',
+        label: 'Fees Generated',
+        backgroundColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setPurpleBlueBarAnimatedGradient(ctx, chartArea)
+        },
+        data: [] as any[]
+      },
+      {
         type: 'line',
         label: 'Balance',
         borderColor: function(context: any)
@@ -546,19 +557,20 @@
 
   enum ChartIndex
   {
-    Balances = 0,
-    InterestEarned = 1,
-    Debts = 2,
-    InterestAccrued = 3,
-    Deposits = 4,
-    Withdrawals = 5,
-    Borrows = 6,
-    Repays = 7,
-    Liquidator = 8,
-    Liquidated = 9,
-    CollectedLiquidationFees = 10,
-    CollectedSubMarketFees = 11,
-    CollectedSolvencyFees = 12
+    FeesGenerated = 0,
+    Balances = 1,
+    InterestEarned = 2,
+    Debts = 3,
+    InterestAccrued = 4,
+    Deposits = 5,
+    Withdrawals = 6,
+    Borrows = 7,
+    Repays = 8,
+    Liquidator = 9,
+    Liquidated = 10,
+    CollectedLiquidationFees = 11,
+    CollectedSubMarketFees = 12,
+    CollectedSolvencyFees = 13
   }
 
   onMounted(async() =>
@@ -856,6 +868,30 @@
     return gradient
   }
 
+  function setPurpleBlueBarAnimatedGradient(ctx: any, chartArea:any)
+  {
+    if(!chartArea)
+      return
+
+    const height = chartArea.bottom - chartArea.top
+    const offset = gradientOffset.value
+    const shift = offset * height
+
+    const gradient = ctx.createLinearGradient(
+      0, chartArea.top - shift, 
+      0, chartArea.top - shift + (height * 2)
+    )
+
+    //Two full cycles of the purple blue colors
+    gradient.addColorStop(0.00, '#8a2be2')
+    gradient.addColorStop(0.25, '#557fcc')
+    gradient.addColorStop(0.50, '#8a2be2')
+    gradient.addColorStop(0.75, '#557fcc')
+    gradient.addColorStop(1.00, '#8a2be2')
+
+    return gradient
+  }
+
   function resetSelectedYearForTokenMintAddressHashMap(subMarketArray: any[])
   {
     const newDate = new Date()
@@ -867,7 +903,7 @@
       {
         const key = subMarketArray[i].tokenId.toString() + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex.toString()
         
-        // Only set the year if this specific token doesn't already have one!
+        //Only set the year if this specific token doesn't already have one!
         if(!selectedYearHashMap.has(key)) 
           selectedYearHashMap.set(key, currentYear)
       }
@@ -918,6 +954,7 @@
           for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
           {
             var labels = []
+            var feesGenerated = []
             var balances = []
             var earnedInterests = []
             var debts = []
@@ -934,7 +971,7 @@
 
             var tempChartData = cloneDeep(baseChartData)
             
-            // If current year, go up until the current month, otherwise cover the whole year
+            //If current year, go up until the current month, otherwise cover the whole year
             const maxMonth = (year == currentYear) ? currentMonth : 12
 
             for(var month=1; month<=maxMonth; month++)
@@ -964,6 +1001,7 @@
                 tempChartData.lastActionAmount = lastKnownActionAmount
                 tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
 
+                feesGenerated.push(Number(userMonthlyStatement.feesGeneratedAmount) / divisor)
                 balances.push(previousBalance)
                 debts.push(previousDebt)
                 earnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / divisor)
@@ -984,6 +1022,7 @@
                 tempChartData.lastActionAmount = lastKnownActionAmount
                 tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
 
+                feesGenerated.push(0)
                 balances.push(previousBalance)
                 debts.push(previousDebt)
                 earnedInterests.push(0)
@@ -1001,6 +1040,7 @@
             }
 
             tempChartData.labels = labels
+            tempChartData.datasets[ChartIndex.FeesGenerated].data = feesGenerated
             tempChartData.datasets[ChartIndex.Balances].data = balances
             tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
             tempChartData.datasets[ChartIndex.Debts].data = debts
@@ -1027,10 +1067,10 @@
         }
     }
 
-    // Process Stable Coin Yearly Chart Data
+    //Process Stable Coin Yearly Chart Data
     processStatementList(userMonthlyStatementStableCoinList, lendingUserAvailableStableCoinYearsBySubMarketHashMap)
 
-    // Process Crypto Currency Yearly Chart Data
+    //Process Crypto Currency Yearly Chart Data
     processStatementList(userMonthlyStatementCryptoCurrencyList, lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap)
 
     selectedUserChartDataHashMap = tempHashMap
