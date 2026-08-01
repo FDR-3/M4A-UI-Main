@@ -1,22 +1,6 @@
 <template>
   <h4 class="underLine noWrapText" style="font-size: 25px">Contract Switcher</h4>
-  <h5 class="nMediumMarginTop smallMarginBottom">M4A Protocol</h5>
-  <ion-button @click="openM4AContractSelectPopover($event)" slot="start" class="contractPickerButton" :color="colorName">
-      <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
-        <ion-label color="dark">{{ m4aContractText }}</ion-label>
-        <div>
-          <ion-icon :src=chevronDown color="black"></ion-icon>
-        </div>
-      </div>
-    </ion-button>
-    <ion-popover :is-open="m4aContractSelectPopoverOpen" :event="event" @didDismiss="m4aContractSelectPopoverOpen = false" side="bottom" size="cover">
-      <div v-for="(contactVersion, index) in m4aContracts">
-        <ion-button class="popOverButton" :color="colorName" @click="setSelectedM4AContract(index)" >
-          <ion-label color="dark">{{ contactVersion }}</ion-label>
-        </ion-button>
-      </div>
-    </ion-popover>
-  <h5 class="smallMarginBottom">Chat Protocol</h5>
+  <h5 class="nMediumMarginTop smallMarginBottom alignSelfLeft">Chat Protocol</h5>
   <ion-button @click="openChatContractSelectPopover($event)" slot="start" class="contractPickerButton" :color="colorName">
     <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
       <ion-label color="dark">{{ chatContractText }}</ion-label>
@@ -32,8 +16,24 @@
       </ion-button>
     </div>
   </ion-popover>
-  <h5 class="smallMarginBottom">Lending Protocol</h5>
-  <ion-button @click="openLendingContractSelectPopover($event)" slot="start" class="contractPickerButton mediumMarginBottom" :color="colorName">
+  <h5 class="smallMarginBottom alignSelfLeft">Alert Protocol</h5>
+  <ion-button @click="openChatContractSelectPopover($event)" slot="start" class="contractPickerButton" :color="colorName">
+    <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
+      <ion-label color="dark">{{ alertContractText }}</ion-label>
+      <div>
+        <ion-icon :src=chevronDown color="black"></ion-icon>
+      </div>
+    </div>
+  </ion-button>
+  <ion-popover :is-open="alertContractSelectPopoverOpen" :event="event" @didDismiss="alertContractSelectPopoverOpen = false" side="bottom" size="cover">
+    <div v-for="(contactVersion, index) in alertContracts">
+      <ion-button class="popOverButton" :color="colorName" @click="setSelectedAlertContract(index)" >
+        <ion-label color="dark">{{ contactVersion }}</ion-label>
+      </ion-button>
+    </div>
+  </ion-popover>
+  <h5 class="smallMarginBottom alignSelfLeft">Lending Protocol</h5>
+  <ion-button @click="openLendingContractSelectPopover($event)" slot="start" class="contractPickerButton" :color="colorName">
     <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
       <ion-label color="dark">{{ lendingContractText }}</ion-label>
       <div>
@@ -48,61 +48,71 @@
       </ion-button>
     </div>
   </ion-popover>
+  <h5 class="smallMarginBottom alignSelfLeft">M4A Protocol</h5>
+  <ion-button @click="openM4AContractSelectPopover($event)" slot="start" class="contractPickerButton mediumMarginBottom" :color="colorName">
+    <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
+      <ion-label color="dark">{{ m4aContractText }}</ion-label>
+      <div>
+        <ion-icon :src=chevronDown color="black"></ion-icon>
+      </div>
+    </div>
+  </ion-button>
+  <ion-popover :is-open="m4aContractSelectPopoverOpen" :event="event" @didDismiss="m4aContractSelectPopoverOpen = false" side="bottom" size="cover">
+    <div v-for="(contactVersion, index) in m4aContracts">
+      <ion-button class="popOverButton" :color="colorName" @click="setSelectedM4AContract(index)" >
+        <ion-label color="dark">{{ contactVersion }}</ion-label>
+      </ion-button>
+    </div>
+  </ion-popover>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, onMounted } from 'vue'
   import { IonButton, IonPopover, IonLabel, IonIcon } from '@ionic/vue'
   import { chevronDown } from 'ionicons/icons'
 
   defineProps(['colorName', 'colorHexValue', 'buttonShadow'])
 
-  var m4aContractSelectPopoverOpen = ref()
   var chatContractSelectPopoverOpen = ref()
+  var alertContractSelectPopoverOpen = ref()
+  var m4aContractSelectPopoverOpen = ref()
   var lendingContractSelectPopoverOpen = ref()
   var event = ref()
 
-  var m4aContractText = ref("")
   var chatContractText = ref("")
-  var lendingContractText = ref("") 
+  var alertContractText = ref("")
+  var lendingContractText = ref("")
+  var m4aContractText = ref("")
 
-  const m4aContracts = ["Version 1 (SC BETA)"/*, "Version 2"*/]
   const chatContracts = ["Version 1 (BETA)"/*, "Version 2"*/]
+  const alertContracts = ["Version 1 (BETA)"/*, "Version 2"*/]
   const lendingContracts = ["Version 1 (BETA)"/*, "Version 2"*/]
+  const m4aContracts = ["Version 1 (SC BETA)"/*, "Version 2"*/]
 
-  var selectedM4AContractIndex: number
   var selectedChatContractIndex: number
+  var selectedAlertContractIndex: number
   var selectedLendingContractIndex: number
+  var selectedM4AContractIndex: number
   
   onMounted(async() =>
   {
-    selectedM4AContractIndex = parseInt(localStorage.getItem("ContractSelectM4A") || "0")
-    localStorage.setItem("ContractSelectM4A", selectedM4AContractIndex.toString())//Set value in local storage incase it isn't already
-
     selectedChatContractIndex = parseInt(localStorage.getItem("ContractSelectChat") || "0")
     localStorage.setItem("ContractSelectChat", selectedChatContractIndex.toString())//Set value in local storage incase it isn't already
+
+    selectedAlertContractIndex = parseInt(localStorage.getItem("ContractSelectAlert") || "0")
+    localStorage.setItem("ContractSelectAlert", selectedAlertContractIndex.toString())//Set value in local storage incase it isn't already
 
     selectedLendingContractIndex = parseInt(localStorage.getItem("ContractSelectLending") || "0")
     localStorage.setItem("ContractSelectLending", selectedLendingContractIndex.toString())//Set value in local storage incase it isn't already
 
-    m4aContractText.value = m4aContracts[selectedM4AContractIndex]
+    selectedM4AContractIndex = parseInt(localStorage.getItem("ContractSelectM4A") || "0")
+    localStorage.setItem("ContractSelectM4A", selectedM4AContractIndex.toString())//Set value in local storage incase it isn't already
+
     chatContractText.value = chatContracts[selectedChatContractIndex]
+    alertContractText.value = alertContracts[selectedAlertContractIndex]
     lendingContractText.value = lendingContracts[selectedLendingContractIndex]
+    m4aContractText.value = m4aContracts[selectedM4AContractIndex]
   })
-
-  async function setSelectedM4AContract(index: number)
-  {
-    if(index == selectedM4AContractIndex)
-    {
-      m4aContractSelectPopoverOpen.value = false
-      return
-    }
-
-    localStorage.setItem("ContractSelectM4A", index.toString())
-    m4aContractSelectPopoverOpen.value = false
-    m4aContractText.value = m4aContracts[index]
-    window.location.reload()
-  }
 
   async function setSelectedChatContract(index: number)
   {
@@ -118,6 +128,20 @@
     window.location.reload()
   }
 
+  async function setSelectedAlertContract(index: number)
+  {
+    if(index == selectedAlertContractIndex)
+    {
+      alertContractSelectPopoverOpen.value = false
+      return
+    }
+
+    localStorage.setItem("ContractSelectAlert", index.toString())
+    alertContractSelectPopoverOpen.value = false
+    alertContractText.value = alertContracts[index]
+    window.location.reload()
+  }
+
   async function setSelectedLendingContract(index: number)
   {
     if(index == selectedLendingContractIndex)
@@ -129,6 +153,20 @@
     localStorage.setItem("ContractSelectLending", index.toString())
     lendingContractSelectPopoverOpen.value = false
     lendingContractText.value = lendingContracts[index]
+    window.location.reload()
+  }
+
+  async function setSelectedM4AContract(index: number)
+  {
+    if(index == selectedM4AContractIndex)
+    {
+      m4aContractSelectPopoverOpen.value = false
+      return
+    }
+
+    localStorage.setItem("ContractSelectM4A", index.toString())
+    m4aContractSelectPopoverOpen.value = false
+    m4aContractText.value = m4aContracts[index]
     window.location.reload()
   }
 

@@ -3,7 +3,7 @@
   import { useAnchorWallet } from 'solana-wallets-vue'
   import { Connection, clusterApiUrl } from "@solana/web3.js"
   import { AnchorProvider, Program } from "@coral-xyz/anchor"
-  import idl from "/src/assets/contracts/Solana/AlertProtocol.json"
+  import idl1 from "/src/assets/contracts/Solana/AlertProtocol.json"
   //import idl2 from "/src/assets/contracts/Solana/AlertProtocol2.json"
   import { AlertProtocol } from "./alert.ts"//including the type doesn't seem to help with auto complete/IDE suggestions when programing in the front end, not sure how to fix that
   import { DEV_MODE } from '/src/assets/globalStates/EnvironmentSettings.ts'
@@ -16,7 +16,7 @@
   var connection: any = null
 
   export const useAlertWorkspace = () => workspace
-  export const initAlertWorkspace = () =>
+  export const initAlertWorkspace = (contractVersion: number) =>
   { 
     const wallet = useAnchorWallet()
     //connection = new Connection(clusterApiUrl("devnet")/*Interchangeable with "https://api.devnet.solana.com"*/, preflightCommitment)
@@ -39,7 +39,14 @@
       )
     )
 
-    var alertProgram = computed(() => new Program(idl, provider.value) as Program<AlertProtocol>) 
+    var idlToUse: any
+
+    if(contractVersion == 0)
+      idlToUse = idl1
+    //if(contractVersion == 1)
+      //idlToUse = idl2
+
+    var alertProgram = computed(() => new Program(idlToUse, provider.value) as Program<AlertProtocol>) 
 
     workspace =
     {

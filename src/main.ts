@@ -31,9 +31,7 @@ import '/src/assets/css/rainbowText.css'
 import '/src/assets/css/purpleBlueText.css'
 import '/src/assets/css/style.css'
 
-//import 'primevue/resources/themes/saga-blue/theme.css'       //theme
-//import 'primevue/resources/primevue.min.css'                 //core css
-import 'primeicons/primeicons.css'                           //icons
+import 'primeicons/primeicons.css'
 
 /**
  * Ionic Dark Mode
@@ -76,21 +74,22 @@ const walletOptions =
 
 initWallet(walletOptions)
 
-const selectedM4AContractIndex = parseInt(localStorage.getItem("ContractSelectM4A") || "0")
 const selectedChatContractIndex = parseInt(localStorage.getItem("ContractSelectChat") || "0")
+const selectedAlertContractIndex = parseInt(localStorage.getItem("ContractSelectAlert") || "0")
 const selectedLendingContractIndex = parseInt(localStorage.getItem("ContractSelectLending") || "0")
-
-initM4AWorkspace(selectedM4AContractIndex)
-anchorPrograms.m4a = useM4AWorkspace()
+const selectedM4AContractIndex = parseInt(localStorage.getItem("ContractSelectM4A") || "0")
 
 initChatWorkspace(selectedChatContractIndex)
 anchorPrograms.chat = useChatWorkspace()
 
+initAlertWorkspace(selectedAlertContractIndex)
+anchorPrograms.alert = useAlertWorkspace()
+
 initLendingWorkspace(selectedLendingContractIndex)
 anchorPrograms.lending = useLendingWorkspace()
 
-initAlertWorkspace()
-anchorPrograms.alert = useAlertWorkspace()
+initM4AWorkspace(selectedM4AContractIndex)
+anchorPrograms.m4a = useM4AWorkspace()
 
 const app = createApp(App)
   .use(IonicVue,
@@ -112,14 +111,9 @@ app.use(PrimeVue,
   }
 })
 
-//app.use(AppState)
 app.use(router)
-//app.use(ConfirmationService)
 app.use(ToastService)
-//app.use(DialogService)
 app.use(SolanaWallets, walletOptions)
-
-//app.config.compilerOptions.isCustomElement = (tag) => tag.startsWith('media-')
 
 router.isReady().then(() =>
 {
