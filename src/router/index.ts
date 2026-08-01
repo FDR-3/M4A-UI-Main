@@ -34,13 +34,28 @@ const router = createRouter(
   routes
 })
 
-router.onError((error, to) =>
+/*router.onError((error, to) =>
 {
   const fetchErrors = ['Failed to fetch dynamically imported module', 'text/html', 'ChunkLoadError']
   
-  //Check if the error matches our caching issues
   if(fetchErrors.some((e) => error.message.includes(e) || error.name === e))
-    window.location.href = to.fullPath //Force a hard reload to the exact page they were trying to go to
-})
+  {
+    const retryKey = `retry_load_${to.path}`
+    
+    //Check if we already tried to reload this specific path in this session
+    if(sessionStorage.getItem(retryKey))
+    {
+      console.error("Stopping infinite reload loop.", error)
+      sessionStorage.removeItem(retryKey) //Clear it out
+      return
+    }
+
+    //Set the flag in storage so we don't loop
+    sessionStorage.setItem(retryKey, 'true')
+    
+    //Force the hard reload
+    window.location.href = to.fullPath
+  }
+})*/
 
 export default router
