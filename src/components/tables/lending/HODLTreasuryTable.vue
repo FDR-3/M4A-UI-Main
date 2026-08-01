@@ -230,7 +230,7 @@
     {
       processHODLStableCoinTableData()
       processHODLCryptoCurrencyTableData()
-      tvl.hodlTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+      tvl.hodlTreasury = Math.floor((treasuryStableValue.value + treasuryCryptoValue.value) * 100) / 100
       tvl.hodlTVLContribution = tvlContributionStableValue.value
 
       isLoading.value = false
@@ -250,7 +250,7 @@
   {
     processHODLStableCoinTableData()
     processHODLCryptoCurrencyTableData()
-    tvl.hodlTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.hodlTreasury = Math.floor((treasuryStableValue.value + treasuryCryptoValue.value) * 100) / 100
     tvl.hodlTVLContribution = tvlContributionStableValue.value
 
     if(isLoading.value && lendingUserTabAccountsHashMap.map)
@@ -261,7 +261,7 @@
   {
     processHODLStableCoinTableData()
     processHODLCryptoCurrencyTableData()
-    tvl.hodlTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.hodlTreasury = Math.floor((treasuryStableValue.value + treasuryCryptoValue.value) * 100) / 100
     tvl.hodlTVLContribution = tvlContributionStableValue.value
 
     if(isLoading.value && hodlTreasuryWalletBalancesHashMap.map)
@@ -272,7 +272,7 @@
   {
     processHODLStableCoinTableData()
     processHODLCryptoCurrencyTableData()
-    tvl.hodlTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.hodlTreasury = Math.floor((treasuryStableValue.value + treasuryCryptoValue.value) * 100) / 100
     tvl.hodlTVLContribution = tvlContributionStableValue.value
   })
 
@@ -390,23 +390,24 @@
         maximumFractionDigits: decimalAmount })
       }
 
+      const treasuryTotalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+      const tvlContributionTotalAmount = Number(unprocessedTableData[i].wallet)
+      var treasuryCalculatedValue = 0
+      var tvlContributionCalculatedValue = 0
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
-
-      const treasuryTotalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
-      const tvlContributionTotalAmount = Number(unprocessedTableData[i].wallet)
-
-      if(!priceData)
-        return
-
-      const treasuryCalculatedValue = Math.floor(treasuryTotalAmount * priceData.usdPrice * 100) / 100
-      const tvlContributionCalculatedValue = Math.floor(tvlContributionTotalAmount * priceData.usdPrice * 100) / 100
+      if(priceData)
+      {
+        treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
+        tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
+      }
 
       treasuryValue += treasuryCalculatedValue
       tvlContributionValue += tvlContributionCalculatedValue
+      var flooredValue = Math.floor(treasuryCalculatedValue * 100) / 100
 
-      unprocessedTableData[i].value = treasuryCalculatedValue
-      unprocessedTableData[i].valueString = '$' + treasuryCalculatedValue.toLocaleString('en-US', {
+      unprocessedTableData[i].value = flooredValue
+      unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }
@@ -470,20 +471,18 @@
         maximumFractionDigits: decimalAmount })
       }
 
+      const treasuryTotalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+      var treasuryCalculatedValue = 0
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
-
-      const treasuryTotalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
-
-      if(!priceData)
-        return
-
-      const treasuryCalculatedValue = Math.floor(treasuryTotalAmount * priceData.usdPrice * 100) / 100
+      if(priceData)
+        treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
 
       treasuryValue += treasuryCalculatedValue
+      var flooredValue = Math.floor(treasuryCalculatedValue * 100) / 100
 
-      unprocessedTableData[i].value = treasuryCalculatedValue
-      unprocessedTableData[i].valueString = '$' + treasuryCalculatedValue.toLocaleString('en-US', {
+      unprocessedTableData[i].value = flooredValue
+      unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }

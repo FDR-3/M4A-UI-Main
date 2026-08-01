@@ -207,7 +207,7 @@
     {
       processSinglePayerStableCoinTableData()
       processSinglePayerCryptoCurrencyTableData()
-      tvl.singlePayerPayOuts = stableValue.value + cryptoValue.value
+      tvl.singlePayerPayOuts = Math.floor((stableValue.value + cryptoValue.value) * 100) / 100  
 
       isLoading.value = false
     }
@@ -226,7 +226,7 @@
   {
     processSinglePayerStableCoinTableData()
     processSinglePayerCryptoCurrencyTableData()
-    tvl.singlePayerPayOuts = stableValue.value + cryptoValue.value
+    tvl.singlePayerPayOuts = Math.floor((stableValue.value + cryptoValue.value) * 100) / 100  
 
     if(isLoading.value)
       isLoading.value = false
@@ -236,7 +236,7 @@
   {
     processSinglePayerStableCoinTableData()
     processSinglePayerCryptoCurrencyTableData()
-    tvl.singlePayerPayOuts = stableValue.value + cryptoValue.value
+    tvl.singlePayerPayOuts = Math.floor((stableValue.value + cryptoValue.value) * 100) / 100  
   })
 
   watch([tokenReservesHashMap, subMarketsHashMap], () => 
@@ -269,7 +269,7 @@
     if(!lendingUserTabAccountsHashMap.map)
       return
 
-    var value = 0
+    var treasuryValue = 0
     var unprocessedTableData = []
 
     for(var i=0; i<StableCoins.length; i++)
@@ -318,24 +318,23 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      const totalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
-
-      var calculatedValue = 0
-      
+      const treasuryTotalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+      var treasuryCalculatedValue = 0
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
       if(priceData)
-        calculatedValue = Math.floor(totalAmount * priceData.usdPrice * 100) / 100
+        treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
 
-      value += calculatedValue
+      treasuryValue += treasuryCalculatedValue
+      var flooredValue = Math.floor(treasuryCalculatedValue * 100) / 100
 
-      unprocessedTableData[i].value = calculatedValue
-      unprocessedTableData[i].valueString = '$' + calculatedValue.toLocaleString('en-US', {
+      unprocessedTableData[i].value = flooredValue
+      unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }
 
-    stableValue.value = value
+    stableValue.value = treasuryValue
     stableCoinTableData.value = unprocessedTableData
   }
 
@@ -344,7 +343,7 @@
     if(!lendingUserTabAccountsHashMap.map)
       return
 
-    var value = 0
+    var treasuryValue = 0
     var unprocessedTableData = []
 
     for(var i=0; i<CryptoCurrency.length; i++)
@@ -393,24 +392,23 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      const totalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
-
-      var calculatedValue = 0
-
+      const treasuryTotalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+      var treasuryCalculatedValue = 0
       const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
       const priceData = priceObjectMap.data[tokenMintAddressString]
       if(priceData)
-        calculatedValue = Math.floor(totalAmount * priceData.usdPrice * 100) / 100
+        treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
 
-      value += calculatedValue
+      treasuryValue += treasuryCalculatedValue
+      var flooredValue = Math.floor(treasuryCalculatedValue * 100) / 100
 
-      unprocessedTableData[i].value = calculatedValue
-      unprocessedTableData[i].valueString = '$' + calculatedValue.toLocaleString('en-US', {
+      unprocessedTableData[i].value = flooredValue
+      unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }
 
-    cryptoValue.value = value
+    cryptoValue.value = treasuryValue
     CryptoCurrencyTableData.value = unprocessedTableData
   }
 

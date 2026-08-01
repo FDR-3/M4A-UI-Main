@@ -12,9 +12,7 @@
   </div>
   <!--<M4AProtocolTVLLongHTMLText/>-->
   <!--<M4AProtocolTVLShortHTMLText/>-->
-  <h1 class="nMediumLargeMarginTop">$<span class="rainbowText">{{ (tvl.hodlTVLContribution + tvl.solvencyTVLContribution + tvl.tokenReserveTVL).toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2 }) }}</span></h1>
+  <h1 class="nMediumLargeMarginTop">$<span class="rainbowText">{{ totalTVL }}</span></h1>
       
   <div class="tableFlipContainer" :class="flipped" :style="{ height: activeContainerHeight }">
     <div class="tableCard" :class="flipped">
@@ -47,7 +45,7 @@
 
   
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, Component } from 'vue'
+  import { ref, onMounted, onUnmounted, Component, computed } from 'vue'
   import { IonButton } from '@ionic/vue'
   import SinglePayerTreasuryTable from '/src/components/tables/lending/SinglePayerTreasuryTable.vue'
   import HODLTreasuryTable from '/src/components/tables/lending/HODLTreasuryTable.vue'
@@ -87,6 +85,13 @@
 
   const tvlInfoMSG = "M4A Protocol Total Value Locked is calculated by adding the deposit value of all of the Token Reserves, the wallet balances of the Solvency Treasury, and the Stable Coin wallet balances of the HODL Treasury."
 
+  const totalTVL = computed(() =>
+  {
+    return(Math.floor((tvl.hodlTVLContribution + tvl.solvencyTVLContribution + tvl.tokenReserveTVL) * 100) / 100).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 })
+  })
+  
   function handleHeightUpdate()
   {
     if(flipped === "")

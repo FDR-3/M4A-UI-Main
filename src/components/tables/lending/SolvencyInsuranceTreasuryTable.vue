@@ -211,7 +211,7 @@
     {
       processSolvencyStableCoinTableData()
       processSolvencyCryptoCurrencyTableData()
-      tvl.solvencyTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+      tvl.solvencyTreasury = Math.floor((treasuryStableValue.value + treasuryCryptoValue.value) * 100) / 100
       tvl.solvencyTVLContribution = tvlContributionStableValue.value + tvlContributionCryptoValue.value
 
       isLoading.value = false
@@ -231,7 +231,7 @@
   {
     processSolvencyStableCoinTableData()
     processSolvencyCryptoCurrencyTableData()
-    tvl.solvencyTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.solvencyTreasury = Math.floor((treasuryStableValue.value + treasuryCryptoValue.value) * 100) / 100
     tvl.solvencyTVLContribution = tvlContributionStableValue.value + tvlContributionCryptoValue.value
 
     if(isLoading.value && lendingUserTabAccountsHashMap.map)
@@ -242,7 +242,7 @@
   {
     processSolvencyStableCoinTableData()
     processSolvencyCryptoCurrencyTableData()
-    tvl.solvencyTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.solvencyTreasury = Math.floor((treasuryStableValue.value + treasuryCryptoValue.value) * 100) / 100
     tvl.solvencyTVLContribution = tvlContributionStableValue.value + tvlContributionCryptoValue.value
 
     if(isLoading.value && solvencyInsuranceTreasuryWalletBalancesHashMap.map)
@@ -253,7 +253,7 @@
   {
     processSolvencyStableCoinTableData()
     processSolvencyCryptoCurrencyTableData()
-    tvl.solvencyTreasury = treasuryStableValue.value + treasuryCryptoValue.value
+    tvl.solvencyTreasury = Math.floor((treasuryStableValue.value + treasuryCryptoValue.value) * 100) / 100
     tvl.solvencyTVLContribution = tvlContributionStableValue.value + tvlContributionCryptoValue.value
   })
 
@@ -329,23 +329,26 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
-      const priceData = priceObjectMap.data[tokenMintAddressString]
-
       const treasuryTotalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees)
       const tvlContributionTotalAmount = Number(unprocessedTableData[i].wallet)
+      var treasuryCalculatedValue = 0
+      var tvlContributionCalculatedValue = 0
+      const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
+      const priceData = priceObjectMap.data[tokenMintAddressString]
+      if(priceData)
+      {
+        treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
+        tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
+      }
 
-      if(!priceData)
-        return
-
-      const treasuryCalculatedValue = Math.floor(treasuryTotalAmount * priceData.usdPrice * 100) / 100
-      const tvlContributionCalculatedValue = Math.floor(tvlContributionTotalAmount * priceData.usdPrice * 100) / 100
+      treasuryValue += treasuryCalculatedValue
+      var flooredValue = Math.floor(treasuryCalculatedValue * 100) / 100
 
       treasuryValue += treasuryCalculatedValue
       tvlContributionValue += tvlContributionCalculatedValue
 
-      unprocessedTableData[i].value = treasuryCalculatedValue
-      unprocessedTableData[i].valueString = '$' + treasuryCalculatedValue.toLocaleString('en-US', {
+      unprocessedTableData[i].value = flooredValue
+      unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }
@@ -402,23 +405,26 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
-      const priceData = priceObjectMap.data[tokenMintAddressString]
-
       const treasuryTotalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees)
       const tvlContributionTotalAmount = Number(unprocessedTableData[i].wallet)
+      var treasuryCalculatedValue = 0
+      var tvlContributionCalculatedValue = 0
+      const tokenMintAddressString = tokenIdHashMap.map.get(unprocessedTableData[i].tokenId)
+      const priceData = priceObjectMap.data[tokenMintAddressString]
+      if(priceData)
+      {
+        treasuryCalculatedValue = treasuryTotalAmount * priceData.usdPrice
+        tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
+      }
 
-      if(!priceData)
-        return
-
-      const treasuryCalculatedValue = Math.floor(treasuryTotalAmount * priceData.usdPrice * 100) / 100
-      const tvlContributionCalculatedValue = Math.floor(tvlContributionTotalAmount * priceData.usdPrice * 100) / 100
+      treasuryValue += treasuryCalculatedValue
+      var flooredValue = Math.floor(treasuryCalculatedValue * 100) / 100
 
       treasuryValue += treasuryCalculatedValue
       tvlContributionValue += tvlContributionCalculatedValue
 
-      unprocessedTableData[i].value = treasuryCalculatedValue
-      unprocessedTableData[i].valueString = '$' + treasuryCalculatedValue.toLocaleString('en-US', {
+      unprocessedTableData[i].value = flooredValue
+      unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
     }
