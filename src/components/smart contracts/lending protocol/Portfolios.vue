@@ -278,7 +278,7 @@
     </div>
   </div>
 
-  <div v-else-if="!isBrowsingAllUsers" class="mediumMarginTop">{{ anchorPrograms.isLendingProtocolReady ? 'No Lending User Found At That PublicKey' : 'Loading' }}</div>
+  <div v-else-if="!isBrowsingAllUsers" class="smallMarginTop">{{ anchorPrograms.isLendingProtocolReady ? 'No Lending User Found At That PublicKey' : 'Loading' }}</div>
 </template>
 
 <script setup lang="ts">

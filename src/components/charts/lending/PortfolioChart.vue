@@ -337,7 +337,7 @@
   import { subMarketsHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { copyAddress, copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SECONDS_IN_A_WEEK } from '/src/assets/constants/TimeLengths.ts'
   import { convertUnixTimeToLocalDate, convertUnixTimeToLocalTime } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
