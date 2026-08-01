@@ -1,6 +1,6 @@
 <template>
   <h4 class="underLine noWrapText" style="font-size: 25px">Contract Switcher</h4>
-  <h5 class="nMediumMarginTop">M4A Protocol</h5>
+  <h5 class="nMediumMarginTop smallMarginBottom">M4A Protocol</h5>
   <ion-button @click="openM4AContractSelectPopover($event)" slot="start" class="contractPickerButton" :color="colorName">
       <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
         <ion-label color="dark">{{ m4aContractText }}</ion-label>
@@ -16,7 +16,7 @@
         </ion-button>
       </div>
     </ion-popover>
-  <h5>Chat Protocol</h5>
+  <h5 class="smallMarginBottom">Chat Protocol</h5>
   <ion-button @click="openChatContractSelectPopover($event)" slot="start" class="contractPickerButton" :color="colorName">
     <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
       <ion-label color="dark">{{ chatContractText }}</ion-label>
@@ -32,7 +32,7 @@
       </ion-button>
     </div>
   </ion-popover>
-  <h5>Lending Protocol</h5>
+  <h5 class="smallMarginBottom">Lending Protocol</h5>
   <ion-button @click="openLendingContractSelectPopover($event)" slot="start" class="contractPickerButton mediumMarginBottom" :color="colorName">
     <div class="contractPickerTextContainer noClickEvent flexCenterColumn">
       <ion-label color="dark">{{ lendingContractText }}</ion-label>
