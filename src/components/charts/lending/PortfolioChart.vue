@@ -585,6 +585,8 @@
 
   function startGradientAnimation()
   {
+    stopGradientAnimation()
+
     animationIntervalId = setInterval(() =>
     { 
       if(chartRef.value)
@@ -610,6 +612,13 @@
       aspectRatio: 0.7,
       transitions:
       {
+        hide:
+        {
+          animation:
+          {
+            duration: 0
+          }
+        }
         /*hide: //Only the show fade in animation is currently working for the custom rainbow line
         {
             animations:
@@ -623,7 +632,7 @@
               }
             }
         },*/
-        show:
+        /*show:
         {
           animations:
           {
@@ -636,7 +645,7 @@
               to: 4,
             }
           }
-        },
+        },*/
       },
       plugins:
       {
@@ -706,18 +715,18 @@
         legenHiddenArray.value[index] = true
         chart.hide(index)
 
-        if(index == 0 && legenHiddenArray.value[2] == false)
-          stopGradientAnimation()
+        //if(index == 0 && legenHiddenArray.value[2] == false)
+          //stopGradientAnimation()
 
-        if(index == 2 && legenHiddenArray.value[0] == false)
-          stopGradientAnimation()
+        //if(index == 2 && legenHiddenArray.value[0] == false)
+          //stopGradientAnimation()
       }
       else
       {
         legenHiddenArray.value[index] = false
         chart.show(index)
 
-        if(index == 0)
+        /*if(index == 0)
           setTimeout(() =>
           {
             if(legenHiddenArray.value[0] == false && legenHiddenArray.value[2] == false)//Incase user has already clicked the button again, don't start animation.
@@ -729,7 +738,7 @@
             if(legenHiddenArray.value[index] == false && legenHiddenArray.value[2] == false)//Incase user has already clicked the button again, don't start animation.
               startGradientAnimation()
           }, 400)
-        else
+        else*/
           chart.update()
       }
     }

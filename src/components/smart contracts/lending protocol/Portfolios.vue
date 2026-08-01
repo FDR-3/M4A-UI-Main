@@ -444,7 +444,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setRainbowAnimatedGradient(ctx, chartArea)
+          return setRainbowLineAnimatedGradient(ctx, chartArea)
         },
         borderWidth: 4,
         fill: false,
@@ -458,7 +458,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setRainbowGradient(ctx, chartArea)
+          return setRainbowBarAnimatedGradient(ctx, chartArea)
         },
         data: [] as any[]
       },
@@ -469,7 +469,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setPoopAnimatedGradient(ctx, chartArea)
+          return setPoopLineAnimatedGradient(ctx, chartArea)
         },
         borderWidth: 4,
         fill: false,
@@ -483,7 +483,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setPoopGradient(ctx, chartArea)
+          return setPoopBarAnimatedGradient(ctx, chartArea)
         },
         data: [] as any[]
       },
@@ -733,7 +733,6 @@
 
     setChartData()
 
-    stopGradientAnimation()
     startGradientAnimation()
   })
 
@@ -753,67 +752,106 @@
       }, 100)
   }))
 
-  function setRainbowAnimatedGradient(ctx: any, chartArea:any)
+  function setRainbowLineAnimatedGradient(ctx: any, chartArea:any)
   {
     if(!chartArea)
       return
 
+    const width = chartArea.right - chartArea.left
     const offset = gradientOffset.value
-    const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0)
+    //Shift goes from 0 to the width of the chart
+    const shift = offset * width
 
-    gradient.addColorStop((0 - offset + 1) % 1, '#14ffe9')
-    gradient.addColorStop((0.10 - offset + 1) % 1, '#ffc800')
-    gradient.addColorStop((0.50 - offset + 1) % 1, '#ff00e0')
-    gradient.addColorStop((0.95 - offset + 1) % 1, '#14ffe9')
+    //Create a gradient that is exactly twice as wide as the chart, and slide it left
+    const gradient = ctx.createLinearGradient(
+      chartArea.left - shift, 0, 
+      chartArea.left - shift + (width * 2), 0
+    )
 
-    /*gradient.addColorStop((0 - offset + 1) % 1, '#14ffe9')
-    gradient.addColorStop((0.25 - offset + 1) % 1, '#ffc800')
-    gradient.addColorStop((0.50 - offset + 1) % 1, '#ff00e0')
-    gradient.addColorStop((0.75 - offset + 1) % 1, '#14ffe9')*/
-
-    return gradient
-  }
-
-  function setRainbowGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const gradient = ctx.createLinearGradient(0, 0, 0, 170)
-
-    gradient.addColorStop((0), '#14ffe9')
-    gradient.addColorStop((0.25), '#ffc800')
-    gradient.addColorStop((0.50), '#ff00e0')
-    gradient.addColorStop((0.75) , '#14ffe9')
+    //Two full cycles of the rainbow
+    gradient.addColorStop(0.000, '#14ffe9')
+    gradient.addColorStop(0.166, '#ffc800')
+    gradient.addColorStop(0.333, '#ff00e0')
+    gradient.addColorStop(0.500, '#14ffe9')
+    gradient.addColorStop(0.666, '#ffc800')
+    gradient.addColorStop(0.833, '#ff00e0')
+    gradient.addColorStop(1.000, '#14ffe9')
 
     return gradient
   }
 
-  function setPoopAnimatedGradient(ctx: any, chartArea:any)
+  function setRainbowBarAnimatedGradient(ctx: any, chartArea:any)
   {
     if(!chartArea)
       return
 
+    const height = chartArea.bottom - chartArea.top
     const offset = gradientOffset.value
-    const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0)
+    //Shift goes from 0 to the height of the chart
+    const shift = offset * height
 
-    gradient.addColorStop((0 - offset + 1) % 1, '#851717')
-    gradient.addColorStop((0.50 - offset + 1) % 1, '#0f8332')
-    gradient.addColorStop((0.95 - offset + 1) % 1, '#851717')
+    //Create a gradient twice as tall as the chart, and slide it up
+    const gradient = ctx.createLinearGradient(
+      0, chartArea.top - shift, 
+      0, chartArea.top - shift + (height * 2)
+    )
+
+    //Two full cycles of the rainbow
+    gradient.addColorStop(0.000, '#14ffe9')
+    gradient.addColorStop(0.166, '#ffc800')
+    gradient.addColorStop(0.333, '#ff00e0')
+    gradient.addColorStop(0.500, '#14ffe9')
+    gradient.addColorStop(0.666, '#ffc800')
+    gradient.addColorStop(0.833, '#ff00e0')
+    gradient.addColorStop(1.000, '#14ffe9')
 
     return gradient
   }
 
-  function setPoopGradient(ctx: any, chartArea:any)
+  function setPoopLineAnimatedGradient(ctx: any, chartArea:any)
   {
     if(!chartArea)
       return
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, 170)
+    const width = chartArea.right - chartArea.left
+    const offset = gradientOffset.value
+    const shift = offset * width
 
-    gradient.addColorStop((0), '#851717')
-    gradient.addColorStop((0.50), '#0f8332')
-    gradient.addColorStop((0.75) , '#851717')
+    const gradient = ctx.createLinearGradient(
+      chartArea.left - shift, 0, 
+      chartArea.left - shift + (width * 2), 0
+    )
+
+    //Two full cycles of the poop colors
+    gradient.addColorStop(0.00, '#851717')
+    gradient.addColorStop(0.25, '#0f8332')
+    gradient.addColorStop(0.50, '#851717')
+    gradient.addColorStop(0.75, '#0f8332')
+    gradient.addColorStop(1.00, '#851717')
+
+    return gradient
+  }
+
+  function setPoopBarAnimatedGradient(ctx: any, chartArea:any)
+  {
+    if(!chartArea)
+      return
+
+    const height = chartArea.bottom - chartArea.top
+    const offset = gradientOffset.value
+    const shift = offset * height
+
+    const gradient = ctx.createLinearGradient(
+      0, chartArea.top - shift, 
+      0, chartArea.top - shift + (height * 2)
+    )
+
+    //Two full cycles of the poop colors
+    gradient.addColorStop(0.00, '#851717')
+    gradient.addColorStop(0.25, '#0f8332')
+    gradient.addColorStop(0.50, '#851717')
+    gradient.addColorStop(0.75, '#0f8332')
+    gradient.addColorStop(1.00, '#851717')
 
     return gradient
   }
@@ -1012,6 +1050,8 @@
 
   function startGradientAnimation()
   {
+    stopGradientAnimation()
+
     intervalId = setInterval(() =>
     {
       //Increment the offset slightly.

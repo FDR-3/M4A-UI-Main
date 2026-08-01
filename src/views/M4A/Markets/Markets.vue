@@ -75,7 +75,7 @@
 
   var portfolioReRenderHelper = ref(0)
 
-  const portfolioChartInfoMSG = "Values in the charts are updated after a user does any lending activity, IE: depositing, repaying, etc."
+  const portfolioChartInfoMSG = "Values in the charts are updated after a user does any lending activity, IE: depositing, repaying, etc.\n\nAll other values are calculated dynamically."
   
   const activeContainerHeight = ref('auto')
   const frontTableRef = ref<HTMLElement | null>(null)
