@@ -85,7 +85,7 @@ h5
   margin-bottom: 25px
 }
 
-p, a, button, ion-text, ion-label
+p, a, button, ion-text, ion-label, ion-button
 {
   font-size: min(4vw, 15px)
 }

@@ -1,18 +1,18 @@
 <template>
-  <h2 class="nSmallMarginBottom">Lending Protocol Testing On<br>🥳Mainnet🥳</h2>
+  <h2 class="nMediumLargeMarginBottom">Lending Protocol Testing On<br>🥳Mainnet🥳</h2>
   <div class="flexCenterColumn">
-    <div class="flexCenterRow nMediumMarginBottom">
+    <div class="flexCenterRow">
       
-      <TVLLongSVG id="tvlLongSVG" class="nLargeMarginTop" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
-      <TVLShortSVG id="tvlShortSVG" class="nLargeMarginTop" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
-      <span id="infoButton" class=" infoButtonContainer ">
+      <TVLLongSVG id="tvlLongSVG" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+      <TVLShortSVG id="tvlShortSVG"  :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+      <span id="infoButton" class=" infoButtonContainer nSmallMarginRight">
         <InfoButton :infoMessage="tvlInfoMSG"/>
       </span>
     </div>
   </div>
   <!--<M4AProtocolTVLLongHTMLText/>-->
   <!--<M4AProtocolTVLShortHTMLText/>-->
-  <h1 class="nMediumLargeMarginTop nSmallMarginBottom">$<span class="rainbowText">{{ totalTVL }}</span></h1>
+  <h1 class="nSmallMarginTop nTinyMarginBottom">$<span class="rainbowText">{{ totalTVL }}</span></h1>
   <ion-button color="lightOffDark" class="thinBorder mediumMarginBottom" style="border-radius: 4px" @click="handleShowTVLHistory()">
     <ion-label v-if="!showTVLHistory" color="green">Show History</ion-label>
     <ion-label v-else color="green">Hide History</ion-label>
@@ -205,6 +205,16 @@
 </script>
 
 <style scoped>
+  ion-button
+  {
+    --border-radius: 4px;
+    --border-width: 1px;
+    --border-style: solid;
+    --border-color: currentColor /*Or your custom border color*/
+
+    /*width: min(400px, 58vw)*/
+  }
+
   h1
   {
     text-decoration: none
@@ -248,7 +258,7 @@
 
   .infoButtonContainer
   {
-    width: min(44px, 20vw)
+    width: min(40px, 15vw)
   }
 
   .backTable
