@@ -40,7 +40,7 @@
   import { IonText, IonButton } from '@ionic/vue'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import { playHoverSFX, playHoverSFXIfNotOnAPhone, playSelection1SFXThenNextPage }  from '/src/components/audio/SelectionAudioFunctions.vue'
+  import { playHoverSFX, playHoverSFXIfNotOnAPhone, playSelection1SFXThenNextPage }  from '/src/components/audio/AudioFunctions.vue'
   import WindowsSVG from '/src/assets/svg/windows-svg.vue'
   import WindowsFlashing from '/src/components/fancy/flashing/WindowsFlashing.vue'
   import AppleSVG from '/src/assets/svg/apple-svg.vue'

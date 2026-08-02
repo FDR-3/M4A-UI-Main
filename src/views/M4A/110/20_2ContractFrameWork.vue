@@ -57,7 +57,7 @@
   import { IonText, IonButton } from '@ionic/vue'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import { playHoverSFX, playHoverSFXIfNotOnAPhone, playSelection2SFXThenNextPage }  from '/src/components/audio/SelectionAudioFunctions.vue'
+  import { playHoverSFX, playHoverSFXIfNotOnAPhone, playSelection2SFXThenNextPage }  from '/src/components/audio/AudioFunctions.vue'
   import AnchorSVG from '/src/assets/svg/anchor-svg.vue'
   import AnchorFlashing from '/src/components/fancy/flashing/AnchorFlashing.vue'
   import HardhatSVG from '/src/assets/svg/hardhat-svg.vue'

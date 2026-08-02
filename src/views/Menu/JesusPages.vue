@@ -76,7 +76,7 @@
     labelClass: '',
     text: "FAQs",
     lilNavText: "FAQs",
-    textColor: "dark"
+    textColor: "yellow"
   }]
 
   watch(navigation, () => 

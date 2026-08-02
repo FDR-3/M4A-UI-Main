@@ -568,7 +568,6 @@
 
   function setChartOptions()
   {
-    
     return{
       maintainAspectRatio: false,
       aspectRatio: 0.7,
@@ -615,7 +614,7 @@
         {
           display: false
         },
-        // Fixes the hover popup truncation
+        //Fixes the hover popup truncation
         tooltip:
         {
           callbacks:
@@ -626,7 +625,7 @@
               if(label)
                 label += ': '
   
-              if (context.parsed.y !== null)
+              if(context.parsed.y !== null)
               {
                 const value = context.parsed.y
                 label += value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 9 })

@@ -51,3 +51,9 @@ ion-input.invalid
 {
   --padding-top: 32px
 }
+
+.replyButtons
+{
+  border-radius: 4px;
+  border: thin solid var(--ion-color-dark) 
+}

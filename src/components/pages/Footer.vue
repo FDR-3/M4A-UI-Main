@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <SelectionAudio/>
+      <Audio/>
       
       <div class="mediumFormatButtonContainer">
         <div class="mediumFormat">
@@ -62,7 +62,7 @@
   import { IonButton, IonFooter, IonIcon } from '@ionic/vue'
   import { closeCircle } from 'ionicons/icons'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import SelectionAudio from '/src/components/audio/SelectionAudio.vue'
+  import Audio from '/src/components/audio/Audio.vue'
   import Twitter from '/src/assets/svg/twitter-svg.vue'
   import Github from '/src/assets/svg/github-svg.vue'
   import Youtube from '/src/assets/svg/youtube-link-svg.vue'
@@ -115,7 +115,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: light-dark(lightgray,#1f1f1f);
+    background: var(--ion-color-light-off-dark);
     border-radius: 0px
   }
 

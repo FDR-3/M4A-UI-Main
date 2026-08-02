@@ -38,7 +38,7 @@ iframe
 .thickBorder
 {
   /*border: thick, solid*/
-  border: thick solid
+  border: thick solid var(--ion-color-dark) 
 }
 
 .thinBorderTop

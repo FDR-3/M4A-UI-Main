@@ -113,21 +113,21 @@
       labelClass: '',
       text: "Heart Beat",
       lilNavText: "Heart",
-      textColor: "dark"
+      textColor: "blue"
     },
     {
       id: 'treasuryButton',
       labelClass: '',
       text: "Treasury",
       lilNavText: "Treasury",
-      textColor: "dark"
+      textColor: "blue"
     },
     {
       id: 'adsButton',
       labelClass: '',
       text: "Ads",
       lilNavText: "Ads",
-      textColor: "dark"
+      textColor: "blue"
     }
   ]
 

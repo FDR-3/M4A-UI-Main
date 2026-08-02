@@ -21,7 +21,7 @@
     >
       <template #header>
         <div>
-          <h2>Single Payer Treasury Value <br>(Amount Available For Claim Payouts): $<span class="rainbowText">{{ tvl.singlePayerPayOuts.toLocaleString('en-US', {
+          <h2>Single Payer Treasury Value <br>Amount Available For Claim Payouts: $<span class="rainbowText">{{ tvl.singlePayerPayOuts.toLocaleString('en-US', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2 }) }}</span>
           </h2>

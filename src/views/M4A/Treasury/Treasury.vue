@@ -1,7 +1,7 @@
 <template>
-  <h2>Lending Protocol Testing On<br>🥳Mainnet🥳</h2>
+  <h2 class="nSmallMarginBottom">Lending Protocol Testing On<br>🥳Mainnet🥳</h2>
   <div class="flexCenterColumn">
-    <div class="flexCenterRow">
+    <div class="flexCenterRow nMediumMarginBottom">
       
       <TVLLongSVG id="tvlLongSVG" class="nLargeMarginTop" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
       <TVLShortSVG id="tvlShortSVG" class="nLargeMarginTop" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
@@ -12,13 +12,26 @@
   </div>
   <!--<M4AProtocolTVLLongHTMLText/>-->
   <!--<M4AProtocolTVLShortHTMLText/>-->
-  <h1 class="nMediumLargeMarginTop">$<span class="rainbowText">{{ totalTVL }}</span></h1>
+  <h1 class="nMediumLargeMarginTop nSmallMarginBottom">$<span class="rainbowText">{{ totalTVL }}</span></h1>
+  <ion-button color="lightOffDark" class="thinBorder mediumMarginBottom" style="border-radius: 4px" @click="handleShowTVLHistory()">
+    <ion-label v-if="!showTVLHistory" color="green">Show History</ion-label>
+    <ion-label v-else color="green">Hide History</ion-label>
+  </ion-button>
+
+  <transition name="chartSlide">
+    <div v-if="showTVLHistory" class="chartindow">
+      <div class="chartContent">
+        <div class="beamOverlay"></div>
+        <TVLChart :currentTVL="totalTVL"/>
+      </div>
+    </div>
+  </transition>
       
   <div class="tableFlipContainer" :class="flipped" :style="{ height: activeContainerHeight }">
     <div class="tableCard" :class="flipped">
       
       <div class="frontTable" ref="frontTableRef" :style="{display: display1stTable}">
-        <h1>Treasuries</h1>
+        <h1 class="nSmallMarginBottom">Treasuries</h1>
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Reserves</ion-button>
         <SinglePayerTreasuryTable/>
         <HODLTreasuryTable/>
@@ -26,7 +39,7 @@
       </div>
 
       <div class="backTable" ref="backTableRef" :style="{display: display2ndTable}">
-        <h1>Reserves</h1>
+        <h1 class="nSmallMarginBottom">Reserves</h1>
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Treasuries</ion-button>
         <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
           createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"
@@ -46,7 +59,7 @@
   
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, Component, computed } from 'vue'
-  import { IonButton } from '@ionic/vue'
+  import { IonButton, IonLabel } from '@ionic/vue'
   import SinglePayerTreasuryTable from '/src/components/tables/lending/SinglePayerTreasuryTable.vue'
   import HODLTreasuryTable from '/src/components/tables/lending/HODLTreasuryTable.vue'
   import SolvencyInsuranceTreasuryTable from '/src/components/tables/lending/SolvencyInsuranceTreasuryTable.vue'
@@ -62,6 +75,8 @@
   import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'
   import KingobamaMobile from '/src/components/fancy/poly/KingobamaMobile.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
+  import TVLChart from '/src/components/charts/lending/TVLChart.vue'
+  import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
   import M4AProtocolTVLLongHTMLText from './M4AProtocolTVLLongHTMLText.vue'
   import M4AProtocolTVLShortHTMLText from './M4AProtocolTVLShortHTMLText.vue'
 
@@ -71,6 +86,7 @@
   var flipped = ""
   var display1stTable = ref("")
   var display2ndTable = ref("none")
+  var showTVLHistory = ref(false)
 
   var createSubMarketModal = ref()
   var collectSubMarketFeesModal = ref()
@@ -175,6 +191,16 @@
         flipping.value = false
       }, 500) //500 milliseconds == 0.5 seconds
     }   
+  }
+
+  function handleShowTVLHistory()
+  {
+    if(!showTVLHistory.value)
+      playOpenChartSFX()
+    else
+      playCloseChartSFX()
+
+    showTVLHistory.value = !showTVLHistory.value
   }
 </script>
 
@@ -288,4 +314,185 @@
       height: min(77vw, 150px)
     }
   }
+
+/*=========================================
+   1. The Slide Down/Up Transition (Grid Method)
+   =========================================*/
+.chartSlide-enter-active, .chartSlide-leave-active
+{
+  /*Grid row interpolation handles smooth height reveal without squishing chart content*/
+  transition: grid-template-rows 0.6s cubic-bezier(0.33, 1, 0.68, 1),
+              opacity 0.5s ease-out;
+  display: grid
+}
+
+/*State BEFORE entering and AFTER leaving (Hidden)*/
+.chartSlide-enter-from, .chartSlide-leave-to
+{
+  grid-template-rows: 0fr;
+  opacity: 0
+}
+
+/*State AFTER entering and BEFORE leaving (Visible)*/
+.chartSlide-enter-to, .chartSlide-leave-from
+{
+  grid-template-rows: 1fr;
+  opacity: 1
+}
+
+.chartWindow
+{
+  width: 100%;
+  overflow: hidden
+}
+
+.chartContent
+{
+  min-height: 0;
+  overflow: hidden;
+  position: relative
+}
+
+/*=========================================
+   2. Focused Light Beam & Particle Trail
+   =========================================*/
+.beamOverlay
+{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+  overflow: hidden
+}
+
+/*The Horizontal Glowing Light Beam*/
+.beamOverlay::before
+{
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(57, 189, 57, 0.9) 50%, transparent 100%);
+  box-shadow: 0 0 15px rgba(57, 189, 57, 0.8)
+}
+
+/*Particles following near the beam*/
+.beamOverlay::after
+{
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 35px;
+  opacity: 0;
+  background-image: radial-gradient(circle, rgba(57, 189, 57, 0.9) 1.5px, transparent 2px);
+  background-size: 24px 24px
+}
+
+/*Sweeping Down on Show*/
+.chartSlide-enter-active .beamOverlay::before
+{
+  animation: beamSweepDown 0.65s ease-in-out forwards
+}
+
+.chartSlide-enter-active .beamOverlay::after
+{
+  animation: particleSweepDown 0.65s ease-in-out forwards
+}
+
+/*Sweeping Up on Hide*/
+.chartSlide-leave-active .beamOverlay::before
+{
+  animation: beamSweepUp 0.65s ease-in-out forwards
+}
+
+.chartSlide-leave-active .beamOverlay::after
+{
+  animation: particleSweepUp 0.65s ease-in-out forwards
+}
+
+@keyframes beamSweepDown
+{
+  0%
+  {
+    top: -15px;
+    opacity: 0
+  }
+  20%
+  {
+    opacity: 1
+  }
+  80%
+  {
+    opacity: 1
+  }
+  100%
+  {
+    top: 100%;
+    opacity: 0
+  }
+}
+
+@keyframes beamSweepUp
+{
+  0%
+  {
+    top: 100%;
+    opacity: 0
+  }
+  20%
+  {
+    opacity: 1
+  }
+  80%
+  {
+    opacity: 1
+  }
+  100%
+  {
+    top: -15px;
+    opacity: 0
+  }
+}
+
+@keyframes particleSweepDown
+{
+  0%
+  {
+    top: -35px;
+    opacity: 0
+  }
+  30%
+  {
+    opacity: 0.85
+  }
+  100%
+  {
+    top: 100%;
+    opacity: 0
+  }
+}
+
+@keyframes particleSweepUp
+{
+  0%
+  {
+    top: 100%;
+    opacity: 0
+  }
+  30%
+  {
+    opacity: 0.85
+  }
+  100%
+  {
+    top: -35px;
+    opacity: 0
+  }
+}
 </style>

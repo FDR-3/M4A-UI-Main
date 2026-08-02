@@ -1,6 +1,6 @@
 <template>
   <div v-if="isBrowsingAllUsers">
-    <ion-button fill="clear" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false)">
+    <ion-button color="lightOffDark" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false)">
       <ion-label color="green">Charts</ion-label>
     </ion-button>
     <LendingLeaderBoardTable
@@ -28,12 +28,12 @@
       <ion-button
       id="checkNewAddressButton"
       @click="isValidPublicKey=isValidSolanaPublicKey(addressToCheck); checkNewAddress()"
-      fill="clear" class="thinBorder" style="border-radius: 4px"
+      color="lightOffDark" class="thinBorder" style="border-radius: 4px"
       >
         <ion-label color="green">Check New Address</ion-label>
       </ion-button>
 
-      <ion-button fill="clear" class="thinBorder" style="border-radius: 4px" @click="setIsBrowsingAllLendingUsers(true)">
+      <ion-button color="lightOffDark" class="thinBorder" style="border-radius: 4px" @click="setIsBrowsingAllLendingUsers(true)">
         <ion-label color="green">Browse All Users</ion-label>
       </ion-button>
     </div>
@@ -355,6 +355,8 @@
   var cryptoLifeTimeInterestEarnedAmount = ref("0")
   var cryptoLifeTimeInterestEarnedValue = ref(0)
   var cryptoLifeTimeInterestEarnedValueUnRounded = ref(0)
+
+  var gradientOffset = ref(0)
 
   const total7DayProjectionRateValue = computed (() =>
   {
@@ -1086,8 +1088,6 @@
     return selectedYearHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString())
   }
 
-  const gradientOffset = ref(0)
-
   function startGradientAnimation()
   {
     stopGradientAnimation()
@@ -1098,7 +1098,7 @@
       gradientOffset.value += 0.07
       
       //Ensure the offset wraps around (e.g., from 1.0 back to 0.0)
-      if (gradientOffset.value >= 1)
+      if(gradientOffset.value >= 1)
         gradientOffset.value = 0
 
     }, 55)

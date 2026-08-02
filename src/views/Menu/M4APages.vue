@@ -139,7 +139,7 @@
       labelClass: '',
       text: "Markets",
       lilNavText: "Markets",
-      textColor: "dark",
+      textColor: "green",
       url: "/M4A/Markets"
     },
     {
@@ -147,7 +147,7 @@
       labelClass: '',
       text: "Treasury",
       lilNavText: "Treasury",
-      textColor: "dark",
+      textColor: "green",
       url: "/M4A/Treasury"
     },
     {
@@ -155,7 +155,7 @@
       labelClass: '',
       text: "Claims/\r\nMap",
       lilNavText: "Claims",
-      textColor: "dark",
+      textColor: "green",
       url: "/M4A/Claims&Map"
     },
     {
@@ -163,7 +163,7 @@
       labelClass: '',
       text: "Queue",
       lilNavText: "Queue",
-      textColor: "dark",
+      textColor: "green",
       url: "/M4A/Queue"
     }
   ]

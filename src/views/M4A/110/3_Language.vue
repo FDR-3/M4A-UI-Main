@@ -34,7 +34,7 @@
   import { ref } from 'vue'
   import { IonText, IonButton } from '@ionic/vue'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
-  import { playHoverSFX, playHoverSFXIfNotOnAPhone, playSelection2SFXThenNextPage }  from '/src/components/audio/SelectionAudioFunctions.vue'
+  import { playHoverSFX, playHoverSFXIfNotOnAPhone, playSelection2SFXThenNextPage }  from '/src/components/audio/AudioFunctions.vue'
   import VueSVG from '/src/assets/svg/vue-svg.vue'
   import VueFlashing from '/src/components/fancy/flashing/VueFlashing.vue'
   import ReactSVG from '/src/assets/svg/react-svg.vue'

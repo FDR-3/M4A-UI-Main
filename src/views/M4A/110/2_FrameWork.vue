@@ -33,7 +33,7 @@
   import { IonIcon, IonText, IonButton } from '@ionic/vue'
   import { logoIonic } from 'ionicons/icons'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
-  import { playHoverSFX, playHoverSFXIfNotOnAPhone, playSelection1SFXThenNextPage }  from '/src/components/audio/SelectionAudioFunctions.vue'
+  import { playHoverSFX, playHoverSFXIfNotOnAPhone, playSelection1SFXThenNextPage }  from '/src/components/audio/AudioFunctions.vue'
   import IonicFlashing from '/src/components/fancy/flashing/IonicFlashing.vue'
   import SvelteSVG from '/src/assets/svg/svelte-svg.vue'
   import { giveSVGRepoSvelteCredit } from '/src/assets/helperFunctions/credits.ts'

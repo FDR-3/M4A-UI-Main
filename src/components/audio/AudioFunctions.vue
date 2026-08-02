@@ -53,5 +53,21 @@
     localStorage.setItem("navigationPageIndex", navigation.pageIndex)
   }
 
+  export function playOpenChartSFX()
+  {
+    const audio = document.getElementById("openChartSFX") as HTMLMediaElement
+    audio.pause()
+    audio.currentTime = 0
+    audio.play()
+  }
+
+  export function playCloseChartSFX()
+  {
+    const audio = document.getElementById("closeChartSFX") as HTMLMediaElement
+    audio.pause()
+    audio.currentTime = 0
+    audio.play()
+  }
+
   export default playHoverSFX
 </script>

@@ -404,8 +404,7 @@
           v-if="!connectedWallet.isChatAccountReady"
           @click="createChatAccount()"
           class="replyButtons"
-          fill="outline" 
-          color="dark"
+          color="lightOffDark"
         >
           <ion-label :color="colorName">Create Your Chat Account</ion-label>
         </ion-button>
@@ -413,15 +412,14 @@
         <ion-button
           v-else
           @click="postReply()" 
-          fill="outline"  
           class="replyButtons" 
-          color="dark"
+          color="lightOffDark"
           :disabled="overReplyByteSizeLimit || replyMessage==''"
         >
           <ion-label :color="colorName">Reply</ion-label>
         </ion-button>
 
-        <ion-button @click="replying=false; replyMessage=''" class="replyButtons" fill="outline" color="dark">
+        <ion-button @click="replying=false; replyMessage=''" class="replyButtons" color="lightOffDark">
           <ion-label :color="colorName">Cancel</ion-label>
         </ion-button>
       </div>

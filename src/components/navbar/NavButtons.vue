@@ -3,8 +3,9 @@
     <!--Big Nav Buttons-->
     <ion-button 
       v-for="(navButton, index) in navButtons"
-      :color="colorName"
-      class="navButton bigNavButtons"
+      color="offLightDark "
+      class="navButton bigNavButtons thinBorder"
+      style="border-radius: 4px"
       :class="{ selected: navigation.navBarIndex === index }"
       @click="handleNavClick(index, navButton.url)"
     >
@@ -14,21 +15,21 @@
     <!--Lil Nav Buttons-->
     <ion-button
       id="lilNavSelector"
-      :color="colorName"
+      color="offLightDark "
       class="navButton"
       @click="openPopOver($event)"
     >
       <div class="flexCenterColumn noClickEvent" style="margin-top: 20px">
-        <ion-label class="lilNavTextSize" :class="lilNavClass" :color="lilNavTextColor">{{ lilNavText }}</ion-label>
-        <ion-icon id="lilNavChevron" :src="chevronDown"></ion-icon>
+        <ion-label class="lilNavTextSize" :class="lilNavClass" :color="lilNavClass=='' ? colorName : ''">{{ lilNavText }}</ion-label>
+        <ion-icon id="lilNavChevron" color="dark" :src="chevronDown"></ion-icon>
       </div>
     </ion-button>
     <ion-popover :is-open="popoverOpen" :event="event" @didDismiss="popoverOpen=false" side="bottom" size="cover">
       <div class="flexCenterColumn">
         <ion-button 
           v-for="(navButton, index) in navButtons"
-          :color="colorName"
-          class="popOverButton tinyMarginTop"
+          color="offLightDark "
+          class="popOverButton tinyMarginTop thinBorder"
           :class="{ selected: navigation.navBarIndex === index,
             tinyMarginBottom: index === navButtons.length - 1 }"
           :style="{ '--box-shadow': navigation.navBarIndex === index ? `0px 0px 5px 8px ${buttonShadow}`: '' }"
@@ -50,8 +51,7 @@
   const props = defineProps(['navButtons', 'colorName', 'buttonShadow'])
 
   var lilNavText = ref("")
-  var lilNavClass = ""
-  var lilNavTextColor = ref("")
+  var lilNavClass = ref("")
 
   var popoverOpen = ref()
   var event :Event
@@ -102,19 +102,23 @@
     if(navigation.navBarIndex == 0)
     {
       lilNavText.value = props.navButtons[navigation.navBarIndex]?.lilNavText
-      lilNavClass = "rainbowText"
-      lilNavTextColor.value = ""
+      lilNavClass.value = "rainbowText"
     }
     else
     {
       lilNavText.value = props.navButtons[navigation.navBarIndex]?.lilNavText
-      lilNavClass = ""
-      lilNavTextColor.value = "dark"
+      lilNavClass.value = ""
     }
   }
 </script>
 
 <style scoped>
+  ion-button
+  {
+    border: thin solid var(--ion-color-dark);
+    border-radius: 4px
+  }
+
   .navButton
   {
     margin: 7px;
@@ -125,11 +129,11 @@
     font-weight: bold
   }
 
-  .navButton:hover
+  ion-button:hover
   {
-    opacity: 1;
+
     text-decoration: underline;
-    text-decoration-color: var(--ion-color-light);
+    text-decoration-color: var(--ion-color-dark);
     text-decoration-thickness: 2px
   }
 
@@ -141,15 +145,13 @@
   ion-button.selected
   {
     text-decoration: underline;
-    text-decoration-color: var(--ion-color-light);
+    text-decoration-color: var(--ion-color-dark);
     text-decoration-thickness: 2px;
-    --border-radius: 12px;
     --box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
   }
 
   #lilNavSelector
   {
-    --border-radius: 12px;
     --box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
   }
 

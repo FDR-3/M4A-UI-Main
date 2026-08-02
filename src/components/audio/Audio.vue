@@ -27,6 +27,18 @@
       Your browser does not support the audio element.
     </audio>
   </div>
+
+  <div v-if="navigation.menuIndex==MenuIndex.M4A && navigation.navBarIndex==2">
+    <audio id="openChartSFX">
+      <source src="/metal_gear_solid_tone.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+
+    <audio id="closeChartSFX">
+      <source src="/mgs_exit.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -37,11 +49,12 @@
   function playSelectionMusic()
   {
     return navigation.menuIndex == MenuIndex.M4A && 
-      navigation.navBarIndex == 0 &&
+      (
+      (navigation.navBarIndex == 0 &&
       (navigation.pageIndex == 1 || 
       navigation.pageIndex == 2 ||
       navigation.pageIndex == 3 ||
-      navigation.pageIndex == 35)
+      navigation.pageIndex == 35)))
   }
   
   watch(navigation, async() =>

@@ -112,14 +112,14 @@
       labelClass: '',
       text: "Stats",
       lilNavText: "Stats",
-      textColor: "dark"
+      textColor: "gray"
     },
     {
       id: 'admin',
       labelClass: '',
       text: "Admin",
       lilNavText: "Admin",
-      textColor: "dark"
+      textColor: "gray"
     }
   ]
 

@@ -48,13 +48,14 @@
   .toolbarContainer
   {
     display: flex;
-    height: 88px;
+    height: 88px
   }
 
   .buttonContainer
   {
     display: flex;
-    align-items: center
+    align-items: center;
+    background: light-dark(#ffffff,#202020)
   }
 
   .solanaWalletButtonContainer
