@@ -137,7 +137,7 @@
     chartOptions.value = setChartOptions()
   })
 
-  watch([chartRef, chartData], async() =>
+  watch(chartData, async() =>
   {
     await sleep(40)
     chartRef.value.chart.hide(0)
