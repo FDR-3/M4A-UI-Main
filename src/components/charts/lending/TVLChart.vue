@@ -1,11 +1,7 @@
 <template>
   <div class="smallMarginTop">
     <div class="">
-
-      
       <br>
-
-
       <div class="nMediumMarginTop vYearAndActionContainer">
         <Select
         class="chartSelect smallMarginBottom"
@@ -52,15 +48,13 @@
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, watch } from 'vue'
-  import { IonButton, IonLabel, IonPopover, IonText } from '@ionic/vue'
+  import { IonLabel} from '@ionic/vue'
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
-  import { lendingUserAvailableStableCoinYearsBySubMarketHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
-  import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { lendingProtocolHistoryOptions, TVLHistoryHashMap } from './TVLHistory'
+  import { sleep } from '/src/assets/helperFunctions/sleep.ts'
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(['currentTVL'])
@@ -68,7 +62,7 @@
   var chartData = ref()
   var chartOptions = ref()
   var chartRef = ref<any>(null)
-  var legenHiddenArray = ref([false, false, false])
+  var legenHiddenArray = ref([false])
   var chartTextColor = ref(darkTheme.value ? "#ffffff" : "#000000")
   var animationIntervalId: any
   var chartSelect = ref("All")
@@ -141,6 +135,14 @@
       chartTextColor.value = "#000000"
 
     chartOptions.value = setChartOptions()
+  })
+
+  watch([chartRef, chartData], async() =>
+  {
+    await sleep(40)
+    chartRef.value.chart.hide(0)
+    chartRef.value.chart.show(0)
+    chartRef.value.chart.update()
   })
 
   watch(() => [props.currentTVL], (() => 

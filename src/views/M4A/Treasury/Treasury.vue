@@ -19,7 +19,7 @@
   </ion-button>
 
   <transition name="chartSlide">
-    <div v-if="showTVLHistory" class="chartindow">
+    <div v-if="showTVLHistory">
       <div class="chartContent">
         <div class="beamOverlay"></div>
         <TVLChart :currentTVL="totalTVL"/>
@@ -210,9 +210,6 @@
     --border-radius: 4px;
     --border-width: 1px;
     --border-style: solid;
-    --border-color: currentColor /*Or your custom border color*/
-
-    /*width: min(400px, 58vw)*/
   }
 
   h1
@@ -348,12 +345,6 @@
 {
   grid-template-rows: 1fr;
   opacity: 1
-}
-
-.chartWindow
-{
-  width: 100%;
-  overflow: hidden
 }
 
 .chartContent

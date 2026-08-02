@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div style="margin-bottom: 3px">
     <!--Big Nav Buttons-->
     <ion-button 
       v-for="(navButton, index) in navButtons"
       color="offLightDark "
-      class="navButton bigNavButtons thinBorder"
+      class="navButton bigNavButtons"
       style="border-radius: 4px"
       :class="{ selected: navigation.navBarIndex === index }"
       @click="handleNavClick(index, navButton.url)"
@@ -29,7 +29,7 @@
         <ion-button 
           v-for="(navButton, index) in navButtons"
           color="offLightDark "
-          class="popOverButton tinyMarginTop thinBorder"
+          class="popOverButton tinyMarginTop"
           :class="{ selected: navigation.navBarIndex === index,
             tinyMarginBottom: index === navButtons.length - 1 }"
           :style="{ '--box-shadow': navigation.navBarIndex === index ? `0px 0px 5px 8px ${buttonShadow}`: '' }"
@@ -114,9 +114,11 @@
 
 <style scoped>
   ion-button
-  {
-    border: thin solid var(--ion-color-dark);
-    border-radius: 4px
+  { 
+    --border-radius: 4px;
+    --border-width: 1px;
+    --border-style: solid;
+    border: thin solid var(--ion-color-dark)
   }
 
   .navButton
