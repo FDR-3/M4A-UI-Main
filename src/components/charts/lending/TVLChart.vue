@@ -139,7 +139,7 @@
 
   watch(chartData, async() =>
   {
-    await sleep(40)
+    await sleep(70)
     chartRef.value.chart.hide(0)
     chartRef.value.chart.show(0)
     chartRef.value.chart.update()
