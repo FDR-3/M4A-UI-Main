@@ -606,8 +606,10 @@
       playOpenChartSFX()
       setTimeout(() => 
       {
-        document.getElementById(props.id)?.scrollIntoView() //Scroll to the comment that had it's replies opened
-      }, 20) // 2000 milliseconds = 2 seconds
+        document.getElementById(props.id)?.scrollIntoView({ //Scroll to the comment that had it's replies opened
+        behavior: 'smooth', 
+        block: 'start' })
+      }, 350) //350 milliseconds = 0.35 seconds
     }
     else
       playCloseChartSFX()
