@@ -173,14 +173,13 @@
   import { search } from 'ionicons/icons'
   import { tokenReserves, tokenReserveFontEndInfoHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { getLendingUserLookUpTableAddressAndInstructions, sendVersionedLendingProtocolTransaction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
-  import { PublicKey, VersionedTransaction, TransactionMessage } from "@solana/web3.js"
+  import { PublicKey } from "@solana/web3.js"
   import { copyAddress,
     copyTreasuryATAText,
     confirmLendingTransaction,
     parseProgramErrorCode,
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { adminAccounts, tvl } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { solvencyTreasuryWalletPublicKeyString } from '/src/assets/constants/Addresses.ts'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
@@ -265,7 +264,6 @@
 
   function processTokenReserveTableData()
   {
-    var value = 0
     var processedTableData = []
     var newTableData = cloneDeep(tokenReserves)
 
@@ -317,7 +315,6 @@
       maximumFractionDigits: decimalAmount })
     }
 
-    tvl.tokenReserveTVL = value
     tokenReserveTableData.value = processedTableData
   }
 

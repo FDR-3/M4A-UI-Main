@@ -30,19 +30,9 @@
       <template #header>
         <div class="flexCenterRow">
           <div>
-            <h2>Token Reserve Deposited Value: $<span class="rainbowText">{{ tvl.tokenReserveTVL.toLocaleString('en-US',
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2 
-                }) }}
-              </span>
+            <h2>Token Reserve Deposited Value: $<span class="rainbowText">{{ totalDepositedValue }}</span>
             </h2>
-            <h2>Token Reserve Borrowed Value: $<span class="poopText">{{ totalBorrowedValue.toLocaleString('en-US',
-                {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2 
-                }) }}
-              </span>
+            <h2>Token Reserve Borrowed Value: $<span class="poopText">{{ totalBorrowedValue }}</span>
             </h2>
           </div>
           <br>
@@ -349,7 +339,8 @@
   var copyFullAddressButtonText = ref(copyFullAddressText)
 
   var tokenReserveATAPopoverOpen = ref(false)
-  var totalBorrowedValue = ref(0)
+  var totalDepositedValue = ref("$0.00")
+  var totalBorrowedValue = ref("$0.00")
   var copyTokenReserveATAButtonText = ref(copyTonkenReserveATAText)
 
   var inputFeeRefs = ref(new Map())
@@ -548,14 +539,18 @@
       //Calculate Deposit Value
       const depositedBalance = processedTableData[i].depositedAmount
       var depositCalculatedValue = 0
+      let flooredValue = 0
 
       if(priceData)
-        depositCalculatedValue = Math.floor(depositedBalance * priceData.usdPrice * 100) / 100
+      {
+        depositCalculatedValue = depositedBalance * priceData.usdPrice
+        flooredValue = Math.floor(depositCalculatedValue * 100) / 100
+      }
 
       processedTableData[i].depositedAmountString = Number(depositedBalance).toLocaleString('en-US', {
           minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
           maximumFractionDigits: processedTableData[i].tokenDecimalAmount })
-      processedTableData[i].depositedValue = '$' + depositCalculatedValue.toLocaleString('en-US', {
+      processedTableData[i].depositedValue = '$' + flooredValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
       depositedValue += depositCalculatedValue
@@ -563,14 +558,18 @@
       //Calculate Borrow Value
       const borrowedBalance = processedTableData[i].borrowedAmount
       var borrowCalculatedValue = 0
+      flooredValue = 0
 
       if(priceData)
-        borrowCalculatedValue = Math.floor(borrowedBalance * priceData.usdPrice * 100) / 100
+      {
+        borrowCalculatedValue = borrowedBalance * priceData.usdPrice
+        flooredValue = Math.floor(borrowCalculatedValue * 100) / 100
+      }
 
       processedTableData[i].borrowedAmountString = Number(borrowedBalance).toLocaleString('en-US', {
           minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
           maximumFractionDigits: processedTableData[i].tokenDecimalAmount })
-      processedTableData[i].borrowedValue = '$' + borrowCalculatedValue.toLocaleString('en-US', {
+      processedTableData[i].borrowedValue = '$' + flooredValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
       borrowedValue += borrowCalculatedValue
@@ -594,29 +593,29 @@
             {
               //Calculate Deposit Value
               const depositedBalance = unProcessedTokenSubMarketList[j].depositedAmount
-              var depositCalculatedValue = 0
+              let flooredValue = 0
 
               if(priceData)
-                depositCalculatedValue = (depositedBalance * priceData.usdPrice)
+                flooredValue = Math.floor(depositedBalance * priceData.usdPrice * 100) / 100
 
               unProcessedTokenSubMarketList[j].depositedAmountString = Number(depositedBalance).toLocaleString('en-US', {
                 minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
                 maximumFractionDigits: processedTableData[i].tokenDecimalAmount })
-              unProcessedTokenSubMarketList[j].depositedValue = '$' + depositCalculatedValue.toLocaleString('en-US', {
+              unProcessedTokenSubMarketList[j].depositedValue = '$' + flooredValue.toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2 })
 
               //Calculate Borrow Value
               const borrowedBalance = unProcessedTokenSubMarketList[j].borrowedAmount
-              var borrowCalculatedValue = 0
+              flooredValue = 0
 
               if(priceData)
-                borrowCalculatedValue = (borrowedBalance * priceData.usdPrice)
+                flooredValue = Math.floor(borrowedBalance * priceData.usdPrice * 100) / 100
 
               unProcessedTokenSubMarketList[j].borrowedAmountString = Number(borrowedBalance).toLocaleString('en-US', {
                 minimumFractionDigits: processedTableData[i].tokenDecimalAmount,
                 maximumFractionDigits: processedTableData[i].tokenDecimalAmount })
-              unProcessedTokenSubMarketList[j].borrowedValue = '$' + borrowCalculatedValue.toLocaleString('en-US', {
+              unProcessedTokenSubMarketList[j].borrowedValue = '$' + flooredValue.toLocaleString('en-US', {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2 })
             }
@@ -634,7 +633,12 @@
     }
 
     tvl.tokenReserveTVL = depositedValue
-    totalBorrowedValue.value = borrowedValue
+
+    borrowedValue = Math.floor(borrowedValue * 100) / 100
+    depositedValue = Math.floor(depositedValue * 100) / 100
+
+    totalDepositedValue.value = depositedValue.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
+    totalBorrowedValue.value = borrowedValue.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
     tokenReserveTableData.value = processedTableData
   }
 

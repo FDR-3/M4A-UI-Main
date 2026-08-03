@@ -114,12 +114,12 @@
     ]
   }
 
-  onMounted(() =>
+  onMounted(async() =>
   {
     setChartData()
-    chartData.value = chartDataHashMap.get(chartSelect.value)
     chartOptions.value = setChartOptions()
     startGradientAnimation()
+    chartData.value = chartDataHashMap.get(chartSelect.value)
   })
 
   onUnmounted(() =>
@@ -147,7 +147,7 @@
 
   watch(() => [props.currentTVL], (() => 
   {
-    setChartData()
+    chartData.value.datasets[0].data[chartData.value.datasets[0].data.length-1] = props.currentTVL
   }))
 
   function startGradientAnimation()
@@ -341,7 +341,7 @@
         }
         else
         {
-          if(year == currentYear && month == currentMonth)
+          if(year == currentYear && (month == currentMonth || month == currentMonth-1)) //Handle current month and previous month if it has just turned to a new month
             if(props.currentTVL)
             {
               allLabels.push(monthList[month-1].monthName + ' ' + year.toString())
