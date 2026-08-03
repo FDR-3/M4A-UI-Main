@@ -425,18 +425,22 @@
       </div>
     </div>
     
-    <ReplyLv4List 
-      v-if="showReplies"
-      id="replies" 
-      class="fancyLine"
-      :commentSectionNamePrefix="commentSectionNamePrefix"
-      :commentSectionName="commentSectionName"
-      :replies="replyTuple[REPLY_LIST_INDEX]"
-      :remainingReplies="replyTuple[REMAINING_REPLIES_INDEX]"
-      :colorName="colorName"
-      :colorHexValue="colorHexValue"
-
-    />
+    <transition name="commentListSlide">
+      <div v-if="showReplies">
+        <div class="commentListContent">
+          <div class="beamOverlay"></div>
+          <ReplyLv4List 
+          id="replies" 
+          class="fancyLine"
+          :commentSectionNamePrefix="commentSectionNamePrefix"
+          :commentSectionName="commentSectionName"
+          :replies="replyTuple[REPLY_LIST_INDEX]"
+          :remainingReplies="replyTuple[REMAINING_REPLIES_INDEX]"
+          :colorName="colorName"
+          :colorHexValue="colorHexValue"/>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -466,6 +470,7 @@
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { openReplyLv3InSolanaExplorer } from '/src/assets/helperFunctions/browserHelper.ts'
   import SolanaSVG from '/src/assets/svg/solana-svg.vue'
+  import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
 
   const props = defineProps(
   [
@@ -599,11 +604,14 @@
 
     if(show)
     {
+      playOpenChartSFX()
       setTimeout(() => 
       {
         document.getElementById(props.id)?.scrollIntoView() //Scroll to the comment that had it's replies opened
       }, 20) // 2000 milliseconds = 2 seconds
     }
+    else
+      playCloseChartSFX()
   }
 
   function openUserPopover(e: Event) 
@@ -1087,15 +1095,31 @@
     max-width: 55px
   }
 
-  /*.transition
+  /*The Horizontal Glowing Light Beam*/
+  .beamOverlay::before
   {
-    max-height: 0
-    transition: max-height ease 750ms
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    opacity: 0;
+    background: linear-gradient(90deg, transparent 0%, v-bind(colorHexValue) 50%, transparent 100%);
+    box-shadow: 0 0 15px v-bind(colorHexValue)
   }
 
-  .transition.active {
-    max-height: 100vh
-  }*/
+  /*Particles following near the beam*/
+  .beamOverlay::after
+  {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 35px;
+    opacity: 0;
+    background-image: radial-gradient(circle, v-bind(colorHexValue) 1.5px, transparent 2px);
+    background-size: 24px 24px
+  }
 
   @media screen and (min-width: 1115px)  
   { 

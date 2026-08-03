@@ -15,24 +15,31 @@
     style="margin-bottom: -0px"/>
     <div id="commentSection">
       <ion-button v-if="connectedWallet.addressString==adminAccounts.chatCEOAddress" :color="colorName" @click="setCommentSectionFlag(true)"><ion-label color="dark">Disable Comment Section</ion-label></ion-button>
-      <ion-button :color="colorName" @click="toggleShowComments()" :disabled="reloadingData"><ion-label color="dark">{{ hideCommentsMessage }}</ion-label></ion-button>
+      <ion-button id="hideCommentSectionsButton" :color="colorName" @click="toggleShowComments()" :disabled="reloadingData"><ion-label color="dark">{{ hideCommentsMessage }}</ion-label></ion-button>
       <ion-button v-if="!hidenCommentSections.hidden && commentSectionCommentCount!=0" id="sortButton" @click="reOrderList()" :color="colorName">
         <ion-label color="dark">
           {{ sortMessage }}
         </ion-label>
       </ion-button>
-      <CommentList
-        v-if="!hidenCommentSections.hidden"
-        :colorName="colorName"
-        :colorHexValue="colorHexValue"
-        :toggleList="toggleList"
-        :commentSectionNamePrefix="commentSectionNamePrefix"
-        :commentSectionName="commentSectionName"
-        :comments="commentSectionComments"
-        :replies="commentSectionReplies"
-        :repliesToReplies="commentSectionRepliesToReplies"
-        :remainingReplies="commentSectionRemainingReplies"
-      />
+
+      <transition name="commentListSlide">
+        <div v-if="!hidenCommentSections.hidden">
+          <div class="commentListContent">
+            <div class="beamOverlay"></div>
+            <CommentList
+            :colorName="colorName"
+            :colorHexValue="colorHexValue"
+            :toggleList="toggleList"
+            :commentSectionNamePrefix="commentSectionNamePrefix"
+            :commentSectionName="commentSectionName"
+            :comments="commentSectionComments"
+            :replies="commentSectionReplies"
+            :repliesToReplies="commentSectionRepliesToReplies"
+            :remainingReplies="commentSectionRemainingReplies"/>
+          </div>
+        </div>
+      </transition>
+
     </div>
   </div>
 </template>
@@ -51,6 +58,7 @@
   import { getCommentSection, sortCommentSectionPostsAndProcessUserNames, getUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
 
   defineProps(['colorName', 'colorHexValue'])
 
@@ -273,7 +281,7 @@
     }
   }
 
-  async function toggleShowComments()
+  function toggleShowComments()
   {
     reloadingData.value = true; //Keeps user from multi clicking and loading the comments too many times, saves them from themselves
 
@@ -285,9 +293,17 @@
       commentSectionRepliesToReplies.value = sortCommentSectionPostsAndProcessUserNames(pliLv3Replies.data, commentSectionName.value)
       commentSectionRemainingReplies.value = sortCommentSectionPostsAndProcessUserNames(pliLv4Replies.data, commentSectionName.value)
 
+      playOpenChartSFX()
       hideCommentsMessage.value = "Hide All Comment Sections"
       localStorage.setItem("hideComments", "false")
       hidenCommentSections.hidden = false
+
+      setTimeout(() => 
+      {
+        document.getElementById("hideCommentSectionsButton")?.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' })
+      }, 350) //350 milliseconds = 0.35 seconds
     }
     else
     {
@@ -296,6 +312,7 @@
       commentSectionRepliesToReplies.value = []
       commentSectionRemainingReplies.value = []
 
+      playCloseChartSFX()
       hideCommentsMessage.value = "Show All Comment Sections"
       localStorage.setItem("hideComments", "true")
       hidenCommentSections.hidden = true

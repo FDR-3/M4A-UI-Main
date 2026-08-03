@@ -28,7 +28,7 @@
     </audio>
   </div>
 
-  <div v-if="navigation.menuIndex==MenuIndex.M4A && navigation.navBarIndex==2">
+  <div>
     <audio id="openChartSFX">
       <source src="/metal_gear_solid_tone.mp3" type="audio/mpeg">
       Your browser does not support the audio element.

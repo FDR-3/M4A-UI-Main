@@ -274,41 +274,6 @@
         currentLv4ReplyFEDCount = aboutChat.data.ceoMarkedFedLv4ReplyCount
       }
     }
-    else
-    {
-      aboutComments.data = []
-      aboutReplies.data = []
-      aboutLv3Replies.data = []
-      aboutLv4Replies.data = []
-
-      currentCommentCount = new anchor.BN(0)
-      currentEditedCommentCount = new anchor.BN(0)
-      currentDeletedCommentCount = new anchor.BN(0)
-      currentCommentVoteCount = new anchor.BN(0)
-      currentCommentStarredCount = new anchor.BN(0)
-      currentCommentFEDCount = new anchor.BN(0)
-
-      currentReplyCount = new anchor.BN(0)
-      currentEditedReplyCount = new anchor.BN(0)
-      currentDeletedReplyCount = new anchor.BN(0)
-      currentReplyVoteCount = new anchor.BN(0)
-      currentReplyStarredCount = new anchor.BN(0)
-      currentReplyFEDCount = new anchor.BN(0)
-
-      currentLv3ReplyCount = new anchor.BN(0)
-      currentEditedLv3ReplyCount = new anchor.BN(0)
-      currentDeletedLv3ReplyCount = new anchor.BN(0)
-      currentLv3ReplyVoteCount = new anchor.BN(0)
-      currentLv3ReplyStarredCount = new anchor.BN(0)
-      currentLv3ReplyFEDCount = new anchor.BN(0)
-
-      currentLv4ReplyCount = new anchor.BN(0)
-      currentEditedLv4ReplyCount = new anchor.BN(0)
-      currentDeletedLv4ReplyCount = new anchor.BN(0)
-      currentLv4ReplyVoteCount = new anchor.BN(0)
-      currentLv4ReplyStarredCount = new anchor.BN(0)
-      currentLv4ReplyFEDCount = new anchor.BN(0)
-    }
   })
 
   async function getAboutComments()
