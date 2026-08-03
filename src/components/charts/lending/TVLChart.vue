@@ -147,6 +147,7 @@
 
   watch(() => [props.currentTVL], (() => 
   {
+    setChartData()
     //chartData.value.datasets[0].data[chartData.value.datasets[0].data.length-1] = props.currentTVL
   }))
 
