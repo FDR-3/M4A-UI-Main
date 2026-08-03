@@ -339,8 +339,8 @@
   var copyFullAddressButtonText = ref(copyFullAddressText)
 
   var tokenReserveATAPopoverOpen = ref(false)
-  var totalDepositedValue = ref("$0.00")
-  var totalBorrowedValue = ref("$0.00")
+  var totalDepositedValue = ref("0.00")
+  var totalBorrowedValue = ref("0.00")
   var copyTokenReserveATAButtonText = ref(copyTonkenReserveATAText)
 
   var inputFeeRefs = ref(new Map())

@@ -38,7 +38,7 @@
     /*if(isProduction())
       rpcUrl.value = "https://m4a.io/MainNetProxy"
     else
-      rpcUrl.value = "https://m4a.io/MainNetProxy"*/
+      rpcUrl.value = "https://api.testnet.solana.com"*/
   }
 
   const connection = shallowRef(new Connection(rpcUrl.value, preflightCommitment))

@@ -52,6 +52,7 @@
           optionLabel="yearAvailable" 
           optionValue="yearAvailable" 
           placeholder="Select Year"
+          appendTo="self"
           @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, yearSelect)">
           </Select>
 
@@ -143,6 +144,7 @@
         optionLabel="yearAvailable" 
         optionValue="yearAvailable" 
         placeholder="Select Year"
+        appendTo="self"
         @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, yearSelect)">
         </Select>
         <div v-if="ownerAddress==connectedWallet.addressString" class="nSmallMarginTop">

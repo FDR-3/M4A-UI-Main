@@ -119,7 +119,7 @@
     setChartData()
     chartOptions.value = setChartOptions()
     startGradientAnimation()
-    chartData.value = chartDataHashMap.get(chartSelect.value)
+    chartData.value = cloneDeep(chartDataHashMap.get(chartSelect.value))
   })
 
   onUnmounted(() =>
@@ -137,17 +137,17 @@
     chartOptions.value = setChartOptions()
   })
 
-  watch(chartData, async() =>
+  /*watch(chartData, async() =>
   {
     await sleep(70)
     chartRef.value.chart.hide(0)
     chartRef.value.chart.show(0)
     chartRef.value.chart.update()
-  })
+  })*/
 
   watch(() => [props.currentTVL], (() => 
   {
-    chartData.value.datasets[0].data[chartData.value.datasets[0].data.length-1] = props.currentTVL
+    //chartData.value.datasets[0].data[chartData.value.datasets[0].data.length-1] = props.currentTVL
   }))
 
   function startGradientAnimation()
@@ -368,7 +368,7 @@
 
   function updateChartData()
   {
-    chartData.value = chartDataHashMap.get(chartSelect.value)
+    chartData.value = cloneDeep(chartDataHashMap.get(chartSelect.value))
   }
 </script>
 
