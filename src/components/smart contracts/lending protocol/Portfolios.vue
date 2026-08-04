@@ -1,6 +1,6 @@
 <template>
   <div v-if="isBrowsingAllUsers">
-    <ion-button color="lightOffDark" class="thinBorder" style="border-radius: 4px; margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false)">
+    <ion-button color="lightOffDark" class="" style="margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false)">
       <ion-label color="green">Charts</ion-label>
     </ion-button>
     <LendingLeaderBoardTable
@@ -28,12 +28,12 @@
       <ion-button
       id="checkNewAddressButton"
       @click="isValidPublicKey=isValidSolanaPublicKey(addressToCheck); checkNewAddress()"
-      color="lightOffDark" class="thinBorder" style="border-radius: 4px"
+      color="lightOffDark" 
       >
         <ion-label color="green">Check New Address</ion-label>
       </ion-button>
 
-      <ion-button color="lightOffDark" class="thinBorder" style="border-radius: 4px" @click="setIsBrowsingAllLendingUsers(true)">
+      <ion-button color="lightOffDark" @click="setIsBrowsingAllLendingUsers(true)">
         <ion-label color="green">Browse All Users</ion-label>
       </ion-button>
     </div>
@@ -1377,6 +1377,15 @@
 </script>
 
 <style scoped>
+  ion-button
+  {
+    --padding-start: 10px;
+    --padding-end: 10px;
+    border-radius: 4px;
+   
+    border: thin solid var(--ion-color-dark);
+  }
+
   h2
   {
     font-size: min(6vw, 30px)
@@ -1517,11 +1526,6 @@
     .hHeaderDisplay
     {
       display: none
-    }
-
-    .topVHeaderDisplay
-    {
-
     }
     .vHeaderDisplay
     {

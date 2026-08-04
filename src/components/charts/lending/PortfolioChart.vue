@@ -282,7 +282,7 @@
     </div>
 
     <div class="card">
-      <Chart type="line" ref="chartRef" :data="chartData" :options="chartOptions" class="h-30rem"/>
+      <Chart type="line" ref="chartRef" :data="chartData" :options="chartOptions"/>
     </div>
   </div>
 

@@ -10,7 +10,7 @@
           :buttonShadow = "buttonShadow"
         />
     
-        <div v-if="width >= breakpoint" class="solanaWalletButtonContainer">
+        <div v-if="windowWidth >= breakpoint" class="solanaWalletButtonContainer">
           <WalletButton 
             :colorName="colorName"
             :colorHexValue="colorHexValue"
@@ -39,7 +39,7 @@
 
   defineProps(['navButtons', 'colorName', 'buttonShadow', 'colorHexValue'])
 
-  const { width } = useWindowResize() //Use the composable to get the reactive width
+  const { windowWidth } = useWindowResize() //Use the composable to get the reactive width
   const breakpoint = 655 //Define your breakpoint
 
 </script>

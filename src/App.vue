@@ -5,7 +5,7 @@
         <ion-content>
           <div class="flexCenterColumn" style="padding: 10px">
             <div id="walletConnectButtonContainer">
-              <div v-if="width < breakpoint">
+              <div v-if="windowWidth < breakpoint">
                 <WalletButton :colorName="colorName" :colorHexValue="colorHexValue" :featured="2" container="body"/>
               </div>
             </div>
@@ -106,7 +106,7 @@
   var buttonShadow = ref()
   var currentMenuIndex: number
 
-  const { width } = useWindowResize() //Use the composable to get the reactive width
+  const { windowWidth } = useWindowResize() //Use the composable to get the reactive width
   const breakpoint = 655 //Define your breakpoint
 
   const appPages = 

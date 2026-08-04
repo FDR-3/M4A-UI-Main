@@ -483,6 +483,9 @@
 
         for(var j=0; j<tempData[i].accountList.length; j++)
         {
+          //Remarking SVG Raw to prevent overhead and warnings in console
+          tempData[i].accountList[j].tokenSVG = markRaw(tempData[i].accountList[j].tokenSVG)
+
           const decimalAmount = tokenDecimalHashMap.get(tempData[i].accountList[j].tokenId)
           var calculatedValue = 0
           var flooredValue = 0.00
@@ -497,10 +500,7 @@
             const subMarket = subMarketsHashMap.map.get(tempData[i].accountList[j].tokenId.toString() +
             tempData[i].accountList[j].subMarketOwnerAddress +
             tempData[i].accountList[j].subMarketIndex.toString())
-            tempData[i].accountList[j].feeOnInterestEarnedRate = subMarket.feeOnInterestEarnedRate.toFixed(2) + '%',
-
-            //Remarking SVG Raw to prevent overhead and warnings in console
-            tempData[i].accountList[j].tokenSVG = markRaw(tempData[i].accountList[j].tokenSVG)
+            tempData[i].accountList[j].feeOnInterestEarnedRate = subMarket.feeOnInterestEarnedRate.toFixed(2) + '%'
 
             const [newInterestEarnedAmount, newFeesGeneratedAmount] = calculateUserNewInterestEarnedAmount(tempData[i].accountList[j])
             

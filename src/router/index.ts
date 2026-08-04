@@ -38,6 +38,16 @@ const router = createRouter(
 {
   const fetchErrors = ['Failed to fetch dynamically imported module', 'text/html', 'ChunkLoadError']
   
+  //Check if the error matches our caching issues
+  if(fetchErrors.some((e) => error.message.includes(e) || error.name === e))
+    //Force a hard reload to the exact page they were trying to go to
+    window.location.href = to.fullPath
+})*/
+
+/*router.onError((error, to) =>
+{
+  const fetchErrors = ['Failed to fetch dynamically imported module', 'text/html', 'ChunkLoadError']
+  
   if(fetchErrors.some((e) => error.message.includes(e) || error.name === e))
   {
     const retryKey = `retry_load_${to.path}`

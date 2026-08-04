@@ -2,7 +2,7 @@
   <div class="smallMarginTop">
     <div class="">
       <br>
-      <div class="nMediumMarginTop vYearAndActionContainer">
+      <div class="nMediumMarginTop flexCenterColumn">
         <Select
         class="chartSelect smallMarginBottom"
         v-model="chartSelect" 
@@ -10,9 +10,8 @@
         optionLabel="historyOption" 
         optionValue="historyOption" 
         placeholder="Select Year"
-        @change="updateChartData()">
+        @change="switchChartData()">
         </Select>
-
       </div>
     </div>
 
@@ -40,15 +39,15 @@
       </div>
     </div>
 
-    <div class="card">
-      <Chart type="line" ref="chartRef" :data="chartData" :options="chartOptions" class="h-30rem"/>
+    <div ref="chartContainer">
+      <Chart type="line" ref="chartRef" :width="chartWidth" :data="chartData" :options="chartOptions"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch } from 'vue'
-  import { IonLabel} from '@ionic/vue'
+  import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+  import { IonLabel } from '@ionic/vue'
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
@@ -56,10 +55,10 @@
   import { lendingProtocolHistoryOptions, TVLHistoryHashMap } from './TVLHistory'
   import { sleep } from '/src/assets/helperFunctions/sleep.ts'
   import cloneDeep from 'lodash/cloneDeep'
-  
+
   const props = defineProps(['currentTVL'])
 
-  var chartData = ref()
+  var chartData: any
   var chartOptions = ref()
   var chartRef = ref<any>(null)
   var legenHiddenArray = ref([false])
@@ -67,8 +66,12 @@
   var animationIntervalId: any
   var chartSelect = ref("All")
   var chartDataHashMap = new Map<string, any>()
+  var chartContainer = ref<any>(null)
+  var chartWidth = ref(0)
 
   var gradientOffset = ref(0)
+
+  var initialLoad = true
  
   const allBaseChartData =
   {
@@ -116,10 +119,14 @@
 
   onMounted(async() =>
   {
+    initialLoad = true
     setChartData()
     chartOptions.value = setChartOptions()
+    chartData = chartDataHashMap.get(chartSelect.value)
+
+    await updateChartWidth() 
     startGradientAnimation()
-    chartData.value = cloneDeep(chartDataHashMap.get(chartSelect.value))
+    await showToggleAnimation()
   })
 
   onUnmounted(() =>
@@ -137,19 +144,56 @@
     chartOptions.value = setChartOptions()
   })
 
-  /*watch(chartData, async() =>
+  watch(() => [props.currentTVL], (async() => 
   {
-    await sleep(70)
+    if(chartData?.datasets?.[0])
+      chartData.datasets[0].data[chartData.datasets[0].data.length-1] = props.currentTVL.replace(/,/g, '')
+  }))
+
+  async function switchChartData()
+  {
+    chartOptions.value.responsive = false
+    chartData = chartDataHashMap.get(chartSelect.value)
+  
+    await sleep(40)
+    chartOptions.value.responsive = true
+  }
+
+  async function updateChartWidth() 
+  {
+    /*if(chartContainer.value) 
+    {
+      const currentWidth = chartContainer.value.clientWidth
+
+      if (currentWidth > 0) 
+      {
+        chartWidth.value = currentWidth
+        await nextTick()
+        
+        if (chartRef.value?.chart) 
+        {
+          const chart = chartRef.value.chart
+          
+          // Calculate target height using your configured aspectRatio (0.7)
+          // aspectRatio = width / height, so height = width / aspectRatio
+          const aspectRatio = chart.options.aspectRatio || 0.7
+          const currentHeight = Math.round(currentWidth / aspectRatio)
+
+          // Passing BOTH width and height forces Chart.js to recalculate crisp text fonts 
+          // AND align mouse hover event coordinates perfectly!
+          //chart.resize(currentWidth)
+        }
+      }
+    }*/
+  }
+
+  async function showToggleAnimation()
+  {
+    await sleep(100)
     chartRef.value.chart.hide(0)
     chartRef.value.chart.show(0)
     chartRef.value.chart.update()
-  })*/
-
-  watch(() => [props.currentTVL], (() => 
-  {
-    setChartData()
-    //chartData.value.datasets[0].data[chartData.value.datasets[0].data.length-1] = props.currentTVL
-  }))
+  }
 
   function startGradientAnimation()
   {
@@ -157,16 +201,13 @@
 
     animationIntervalId = setInterval(() =>
     { 
-      //Increment the offset slightly.
       gradientOffset.value += 0.07
       
-      //Ensure the offset wraps around (e.g., from 1.0 back to 0.0)
       if(gradientOffset.value >= 1)
         gradientOffset.value = 0
 
-      if(chartRef.value)
-        if(chartRef.value.chart)
-          chartRef.value.chart.update("none")
+      if(chartRef.value?.chart)
+        chartRef.value.chart.update("none")
     }, 55)
   }
 
@@ -186,16 +227,13 @@
 
     const width = chartArea.right - chartArea.left
     const offset = gradientOffset.value
-    //Shift goes from 0 to the width of the chart
     const shift = offset * width
 
-    //Create a gradient that is exactly twice as wide as the chart, and slide it left
     const gradient = ctx.createLinearGradient(
       chartArea.left - shift, 0, 
       chartArea.left - shift + (width * 2), 0
     )
 
-    //Two full cycles of the rainbow
     gradient.addColorStop(0.000, '#14ffe9')
     gradient.addColorStop(0.166, '#ffc800')
     gradient.addColorStop(0.333, '#ff00e0')
@@ -209,7 +247,8 @@
 
   function setChartOptions()
   {
-    return{
+    return {
+      responsive: true,
       maintainAspectRatio: false,
       aspectRatio: 0.7,
       transitions:
@@ -228,7 +267,6 @@
         {
           display: false
         },
-        //Fixes the hover popup truncation
         tooltip:
         {
           callbacks:
@@ -325,7 +363,6 @@
     
       var tempYearlyChartData = cloneDeep(yearlyBaseChartData)
       
-      //If current year, go up until the current month, otherwise cover the whole year
       const maxMonth = (year == currentYear) ? currentMonth : 12
 
       for(var month=1; month<=maxMonth; month++)
@@ -342,12 +379,12 @@
         }
         else
         {
-          if(year == currentYear && (month == currentMonth || month == currentMonth-1)) //Handle current month and previous month if it has just turned to a new month
+          if(year == currentYear && (month == currentMonth || month == currentMonth-1))
             if(props.currentTVL)
             {
               allLabels.push(monthList[month-1].monthName + ' ' + year.toString())
-              allTVLs.push(props.currentTVL)
-              yearlyTVLs.push(props.currentTVL)
+              allTVLs.push(props.currentTVL.replace(/,/g, ''))
+              yearlyTVLs.push(props.currentTVL.replace(/,/g, ''))
             }
             else
               yearlyTVLs.push(0)
@@ -365,11 +402,6 @@
     tempAllChartData.datasets[0].data = allTVLs
     tempYearlyHashMap.set("All", tempAllChartData)
     chartDataHashMap = tempYearlyHashMap
-  }
-
-  function updateChartData()
-  {
-    chartData.value = cloneDeep(chartDataHashMap.get(chartSelect.value))
   }
 </script>
 
@@ -515,26 +547,6 @@
     .vChartLayout
     {
       display: block
-    }
-  }
-
-  @media screen and (min-width: 240.1px)
-  { 
-    .vYearAndActionContainer
-    {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-    }
-  }
-  @media screen and (max-width: 240px)
-  { 
-    .vYearAndActionContainer
-    {
-      display: flex;
-      flex-direction: column;
-      align-items: center
     }
   }
 
