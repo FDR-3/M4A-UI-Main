@@ -27,6 +27,25 @@
           </h2>
           <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
+          <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowSinglePayerHistory()">
+            <ion-label v-if="!showSinglePayerHistory" color="green">Show History</ion-label>
+            <ion-label v-else color="green">Hide History</ion-label>
+          </ion-button>
+
+          <transition name="divSlide">
+            <div v-if="showSinglePayerHistory">
+              <div class="divSlideContent">
+                <div class="beamOverlay"></div>
+                <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })"
+            :current7DayProjection="sevenDayProjectionRate.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2 })"/>
+              </div>
+            </div>
+          </transition>
+
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Single Payer Treasury Search     ">
               <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
@@ -167,7 +186,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch, markRaw } from 'vue'
+  import { ref, onMounted, onUnmounted, watch, markRaw, inject } from 'vue'
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import DataTable from 'primevue/datatable'
   import Column from 'primevue/column'
@@ -183,13 +202,18 @@
   import { calculateTokenReserveSevenDaySupplyInterestFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import SinglePayerChart from '/src/components/charts/lending/SinglePayerChart.vue'
+  import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
   import cloneDeep from 'lodash/cloneDeep'
+
+  const colorHexValue = inject('colorHexValue') as string
 
   var stableCoinTableData = ref()
   var CryptoCurrencyTableData = ref()
   var isLoading = ref(true)
   var stableValue = ref(0)
   var cryptoValue = ref(0)
+  var showSinglePayerHistory = ref(false)
 
   var tokenPopoverOpen = ref(false)
   var event = ref()
@@ -506,6 +530,16 @@
   {
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
   })
+
+  function handleShowSinglePayerHistory()
+  {
+    if(!showSinglePayerHistory.value)
+      playOpenChartSFX()
+    else
+      playCloseChartSFX()
+
+    showSinglePayerHistory.value = !showSinglePayerHistory.value
+  }
 </script>
 
 <style scoped>
@@ -522,5 +556,31 @@
   ion-input
   {
     --highlight-color: var(--ion-color-green)
+  }
+
+  /*The Horizontal Glowing Light Beam*/
+  .beamOverlay::before
+  {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    opacity: 0;
+    background: linear-gradient(90deg, transparent 0%, var(--ion-color-green) 50%, transparent 100%);
+    box-shadow: 0 0 15px var(--ion-color-green)
+  }
+
+  /*Particles following near the beam*/
+  .beamOverlay::after
+  {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 35px;
+    opacity: 0;
+    background-image: radial-gradient(circle, var(--ion-color-green) 1.5px, transparent 2px);
+    background-size: 24px 24px
   }
 </style>

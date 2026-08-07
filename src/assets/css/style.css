@@ -29,6 +29,13 @@ iframe
   border-radius: 10px
 }
 
+.thinBorder4Rad
+{
+  /*border: thin, solid*/
+  border: thin solid var(--ion-color-dark); /*Color specified here for map hospital note popup border*/
+  border-radius: 4px
+}
+
 .thinBorder
 {
   /*border: thin, solid*/

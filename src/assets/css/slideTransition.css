@@ -1,7 +1,7 @@
 /*=========================================
    1. The Slide Down/Up Transition (Grid Method)
    =========================================*/
-.commentListSlide-enter-active, .commentListSlide-leave-active
+.divSlide-enter-active, .divSlide-leave-active
 {
   /*Grid row interpolation handles smooth height reveal without squishing chart content*/
   transition: grid-template-rows 0.6s cubic-bezier(0.33, 1, 0.68, 1),
@@ -10,20 +10,20 @@
 }
 
 /*State BEFORE entering and AFTER leaving (Hidden)*/
-.commentListSlide-enter-from, .commentListSlide-leave-to
+.divSlide-enter-from, .divSlide-leave-to
 {
   grid-template-rows: 0fr;
   opacity: 0
 }
 
 /*State AFTER entering and BEFORE leaving (Visible)*/
-.commentListSlide-enter-to, .commentListSlide-leave-from
+.divSlide-enter-to, .divSlide-leave-from
 {
   grid-template-rows: 1fr;
   opacity: 1
 }
 
-.commentListContent
+.divSlideContent
 {
   min-height: 0;
   overflow: hidden;
@@ -72,23 +72,23 @@
 }
 
 /*Sweeping Down on Show*/
-.commentListSlide-enter-active .beamOverlay::before
+.divSlide-enter-active .beamOverlay::before
 {
   animation: beamSweepDown 0.65s ease-in-out forwards
 }
 
-.commentListSlide-enter-active .beamOverlay::after
+.divSlide-enter-active .beamOverlay::after
 {
   animation: particleSweepDown 0.65s ease-in-out forwards
 }
 
 /*Sweeping Up on Hide*/
-.commentListSlide-leave-active .beamOverlay::before
+.divSlide-leave-active .beamOverlay::before
 {
   animation: beamSweepUp 0.65s ease-in-out forwards
 }
 
-.commentListSlide-leave-active .beamOverlay::after
+.divSlide-leave-active .beamOverlay::after
 {
   animation: particleSweepUp 0.65s ease-in-out forwards
 }

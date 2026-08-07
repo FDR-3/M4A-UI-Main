@@ -39,7 +39,7 @@
 
           <div v-if="accountList?.length > 0" class="nMediumSmallMarginBottom">
             <div class="flexCenterRow">
-              <div>
+              <div style="margin-top: 7px">
                 <InfoButton :infoMessage="userLendingInfoMSG"/>
               </div>
 
@@ -83,7 +83,7 @@
               <ion-button v-if="editingAccountName" class="nMediumSmallMarginLeft" fill="clear" @click="editingAccountName=false">
                 <ion-icon :src="close" color="dark"></ion-icon>
               </ion-button>
-              <ion-button v-else class="nSmallMarginLeft" fill="clear" @click="setInputFocus(); editingAccountName=true">
+              <ion-button v-else class="nSmallMarginLeft smallMarginTop" fill="clear" @click="setInputFocus(); editingAccountName=true">
                 <ion-icon :src="pencil" color="dark"></ion-icon>
               </ion-button>
             </div>

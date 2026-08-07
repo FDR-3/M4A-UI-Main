@@ -25,8 +25,12 @@
           @click="toggleDataset(index, chartRef)"
           >
             <div 
-              v-if="dataset.label=='TVL'" 
+              v-if="dataset.label=='Available For Payouts'" 
               class="swatch animatedRainbowX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='7 Day Projection'" 
+              class="swatch animatedRainbowY">
             </div>
             <span 
               class="legendLabel" 
@@ -52,11 +56,12 @@
   import Chart from 'primevue/chart'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { lendingProtocolHistoryOptions, TVLHistoryHashMap } from './TVLHistory'
+  import { lendingProtocolHistoryOptions } from './TVLHistory'
+  import { SinglePayerPayoutHistoryHashMap, SinglePayer7DayProjectionHistoryHashMap } from './SinglePayerHistory'
   import { sleep } from '/src/assets/helperFunctions/sleep.ts'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const props = defineProps(['currentTVL'])
+  const props = defineProps(['currentPayoutAmount', 'current7DayProjection'])
 
   var chartData: any
   var chartOptions = ref()
@@ -78,7 +83,7 @@
     [
       {
         type: 'line',
-        label: 'TVL',
+        label: 'Available For Payouts',
         borderColor: function(context: any)
         { 
           const chart = context.chart
@@ -88,6 +93,18 @@
         borderWidth: 4,
         fill: false,
         tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: '7 Day Projection',
+        backgroundColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setRainbowBarAnimatedGradient(ctx, chartArea)
+        },
+        maxBarThickness: 44,
         data: [] as any[]
       }
     ]
@@ -100,7 +117,7 @@
     [
       {
         type: 'line',
-        label: 'TVL',
+        label: 'Available For Payouts',
         borderColor: function(context: any)
         { 
           const chart = context.chart
@@ -110,6 +127,18 @@
         borderWidth: 4,
         fill: false,
         tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'bar',
+        label: '7 Day Projection',
+        backgroundColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setRainbowBarAnimatedGradient(ctx, chartArea)
+        },
+        maxBarThickness: 44,
         data: [] as any[]
       }
     ]
@@ -121,8 +150,10 @@
     chartOptions.value = setChartOptions()
     chartData = chartDataHashMap.get(chartSelect.value)
 
+    await updateChartWidth() 
     startGradientAnimation()
-    await showToggleAnimation()
+    await sleep(100)
+    chartOptions.value.responsive = true
   })
 
   onUnmounted(() =>
@@ -140,10 +171,12 @@
     chartOptions.value = setChartOptions()
   })
 
-  watch(() => [props.currentTVL], (async() => 
+  watch(() => [props.currentPayoutAmount, props.current7DayProjection], (async() => 
   {
     if(chartData?.datasets?.[0])
-      chartData.datasets[0].data[chartData.datasets[0].data.length-1] = props.currentTVL.replace(/,/g, '')
+      chartData.datasets[0].data[chartData.datasets[0].data.length-1] = props.currentPayoutAmount.replace(/,/g, '')
+    if(chartData?.datasets?.[1])
+      chartData.datasets[1].data[chartData.datasets[1].data.length-1] = props.current7DayProjection.replace(/,/g, '')
   }))
 
   async function switchChartData()
@@ -160,6 +193,17 @@
   {
     for(var i=0; i<legenHiddenArray.value.length; i++)
       legenHiddenArray.value[i] = false
+  }
+  
+  function updateChartWidth() 
+  {
+    if(chartContainer.value) 
+    {
+      const currentWidth = chartContainer.value.clientWidth
+
+      if (currentWidth > 0) 
+        chartWidth.value = currentWidth
+    }
   }
 
   async function showToggleAnimation()
@@ -220,10 +264,38 @@
     return gradient
   }
 
+  function setRainbowBarAnimatedGradient(ctx: any, chartArea:any)
+  {
+    if(!chartArea)
+      return
+
+    const height = chartArea.bottom - chartArea.top
+    const offset = gradientOffset.value
+    //Shift goes from 0 to the height of the chart
+    const shift = offset * height
+
+    //Create a gradient twice as tall as the chart, and slide it up
+    const gradient = ctx.createLinearGradient(
+      0, chartArea.top - shift, 
+      0, chartArea.top - shift + (height * 2)
+    )
+
+    //Two full cycles of the rainbow
+    gradient.addColorStop(0.000, '#14ffe9')
+    gradient.addColorStop(0.166, '#ffc800')
+    gradient.addColorStop(0.333, '#ff00e0')
+    gradient.addColorStop(0.500, '#14ffe9')
+    gradient.addColorStop(0.666, '#ffc800')
+    gradient.addColorStop(0.833, '#ff00e0')
+    gradient.addColorStop(1.000, '#14ffe9')
+
+    return gradient
+  }
+
   function setChartOptions()
   {
     return {
-      responsive: true,
+      responsive: false,
       maintainAspectRatio: false,
       aspectRatio: 0.7,
       transitions:
@@ -249,7 +321,7 @@
             label: function(context: any)
             {
               let label = context.dataset.label || ''
-              if(label == "TVL")
+              if(label == "Available For Payouts")
                 label += ': $'
               else if(label)
                 label += ': '
@@ -329,49 +401,70 @@
     var tempYearlyHashMap = new Map<string, any>()
     var tempAllChartData = cloneDeep(allBaseChartData)
     var allLabels = []
-    var allTVLs = []
+    var allSinglePayerAmounts = []
+    var allSinglePayer7DayProjections = []
 
     for(var year=Number(lendingProtocolHistoryOptions[1].historyOption); year<=currentYear; year++)
     {
       var yearlyLabels = []
-      var yearlyTVLs = []
+      var yearlySinglePayerAmounts = []
+      var yearlySinglePayer7DayProjections = []
 
       var tempYearlyChartData = cloneDeep(yearlyBaseChartData)
-      
+
       const maxMonth = (year == currentYear) ? currentMonth : 12
 
       for(var month=1; month<=maxMonth; month++)
       {
         yearlyLabels.push(monthList[month-1].monthName)
 
-        const tvlMonthlyStatementValue = TVLHistoryHashMap.get(month.toString() + '-' + year.toString())
+        const singlePayerAmountMonthlyValue = SinglePayerPayoutHistoryHashMap.get(month.toString() + '-' + year.toString())
+        const singlePayerProjectionMonthlyValue = SinglePayer7DayProjectionHistoryHashMap.get(month.toString() + '-' + year.toString())
 
-        if(tvlMonthlyStatementValue != undefined)
+        if(singlePayerAmountMonthlyValue != undefined)
         {
           allLabels.push(monthList[month-1].monthName + ' ' + year.toString())
-          allTVLs.push(tvlMonthlyStatementValue)
-          yearlyTVLs.push(tvlMonthlyStatementValue)
+          allSinglePayerAmounts.push(singlePayerAmountMonthlyValue)
+          yearlySinglePayerAmounts.push(singlePayerAmountMonthlyValue)
         }
         else
         {
           if(year == currentYear && (month == currentMonth || month == currentMonth-1))
           {
             allLabels.push(monthList[month-1].monthName + ' ' + year.toString())
-            allTVLs.push(props.currentTVL.replace(/,/g, ''))
-            yearlyTVLs.push(props.currentTVL.replace(/,/g, ''))
+            allSinglePayerAmounts.push(props.currentPayoutAmount.replace(/,/g, ''))
+            yearlySinglePayerAmounts.push(props.currentPayoutAmount.replace(/,/g, ''))
           }
           else
-            yearlyTVLs.push(0)
+            yearlySinglePayerAmounts.push(0)
+        }
+
+        if(singlePayerProjectionMonthlyValue != undefined)
+        {
+          allSinglePayer7DayProjections.push(singlePayerProjectionMonthlyValue)
+          yearlySinglePayer7DayProjections.push(singlePayerProjectionMonthlyValue)
+        }
+        else
+        {
+          if(year == currentYear && (month == currentMonth || month == currentMonth-1))
+          {
+            allSinglePayer7DayProjections.push(props.current7DayProjection.replace(/,/g, ''))
+            yearlySinglePayer7DayProjections.push(props.current7DayProjection.replace(/,/g, ''))
+          }
+          else
+            yearlySinglePayer7DayProjections.push(0)
         }
       }
 
       tempYearlyChartData.labels = yearlyLabels
-      tempYearlyChartData.datasets[0].data = yearlyTVLs
+      tempYearlyChartData.datasets[0].data = yearlySinglePayerAmounts
+      tempYearlyChartData.datasets[1].data = yearlySinglePayer7DayProjections
       tempYearlyHashMap.set(year.toString(), tempYearlyChartData)
     }
 
     tempAllChartData.labels = allLabels
-    tempAllChartData.datasets[0].data = allTVLs
+    tempAllChartData.datasets[0].data = allSinglePayerAmounts
+    tempAllChartData.datasets[1].data = allSinglePayer7DayProjections
     tempYearlyHashMap.set("All", tempAllChartData)
     chartDataHashMap = tempYearlyHashMap
   }
@@ -432,11 +525,26 @@
     animation: xAnimation 1.8s linear infinite
   }
 
+  .animatedRainbowY
+  {
+    background: repeating-linear-gradient(0deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
+    background-size: auto 200%;
+    animation: yAnimation 1.8s linear infinite
+  }
+
   @keyframes xAnimation
   {
     to
     {
       background-position: 150% center
+    }
+  }
+
+  @keyframes yAnimation
+  {
+    to
+    {
+      background-position: center 200%
     }
   }
 

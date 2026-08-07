@@ -245,31 +245,31 @@
           class="legendItem"
           @click="toggleDataset(index, chartRef)"
           >
-              <div 
-                v-if="dataset.label=='Fees Generated'" 
-                class="swatch animatedPurpleBlueY">
-              </div>
-              <div 
-                v-else-if="dataset.label=='Balance'" 
-                class="swatch animatedRainbowX">
-              </div>
-              <div 
-                v-else-if="dataset.label=='Interest Earned'" 
-                class="swatch animatedRainbowY">
-              </div>
-              <div 
-                v-else-if="dataset.label=='Debt'" 
-                class="swatch animatedPoopX">
-              </div>
-              <div 
-                v-else-if="dataset.label=='Interest Accrued'" 
-                class="swatch animatedPoopY">
-              </div>
-              <div 
-                v-else 
-                class="swatch" 
-                :style="{ backgroundColor: dataset.backgroundColor }">
-              </div>
+            <div 
+              v-if="dataset.label=='Fees Generated'" 
+              class="swatch animatedPurpleBlueY">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Balance'" 
+              class="swatch animatedRainbowX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Interest Earned'" 
+              class="swatch animatedRainbowY">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Debt'" 
+              class="swatch animatedPoopX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Interest Accrued'" 
+              class="swatch animatedPoopY">
+            </div>
+            <div 
+              v-else 
+              class="swatch" 
+              :style="{ backgroundColor: dataset.backgroundColor }">
+            </div>
             <span 
               class="legendLabel" 
               :class="{'hiddenLabel': legenHiddenArray[index] }"

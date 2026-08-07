@@ -22,9 +22,9 @@
         </ion-label>
       </ion-button>
 
-      <transition name="commentListSlide">
+      <transition name="divSlide">
         <div v-if="!hidenCommentSections.hidden">
-          <div class="commentListContent">
+          <div class="divSlideContent">
             <div class="beamOverlay"></div>
             <CommentList
             :colorName="colorName"

@@ -425,9 +425,9 @@
       </div>
     </div>
     
-    <transition name="commentListSlide">
+    <transition name="divSlide">
       <div v-if="showReplies">
-        <div class="commentListContent">
+        <div class="divSlideContent">
           <div class="beamOverlay"></div>
           <ReplyLv4List 
           id="replies" 
