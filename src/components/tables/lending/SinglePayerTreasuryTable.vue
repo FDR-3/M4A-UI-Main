@@ -21,9 +21,15 @@
     >
       <template #header>
         <div>
-          <h2>Single Payer Treasury Value <br>Amount Available For Claim Payouts: $<span class="rainbowText">{{ tvl.singlePayerPayOuts.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 }) }}</span>
+          <h2>Single Payer Treasury Value <br>
+            <div class="flexCenterRow">
+              <div style="margin-bottom: 2px">
+                <InfoButton :infoMessage="payoutMSG"/>
+              </div>
+              Amount Available For Claim Payouts: $<span class="rainbowText">{{ tvl.singlePayerPayOuts.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}</span>
+            </div>
           </h2>
           <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
@@ -204,9 +210,8 @@
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import SinglePayerChart from '/src/components/charts/lending/SinglePayerChart.vue'
   import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
+  import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
-
-  const colorHexValue = inject('colorHexValue') as string
 
   var stableCoinTableData = ref()
   var CryptoCurrencyTableData = ref()
@@ -224,6 +229,8 @@
   var stableCoinFeeArray = cloneDeep(StableCoins)
   var cryptoCurrencyFeeArray = cloneDeep(CryptoCurrency)
   var subMarketFeesAccruedIntervalId: any
+
+  const payoutMSG = "The amount available for claim payouts is updated every Friday at the latest."
 
   onMounted(() =>
   {

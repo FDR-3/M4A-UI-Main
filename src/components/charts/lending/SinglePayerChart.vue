@@ -29,7 +29,7 @@
               class="swatch animatedRainbowX">
             </div>
             <div 
-              v-else-if="dataset.label=='7 Day Projection'" 
+              v-else-if="dataset.label=='7 Day Rate'" 
               class="swatch animatedRainbowY">
             </div>
             <span 
@@ -97,7 +97,7 @@
       },
       {
         type: 'bar',
-        label: '7 Day Projection',
+        label: '7 Day Rate',
         backgroundColor: function(context: any)
         { 
           const chart = context.chart
@@ -131,7 +131,7 @@
       },
       {
         type: 'bar',
-        label: '7 Day Projection',
+        label: '7 Day Rate',
         backgroundColor: function(context: any)
         { 
           const chart = context.chart
@@ -321,7 +321,7 @@
             label: function(context: any)
             {
               let label = context.dataset.label || ''
-              if(label == "Available For Payouts")
+              if(label == "Available For Payouts" || label == "7 Day Rate")
                 label += ': $'
               else if(label)
                 label += ': '
