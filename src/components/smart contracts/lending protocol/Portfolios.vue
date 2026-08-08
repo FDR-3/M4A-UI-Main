@@ -1052,10 +1052,13 @@
                 lastKnownActionTimeStamp = Number(userMonthlyStatement.lastLendingActivityTimeStamp)
                 previousBalance = Number(userMonthlyStatement.snapShotBalanceAmount) / divisor
                 previousDebt = Number(userMonthlyStatement.snapShotDebtAmount) / divisor
-
-                tempChartData.lastActionType = lastKnownActionType
-                tempChartData.lastActionAmount = lastKnownActionAmount
-                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+              
+                if(lastKnownActionTimeStamp != 0)
+                {
+                  tempChartData.lastActionType = lastKnownActionType
+                  tempChartData.lastActionAmount = lastKnownActionAmount
+                  tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                }
 
                 feesGenerated.push(Number(userMonthlyStatement.feesGeneratedAmount) / divisor)
                 balances.push(previousBalance)
@@ -1074,9 +1077,12 @@
               }
               else
               {
-                tempChartData.lastActionType = lastKnownActionType
-                tempChartData.lastActionAmount = lastKnownActionAmount
-                tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                if(lastKnownActionTimeStamp != 0)
+                {
+                  tempChartData.lastActionType = lastKnownActionType
+                  tempChartData.lastActionAmount = lastKnownActionAmount
+                  tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                }
 
                 feesGenerated.push(0)
                 balances.push(previousBalance)
