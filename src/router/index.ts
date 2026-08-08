@@ -34,7 +34,7 @@ const router = createRouter(
   routes
 })
 
-/*router.onError((error, to) =>
+router.onError((error, to) =>
 {
   const fetchErrors = ['Failed to fetch dynamically imported module', 'text/html', 'ChunkLoadError']
   
@@ -42,7 +42,7 @@ const router = createRouter(
   if(fetchErrors.some((e) => error.message.includes(e) || error.name === e))
     //Force a hard reload to the exact page they were trying to go to
     window.location.href = to.fullPath
-})*/
+})
 
 /*router.onError((error, to) =>
 {
@@ -65,6 +65,31 @@ const router = createRouter(
     
     //Force the hard reload
     window.location.href = to.fullPath
+  }
+})*/
+
+/*router.onError((error, to) =>
+{
+  const fetchErrors = ['Failed to fetch dynamically imported module', 'text/html', 'ChunkLoadError']
+  
+  if(fetchErrors.some((e) => error.message.includes(e) || error.name === e))
+  {
+    const retryKey = `retry_load_${to.path}`
+    
+    if(sessionStorage.getItem(retryKey))
+    {
+      console.error("Stopping infinite reload loop.", error)
+      sessionStorage.removeItem(retryKey) 
+      return 
+    }
+
+    sessionStorage.setItem(retryKey, 'true')
+    
+    // Safely construct the new URL and overwrite any existing 't' parameter
+    const url = new URL(window.location.origin + to.fullPath)
+    url.searchParams.set('t', Date.now().toString())
+    
+    window.location.assign(url.toString())
   }
 })*/
 
