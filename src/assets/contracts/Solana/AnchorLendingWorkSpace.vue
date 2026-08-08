@@ -34,7 +34,7 @@
   }
   else
   {
-    rpcUrl.value = "https://m4a.io/MainNetProxy"
+    rpcUrl.value = DEV_MODE ? "https://api.testnet.solana.com" : "https://m4a.io/MainNetProxy"
     /*if(isProduction())
       rpcUrl.value = "https://m4a.io/MainNetProxy"
     else

@@ -66,7 +66,9 @@
       v-model="globalLimitInput"
       :inputStyle="{'text-align': 'center'}"
       :min="0"
-      :step="1"
+      :step="0.001"
+      :minFractionDigits="3"
+      :maxFractionDigits="3"
       showButtons
       fluid
     />

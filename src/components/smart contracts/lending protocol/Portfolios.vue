@@ -68,6 +68,24 @@
           appendTo="self"
           @change="updateStoredSelectedAccount()">
           </Select>
+
+          <div v-if="!connectedWallet.isTempPriceAccountAlive" class="flexCenterRow">
+            <div class="nMediumMarginLeft">
+              <InfoButton :infoMessage="refreshAccountMSG"/>
+            </div>
+            <ion-button v-if="connectedWallet.addressString==searchAddress" color="lightOffDark" @click="refreshUser()">
+              <ion-label color="green">Refresh Account</ion-label>
+            </ion-button>
+          </div>
+
+          <div v-else class="flexCenterColumn">
+            <br>
+            <ion-text style="margin: 10px">{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
+            <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
+              Close Temp Price Account
+            </ion-button>
+          </div>
+
         </div>
 
         <div>
@@ -99,6 +117,23 @@
       appendTo="self"
       @change="updateStoredSelectedAccount()">
       </Select>
+
+      <div v-if="!connectedWallet.isTempPriceAccountAlive" class="flexCenterRow">
+        <div class="nMediumMarginLeft">
+          <InfoButton :infoMessage="refreshAccountMSG"/>
+        </div>
+        <ion-button v-if="connectedWallet.addressString==searchAddress" color="lightOffDark" @click="refreshUser()">
+          <ion-label color="green">Refresh Account</ion-label>
+        </ion-button>
+      </div>
+
+      <div v-else class="flexCenterColumn">
+        <br>
+        <ion-text style="margin: 10px">{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
+        <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
+          Close Temp Price Account
+        </ion-button>
+      </div>
 
       <div>
         <h2 class="underLine yellow">7 Day Projection Rate</h2>
@@ -282,8 +317,8 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
-  import { IonInput, IonButton, IonLabel } from '@ionic/vue'
+  import { ref, watch, onMounted, onUnmounted, computed, inject } from 'vue'
+  import { IonInput, IonButton, IonLabel, IonText } from '@ionic/vue'
   import Select from 'primevue/select'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { getUserDisplayName, getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
@@ -293,8 +328,20 @@
     lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap,
     lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap,
     lendingUserMonthlyStatementsHashMap,
-    lendingUserTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { trimAddress, isValidSolanaPublicKey } from '/src/assets/contracts/WalletHelper.vue'
+    lendingUserTabAccountListHashMap,
+    lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
+  import { trimAddress,
+    isValidSolanaPublicKey,
+    confirmLendingTransaction,
+    parseProgramErrorCode,
+    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { userSignsLendingTransactions,
+    bundleProtocolPriceTransactions,
+    getNeccessaryRefreshInstructionData,
+    getTokenReserveRemainingAccounts,
+    getTempRemainingPriceAccount,
+    closeTempOraclePriceData,
+    TEMP_PRICE_ACCOUNT_ALIVE_MSG } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import LendingLeaderBoardTable from '/src/components/tables/lending/LendingLeaderBoardTable.vue'
@@ -303,8 +350,13 @@
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import HealthFactorBig from '/src/components/smart contracts/lending protocol/HealthFactorBig.vue'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
+  import * as bs58 from 'bs58'
   
+  const toast = inject('toast')
+  const colorName = inject('colorName') as string
+
   const props = defineProps(['portfolioReRenderHelper'])
   const emits = defineEmits(
   [
@@ -357,6 +409,8 @@
   var cryptoLifeTimeInterestEarnedValueUnRounded = ref(0)
 
   var gradientOffset = ref(0)
+
+  const refreshAccountMSG = "This will create new monthly statements if they need to be created and update user Balance/Debt and Interest Earned/Accrued.\n\nInterest is not considered Earned/Accrued until it appears in your monthly statement where tax purposes are concerned."
 
   const total7DayProjectionRateValue = computed (() =>
   {
@@ -1374,6 +1428,72 @@
       toastPreTransactionError(error, toast, "edit_lending_user_account_name")
     }
   }*/
+
+ async function refreshUser()
+ {
+    try
+    {
+      const remainingTabAccounts = lendingUserRemainingTabAccountListHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
+      var instructionsToSend = []
+      var lookUpTableAccounts = []
+      var refreshingUserRemainingAccounts = []
+      
+      //Get Lending Protocol Look Up Table Account
+      lookUpTableAccounts.push(anchorPrograms.lendingProtocolLookUpTableAccount)
+
+      //Get Lending User Look Up Table Account
+      lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
+    
+      const [uniqueTokenIds, createMonthlyStatementInstructions, lendingTabSubMarketAndMonthlyStatementRemainingAccounts, subMarketOwnerArray] =
+      await getNeccessaryRefreshInstructionData(remainingTabAccounts, connectedWallet.publicKey, accountSelect.value)
+
+      const uniqueTokenReserveRemainingAccounts = getTokenReserveRemainingAccounts(uniqueTokenIds)
+      const tempPriceRemainingAccount = getTempRemainingPriceAccount()
+
+      refreshingUserRemainingAccounts.push(tempPriceRemainingAccount)
+      refreshingUserRemainingAccounts.push(...uniqueTokenReserveRemainingAccounts)
+      refreshingUserRemainingAccounts.push(...lendingTabSubMarketAndMonthlyStatementRemainingAccounts)
+      refreshingUserRemainingAccounts.push(adminAccounts.priceOracleRemainingAccount)
+
+      const refreshUserHealthAndTokenReservesInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshUserHealthChunkAndTokenReserves(accountSelect.value,
+        uniqueTokenReserveRemainingAccounts.length,
+        lendingTabSubMarketAndMonthlyStatementRemainingAccounts.length / 3,
+        true
+      )
+      .accounts({ lendingUserOwner: connectedWallet.publicKey })
+      .remainingAccounts(refreshingUserRemainingAccounts)
+      .instruction()
+
+      instructionsToSend.push(...createMonthlyStatementInstructions)
+      instructionsToSend.push(refreshUserHealthAndTokenReservesInstruction)
+
+      const signedTransactions = await userSignsLendingTransactions(instructionsToSend, lookUpTableAccounts)
+
+      for(var i=0; i<signedTransactions.length; i++)
+      {
+        const size = signedTransactions[i].serialize().length
+        console.log(`Signed Transaction Size: ${size} bytes`)
+      }
+
+      await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
+
+      var userTxs = []
+  
+      for(var i=0; i<signedTransactions.length; i++)
+        userTxs.push(bs58.default.encode(signedTransactions[i].signatures[0]))
+
+      if(userTxs.length)
+        for(var i=0; i<userTxs.length; i++)
+          await confirmLendingTransaction(userTxs[i], toast, "refresh_user_health_chunk")
+      else
+        await confirmLendingTransaction(userTxs, toast, "refresh_user_health_chunk")
+       }
+    catch(error: any)
+    {
+      var errorMessage = parseProgramErrorCode(error, anchorPrograms.lending.lendingProgram)
+      toastPreTransactionError(errorMessage, toast, "refresh_user_health_chunk")
+    }
+ }
 </script>
 
 <style scoped>
