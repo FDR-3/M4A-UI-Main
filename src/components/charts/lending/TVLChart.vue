@@ -142,6 +142,9 @@
 
   watch(() => [props.currentTVL], (async() => 
   {
+    setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
+
+    //chartData = chartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
     if(chartData?.datasets?.[0])
       chartData.datasets[0].data[chartData.datasets[0].data.length-1] = props.currentTVL.replace(/,/g, '')
   }))
@@ -165,9 +168,25 @@
   async function showToggleAnimation()
   {
     await sleep(100)
-    chartRef.value.chart.hide(0)
-    chartRef.value.chart.show(0)
-    chartRef.value.chart.update()
+
+    const chart = chartRef.value?.chart
+    if(!chart) return
+
+    //1. Hide the dataset and force an INSTANT update (no animation)
+    chart.hide(0)
+    chart.update('none')
+
+    //2. Wait exactly two browser frames. This guarantees the browser 
+    //actually paints the "empty" chart to the screen before moving on.
+    requestAnimationFrame(() => 
+    {
+      requestAnimationFrame(() => 
+      {
+        //3. Now that the browser knows it is hidden, trigger the show animation
+        chart.show(0)
+        chart.update() 
+      })
+    })
   }
 
   function startGradientAnimation()

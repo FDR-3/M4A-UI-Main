@@ -150,7 +150,7 @@
     chartOptions.value = setChartOptions()
     chartData = chartDataHashMap.get(chartSelect.value)
 
-    await updateChartWidth() 
+    updateChartWidth() 
     startGradientAnimation()
     await sleep(100)
     chartOptions.value.responsive = true
@@ -173,10 +173,13 @@
 
   watch(() => [props.currentPayoutAmount, props.current7DayProjection], (async() => 
   {
+    setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
+
+    //chartData = chartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
     if(chartData?.datasets?.[0])
       chartData.datasets[0].data[chartData.datasets[0].data.length-1] = props.currentPayoutAmount.replace(/,/g, '')
     if(chartData?.datasets?.[1])
-      chartData.datasets[1].data[chartData.datasets[1].data.length-1] = props.current7DayProjection.replace(/,/g, '')
+      chartData.datasets[1].data[chartData.datasets[1].data.length-1] = props.current7DayProjection.replace(/,/g, '') 
   }))
 
   async function switchChartData()
@@ -204,14 +207,6 @@
       if (currentWidth > 0) 
         chartWidth.value = currentWidth
     }
-  }
-
-  async function showToggleAnimation()
-  {
-    await sleep(100)
-    chartRef.value.chart.hide(0)
-    chartRef.value.chart.show(0)
-    chartRef.value.chart.update()
   }
 
   function startGradientAnimation()
