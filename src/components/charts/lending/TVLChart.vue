@@ -71,31 +71,9 @@
 
   var gradientOffset = ref(0)
  
-  const allBaseChartData =
+  const baseChartData =
   {
     labels: [],
-    datasets:
-    [
-      {
-        type: 'line',
-        label: 'TVL',
-        borderColor: function(context: any)
-        { 
-          const chart = context.chart
-          const { ctx, chartArea } = chart
-          return setRainbowLineAnimatedGradient(ctx, chartArea)
-        },
-        borderWidth: 4,
-        fill: false,
-        tension: 0.4,
-        data: [] as any[]
-      }
-    ]
-  }
-
-  const yearlyBaseChartData =
-  {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     datasets:
     [
       {
@@ -346,7 +324,7 @@
     const currentYear = newDate.getFullYear()
     const currentMonth = newDate.getMonth() + 1
     var tempYearlyHashMap = new Map<string, any>()
-    var tempAllChartData = cloneDeep(allBaseChartData)
+    var tempAllChartData = cloneDeep(baseChartData)
     var allLabels = []
     var allTVLs = []
 
@@ -355,7 +333,7 @@
       var yearlyLabels = []
       var yearlyTVLs = []
 
-      var tempYearlyChartData = cloneDeep(yearlyBaseChartData)
+      var tempYearlyChartData = cloneDeep(baseChartData)
       
       const maxMonth = (year == currentYear) ? currentMonth : 12
 

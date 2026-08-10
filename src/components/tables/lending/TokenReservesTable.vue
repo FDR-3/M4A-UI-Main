@@ -28,13 +28,27 @@
       ]"  
     >
       <template #header>
-        <div class="flexCenterRow">
+        <div>
           <div>
             <h2>Token Reserve Deposited Value: $<span class="rainbowText">{{ totalDepositedValue }}</span>
             </h2>
             <h2>Token Reserve Borrowed Value: $<span class="poopText">{{ totalBorrowedValue }}</span>
             </h2>
           </div>
+
+          <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleshowTokenReserveHistory()">
+            <ion-label v-if="!showTokenReserveHistory" color="green">Show History</ion-label>
+            <ion-label v-else color="green">Hide History</ion-label>
+          </ion-button>
+
+          <transition name="divSlide">
+            <div v-if="showTokenReserveHistory">
+              <div class="divSlideContent">
+                <div class="beamOverlay"></div>
+                <TokenReserveChart :tokenReserveHistoryMap="tokenReserveHistoryMap"/>
+              </div>
+            </div>
+          </transition>
           <br>
         </div>
         <ion-input v-model="filters['global'].value" fill="outline" placeholder="Reserves Search     ">
@@ -297,7 +311,6 @@
   import { tokenReserves,
     tokenReserveFontEndInfoHashMap, 
     priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
-  import { tokenIds } from '/src/assets/constants/Addresses.ts'
   import { tokenReserveSubMarketListHashMap, subMarketsHashMap, subMarketOwnerHashMap } from '/src/assets/globalStates/lending/SubMarkets.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import StarWolf from '/src/assets/svg/star-wolf-svg.vue'
@@ -313,6 +326,8 @@
     toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
   import { tvl } from '/src/assets/globalStates/AdminAccounts.vue'
+  import TokenReserveChart from '/src/components/charts/lending/TokenReserveChart.vue'
+  import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   var emits = defineEmits(['createSubMarketModal', 'collectSubMarketFeesModal'])
@@ -325,6 +340,7 @@
   var showTokenSubMarkets = ref(false)
   var isLoading = ref(true)
   var newTableData: any
+  var showTokenReserveHistory = ref(false)
   
   var ownerPopoverOpen = ref(false)
   var actionsPopoverOpen = ref(false)
@@ -341,6 +357,7 @@
   var tokenReserveATAPopoverOpen = ref(false)
   var totalDepositedValue = ref("0.00")
   var totalBorrowedValue = ref("0.00")
+  var tokenReserveHistoryMap = ref()
   var copyTokenReserveATAButtonText = ref(copyTonkenReserveATAText)
 
   var inputFeeRefs = ref(new Map())
@@ -507,6 +524,7 @@
     var depositedValue = 0
     var borrowedValue = 0
     var processedTableData = []
+    var tempMap = new Map<number, string>()
     var newTableData = cloneDeep(tokenReserves)
     
     if(!newTableData.data)
@@ -574,6 +592,9 @@
           maximumFractionDigits: 2 })
       borrowedValue += borrowCalculatedValue
 
+      //Set TokenReserveHistory Current Data
+      tempMap.set(tokenId, processedTableData[i].depositedAmountString)
+
       //Get SubMarket List And Count
       var tokenReserveSubMarketList = []
 
@@ -639,6 +660,7 @@
 
     totalDepositedValue.value = depositedValue.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
     totalBorrowedValue.value = borrowedValue.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
+    tokenReserveHistoryMap.value = tempMap
     tokenReserveTableData.value = processedTableData
   }
 
@@ -824,6 +846,16 @@
 
       newTableData = undefined
     }
+  }
+
+  function handleshowTokenReserveHistory()
+  {
+    if(!showTokenReserveHistory.value)
+      playOpenChartSFX()
+    else
+      playCloseChartSFX()
+
+    showTokenReserveHistory.value = !showTokenReserveHistory.value
   }
 
   async function editSubMarket()
