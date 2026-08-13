@@ -69,21 +69,23 @@
           @change="updateStoredSelectedAccount()">
           </Select>
 
-          <div v-if="!connectedWallet.isTempPriceAccountAlive" class="flexCenterRow">
-            <div class="nMediumMarginLeft">
-              <InfoButton :infoMessage="refreshAccountMSG"/>
+          <div v-if="connectedWallet.addressString==searchAddress">
+            <div v-if="!connectedWallet.isTempPriceAccountAlive" class="flexCenterRow">
+              <div class="nMediumMarginLeft">
+                <InfoButton :infoMessage="refreshAccountMSG"/>
+              </div>
+              <ion-button  color="lightOffDark" @click="refreshUser()">
+                <ion-label color="green">Refresh Account</ion-label>
+              </ion-button>
             </div>
-            <ion-button v-if="connectedWallet.addressString==searchAddress" color="lightOffDark" @click="refreshUser()">
-              <ion-label color="green">Refresh Account</ion-label>
-            </ion-button>
-          </div>
 
-          <div v-else class="flexCenterColumn">
-            <br>
-            <ion-text style="margin: 10px">{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
-            <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
-              Close Temp Price Account
-            </ion-button>
+            <div v-else class="flexCenterColumn">
+              <br>
+              <ion-text style="margin: 10px">{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
+              <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
+                Close Temp Price Account
+              </ion-button>
+            </div>
           </div>
 
         </div>
@@ -118,21 +120,23 @@
       @change="updateStoredSelectedAccount()">
       </Select>
 
-      <div v-if="!connectedWallet.isTempPriceAccountAlive" class="flexCenterRow">
-        <div class="nMediumMarginLeft">
-          <InfoButton :infoMessage="refreshAccountMSG"/>
+      <div v-if="connectedWallet.addressString==searchAddress">
+        <div v-if="!connectedWallet.isTempPriceAccountAlive" class="flexCenterRow">
+          <div class="nMediumMarginLeft">
+            <InfoButton :infoMessage="refreshAccountMSG"/>
+          </div>
+          <ion-button color="lightOffDark" @click="refreshUser()">
+            <ion-label color="green">Refresh Account</ion-label>
+          </ion-button>
         </div>
-        <ion-button v-if="connectedWallet.addressString==searchAddress" color="lightOffDark" @click="refreshUser()">
-          <ion-label color="green">Refresh Account</ion-label>
-        </ion-button>
-      </div>
 
-      <div v-else class="flexCenterColumn">
-        <br>
-        <ion-text style="margin: 10px">{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
-        <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
-          Close Temp Price Account
-        </ion-button>
+        <div v-else class="flexCenterColumn">
+          <br>
+          <ion-text style="margin: 10px">{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
+          <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
+            Close Temp Price Account
+          </ion-button>
+        </div>
       </div>
 
       <div>
@@ -1280,7 +1284,7 @@
     cryptoLifeTimeInterestEarnedAmount.value = "0"
     cryptoLifeTimeInterestEarnedValue.value = 0
 
-    document.getElementById("portfolioHeader")?.scrollIntoView() 
+    document.getElementById("portfolioHeader")?.scrollIntoView()
   }
 
   function emitOpenLiquidationModal(accountOwner: string, accountIndex: number)

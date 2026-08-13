@@ -2,7 +2,7 @@
   <div class="smallMarginTop">
     <div class="">
       <br>
-      <div class="nMediumMarginTop flexCenterColumn">
+      <div class="nMediumMarginTop">
         <Select
         class="chartSelect smallMarginBottom"
         v-model="chartSelect" 
@@ -10,12 +10,13 @@
         optionLabel="historyOption" 
         optionValue="historyOption" 
         placeholder="Select Year"
+        appendTo="self"
         @change="switchChartData()">
         </Select>
       </div>
     </div>
 
-    <div class="">
+    <div>
       <div class="flexCenterColumn">
         <div class="chartLegend">
           <div 

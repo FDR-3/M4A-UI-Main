@@ -2,24 +2,30 @@
   <div class="smallMarginTop">
     <div class="">
       <br>
-      <div class="nMediumMarginTop flexCenterColumn">
+      <div class="nMediumMarginTop tinyMarginBottom flexCenterRow">
         <Select
-        class="chartSelect smallMarginBottom"
+        class="chartSelect "
         v-model="chartSelect" 
         :options="lendingProtocolHistoryOptions" 
         optionLabel="historyOption" 
         optionValue="historyOption" 
         placeholder="Select Year"
+        appendTo="self"
         @change="switchChartData()">
         </Select>
+
+        <ion-button class="smallMarginLeft" fill="clear" @click="showValues=!showValues">
+          <ion-label v-if="showValues" color="dark">Toggle Amounts</ion-label>
+          <ion-label v-else color="dark">Toggle Values</ion-label>
+        </ion-button>
       </div>
     </div>
 
-    <div class="">
+    <div>
       <div class="flexCenterColumn">
         <div class="chartLegend">
           <div 
-          v-for="(dataset, index) in chartData?.datasets" 
+          v-for="(dataset, index) in valueChartData?.datasets" 
           :key="index" 
           class="legendItem"
           @click="toggleDataset(index, chartRef)"
@@ -44,7 +50,8 @@
     </div>
 
     <div ref="chartContainer">
-      <Chart type="line" ref="chartRef" :width="chartWidth" :data="chartData" :options="chartOptions"/>
+      <Chart v-if="showValues" type="line" ref="chartRef" :width="chartWidth" :data="valueChartData" :options="chartOptions"/>
+      <Chart v-else type="bar" ref="chartRef" :width="chartWidth" :data="false" :options="chartOptions"/>
     </div>
   </div>
 </template>
@@ -63,16 +70,19 @@
 
   const props = defineProps(['currentPayoutAmount', 'current7DayProjection'])
 
-  var chartData: any
+  var valueChartData: any
+  var amountChartData: any
   var chartOptions = ref()
   var chartRef = ref<any>(null)
   var legenHiddenArray = ref([false])
   var chartTextColor = ref(darkTheme.value ? "#ffffff" : "#000000")
   var animationIntervalId: any
   var chartSelect = ref("All")
-  var chartDataHashMap = new Map<string, any>()
+  var valueChartDataHashMap = new Map<string, any>()
+  var amountChartDataHashMap = new Map<string, any>()
   var chartContainer = ref<any>(null)
   var chartWidth = ref(0)
+  var showValues = ref(true)
 
   var gradientOffset = ref(0)
  
@@ -114,7 +124,8 @@
   {
     setChartData()
     chartOptions.value = setChartOptions()
-    chartData = chartDataHashMap.get(chartSelect.value)
+    valueChartData = valueChartDataHashMap.get(chartSelect.value)
+    amountChartData = amountChartDataHashMap.get(chartSelect.value)
 
     updateChartWidth() 
     startGradientAnimation()
@@ -141,17 +152,17 @@
   {
     setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
 
-    //chartData = chartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
-    if(chartData?.datasets?.[0])
-      chartData.datasets[0].data[chartData.datasets[0].data.length-1] = props.currentPayoutAmount.replace(/,/g, '')
-    if(chartData?.datasets?.[1])
-      chartData.datasets[1].data[chartData.datasets[1].data.length-1] = props.current7DayProjection.replace(/,/g, '') 
+    //valueChartData = valueChartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
+    if(valueChartData?.datasets?.[0])
+      valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-1] = props.currentPayoutAmount.replace(/,/g, '')
+    if(valueChartData?.datasets?.[1])
+      valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-1] = props.current7DayProjection.replace(/,/g, '') 
   }))
 
   async function switchChartData()
   {
     chartOptions.value.responsive = false
-    chartData = chartDataHashMap.get(chartSelect.value)
+    valueChartData = valueChartDataHashMap.get(chartSelect.value)
     resetHiddenArray()
   
     await sleep(40)
@@ -427,11 +438,19 @@
     tempAllChartData.datasets[0].data = allSinglePayerAmounts
     tempAllChartData.datasets[1].data = allSinglePayer7DayProjections
     tempYearlyHashMap.set("All", tempAllChartData)
-    chartDataHashMap = tempYearlyHashMap
+    valueChartDataHashMap = tempYearlyHashMap
   }
 </script>
 
 <style scoped>
+  ion-button
+  {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    --padding-start: 0;
+    --padding-end: 0
+  }
+
   ion-popover 
   {
     --width: min(70vw, 144px)
