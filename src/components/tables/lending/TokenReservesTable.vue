@@ -45,7 +45,7 @@
             <div v-if="showTokenReserveHistory">
               <div class="divSlideContent">
                 <div class="beamOverlay"></div>
-                <TokenReserveChart :amountHistoryHashMap="amountHistoryHashMap"/>
+                <TokenReserveChart :depositedValue="Number(totalDepositedValue)" :borrowedValue="Number(totalBorrowedValue)" :amountHistoryHashMap="amountHistoryHashMap" />
               </div>
             </div>
           </transition>

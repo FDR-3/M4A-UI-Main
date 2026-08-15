@@ -1,3 +1,17 @@
+export const TokenReserveDepositedValueHistoryHashMap: Map<string, number> = new Map(
+[ 
+  //Key: Month-Year, Value: Payout Value
+  ["6-2026", 0.00],
+  ["7-2026", 454.11]
+])
+
+export const TokenReserveBorrowedValueHistoryHashMap: Map<string, number> = new Map(
+[ 
+  //Key: Month-Year, Value: Payout Value
+  ["6-2026", 0.00],
+  ["7-2026", 161.17]
+])
+
 export const TokenReserveUSDSHistoryHashMap: Map<string, number> = new Map(
 [ 
   //Key: Month-Year, Value: Payout Value

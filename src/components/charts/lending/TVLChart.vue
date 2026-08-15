@@ -1,6 +1,6 @@
 <template>
   <div class="smallMarginTop">
-    <div class="">
+    <div>
       <br>
       <div class="nMediumMarginTop">
         <Select

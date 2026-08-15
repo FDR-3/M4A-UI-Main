@@ -1,10 +1,10 @@
 <template>
   <div class="smallMarginTop">
-    <div class="">
+    <div>
       <br>
       <div class="nMediumMarginTop tinyMarginBottom flexCenterRow">
         <Select
-        class="chartSelect "
+        class="chartSelect"
         v-model="chartSelect" 
         :options="lendingProtocolHistoryOptions" 
         optionLabel="historyOption" 
@@ -178,7 +178,7 @@
   {
     setChartData()
     valueChartOptions.value = setChartOptions(false, chartTextColor.value, true)
-    amountChartOptions.value = setChartOptions(false, chartTextColor.value, false)
+    amountChartOptions.value = setChartOptions(false, chartTextColor.value)
     valueChartData = valueChartDataHashMap.get(chartSelect.value)
     amountChartData = amountChartDataHashMap.get(chartSelect.value)
 

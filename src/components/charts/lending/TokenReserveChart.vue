@@ -1,10 +1,10 @@
 <template>
   <div class="smallMarginTop">
-    <div class="">
+    <div>
       <br>
-      <div class="nMediumMarginTop">
+      <div class="nMediumMarginTop tinyMarginBottom flexCenterRow">
         <Select
-        class="chartSelect smallMarginBottom"
+        class="chartSelect"
         v-model="chartSelect" 
         :options="lendingProtocolHistoryOptions" 
         optionLabel="historyOption" 
@@ -13,14 +13,47 @@
         appendTo="self"
         @change="switchChartData()">
         </Select>
+
+        <ion-button class="toggleButton smallMarginLeft" fill="clear" @click="showValues=!showValues; resetHiddenArray()">
+          <ion-label v-if="showValues" color="dark">Toggle Amounts</ion-label>
+          <ion-label v-else color="dark">Toggle Values</ion-label>
+        </ion-button>
       </div>
     </div>
 
-    <div>
+    <div v-if="showValues">
       <div class="flexCenterColumn">
         <div class="chartLegend">
           <div 
-          v-for="(dataset, index) in chartData?.datasets" 
+          v-for="(dataset, index) in valueChartData?.datasets" 
+          :key="index" 
+          class="legendItem"
+          @click="toggleDataset(index, chartRef, legenHiddenArray)"
+          >
+            <div 
+              v-if="dataset.label=='Deposited Value'" 
+              class="swatch animatedRainbowX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Borrowed Value'" 
+              class="swatch animatedPoopX">
+            </div>
+            <span 
+              class="legendLabel" 
+              :class="{'hiddenLabel': legenHiddenArray[index] }"
+            >
+              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else>
+      <div class="flexCenterColumn">
+        <div class="chartLegend">
+          <div 
+          v-for="(dataset, index) in amountChartData?.datasets" 
           :key="index" 
           class="legendItem"
           @click="toggleDataset(index, chartRef, legenHiddenArray)"
@@ -57,7 +90,8 @@
     </div>
 
     <div ref="chartContainer">
-      <Chart type="line" ref="chartRef" :width="chartWidth" :data="chartData" :options="chartOptions"/>
+      <Chart v-if="showValues" type="bar" ref="chartRef" :width="chartWidth" :data="valueChartData" :options="valueChartOptions"/>
+      <Chart v-else type="line" ref="chartRef" :width="chartWidth" :data="amountChartData" :options="amountChartOptions"/>
     </div>
   </div>
 </template>
@@ -70,7 +104,9 @@
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { lendingProtocolHistoryOptions } from './TVLHistory'
-  import { TokenReserveUSDSHistoryHashMap,
+  import { TokenReserveDepositedValueHistoryHashMap,
+    TokenReserveBorrowedValueHistoryHashMap,
+    TokenReserveUSDSHistoryHashMap,
     TokenReserveUSDCHistoryHashMap,
     TokenReserveSOLHistoryHashMap,
     TokenReserveWEthHistoryHashMap,
@@ -81,40 +117,78 @@
     setChartOptions,
     toggleDataset,
     setRainbowLineAnimatedGradient,
-    setRainbowBarAnimatedGradient,
-    setUSDSLineAnimatedGradient,
-    setUSDCLineAnimatedGradient,
-    setSOLLineAnimatedGradient,
-    setWEthLineAnimatedGradient,
-    setWBtcLineAnimatedGradient } from './ChartHelper'
+    setPoopLineAnimatedGradient } from './ChartHelper'
   import cloneDeep from 'lodash/cloneDeep'
   import './Chart.css'
 
-  const props = defineProps(['amountHistoryHashMap'])
+  const props = defineProps(['depositedValue', 'borrowedValue', 'amountHistoryHashMap'])
 
-  var chartData: any
-  var chartOptions = ref()
+  var valueChartData: any
+  var amountChartData: any
+  var valueChartOptions = ref()
+  var amountChartOptions = ref()
   var chartRef = ref<any>(null)
   var legenHiddenArray = ref([false])
   var chartTextColor = ref(darkTheme.value ? "#ffffff" : "#000000")
   var animationIntervalId: any
   var chartSelect = ref("All")
-  var chartDataHashMap = new Map<string, any>()
+  var valueChartDataHashMap = new Map<string, any>()
+  var amountChartDataHashMap = new Map<string, any>()
   var chartContainer = ref<any>(null)
   var chartWidth = ref(0)
+  var showValues = ref(true)
 
   var gradientOffset = ref(0)
+
+  const valueBaseChartData =
+  {
+    labels: [],
+    datasets:
+    [
+      {
+        type: 'line',
+        label: 'Deposited Value',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setRainbowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Borrowed Value',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setPoopLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      }
+    ]
+  }
  
   onMounted(async() =>
   {
     setChartData()
-    chartOptions.value = setChartOptions(false, chartTextColor.value)
-    chartData = chartDataHashMap.get(chartSelect.value)
+    valueChartOptions.value = setChartOptions(false, chartTextColor.value, true)
+    amountChartOptions.value = setChartOptions(false, chartTextColor.value)
+    valueChartData = valueChartDataHashMap.get(chartSelect.value)
+    amountChartData = amountChartDataHashMap.get(chartSelect.value)
 
     updateChartWidth() 
     startGradientAnimation()
     await sleep(100)
-    chartOptions.value.responsive = true
+    valueChartOptions.value.responsive = true
+    amountChartOptions.value.responsive = true
   })
 
   onUnmounted(() =>
@@ -129,29 +203,45 @@
     else
       chartTextColor.value = "#000000"
 
-    chartOptions.value = setChartOptions(false, chartTextColor.value)
+    valueChartOptions.value = setChartOptions(false, chartTextColor.value, true)
+    amountChartOptions.value = setChartOptions(false, chartTextColor.value)
   })
+
+  watch(() => [props.depositedValue, props.borrowedValue], (async() => 
+  {
+    setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
+
+    //valueChartData = valueChartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
+    if(valueChartData?.datasets?.[0])
+      valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-1] = props.depositedValue
+    if(valueChartData?.datasets?.[1])
+      valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-1] = props.borrowedValue
+  }))
 
   watch(() => [props.amountHistoryHashMap], (async() => 
   {
     setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
 
-    ////chartData = chartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
+    ////amountChartData = amountChartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
 
     tokenIdArray.forEach((tokenId: number, index: number) =>
     {
-      chartData.datasets[index].data[chartData.datasets[index].data.length - 1] = props.amountHistoryHashMap.get(tokenId)
+      amountChartData.datasets[index].data[amountChartData.datasets[index].data.length - 1] = props.amountHistoryHashMap.get(tokenId)
     })
   }))
 
   async function switchChartData()
   {
-    chartOptions.value.responsive = false
-    chartData = chartDataHashMap.get(chartSelect.value)
+    valueChartOptions.value.responsive = false
+    amountChartOptions.value.responsive = false
+    amountChartData = amountChartDataHashMap.get(chartSelect.value)
+    valueChartData = valueChartDataHashMap.get(chartSelect.value)
+
     resetHiddenArray()
   
     await sleep(40)
-    chartOptions.value.responsive = true
+    valueChartOptions.value.responsive = true
+    amountChartOptions.value.responsive = true
   }
 
   function resetHiddenArray()
@@ -202,8 +292,12 @@
     const startYear = Number(lendingProtocolHistoryOptions[1].historyOption)
     const currentYear = newDate.getFullYear()
     const currentMonth = newDate.getMonth() + 1
-    var tempYearlyHashMap = new Map<string, any>()
-    var tempAllChartData = cloneDeep(getAmountBaseChart(gradientOffset))
+    var allTokenReserveDepositedValues = []
+    var allTokenReserveBorrowedValues = []
+    var tempYearlyValueHashMap = new Map<string, any>()
+    var tempAllValueChartData = cloneDeep(valueBaseChartData)
+    var tempYearlyAmountHashMap = new Map<string, any>()
+    var tempAllAmountChartData = getAmountBaseChart(gradientOffset)
     var allLabels: string[] = []
 
     //Define token configs to loop over dynamically
@@ -219,7 +313,10 @@
     for(var year = startYear; year <= currentYear; year++)
     {
       var yearlyLabels: string[] = []
-      var tempYearlyChartData = cloneDeep(getAmountBaseChart(gradientOffset))
+      var yearlyTokenReserveDepositedValues = []
+      var yearlyTokenReserveBorrowedValues = []
+      var yearlyTokenReserveValueChartData = cloneDeep(valueBaseChartData)
+      var yearlyTokenReserveAmountChartData = cloneDeep(getAmountBaseChart(gradientOffset))
 
       //Track yearly arrays for each token index
       var yearlyDataLists: any[][] = tokens.map(() => [])
@@ -235,27 +332,61 @@
 
         var labelAddedToAll = false
 
-        tokens.forEach((token, index) =>
+        const tokenReserveDepositedValue = TokenReserveDepositedValueHistoryHashMap.get(month.toString() + '-' + year.toString())
+        if(tokenReserveDepositedValue != undefined)
         {
-          const monthlyValue = token.historyMap.get(monthKey)
-
-          if(monthlyValue != undefined)
+          if(!labelAddedToAll)
           {
-            if (!labelAddedToAll)
-            {
-              allLabels.push(monthName + ' ' + year.toString())
-              labelAddedToAll = true
-            }
-            token.allData.push(monthlyValue)
-            yearlyDataLists[index].push(monthlyValue)
+            allLabels.push(monthName + ' ' + year.toString())
+            labelAddedToAll = true
           }
-          else if(isCurrentOrPrevMonth)
+          allTokenReserveDepositedValues.push(tokenReserveDepositedValue)
+          yearlyTokenReserveDepositedValues.push(tokenReserveDepositedValue)
+        }
+        else
+        {
+          if(year == currentYear && (month == currentMonth || month == currentMonth-1))
           {
             if(!labelAddedToAll)
             {
               allLabels.push(monthName + ' ' + year.toString())
               labelAddedToAll = true
             }
+            allTokenReserveDepositedValues.push(props.depositedValue)
+            yearlyTokenReserveDepositedValues.push(props.depositedValue)
+          }
+          else
+            yearlyTokenReserveDepositedValues.push(0)
+        }
+
+        const tokenReserveBorrowedValue = TokenReserveBorrowedValueHistoryHashMap.get(month.toString() + '-' + year.toString())
+        if(tokenReserveBorrowedValue != undefined)
+        {
+          allTokenReserveBorrowedValues.push(tokenReserveBorrowedValue)
+          yearlyTokenReserveBorrowedValues.push(tokenReserveBorrowedValue)
+        }
+        else
+        {
+          if(year == currentYear && (month == currentMonth || month == currentMonth-1))
+          {
+            allTokenReserveBorrowedValues.push(props.borrowedValue)
+            yearlyTokenReserveBorrowedValues.push(props.borrowedValue)
+          }
+          else
+            yearlyTokenReserveBorrowedValues.push(0)
+        }
+
+        tokens.forEach((token, index) =>
+        {
+          const monthlyValue = token.historyMap.get(monthKey)
+
+          if(monthlyValue != undefined)
+          {
+            token.allData.push(monthlyValue)
+            yearlyDataLists[index].push(monthlyValue)
+          }
+          else if(isCurrentOrPrevMonth)
+          {
             const val = props.amountHistoryHashMap.get(token.tokenId)
             
             token.allData.push(val)
@@ -268,30 +399,43 @@
         })
       }
 
-      //Assign dataset data for the year
-      tempYearlyChartData.labels = yearlyLabels
+      //Assign Value data for the year
+      yearlyTokenReserveValueChartData.labels = yearlyLabels
+      yearlyTokenReserveValueChartData.datasets[0].data = yearlyTokenReserveDepositedValues
+      yearlyTokenReserveValueChartData.datasets[1].data = yearlyTokenReserveBorrowedValues
+      tempYearlyValueHashMap.set(year.toString(), yearlyTokenReserveValueChartData)
+
+      //Assign Amount data for the year
+      yearlyTokenReserveAmountChartData.labels = yearlyLabels
       tokens.forEach((_, i) =>
       {
-        if (tempYearlyChartData.datasets[i])
+        if (yearlyTokenReserveAmountChartData.datasets[i])
         {
-          tempYearlyChartData.datasets[i].data = yearlyDataLists[i]
+          yearlyTokenReserveAmountChartData.datasets[i].data = yearlyDataLists[i]
         }
       })
       
-      tempYearlyHashMap.set(year.toString(), tempYearlyChartData)
+      tempYearlyAmountHashMap.set(year.toString(), yearlyTokenReserveAmountChartData)
     }
 
-    //Assign aggregated "All" data
-    tempAllChartData.labels = allLabels
+    //Set Value "All" data
+    tempAllValueChartData.labels = allLabels
+    tempAllValueChartData.datasets[0].data = allTokenReserveDepositedValues
+    tempAllValueChartData.datasets[1].data = allTokenReserveBorrowedValues
+
+    //Set Amount "All" data
+    tempAllAmountChartData.labels = allLabels
     tokens.forEach((token, i) =>
     {
-      if (tempAllChartData.datasets[i])
+      if (tempAllAmountChartData.datasets[i])
       {
-        tempAllChartData.datasets[i].data = token.allData
+        tempAllAmountChartData.datasets[i].data = token.allData
       }
     })
 
-    tempYearlyHashMap.set("All", tempAllChartData)
-    chartDataHashMap = tempYearlyHashMap
+    tempYearlyValueHashMap.set("All", tempAllValueChartData)
+    tempYearlyAmountHashMap.set("All", tempAllAmountChartData)
+    valueChartDataHashMap = tempYearlyValueHashMap
+    amountChartDataHashMap = tempYearlyAmountHashMap
   }
 </script>
