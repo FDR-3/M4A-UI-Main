@@ -1,4 +1,6 @@
-export function getAmountBaseChart(gradientOffset: number) :any
+import { Ref } from 'vue'
+
+export function getAmountBaseChart(gradientOffset: Ref<number>) :any
 {
   return{
     labels: [],
@@ -11,7 +13,7 @@ export function getAmountBaseChart(gradientOffset: number) :any
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setUSDSLineAnimatedGradient(ctx, chartArea, gradientOffset)
+          return setUSDSLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,
@@ -25,7 +27,7 @@ export function getAmountBaseChart(gradientOffset: number) :any
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setUSDCLineAnimatedGradient(ctx, chartArea, gradientOffset)
+          return setUSDCLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,
@@ -39,7 +41,7 @@ export function getAmountBaseChart(gradientOffset: number) :any
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setSOLLineAnimatedGradient(ctx, chartArea, gradientOffset)
+          return setSOLLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,
@@ -53,7 +55,7 @@ export function getAmountBaseChart(gradientOffset: number) :any
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setWEthLineAnimatedGradient(ctx, chartArea, gradientOffset)
+          return setWEthLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,
@@ -67,7 +69,7 @@ export function getAmountBaseChart(gradientOffset: number) :any
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setWBtcLineAnimatedGradient(ctx, chartArea, gradientOffset)
+          return setWBtcLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,

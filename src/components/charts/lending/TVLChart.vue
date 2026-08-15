@@ -59,6 +59,7 @@
     toggleDataset,
     setRainbowLineAnimatedGradient } from './ChartHelper'
   import cloneDeep from 'lodash/cloneDeep'
+  import './Chart.css'
 
   const props = defineProps(['currentTVL'])
 
@@ -251,72 +252,3 @@
     chartDataHashMap = tempYearlyHashMap
   }
 </script>
-
-<style scoped>
-  ion-popover 
-  {
-    --width: min(70vw, 144px)
-  }
-
-  h4
-  {
-    font-size: min(4.5vw, 26px)
-  }
-
-  h5
-  {
-    font-size: min(4vw, 25px)
-  }
-
-  .chartLegend
-  {
-    display: flex;
-    justify-content: center;
-    gap: 10px
-  }
-  
-  .chartSelect
-  {
-    width: 130px;
-    padding-left: 20px
-  }
-
-  .legendItem
-  {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px
-  }
-
-  .swatch
-  {
-    width: 27px; /* Standard swatch width */
-    height: 12px; /* Standard swatch height */
-    margin-right: 8px;
-    border: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center
-  }
-
-  .animatedRainbowX
-  {
-    background: repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
-    background-size: 150% auto;
-    animation: xAnimation 1.8s linear infinite
-  }
-
-  @keyframes xAnimation
-  {
-    to
-    {
-      background-position: 150% center
-    }
-  }
-
-  .hiddenLabel
-  {
-    text-decoration: line-through
-  }
-</style>

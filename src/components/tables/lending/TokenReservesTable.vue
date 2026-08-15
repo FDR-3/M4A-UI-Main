@@ -593,7 +593,7 @@
       borrowedValue += borrowCalculatedValue
 
       //Set TokenReserveHistory Current Data
-      tempMap.set(tokenId, processedTableData[i].depositedAmountString)
+      tempMap.set(tokenId, processedTableData[i].depositedAmount)
 
       //Get SubMarket List And Count
       var tokenReserveSubMarketList = []

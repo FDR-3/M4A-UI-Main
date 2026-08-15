@@ -42,12 +42,8 @@
             <div v-if="showSinglePayerHistory">
               <div class="divSlideContent">
                 <div class="beamOverlay"></div>
-                <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 })"
-                :current7DayProjection="sevenDayProjectionRate.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 })"
+                <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts"
+                :current7DayProjection="Number(sevenDayProjectionRate)"
                 :amountHistoryHashMap="amountHistoryHashMap"/>
               </div>
             </div>
@@ -303,6 +299,7 @@
       return
 
     var treasuryValue = 0
+    var tempMap = new Map<number, string>(amountHistoryHashMap.value)
     var unprocessedTableData = []
 
     for(var i=0; i<StableCoins.length; i++)
@@ -365,9 +362,16 @@
       unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
+
+      //Set SinglePayerHistory Current Data
+      const totalAmountString = treasuryTotalAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+      tempMap.set(unprocessedTableData[i].tokenId, totalAmountString)
     }
 
     stableValue.value = treasuryValue
+    amountHistoryHashMap.value = tempMap
     stableCoinTableData.value = unprocessedTableData
   }
 
@@ -377,6 +381,7 @@
       return
 
     var treasuryValue = 0
+    var tempMap = new Map<number, string>(amountHistoryHashMap.value)
     var unprocessedTableData = []
 
     for(var i=0; i<CryptoCurrency.length; i++)
@@ -439,9 +444,16 @@
       unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
+
+      //Set SinglePayerHistory Current Data
+      const totalAmountString = treasuryTotalAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+      tempMap.set(unprocessedTableData[i].tokenId, totalAmountString)
     }
 
     cryptoValue.value = treasuryValue
+    amountHistoryHashMap.value = tempMap
     CryptoCurrencyTableData.value = unprocessedTableData
   }
 

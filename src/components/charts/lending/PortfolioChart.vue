@@ -45,15 +45,15 @@
 
         <div class="flexCenterRow">
           <Select
-          class="yearSelect"
+          class="chartSelect"
           style="margin: 10px"
-          v-model="yearSelect" 
+          v-model="chartSelect" 
           :options="yearList" 
           optionLabel="yearAvailable" 
           optionValue="yearAvailable" 
           placeholder="Select Year"
           appendTo="self"
-          @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, yearSelect)">
+          @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, chartSelect)">
           </Select>
 
           <div v-if="ownerAddress==connectedWallet.addressString">
@@ -138,14 +138,14 @@
 
       <div class="nMediumMarginTop vYearAndActionContainer">
         <Select
-        class="yearSelect smallMarginBottom"
-        v-model="yearSelect" 
+        class="chartSelect smallMarginBottom"
+        v-model="chartSelect" 
         :options="yearList" 
         optionLabel="yearAvailable" 
         optionValue="yearAvailable" 
         placeholder="Select Year"
         appendTo="self"
-        @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, yearSelect)">
+        @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, chartSelect)">
         </Select>
         <div v-if="ownerAddress==connectedWallet.addressString" class="nSmallMarginTop">
           <ion-button v-if="!hasDeposits" class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption)">
@@ -347,6 +347,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { setChartOptions, toggleDataset } from './ChartHelper'
   import cloneDeep from 'lodash/cloneDeep'
+  import './Chart.css'
   
   const props = defineProps(
   [
@@ -381,7 +382,7 @@
   var tokenName = ref()
   var tokenSVG = ref()
 
-  var yearSelect = ref()
+  var chartSelect = ref()
   var yearList = ref()
 
   var subMarketSelectOption: any[] = []
@@ -444,7 +445,7 @@
     }
     subMarketSelectOption.push(option)
     
-    yearSelect.value = props.selectedYear
+    chartSelect.value = props.selectedYear
 
     chartOptions.value = setChartOptions(true, chartTextColor.value)
     startGradientAnimation()
@@ -464,7 +465,7 @@
     setInitialBalance()
 
     yearList.value = getYearList()
-    yearSelect.value = props.selectedYear
+    chartSelect.value = props.selectedYear
   })
 
   watch(darkTheme,() =>
@@ -490,7 +491,7 @@
     userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
 
     yearList.value = getYearList()
-    yearSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
+    chartSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
   }))
 
   function getYearList()
@@ -751,88 +752,6 @@
   {
     font-size: min(4vw, 25px)
   }
-  
-  .yearSelect
-  {
-    width: 130px;
-    padding-left: 20px
-  }
-
-  .legendItem
-  {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px
-  }
-
-  .swatch
-  {
-    width: 27px; /* Standard swatch width */
-    height: 12px; /* Standard swatch height */
-    margin-right: 8px;
-    border: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center
-  }
-
-  .animatedRainbowX
-  {
-    background: repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
-    background-size: 150% auto;
-    animation: xAnimation 1.8s linear infinite
-  }
-
-  .animatedRainbowY
-  {
-    background: repeating-linear-gradient(0deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
-    background-size: auto 200%;
-    animation: yAnimation 1.8s linear infinite
-  }
-
-  .animatedPoopX
-  {
-    background: repeating-linear-gradient(90deg, #851717 0%, #0f8332 25%, #851717 50.0%);
-    background-size: 150% auto;
-    animation: xAnimation 1.8s linear infinite
-  }
-
-  .animatedPoopY
-  {
-    background: repeating-linear-gradient(0deg, #851717 0%, #0f8332 25%, #851717 50.0%);
-    background-size: auto 200%;
-    animation: yAnimation 1.8s linear infinite
-  }
-
-  .animatedPurpleBlueY
-  {
-    background: repeating-linear-gradient(0deg, #8a2be2 0%, #557fcc 25%, #8a2be2 50.0%);
-    background-size: auto 200%;
-    animation: yAnimation 1.8s linear infinite
-  }
-
-  @keyframes xAnimation
-  {
-    to
-    {
-      background-position: 150% center
-    }
-  }
-
-  @keyframes yAnimation
-  {
-    to
-    {
-      background-position: center 200%
-    }
-  }
-
-  .hiddenLabel
-  {
-    text-decoration: line-through
-  }
-
   
   @media screen and (min-width: 1544.1px)
   { 

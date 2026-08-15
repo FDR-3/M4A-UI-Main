@@ -1,0 +1,122 @@
+.chartLegend
+{
+  display: flex;
+  justify-content: center;
+  gap: 10px
+}
+
+.chartSelect
+{
+  width: 130px;
+  padding-left: 20px
+}
+
+.legendItem
+{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-size: 14px
+}
+
+.swatch
+{
+  width: 27px; /* Standard swatch width */
+  height: 12px; /* Standard swatch height */
+  margin-right: 8px;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center
+}
+
+.hiddenLabel
+{
+  text-decoration: line-through
+}
+
+.animatedRainbowX
+{
+  background: repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
+.animatedRainbowY
+{
+  background: repeating-linear-gradient(0deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
+  background-size: auto 200%;
+  animation: yAnimation 1.8s linear infinite
+}
+
+.animatedPoopX
+{
+  background: repeating-linear-gradient(90deg, #851717 0%, #0f8332 25%, #851717 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
+.animatedPoopY
+{
+  background: repeating-linear-gradient(0deg, #851717 0%, #0f8332 25%, #851717 50.0%);
+  background-size: auto 200%;
+  animation: yAnimation 1.8s linear infinite
+}
+
+.animatedPurpleBlueY
+{
+  background: repeating-linear-gradient(0deg, #8a2be2 0%, #557fcc 25%, #8a2be2 50.0%);
+  background-size: auto 200%;
+  animation: yAnimation 1.8s linear infinite
+}
+
+.animatedUSDSX
+{
+  background: repeating-linear-gradient(90deg, #ff6d6d 0%, #ffd232 16%, #ffd232 33%, #ff6d6d 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
+.animatedUSDCX
+{
+  background: repeating-linear-gradient(90deg, #3e73c4 0%, #fff 16%, #3e73c4 33%, #3e73c4 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
+.animatedSOLX
+{
+  background: repeating-linear-gradient(90deg, #10f2b0 0%, #cf41e8 16%, #cf41e8 23%, #10f2b0 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
+.animatedWEthX
+{
+  background: repeating-linear-gradient(90deg, #627eea 0%, #fff 16%, #627eea 33%, #627eea 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
+.animatedWBtcX
+{
+  background: repeating-linear-gradient(90deg, #f09242 0%, #282138 16%, #282138 23%, #f09242 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
+@keyframes xAnimation
+{
+  to
+  {
+    background-position: 150% center
+  }
+}
+
+@keyframes yAnimation
+{
+  to
+  {
+    background-position: center 200%
+  }
+}

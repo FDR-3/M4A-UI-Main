@@ -29,6 +29,26 @@
           </h2>
           <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
+          <!--<ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowHODLHistory()">
+            <ion-label v-if="!showHODLHistory" color="green">Show History</ion-label>
+            <ion-label v-else color="green">Hide History</ion-label>
+          </ion-button>
+
+          <transition name="divSlide">
+            <div v-if="showHODLHistory">
+              <div class="divSlideContent">
+                <div class="beamOverlay"></div>
+                <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 })"
+                :current7DayProjection="sevenDayProjectionRate.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 })"
+                :amountHistoryHashMap="amountHistoryHashMap"/>
+              </div>
+            </div>
+          </transition>-->
+
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="HODL Treasury Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
           </ion-input>
@@ -203,6 +223,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateTokenReserveSevenDaySupplyInterestFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
+  import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
   var stableCoinTableData = ref()
@@ -211,6 +232,8 @@
   var treasuryStableValue = ref(0)
   var treasuryCryptoValue = ref(0)
   var tvlContributionStableValue = ref(0)
+  var showHODLHistory = ref(false)
+  var amountHistoryHashMap = ref()
 
   var treasuryATAPopoverOpen = ref(false)
   var tokenMintAddressPopoverOpen = ref(false)
@@ -327,11 +350,12 @@
 
     var treasuryValue = 0
     var tvlContributionValue = 0
+    var tempMap = new Map<number, string>(amountHistoryHashMap.value)
     var unprocessedTableData = []
 
     for(var i=0; i<StableCoins.length; i++)
     {
-      unprocessedTableData.push(cloneDeep(StableCoins[i]))//Keeps HODL and Single Payer tables from writing over each other
+      unprocessedTableData.push(cloneDeep(StableCoins[i]))//Keeps Single Payer, HODL, and Solvency  tables from writing over each other
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
@@ -390,7 +414,7 @@
         maximumFractionDigits: decimalAmount })
       }
 
-      const treasuryTotalAmount = Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
+      const treasuryTotalAmount = Number(unprocessedTableData[i].wallet) + Number(unprocessedTableData[i].unCollectedFees) + Number(unprocessedTableData[i].deposits)
       const tvlContributionTotalAmount = Number(unprocessedTableData[i].wallet)
       var treasuryCalculatedValue = 0
       var tvlContributionCalculatedValue = 0
@@ -410,10 +434,17 @@
       unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
+
+      //Set HODLHistory Current Data
+      const totalAmountString = treasuryTotalAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+      tempMap.set(unprocessedTableData[i].tokenId, totalAmountString)
     }
 
     treasuryStableValue.value = treasuryValue
     tvlContributionStableValue.value = tvlContributionValue
+    amountHistoryHashMap.value = tempMap
     stableCoinTableData.value = unprocessedTableData
   }
 
@@ -423,11 +454,12 @@
       return
 
     var treasuryValue = 0
+    var tempMap = new Map<number, string>(amountHistoryHashMap.value)
     var unprocessedTableData = []
 
     for(var i=0; i<CryptoCurrency.length; i++)
     {
-      unprocessedTableData.push(cloneDeep(CryptoCurrency[i]))//Keeps HODL and Single Payer tables from writing over each other
+      unprocessedTableData.push(cloneDeep(CryptoCurrency[i]))//Keeps Single Payer, HODL, and Solvency  tables from writing over each other
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].asset.svg)//Have to markRaw again after cloneDeep
       unprocessedTableData[i].svg = markRaw(unprocessedTableData[i].chain.svg)//Have to markRaw again after cloneDeep
 
@@ -485,9 +517,16 @@
       unprocessedTableData[i].valueString = '$' + flooredValue.toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2 })
+
+      //Set HODLHistory Current Data
+      const totalAmountString = treasuryTotalAmount.toLocaleString('en-US', {
+        minimumFractionDigits: decimalAmount,
+        maximumFractionDigits: decimalAmount })
+      tempMap.set(unprocessedTableData[i].tokenId, totalAmountString)
     }
 
     treasuryCryptoValue.value = treasuryValue
+    amountHistoryHashMap.value = tempMap
     CryptoCurrencyTableData.value = unprocessedTableData
   }
 
@@ -577,6 +616,16 @@
   {
     global: { value: undefined, matchMode: FilterMatchMode.CONTAINS }
   })
+
+  function handleShowHODLHistory()
+  {
+    if(!showHODLHistory.value)
+      playOpenChartSFX()
+    else
+      playCloseChartSFX()
+
+    showHODLHistory.value = !showHODLHistory.value
+  }
 </script>
 
 <style scoped>

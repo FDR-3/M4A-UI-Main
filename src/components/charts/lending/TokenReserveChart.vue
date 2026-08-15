@@ -88,6 +88,7 @@
     setWEthLineAnimatedGradient,
     setWBtcLineAnimatedGradient } from './ChartHelper'
   import cloneDeep from 'lodash/cloneDeep'
+  import './Chart.css'
 
   const props = defineProps(['amountHistoryHashMap'])
 
@@ -104,84 +105,6 @@
 
   var gradientOffset = ref(0)
  
-  const baseChartData =
-  {
-    labels: [],
-    datasets:
-    [
-      {
-        type: 'line',
-        label: 'USDS',
-        borderColor: function(context: any)
-        { 
-          const chart = context.chart
-          const { ctx, chartArea } = chart
-          return setUSDSLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
-        },
-        borderWidth: 4,
-        fill: false,
-        tension: 0.4,
-        data: [] as any[]
-      },
-      {
-        type: 'line',
-        label: 'USDC',
-        borderColor: function(context: any)
-        { 
-          const chart = context.chart
-          const { ctx, chartArea } = chart
-          return setUSDCLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
-        },
-        borderWidth: 4,
-        fill: false,
-        tension: 0.4,
-        data: [] as any[]
-      },
-      {
-        type: 'line',
-        label: 'SOL',
-        borderColor: function(context: any)
-        { 
-          const chart = context.chart
-          const { ctx, chartArea } = chart
-          return setSOLLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
-        },
-        borderWidth: 4,
-        fill: false,
-        tension: 0.4,
-        data: [] as any[]
-      },
-      {
-        type: 'line',
-        label: 'WEth',
-        borderColor: function(context: any)
-        { 
-          const chart = context.chart
-          const { ctx, chartArea } = chart
-          return setWEthLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
-        },
-        borderWidth: 4,
-        fill: false,
-        tension: 0.4,
-        data: [] as any[]
-      },
-      {
-        type: 'line',
-        label: 'WBtc',
-        borderColor: function(context: any)
-        { 
-          const chart = context.chart
-          const { ctx, chartArea } = chart
-          return setWBtcLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
-        },
-        borderWidth: 4,
-        fill: false,
-        tension: 0.4,
-        data: [] as any[]
-      }
-    ]
-  }
-
   onMounted(async() =>
   {
     setChartData()
@@ -217,7 +140,7 @@
 
     tokenIdArray.forEach((tokenId: number, index: number) =>
     {
-      chartData.datasets[index].data[chartData.datasets[index].data.length - 1] = props.amountHistoryHashMap.get(tokenId).replace(/,/g, '')
+      chartData.datasets[index].data[chartData.datasets[index].data.length - 1] = props.amountHistoryHashMap.get(tokenId)
     })
   }))
 
@@ -276,10 +199,12 @@
   function setChartData()
   {
     const newDate = new Date()
+    const startYear = Number(lendingProtocolHistoryOptions[1].historyOption)
     const currentYear = newDate.getFullYear()
     const currentMonth = newDate.getMonth() + 1
     var tempYearlyHashMap = new Map<string, any>()
-    var tempAllChartData = getAmountBaseChart(gradientOffset.value)
+    var tempAllChartData = cloneDeep(getAmountBaseChart(gradientOffset))
+    var allLabels: string[] = []
 
     //Define token configs to loop over dynamically
     const tokens =
@@ -291,14 +216,11 @@
       { historyMap: TokenReserveWBtcHistoryHashMap, tokenId: tokenIds.wbtcTokenId, allData: [] as any[] }
     ]
 
-    var allLabels: string[] = []
-    const startYear = Number(lendingProtocolHistoryOptions[1].historyOption)
-
     for(var year = startYear; year <= currentYear; year++)
     {
       var yearlyLabels: string[] = []
-      var tempYearlyChartData = getAmountBaseChart(gradientOffset.value)
-      
+      var tempYearlyChartData = cloneDeep(getAmountBaseChart(gradientOffset))
+
       //Track yearly arrays for each token index
       var yearlyDataLists: any[][] = tokens.map(() => [])
       const maxMonth = (year == currentYear) ? currentMonth : 12
@@ -334,8 +256,7 @@
               allLabels.push(monthName + ' ' + year.toString())
               labelAddedToAll = true
             }
-            const rawPropVal = props.amountHistoryHashMap.get(token.tokenId)
-            const val = rawPropVal ? rawPropVal.replace(/,/g, '') : 0
+            const val = props.amountHistoryHashMap.get(token.tokenId)
             
             token.allData.push(val)
             yearlyDataLists[index].push(val)
@@ -374,108 +295,3 @@
     chartDataHashMap = tempYearlyHashMap
   }
 </script>
-
-<style scoped>
-  ion-popover 
-  {
-    --width: min(70vw, 144px)
-  }
-
-  h4
-  {
-    font-size: min(4.5vw, 26px)
-  }
-
-  h5
-  {
-    font-size: min(4vw, 25px)
-  }
-
-  .chartLegend
-  {
-    display: flex;
-    justify-content: center;
-    gap: 10px
-  }
-  
-  .chartSelect
-  {
-    width: 130px;
-    padding-left: 20px
-  }
-
-  .legendItem
-  {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px
-  }
-
-  .swatch
-  {
-    width: 27px; /* Standard swatch width */
-    height: 12px; /* Standard swatch height */
-    margin-right: 8px;
-    border: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center
-  }
-
-  .animatedUSDSX
-  {
-    background: repeating-linear-gradient(90deg, #ff6d6d 0%, #ffd232 16%, #ffd232 33%, #ff6d6d 50.0%);
-    background-size: 150% auto;
-    animation: xAnimation 1.8s linear infinite
-  }
-
-  .animatedUSDCX
-  {
-    background: repeating-linear-gradient(90deg, #3e73c4 0%, #fff 16%, #3e73c4 33%, #3e73c4 50.0%);
-    background-size: 150% auto;
-    animation: xAnimation 1.8s linear infinite
-  }
-
-  .animatedSOLX
-  {
-    background: repeating-linear-gradient(90deg, #10f2b0 0%, #cf41e8 16%, #cf41e8 23%, #10f2b0 50.0%);
-    background-size: 150% auto;
-    animation: xAnimation 1.8s linear infinite
-  }
-
-  .animatedWEthX
-  {
-    background: repeating-linear-gradient(90deg, #627eea 0%, #fff 16%, #627eea 33%, #627eea 50.0%);
-    background-size: 150% auto;
-    animation: xAnimation 1.8s linear infinite
-  }
-
-  .animatedWBtcX
-  {
-    background: repeating-linear-gradient(90deg, #f09242 0%, #282138 16%, #282138 23%, #f09242 50.0%);
-    background-size: 150% auto;
-    animation: xAnimation 1.8s linear infinite
-  }
-
-  @keyframes xAnimation
-  {
-    to
-    {
-      background-position: 150% center
-    }
-  }
-
-  @keyframes yAnimation
-  {
-    to
-    {
-      background-position: center 200%
-    }
-  }
-
-  .hiddenLabel
-  {
-    text-decoration: line-through
-  }
-</style>
