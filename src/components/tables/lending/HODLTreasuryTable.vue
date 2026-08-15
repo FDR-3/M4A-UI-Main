@@ -29,7 +29,7 @@
           </h2>
           <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
-          <!--<ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowHODLHistory()">
+          <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowHODLHistory()">
             <ion-label v-if="!showHODLHistory" color="green">Show History</ion-label>
             <ion-label v-else color="green">Hide History</ion-label>
           </ion-button>
@@ -38,16 +38,12 @@
             <div v-if="showHODLHistory">
               <div class="divSlideContent">
                 <div class="beamOverlay"></div>
-                <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 })"
-                :current7DayProjection="sevenDayProjectionRate.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 })"
+                <HODLChart :currentTreasuryValue="tvl.hodlTreasury"
+                :current7DayProjection="Number(sevenDayProjectionRate.replace(/,/g, ''))"
                 :amountHistoryHashMap="amountHistoryHashMap"/>
               </div>
             </div>
-          </transition>-->
+          </transition>
 
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="HODL Treasury Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
@@ -223,6 +219,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { calculateTokenReserveSevenDaySupplyInterestFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
+  import HODLChart from '/src/components/charts/lending/HODLChart.vue'
   import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
   import cloneDeep from 'lodash/cloneDeep'
 

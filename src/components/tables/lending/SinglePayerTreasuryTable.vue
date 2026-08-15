@@ -22,7 +22,7 @@
       <template #header>
         <div>
           <h2>Single Payer Treasury Value <br>
-            <div class="flexCenterRow">
+            <div class="flexCenterRow nSmallMarginTop">
               <div style="margin-bottom: 2px">
                 <InfoButton :infoMessage="payoutMSG"/>
               </div>
@@ -31,7 +31,7 @@
                 maximumFractionDigits: 2 }) }}</span>
             </div>
           </h2>
-          <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
+          <h2 class="nMediumLargeMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
           <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowSinglePayerHistory()">
             <ion-label v-if="!showSinglePayerHistory" color="green">Show History</ion-label>
@@ -43,7 +43,7 @@
               <div class="divSlideContent">
                 <div class="beamOverlay"></div>
                 <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts"
-                :current7DayProjection="Number(sevenDayProjectionRate)"
+                :current7DayProjection="Number(sevenDayProjectionRate.replace(/,/g, ''))"
                 :amountHistoryHashMap="amountHistoryHashMap"/>
               </div>
             </div>
