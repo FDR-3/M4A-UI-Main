@@ -77,7 +77,7 @@
   { 
     .buttonContainer
     {
-      justify-content: space-between
+      justify-content: space-around
     }
   }
 </style>
