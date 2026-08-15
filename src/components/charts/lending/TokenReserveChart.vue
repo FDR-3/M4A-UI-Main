@@ -14,7 +14,7 @@
         @change="switchChartData()">
         </Select>
 
-        <ion-button class="toggleButton smallMarginLeft" fill="clear" @click="showValues=!showValues; resetHiddenArray()">
+        <ion-button class="toggleButton smallMarginLeft" fill="clear" @click="handleShowValues()">
           <ion-label v-if="showValues" color="dark">Toggle Amounts</ion-label>
           <ion-label v-else color="dark">Toggle Values</ion-label>
         </ion-button>
@@ -239,6 +239,19 @@
 
     resetHiddenArray()
   
+    await sleep(40)
+    valueChartOptions.value.responsive = true
+    amountChartOptions.value.responsive = true
+  }
+
+  async function handleShowValues()
+  {
+    valueChartOptions.value.responsive = false //Needed this extra step to get initial animation when swithching only in Production for some reason
+    amountChartOptions.value.responsive = false
+
+    resetHiddenArray()
+    showValues.value =! showValues.value
+
     await sleep(40)
     valueChartOptions.value.responsive = true
     amountChartOptions.value.responsive = true
