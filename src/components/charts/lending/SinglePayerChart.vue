@@ -28,7 +28,7 @@
           v-for="(dataset, index) in valueChartData?.datasets" 
           :key="index" 
           class="legendItem"
-          @click="toggleDataset(index, chartRef)"
+          @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
             <div 
               v-if="dataset.label=='Available For Payouts'" 
@@ -51,14 +51,14 @@
 
     <div ref="chartContainer">
       <Chart v-if="showValues" type="line" ref="chartRef" :width="chartWidth" :data="valueChartData" :options="chartOptions"/>
-      <Chart v-else type="bar" ref="chartRef" :width="chartWidth" :data="false" :options="chartOptions"/>
+      <Chart v-else type="bar" ref="chartRef" :width="chartWidth" :data="amountChartData" :options="chartOptions"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, watch } from 'vue'
-  import { IonLabel } from '@ionic/vue'
+  import { IonLabel, IonButton } from '@ionic/vue'
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
@@ -66,9 +66,14 @@
   import { lendingProtocolHistoryOptions } from './TVLHistory'
   import { SinglePayerPayoutHistoryHashMap, SinglePayer7DayProjectionHistoryHashMap } from './SinglePayerHistory'
   import { sleep } from '/src/assets/helperFunctions/sleep.ts'
+  import { tokenIds, tokenIdArray } from '/src/assets/constants/Addresses.ts'
+  import { setChartOptions,
+    toggleDataset,
+    setRainbowLineAnimatedGradient,
+    setRainbowBarAnimatedGradient } from '/src/components/charts/lending/ChartHelper.ts'
   import cloneDeep from 'lodash/cloneDeep'
 
-  const props = defineProps(['currentPayoutAmount', 'current7DayProjection'])
+  const props = defineProps(['currentPayoutAmount', 'current7DayProjection', 'amountHistoryHashMap'])
 
   var valueChartData: any
   var amountChartData: any
@@ -98,7 +103,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setRainbowLineAnimatedGradient(ctx, chartArea)
+          return setRainbowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,
@@ -112,7 +117,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setRainbowBarAnimatedGradient(ctx, chartArea)
+          return setRainbowBarAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         maxBarThickness: 44,
         data: [] as any[]
@@ -123,7 +128,7 @@
   onMounted(async() =>
   {
     setChartData()
-    chartOptions.value = setChartOptions()
+    chartOptions.value = setChartOptions(false, chartTextColor.value, true)
     valueChartData = valueChartDataHashMap.get(chartSelect.value)
     amountChartData = amountChartDataHashMap.get(chartSelect.value)
 
@@ -145,7 +150,7 @@
     else
       chartTextColor.value = "#000000"
 
-    chartOptions.value = setChartOptions()
+    chartOptions.value = setChartOptions(false, chartTextColor.value, true)
   })
 
   watch(() => [props.currentPayoutAmount, props.current7DayProjection], (async() => 
@@ -156,7 +161,17 @@
     if(valueChartData?.datasets?.[0])
       valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-1] = props.currentPayoutAmount.replace(/,/g, '')
     if(valueChartData?.datasets?.[1])
-      valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-1] = props.current7DayProjection.replace(/,/g, '') 
+      valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-1] = props.current7DayProjection.replace(/,/g, '')
+  }))
+
+  watch(() => props.amountHistoryHashMap, (async() => 
+  {
+    setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
+
+    tokenIdArray.forEach((tokenId: number, index: number) =>
+    {
+      amountChartData.datasets[index].data[amountChartData.datasets[index].data.length - 1] = props.amountHistoryHashMap.get(tokenId).replace(/,/g, '')
+    })
   }))
 
   async function switchChartData()
@@ -208,160 +223,6 @@
     {
       clearInterval(animationIntervalId)
       animationIntervalId = undefined
-    }
-  }
-
-  function setRainbowLineAnimatedGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const width = chartArea.right - chartArea.left
-    const offset = gradientOffset.value
-    const shift = offset * width
-
-    const gradient = ctx.createLinearGradient(
-      chartArea.left - shift, 0, 
-      chartArea.left - shift + (width * 2), 0
-    )
-
-    gradient.addColorStop(0.000, '#14ffe9')
-    gradient.addColorStop(0.166, '#ffc800')
-    gradient.addColorStop(0.333, '#ff00e0')
-    gradient.addColorStop(0.500, '#14ffe9')
-    gradient.addColorStop(0.666, '#ffc800')
-    gradient.addColorStop(0.833, '#ff00e0')
-    gradient.addColorStop(1.000, '#14ffe9')
-
-    return gradient
-  }
-
-  function setRainbowBarAnimatedGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const height = chartArea.bottom - chartArea.top
-    const offset = gradientOffset.value
-    //Shift goes from 0 to the height of the chart
-    const shift = offset * height
-
-    //Create a gradient twice as tall as the chart, and slide it up
-    const gradient = ctx.createLinearGradient(
-      0, chartArea.top - shift, 
-      0, chartArea.top - shift + (height * 2)
-    )
-
-    //Two full cycles of the rainbow
-    gradient.addColorStop(0.000, '#14ffe9')
-    gradient.addColorStop(0.166, '#ffc800')
-    gradient.addColorStop(0.333, '#ff00e0')
-    gradient.addColorStop(0.500, '#14ffe9')
-    gradient.addColorStop(0.666, '#ffc800')
-    gradient.addColorStop(0.833, '#ff00e0')
-    gradient.addColorStop(1.000, '#14ffe9')
-
-    return gradient
-  }
-
-  function setChartOptions()
-  {
-    return {
-      responsive: false,
-      maintainAspectRatio: false,
-      aspectRatio: 0.7,
-      transitions:
-      {
-        hide:
-        {
-          animation:
-          {
-            duration: 0
-          }
-        }
-      },
-      plugins:
-      {
-        legend:
-        {
-          display: false
-        },
-        tooltip:
-        {
-          callbacks:
-          {
-            label: function(context: any)
-            {
-              let label = context.dataset.label || ''
-              if(label == "Available For Payouts" || label == "7 Day Rate")
-                label += ': $'
-              else if(label)
-                label += ': '
-
-              if(context.parsed.y !== null)
-              {
-                const value = context.parsed.y
-                label += value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 9 })
-              }
-              return label;
-            }
-          }
-        }
-      },
-      scales:
-      {
-        x:
-        {
-          ticks:
-          {
-            color: chartTextColor.value
-          },
-          grid:
-          {
-            color: chartTextColor.value
-          }
-        },
-        y:
-        {
-          ticks:
-          {
-            color: chartTextColor.value,
-            callback: function(value: any)
-            {
-              return '$' + Number(value).toLocaleString('en-US', {
-                minimumFractionDigits: 0, 
-                maximumFractionDigits: 2
-              })
-            }
-          },
-          grid:
-          {
-            color: chartTextColor.value
-          }
-        }
-      }
-    }
-  }
-
-  function toggleDataset(index: number, chartInstance: any)
-  {
-    if(!chartInstance)
-      return
-
-    const chart = chartInstance.chart
-    if(chart)
-    {
-      if(chart.isDatasetVisible(index))
-      {
-        legenHiddenArray.value[index] = true
-        chart.hide(index)
-      }
-      else
-      {
-        legenHiddenArray.value[index] = false
-        chart.show(index)
-        chart.update()
-      }
     }
   }
 

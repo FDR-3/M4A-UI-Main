@@ -43,11 +43,12 @@
               <div class="divSlideContent">
                 <div class="beamOverlay"></div>
                 <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 })"
-            :current7DayProjection="sevenDayProjectionRate.toLocaleString('en-US', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2 })"/>
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 })"
+                :current7DayProjection="sevenDayProjectionRate.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 })"
+                :amountHistoryHashMap="amountHistoryHashMap"/>
               </div>
             </div>
           </transition>
@@ -219,6 +220,7 @@
   var stableValue = ref(0)
   var cryptoValue = ref(0)
   var showSinglePayerHistory = ref(false)
+  var amountHistoryHashMap = ref()
 
   var tokenPopoverOpen = ref(false)
   var event = ref()

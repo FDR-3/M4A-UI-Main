@@ -204,6 +204,15 @@ export const tokenIds =
   wbtcTokenId: 5
 }
 
+export const tokenIdArray = 
+[
+  tokenIds.usdsTokenId, //Index 0: USDS
+  tokenIds.usdcTokenId, //Index 1: USDC
+  tokenIds.solTokenId,  //Index 2: SOL
+  tokenIds.wethTokenId, //Index 3: WEth
+  tokenIds.wbtcTokenId  //Index 4: WBtc
+]
+
 export const tokenDecimalHashMap: Map<number, number> = new Map(
 [
   //Key: Token Mint Address, Value: Token Decimal Amount

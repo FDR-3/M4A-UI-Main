@@ -45,7 +45,7 @@
             <div v-if="showTokenReserveHistory">
               <div class="divSlideContent">
                 <div class="beamOverlay"></div>
-                <TokenReserveChart :tokenReserveHistoryMap="tokenReserveHistoryMap"/>
+                <TokenReserveChart :amountHistoryHashMap="amountHistoryHashMap"/>
               </div>
             </div>
           </transition>
@@ -357,7 +357,7 @@
   var tokenReserveATAPopoverOpen = ref(false)
   var totalDepositedValue = ref("0.00")
   var totalBorrowedValue = ref("0.00")
-  var tokenReserveHistoryMap = ref()
+  var amountHistoryHashMap = ref()
   var copyTokenReserveATAButtonText = ref(copyTonkenReserveATAText)
 
   var inputFeeRefs = ref(new Map())
@@ -660,7 +660,7 @@
 
     totalDepositedValue.value = depositedValue.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
     totalBorrowedValue.value = borrowedValue.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
-    tokenReserveHistoryMap.value = tempMap
+    amountHistoryHashMap.value = tempMap
     tokenReserveTableData.value = processedTableData
   }
 

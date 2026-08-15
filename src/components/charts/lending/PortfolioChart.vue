@@ -163,7 +163,7 @@
         v-for="(dataset, index) in chartData?.datasets.slice(0, 5)" 
         :key="index" 
         class="legendItem"
-        @click="toggleDataset(index, chartRef)"
+        @click="toggleDataset(index, chartRef, legenHiddenArray)"
         >
           <div 
             v-if="dataset.label=='Fees Generated'" 
@@ -199,7 +199,7 @@
         v-for="(dataset, index) in chartData?.datasets.slice(5, 9)" 
         :key="index + 5" 
         class="legendItem"
-        @click="toggleDataset(index+5, chartRef)"
+        @click="toggleDataset(index+5, chartRef, legenHiddenArray)"
         >
           <div 
             class="swatch" 
@@ -220,7 +220,7 @@
         v-for="(dataset, index) in chartData?.datasets.slice(9)" 
         :key="index + 9" 
         class="legendItem"
-        @click="toggleDataset(index+9, chartRef)"
+        @click="toggleDataset(index+9, chartRef, legenHiddenArray)"
         >  
           <div 
             class="swatch" 
@@ -243,7 +243,7 @@
           v-for="(dataset, index) in chartData?.datasets" 
           :key="index" 
           class="legendItem"
-          @click="toggleDataset(index, chartRef)"
+          @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
             <div 
               v-if="dataset.label=='Fees Generated'" 
@@ -345,6 +345,7 @@
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { getCompoundingFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
+  import { setChartOptions, toggleDataset } from './ChartHelper'
   import cloneDeep from 'lodash/cloneDeep'
   
   const props = defineProps(
@@ -445,7 +446,7 @@
     
     yearSelect.value = props.selectedYear
 
-    chartOptions.value = setChartOptions()
+    chartOptions.value = setChartOptions(true, chartTextColor.value)
     startGradientAnimation()
     
     if(props.chartData && props.chartData.datasets)
@@ -473,7 +474,7 @@
     else
       chartTextColor.value = "#000000"
 
-    chartOptions.value = setChartOptions()
+    chartOptions.value = setChartOptions(true, chartTextColor.value)
   })
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
@@ -565,145 +566,6 @@
     {
       clearInterval(animationIntervalId)
       animationIntervalId = undefined
-    }
-  }
-
-  function setChartOptions()
-  {
-    return{
-      maintainAspectRatio: false,
-      aspectRatio: 0.7,
-      transitions:
-      {
-        hide:
-        {
-          animation:
-          {
-            duration: 0
-          }
-        }
-        /*hide: //Only the show fade in animation is currently working for the custom rainbow line
-        {
-            animations:
-            {
-              borderWidth:
-              {
-                easing: 'linear',
-                duration: 400,//Fade out speed
-                from: 4, 
-                to: 0, 
-              }
-            }
-        },*/
-        /*show:
-        {
-          animations:
-          {
-            // Animate the borderWidth back to the original value
-            borderWidth:
-            {
-              easing: 'linear',
-              duration: 400, //Fade in speed
-              from: 0, 
-              to: 4,
-            }
-          }
-        },*/
-      },
-      plugins:
-      {
-        legend:
-        {
-          display: false
-        },
-        //Fixes the hover popup truncation
-        tooltip:
-        {
-          callbacks:
-          {
-            label: function(context: any)
-            {
-              let label = context.dataset.label || ''
-              if(label)
-                label += ': '
-  
-              if(context.parsed.y !== null)
-              {
-                const value = context.parsed.y
-                label += value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 9 })
-              }
-              return label;
-            }
-          }
-        }
-      },
-      scales:
-      {
-        x:
-        {
-          ticks:
-          {
-            color: chartTextColor.value
-          },
-          grid:
-          {
-            color: chartTextColor.value
-          }
-        },
-        y:
-        {
-          ticks:
-          {
-            color: chartTextColor.value
-          },
-          grid:
-          {
-            color: chartTextColor.value
-          }
-        }
-      }
-    }
-  }
-
-  function toggleDataset(index: number, chartInstance: any)
-  {
-    if(!chartInstance)
-      return
-
-    const chart = chartInstance.chart
-    if(chart)
-    {
-      if(chart.isDatasetVisible(index))
-      {
-        legenHiddenArray.value[index] = true
-        chart.hide(index)
-
-        //if(index == 0 && legenHiddenArray.value[2] == false)
-          //stopGradientAnimation()
-
-        //if(index == 2 && legenHiddenArray.value[0] == false)
-          //stopGradientAnimation()
-      }
-      else
-      {
-        legenHiddenArray.value[index] = false
-        chart.show(index)
-
-        /*if(index == 0)
-          setTimeout(() =>
-          {
-            if(legenHiddenArray.value[0] == false && legenHiddenArray.value[2] == false)//Incase user has already clicked the button again, don't start animation.
-              startGradientAnimation()
-          }, 400)
-        else if(index == 2)
-          setTimeout(() =>
-          {
-            if(legenHiddenArray.value[index] == false && legenHiddenArray.value[2] == false)//Incase user has already clicked the button again, don't start animation.
-              startGradientAnimation()
-          }, 400)
-        else*/
-          chart.update()
-      }
     }
   }
 

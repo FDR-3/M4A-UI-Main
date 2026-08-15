@@ -356,6 +356,11 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import cloneDeep from 'lodash/cloneDeep'
+  import { setRainbowLineAnimatedGradient,
+    setRainbowBarAnimatedGradient,
+    setPoopLineAnimatedGradient,
+    setPoopBarAnimatedGradient,
+    setPurpleBlueBarAnimatedGradient } from '/src/components/charts/lending/ChartHelper.ts'
   import * as bs58 from 'bs58'
   
   const toast = inject('toast')
@@ -504,7 +509,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setPurpleBlueBarAnimatedGradient(ctx, chartArea)
+          return setPurpleBlueBarAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         data: [] as any[]
       },
@@ -515,7 +520,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setRainbowLineAnimatedGradient(ctx, chartArea)
+          return setRainbowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,
@@ -529,7 +534,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setRainbowBarAnimatedGradient(ctx, chartArea)
+          return setRainbowBarAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         data: [] as any[]
       },
@@ -540,7 +545,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setPoopLineAnimatedGradient(ctx, chartArea)
+          return setPoopLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,
@@ -554,7 +559,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setPoopBarAnimatedGradient(ctx, chartArea)
+          return setPoopBarAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         data: [] as any[]
       },
@@ -823,134 +828,6 @@
         window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + accountSelect.value)
       }, 100)
   }))
-
-  function setRainbowLineAnimatedGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const width = chartArea.right - chartArea.left
-    const offset = gradientOffset.value
-    //Shift goes from 0 to the width of the chart
-    const shift = offset * width
-
-    //Create a gradient that is exactly twice as wide as the chart, and slide it left
-    const gradient = ctx.createLinearGradient(
-      chartArea.left - shift, 0, 
-      chartArea.left - shift + (width * 2), 0
-    )
-
-    //Two full cycles of the rainbow
-    gradient.addColorStop(0.000, '#14ffe9')
-    gradient.addColorStop(0.166, '#ffc800')
-    gradient.addColorStop(0.333, '#ff00e0')
-    gradient.addColorStop(0.500, '#14ffe9')
-    gradient.addColorStop(0.666, '#ffc800')
-    gradient.addColorStop(0.833, '#ff00e0')
-    gradient.addColorStop(1.000, '#14ffe9')
-
-    return gradient
-  }
-
-  function setRainbowBarAnimatedGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const height = chartArea.bottom - chartArea.top
-    const offset = gradientOffset.value
-    //Shift goes from 0 to the height of the chart
-    const shift = offset * height
-
-    //Create a gradient twice as tall as the chart, and slide it up
-    const gradient = ctx.createLinearGradient(
-      0, chartArea.top - shift, 
-      0, chartArea.top - shift + (height * 2)
-    )
-
-    //Two full cycles of the rainbow
-    gradient.addColorStop(0.000, '#14ffe9')
-    gradient.addColorStop(0.166, '#ffc800')
-    gradient.addColorStop(0.333, '#ff00e0')
-    gradient.addColorStop(0.500, '#14ffe9')
-    gradient.addColorStop(0.666, '#ffc800')
-    gradient.addColorStop(0.833, '#ff00e0')
-    gradient.addColorStop(1.000, '#14ffe9')
-
-    return gradient
-  }
-
-  function setPoopLineAnimatedGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const width = chartArea.right - chartArea.left
-    const offset = gradientOffset.value
-    const shift = offset * width
-
-    const gradient = ctx.createLinearGradient(
-      chartArea.left - shift, 0, 
-      chartArea.left - shift + (width * 2), 0
-    )
-
-    //Two full cycles of the poop colors
-    gradient.addColorStop(0.00, '#851717')
-    gradient.addColorStop(0.25, '#0f8332')
-    gradient.addColorStop(0.50, '#851717')
-    gradient.addColorStop(0.75, '#0f8332')
-    gradient.addColorStop(1.00, '#851717')
-
-    return gradient
-  }
-
-  function setPoopBarAnimatedGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const height = chartArea.bottom - chartArea.top
-    const offset = gradientOffset.value
-    const shift = offset * height
-
-    const gradient = ctx.createLinearGradient(
-      0, chartArea.top - shift, 
-      0, chartArea.top - shift + (height * 2)
-    )
-
-    //Two full cycles of the poop colors
-    gradient.addColorStop(0.00, '#851717')
-    gradient.addColorStop(0.25, '#0f8332')
-    gradient.addColorStop(0.50, '#851717')
-    gradient.addColorStop(0.75, '#0f8332')
-    gradient.addColorStop(1.00, '#851717')
-
-    return gradient
-  }
-
-  function setPurpleBlueBarAnimatedGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const height = chartArea.bottom - chartArea.top
-    const offset = gradientOffset.value
-    const shift = offset * height
-
-    const gradient = ctx.createLinearGradient(
-      0, chartArea.top - shift, 
-      0, chartArea.top - shift + (height * 2)
-    )
-
-    //Two full cycles of the purple blue colors
-    gradient.addColorStop(0.00, '#8a2be2')
-    gradient.addColorStop(0.25, '#557fcc')
-    gradient.addColorStop(0.50, '#8a2be2')
-    gradient.addColorStop(0.75, '#557fcc')
-    gradient.addColorStop(1.00, '#8a2be2')
-
-    return gradient
-  }
 
   function resetSelectedYearForTokenMintAddressHashMap(subMarketArray: any[])
   {

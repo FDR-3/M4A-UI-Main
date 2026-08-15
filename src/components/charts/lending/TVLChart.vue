@@ -23,7 +23,7 @@
           v-for="(dataset, index) in chartData?.datasets" 
           :key="index" 
           class="legendItem"
-          @click="toggleDataset(index, chartRef)"
+          @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
             <div 
               v-if="dataset.label=='TVL'" 
@@ -55,6 +55,9 @@
   import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { lendingProtocolHistoryOptions, TVLHistoryHashMap } from './TVLHistory'
   import { sleep } from '/src/assets/helperFunctions/sleep.ts'
+  import { setChartOptions,
+    toggleDataset,
+    setRainbowLineAnimatedGradient } from './ChartHelper'
   import cloneDeep from 'lodash/cloneDeep'
 
   const props = defineProps(['currentTVL'])
@@ -84,7 +87,7 @@
         { 
           const chart = context.chart
           const { ctx, chartArea } = chart
-          return setRainbowLineAnimatedGradient(ctx, chartArea)
+          return setRainbowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
         borderWidth: 4,
         fill: false,
@@ -97,7 +100,7 @@
   onMounted(async() =>
   {
     setChartData()
-    chartOptions.value = setChartOptions()
+    chartOptions.value = setChartOptions(true, chartTextColor.value, true)
     chartData = chartDataHashMap.get(chartSelect.value)
 
     startGradientAnimation()
@@ -116,7 +119,7 @@
     else
       chartTextColor.value = "#000000"
 
-    chartOptions.value = setChartOptions()
+    chartOptions.value = setChartOptions(true, chartTextColor.value, true)
   })
 
   watch(() => [props.currentTVL], (async() => 
@@ -190,132 +193,6 @@
     {
       clearInterval(animationIntervalId)
       animationIntervalId = undefined
-    }
-  }
-
-  function setRainbowLineAnimatedGradient(ctx: any, chartArea:any)
-  {
-    if(!chartArea)
-      return
-
-    const width = chartArea.right - chartArea.left
-    const offset = gradientOffset.value
-    const shift = offset * width
-
-    const gradient = ctx.createLinearGradient(
-      chartArea.left - shift, 0, 
-      chartArea.left - shift + (width * 2), 0
-    )
-
-    gradient.addColorStop(0.000, '#14ffe9')
-    gradient.addColorStop(0.166, '#ffc800')
-    gradient.addColorStop(0.333, '#ff00e0')
-    gradient.addColorStop(0.500, '#14ffe9')
-    gradient.addColorStop(0.666, '#ffc800')
-    gradient.addColorStop(0.833, '#ff00e0')
-    gradient.addColorStop(1.000, '#14ffe9')
-
-    return gradient
-  }
-
-  function setChartOptions()
-  {
-    return {
-      responsive: true,
-      maintainAspectRatio: false,
-      aspectRatio: 0.7,
-      transitions:
-      {
-        hide:
-        {
-          animation:
-          {
-            duration: 0
-          }
-        }
-      },
-      plugins:
-      {
-        legend:
-        {
-          display: false
-        },
-        tooltip:
-        {
-          callbacks:
-          {
-            label: function(context: any)
-            {
-              let label = context.dataset.label || ''
-              if(label == "TVL")
-                label += ': $'
-              else if(label)
-                label += ': '
-
-              if(context.parsed.y !== null)
-              {
-                const value = context.parsed.y
-                label += value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 9 })
-              }
-              return label;
-            }
-          }
-        }
-      },
-      scales:
-      {
-        x:
-        {
-          ticks:
-          {
-            color: chartTextColor.value
-          },
-          grid:
-          {
-            color: chartTextColor.value
-          }
-        },
-        y:
-        {
-          ticks:
-          {
-            color: chartTextColor.value,
-            callback: function(value: any)
-            {
-              return '$' + Number(value).toLocaleString('en-US', {
-                minimumFractionDigits: 0, 
-                maximumFractionDigits: 2
-              })
-            }
-          },
-          grid:
-          {
-            color: chartTextColor.value
-          }
-        }
-      }
-    }
-  }
-
-  function toggleDataset(index: number, chartInstance: any)
-  {
-    if(!chartInstance)
-      return
-
-    const chart = chartInstance.chart
-    if(chart)
-    {
-      if(chart.isDatasetVisible(index))
-      {
-        legenHiddenArray.value[index] = true
-        chart.hide(index)
-      }
-      else
-      {
-        legenHiddenArray.value[index] = false
-        chart.show(index)
-        chart.update()
-      }
     }
   }
 
