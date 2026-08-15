@@ -1,5 +1,5 @@
 <template>
-  <div class="flexCenterColumn" v-if="playSelectionMusic() == true"  style="margin-top: 8px">
+  <div class="flexCenterColumn" v-if="showPlayer()"  style="margin-top: 8px">
     <audio
       id="musicPlayer"
       loop 
@@ -28,7 +28,7 @@
     </audio>
   </div>
 
-  <div>
+  <div style="display: none">
     <audio id="openChartSFX">
       <source src="/metal_gear_solid_tone.mp3" type="audio/mpeg">
       Your browser does not support the audio element.
@@ -46,7 +46,7 @@
   import { MenuIndex } from '/src/assets/globalStates/Navigation.vue'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
 
-  function playSelectionMusic()
+  function showPlayer()
   {
     return navigation.menuIndex == MenuIndex.M4A && 
       (
