@@ -14,7 +14,7 @@
         @change="switchChartData()">
         </Select>
 
-        <ion-button class="smallMarginLeft" fill="clear" @click="showValues=!showValues; resetHiddenArray()">
+        <ion-button class="toggleButton smallMarginLeft" fill="clear" @click="showValues=!showValues; resetHiddenArray()">
           <ion-label v-if="showValues" color="dark">Toggle Amounts</ion-label>
           <ion-label v-else color="dark">Toggle Values</ion-label>
         </ion-button>
