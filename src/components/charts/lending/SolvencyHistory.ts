@@ -44,5 +44,5 @@ export const SolvencyWBtcHistoryHashMap: Map<string, number> = new Map(
 [ 
   //Key: Month-Year, Value: Payout Value
   ["6-2026", 0.00],
-  ["7-2026", 0.000242]
+  ["7-2026", 0.00]
 ])

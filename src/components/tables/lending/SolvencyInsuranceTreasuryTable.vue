@@ -28,7 +28,7 @@
           </h2>
           <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
-          <!--<ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowSolvencyHistory()">
+          <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowSolvencyHistory()">
             <ion-label v-if="!showSolvencyHistory" color="green">Show History</ion-label>
             <ion-label v-else color="green">Hide History</ion-label>
           </ion-button>
@@ -37,16 +37,12 @@
             <div v-if="showSolvencyHistory">
               <div class="divSlideContent">
                 <div class="beamOverlay"></div>
-                <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 })"
-                :current7DayProjection="sevenDayProjectionRate.toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2 })"
+                <SolvencyChart :currentTreasuryValue="tvl.solvencyTreasury"
+                :current7DayProjection="Number(sevenDayProjectionRate.replace(/,/g, ''))"
                 :amountHistoryHashMap="amountHistoryHashMap"/>
               </div>
             </div>
-          </transition>-->
+          </transition>
 
           <ion-input color="dark" v-model="filters['global'].value" fill="outline" placeholder="Solvency Treasury Search     ">
             <ion-icon slot="start" :icon="search"></ion-icon>
@@ -205,6 +201,7 @@
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { calculateTokenReserveSevenDaySupplyInterestFactor } from '/src/components/smart contracts/lending protocol/InterestCalcHelpers.ts'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import SolvencyChart from '/src/components/charts/lending/SolvencyChart.vue'
   import { playOpenChartSFX, playCloseChartSFX } from '/src/components/audio/AudioFunctions.vue'
   import cloneDeep from 'lodash/cloneDeep'
 
