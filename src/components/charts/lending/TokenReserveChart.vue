@@ -90,7 +90,7 @@
     </div>
 
     <div ref="chartContainer">
-      <Chart v-if="showValues" type="bar" ref="chartRef" :width="chartWidth" :data="valueChartData" :options="valueChartOptions"/>
+      <Chart v-if="showValues" type="line" ref="chartRef" :width="chartWidth" :data="valueChartData" :options="valueChartOptions"/>
       <Chart v-else type="line" ref="chartRef" :width="chartWidth" :data="amountChartData" :options="amountChartOptions"/>
     </div>
   </div>
