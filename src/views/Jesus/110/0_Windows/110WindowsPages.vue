@@ -32,7 +32,7 @@
     Fired1_13,
     Fired2_14,
     OBS_Background_Remover_15,
-    PastorDropKick_16,
+    //PastorDropKick_16,
     ThisIsACall_17
   ]
 
