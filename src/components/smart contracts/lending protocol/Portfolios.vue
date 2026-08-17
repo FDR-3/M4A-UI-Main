@@ -419,7 +419,7 @@
 
   var gradientOffset = ref(0)
 
-  const refreshAccountMSG = "This will create new monthly statements if they need to be created and update user Balance/Debt and Interest Earned/Accrued.\n\nInterest is not considered Earned/Accrued until it appears in your monthly statement where tax purposes are concerned."
+  const refreshAccountMSG = "This will create new monthly statements if they need to be created and update user Balance/Debt and Interest Earned/Accrued.\n\nFor tax purposes, interest is not considered Earned/Accrued until it appears in your monthly statement."
 
   const total7DayProjectionRateValue = computed (() =>
   {
