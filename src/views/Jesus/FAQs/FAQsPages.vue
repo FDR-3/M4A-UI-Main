@@ -5,7 +5,7 @@
   export const FAQsPages = 
   [
     FAQs_1, 
-    FAQs_2 
+    //FAQs_2 
   ]
 
   export default FAQsPages
