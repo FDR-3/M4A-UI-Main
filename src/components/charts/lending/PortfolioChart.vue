@@ -53,7 +53,7 @@
           optionValue="chartAvailable" 
           placeholder="Select Year"
           appendTo="self"
-          @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, chartSelect)">
+          @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, chartSelect); resetHiddenArray()">
           </Select>
 
           <div v-if="ownerAddress==connectedWallet.addressString">
@@ -531,6 +531,30 @@
       }
 
     return processedList
+  }
+
+  enum ChartIndex
+  {
+    CollectedLiquidationFees = 11,
+    CollectedSubMarketFees = 12,
+    CollectedSolvencyFees = 13
+  }
+
+  function resetHiddenArray()
+  {
+    const isTreasuryAddress = props.ownerAddress == adminAccounts.singlePayerTreasuryAddress.toString() ||
+      props.ownerAddress == adminAccounts.hodlTreasuryAddress.toString() ||
+      props.ownerAddress == adminAccounts.solvencyTreasuryAddress.toString()
+
+    for(var i=0; i<legenHiddenArray.value.length; i++)
+      legenHiddenArray.value[i] = false
+
+    if(!isTreasuryAddress)
+    {
+      legenHiddenArray.value[ChartIndex.CollectedLiquidationFees] = true
+      legenHiddenArray.value[ChartIndex.CollectedSubMarketFees] = true
+      legenHiddenArray.value[ChartIndex.CollectedSolvencyFees] = true
+    }
   }
 
   function setInitialBalance()
