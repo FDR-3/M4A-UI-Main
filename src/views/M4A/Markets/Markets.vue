@@ -6,7 +6,7 @@
         <h2>Lending Protocol Testing On<br>🥳Mainnet🥳</h2>
         <h1>Markets</h1>
     
-        <ion-button @click="flipTable(); portfolioReRenderHelper+=1" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
+        <ion-button @click="flipTable(); portfolioURLHelper+=1" color="dark" :disabled="flipping">Toggle Portfolios</ion-button>
         <MarketsTable @openDepositModal="openDepositModal"
           @openWithdrawalModal="openWithdrawModal"
           @openBorrowModal="openBorrowModal"
@@ -25,7 +25,7 @@
         </div>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Markets</ion-button>
-        <Portfolios :portfolioReRenderHelper="portfolioReRenderHelper"
+        <Portfolios :portfolioURLHelper="portfolioURLHelper"
           @isBrowsingUsers="(isBrowsingUsersFlag: boolean) => isBrowingUsers = isBrowsingUsersFlag"
           @openDepositModal="openDepositModal"
           @openWithdrawalModal="openWithdrawModal"
@@ -73,7 +73,7 @@
   var liquidationModal = ref()
   var isBrowingUsers = ref(false)
 
-  var portfolioReRenderHelper = ref(0)
+  var portfolioURLHelper = ref(0)
 
   const portfolioChartInfoMSG = "Values in the charts are updated after a user does any lending activity, IE: depositing, repaying, etc.\n\nAll other values are calculated dynamically."
   

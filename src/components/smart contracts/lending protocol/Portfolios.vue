@@ -216,7 +216,6 @@
     <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
       <div v-for="(monthlyStatement, userTabIndex) in enrichedStableCoinMonthlyStatementList">
         <PortfolioChart
-        :key="chartReRenderKey"
         :isStableCoin="true"
         :hasDeposits="hasDeposits"
         :tokenId="monthlyStatement.tokenId"
@@ -228,8 +227,8 @@
         :subMarketFee="monthlyStatement.subMarketFee"
         :userTabIndex="userTabIndex"
         :chartData="monthlyStatement.chartData"
-        :selectedYear="monthlyStatement.selectedYear"
-        @changeYear="updateSelectedYearForTokenMintAddressHashMap"
+        :selectedChart="monthlyStatement.selectedChart"
+        @changeYear="updateSelectedChartNameHashMap"
         @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
         @openWithdrawalModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketOption)"
         @openBorrowModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketOption)"
@@ -294,7 +293,6 @@
     <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
       <div v-for="(monthlyStatement, userTabIndex) in enrichedCryptoMonthlyStatementList">
         <PortfolioChart
-        :key="chartReRenderKey"
         :isStableCoin="false"
         :hasDeposits="hasDeposits"
         :tokenId="monthlyStatement.tokenId"
@@ -306,8 +304,8 @@
         :subMarketFee="monthlyStatement.subMarketFee"
         :userTabIndex="userTabIndex"
         :chartData="monthlyStatement.chartData"
-        :selectedYear="monthlyStatement.selectedYear"
-        @changeYear="updateSelectedYearForTokenMintAddressHashMap"
+        :selectedChart="monthlyStatement.selectedChart"
+        @changeYear="updateSelectedChartNameHashMap"
         @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
         @openWithdrawalModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketOption)"
         @openBorrowModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketOption)"
@@ -366,7 +364,7 @@
   const toast = inject('toast')
   const colorName = inject('colorName') as string
 
-  const props = defineProps(['portfolioReRenderHelper'])
+  const props = defineProps(['portfolioURLHelper'])
   const emits = defineEmits(
   [
     'openDepositModal',
@@ -399,8 +397,8 @@
   var accountList = ref()
   var isBrowsingAllUsers = ref()
 
-  var selectedYearHashMap = new Map<string, any>()
-  var selectedUserChartDataHashMap = new Map<string, any>()
+  var selectedChartNameHashMap = new Map<string, any>()
+  var selectedChartDataHashMap = new Map<string, any>()
   var hasDeposits = ref(false)
 
   var stableCoin7DayProjectionRateAmount = ref("0")
@@ -453,7 +451,7 @@
           monthlyStatement.subMarketOwnerAddress, 
           monthlyStatement.subMarketIndex
         ),
-        selectedYear: getSelectedYearForOnMounted
+        selectedChart: getSelectedChartName
         (
           monthlyStatement.tokenId, 
           monthlyStatement.subMarketOwnerAddress, 
@@ -484,7 +482,7 @@
           monthlyStatement.subMarketOwnerAddress, 
           monthlyStatement.subMarketIndex
         ),
-        selectedYear: getSelectedYearForOnMounted
+        selectedChart: getSelectedChartName
         (
           monthlyStatement.tokenId, 
           monthlyStatement.subMarketOwnerAddress, 
@@ -707,12 +705,12 @@
       userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
       userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
       if(userMonthlyStatementStableCoinList.value?.length)
-        resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
+        resetSelectedChartNameHashMap(userMonthlyStatementStableCoinList.value)
 
       userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + connectedWallet.selectedLendingUserAccountIndex.toString())
       userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
       if(userMonthlyStatementCryptoCurrencyList.value?.length)
-        resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
+        resetSelectedChartNameHashMap(userMonthlyStatementCryptoCurrencyList.value)
 
       setChartData()
       startGradientAnimation()
@@ -771,19 +769,16 @@
         userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
         userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
         if(userMonthlyStatementStableCoinList.value?.length)
-          resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
+          resetSelectedChartNameHashMap(userMonthlyStatementStableCoinList.value)
 
         userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(connectedWallet.addressString + accountSelect.value.toString())
         userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
         if(userMonthlyStatementCryptoCurrencyList.value?.length)
-          resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
+          resetSelectedChartNameHashMap(userMonthlyStatementCryptoCurrencyList.value)
 
         setChartData()
       }
     }
-
-    if(accountExists)
-      chartReRenderKey.value += 1
   })
 
   watch(lendingUserAccountsHashMap, () =>
@@ -801,12 +796,12 @@
     userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
     userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
     if(userMonthlyStatementStableCoinList.value?.length)
-      resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
+      resetSelectedChartNameHashMap(userMonthlyStatementStableCoinList.value)
 
     userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
     userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
     if(userMonthlyStatementCryptoCurrencyList.value?.length)
-      resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
+      resetSelectedChartNameHashMap(userMonthlyStatementCryptoCurrencyList.value)
 
     setChartData()
 
@@ -819,9 +814,8 @@
     possiblyTrimmedDisplayName.value = getCustomOrTrimmedUserDisplayName(searchAddress.value)
   })
 
-  watch(() => props.portfolioReRenderHelper, (() => 
+  watch(() => props.portfolioURLHelper, (() => 
   {
-    chartReRenderKey.value += 1
     if(!isBrowsingAllUsers.value)
       setTimeout(()=>
       {
@@ -829,27 +823,21 @@
       }, 100)
   }))
 
-  function resetSelectedYearForTokenMintAddressHashMap(subMarketArray: any[])
+  function resetSelectedChartNameHashMap(subMarketArray: any[])
   {
-    const newDate = new Date()
-    const currentYear = newDate.getFullYear()
-
     if(subMarketArray)
     {
       for(var i=0; i<subMarketArray.length; i++)
       {
         const key = subMarketArray[i].tokenId.toString() + subMarketArray[i].subMarketOwnerAddress + subMarketArray[i].subMarketIndex.toString()
-        
-        //Only set the year if this specific token doesn't already have one!
-        if(!selectedYearHashMap.has(key)) 
-          selectedYearHashMap.set(key, currentYear)
+        selectedChartNameHashMap.set(key, "All")
       }
     }
   }
 
-  function updateSelectedYearForTokenMintAddressHashMap(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number, selectedYear: number)
+  function updateSelectedChartNameHashMap(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number, selectedChart: string)
   {
-    selectedYearHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString(), selectedYear)
+    selectedChartNameHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString(), selectedChart)
     chartReRenderKey.value += 1
   }
 
@@ -888,6 +876,27 @@
           if(!userAvailableYearsByTokenMintAddressList || userAvailableYearsByTokenMintAddressList.length === 0)
             continue
 
+          var allLabels: string[] = []
+          var allFeesGenerated = []
+          var allBalances = []
+          var allEarnedInterests = []
+          var allDebts = []
+          var allAccruedInterests = []
+          var allDeposits = []
+          var allWithdrawals = []
+          var allBorrows = []
+          var allRepays = []
+          var allLiquidator = []
+          var allLiquidated = []
+          var allCollectedLiquidationFees = []
+          var allCollectedSubMarketFees = []
+          var allCollectedSolvencyFees = []
+
+          var allChartData = cloneDeep(baseChartData)
+          
+          //Track the first index where actual user data appears
+          var firstValidDataIndex = -1 
+
           for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
           {
             var labels = []
@@ -906,14 +915,16 @@
             var collectedSubMarketFees = []
             var collectedSolvencyFees = []
 
-            var tempChartData = cloneDeep(baseChartData)
+            var yearlyChartData = cloneDeep(baseChartData)
             
             //If current year, go up until the current month, otherwise cover the whole year
             const maxMonth = (year == currentYear) ? currentMonth : 12
 
             for(var month=1; month<=maxMonth; month++)
             {
-              labels.push(monthList[month-1].monthName)
+              const monthName = monthList[month-1].monthName
+              labels.push(monthName)
+              allLabels.push(monthName + ' ' + year.toString())
 
               const userMonthlyStatement = lendingUserMonthlyStatementsHashMap.map.get(month.toString() +
               year.toString() +
@@ -925,6 +936,10 @@
 
               if(userMonthlyStatement)
               {
+                //If this is the first statement we've found, record its index in the "All" array
+                if(firstValidDataIndex === -1)
+                  firstValidDataIndex = allLabels.length - 1
+
                 const decimalAmount = tokenDecimalHashMap.get(tokenId)
                 const divisor = Math.pow(10, decimalAmount)
 
@@ -936,10 +951,29 @@
               
                 if(lastKnownActionTimeStamp != 0)
                 {
-                  tempChartData.lastActionType = lastKnownActionType
-                  tempChartData.lastActionAmount = lastKnownActionAmount
-                  tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                  allChartData.lastActionType = lastKnownActionType
+                  allChartData.lastActionAmount = lastKnownActionAmount
+                  allChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+
+                  yearlyChartData.lastActionType = lastKnownActionType
+                  yearlyChartData.lastActionAmount = lastKnownActionAmount
+                  yearlyChartData.lastActionTimeStamp = lastKnownActionTimeStamp
                 }
+
+                allFeesGenerated.push(Number(userMonthlyStatement.feesGeneratedAmount) / divisor)
+                allBalances.push(previousBalance)
+                allDebts.push(previousDebt)
+                allEarnedInterests.push(Number(userMonthlyStatement.monthlyInterestEarnedAmount) / divisor)
+                allAccruedInterests.push(Number(userMonthlyStatement.monthlyInterestAccruedAmount) / divisor)
+                allDeposits.push(Number(userMonthlyStatement.monthlyDepositedAmount) / divisor)
+                allWithdrawals.push(Number(userMonthlyStatement.monthlyWithdrawalAmount) / divisor)
+                allBorrows.push(Number(userMonthlyStatement.monthlyBorrowedAmount) / divisor)
+                allRepays.push(Number(userMonthlyStatement.monthlyRepaidDebtAmount) / divisor)
+                allLiquidator.push(Number(userMonthlyStatement.monthlyLiquidatorAmount) / divisor)
+                allLiquidated.push(Number(userMonthlyStatement.monthlyLiquidatedAmount) / divisor)
+                allCollectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / divisor)
+                allCollectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / divisor)
+                allCollectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / divisor)
 
                 feesGenerated.push(Number(userMonthlyStatement.feesGeneratedAmount) / divisor)
                 balances.push(previousBalance)
@@ -960,10 +994,29 @@
               {
                 if(lastKnownActionTimeStamp != 0)
                 {
-                  tempChartData.lastActionType = lastKnownActionType
-                  tempChartData.lastActionAmount = lastKnownActionAmount
-                  tempChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                  allChartData.lastActionType = lastKnownActionType
+                  allChartData.lastActionAmount = lastKnownActionAmount
+                  allChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+
+                  yearlyChartData.lastActionType = lastKnownActionType
+                  yearlyChartData.lastActionAmount = lastKnownActionAmount
+                  yearlyChartData.lastActionTimeStamp = lastKnownActionTimeStamp
                 }
+
+                allFeesGenerated.push(0)
+                allBalances.push(previousBalance)
+                allDebts.push(previousDebt)
+                allEarnedInterests.push(0)
+                allAccruedInterests.push(0)
+                allDeposits.push(0)
+                allWithdrawals.push(0)
+                allBorrows.push(0)
+                allRepays.push(0)
+                allLiquidator.push(0)
+                allLiquidated.push(0)
+                allCollectedLiquidationFees.push(0)
+                allCollectedSubMarketFees.push(0)
+                allCollectedSolvencyFees.push(0)
 
                 feesGenerated.push(0)
                 balances.push(previousBalance)
@@ -982,31 +1035,79 @@
               }
             }
 
-            tempChartData.labels = labels
-            tempChartData.datasets[ChartIndex.FeesGenerated].data = feesGenerated
-            tempChartData.datasets[ChartIndex.Balances].data = balances
-            tempChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
-            tempChartData.datasets[ChartIndex.Debts].data = debts
-            tempChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
-            tempChartData.datasets[ChartIndex.Deposits].data = deposits
-            tempChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-            tempChartData.datasets[ChartIndex.Borrows].data = borrows
-            tempChartData.datasets[ChartIndex.Repays].data = repays
-            tempChartData.datasets[ChartIndex.Liquidator].data = liquidator
-            tempChartData.datasets[ChartIndex.Liquidated].data = liquidated
-            tempChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees 
-            tempChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
-            tempChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
+            yearlyChartData.labels = labels
+            yearlyChartData.datasets[ChartIndex.FeesGenerated].data = feesGenerated
+            yearlyChartData.datasets[ChartIndex.Balances].data = balances
+            yearlyChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
+            yearlyChartData.datasets[ChartIndex.Debts].data = debts
+            yearlyChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
+            yearlyChartData.datasets[ChartIndex.Deposits].data = deposits
+            yearlyChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
+            yearlyChartData.datasets[ChartIndex.Borrows].data = borrows
+            yearlyChartData.datasets[ChartIndex.Repays].data = repays
+            yearlyChartData.datasets[ChartIndex.Liquidator].data = liquidator
+            yearlyChartData.datasets[ChartIndex.Liquidated].data = liquidated
+            yearlyChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees 
+            yearlyChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
+            yearlyChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
             
             if(!isTreasuryAddress)
             {
-              tempChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
-              tempChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+              yearlyChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
+              yearlyChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
+              yearlyChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
             }
 
-            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), tempChartData)
+            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), yearlyChartData)
           }
+
+          //Slice the "All" arrays to start 1 month before the first valid entry
+          if(firstValidDataIndex !== -1)
+          {
+            //Math.max ensures we don't try to use a negative index if their first statement is the very first month
+            const startIndex = Math.max(0, firstValidDataIndex - 1)
+            
+            allLabels = allLabels.slice(startIndex)
+            allFeesGenerated = allFeesGenerated.slice(startIndex)
+            allBalances = allBalances.slice(startIndex)
+            allEarnedInterests = allEarnedInterests.slice(startIndex)
+            allDebts = allDebts.slice(startIndex)
+            allAccruedInterests = allAccruedInterests.slice(startIndex)
+            allDeposits = allDeposits.slice(startIndex)
+            allWithdrawals = allWithdrawals.slice(startIndex)
+            allBorrows = allBorrows.slice(startIndex)
+            allRepays = allRepays.slice(startIndex)
+            allLiquidator = allLiquidator.slice(startIndex)
+            allLiquidated = allLiquidated.slice(startIndex)
+            allCollectedLiquidationFees = allCollectedLiquidationFees.slice(startIndex)
+            allCollectedSubMarketFees = allCollectedSubMarketFees.slice(startIndex)
+            allCollectedSolvencyFees = allCollectedSolvencyFees.slice(startIndex)
+          }
+
+          allChartData.labels = allLabels
+          allChartData.datasets[ChartIndex.FeesGenerated].data = allFeesGenerated
+          allChartData.datasets[ChartIndex.Balances].data = allBalances
+          allChartData.datasets[ChartIndex.InterestEarned].data = allEarnedInterests
+          allChartData.datasets[ChartIndex.Debts].data = allDebts
+          allChartData.datasets[ChartIndex.InterestAccrued].data = allAccruedInterests
+          allChartData.datasets[ChartIndex.Deposits].data = allDeposits
+          allChartData.datasets[ChartIndex.Withdrawals].data = allWithdrawals
+          allChartData.datasets[ChartIndex.Borrows].data = allBorrows
+          allChartData.datasets[ChartIndex.Repays].data = allRepays
+          allChartData.datasets[ChartIndex.Liquidator].data = allLiquidator
+          allChartData.datasets[ChartIndex.Liquidated].data = allLiquidated
+          allChartData.datasets[ChartIndex.CollectedLiquidationFees].data = allCollectedLiquidationFees 
+          allChartData.datasets[ChartIndex.CollectedSubMarketFees].data = allCollectedSubMarketFees
+          allChartData.datasets[ChartIndex.CollectedSolvencyFees].data = allCollectedSolvencyFees
+          
+          if(!isTreasuryAddress)
+          {
+            allChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
+            allChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
+            allChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+          }
+
+          tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + "All", allChartData)
         }
     }
 
@@ -1016,17 +1117,17 @@
     //Process Crypto Currency Yearly Chart Data
     processStatementList(userMonthlyStatementCryptoCurrencyList, lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap)
 
-    selectedUserChartDataHashMap = tempHashMap
+    selectedChartDataHashMap = tempHashMap
   }
 
   function getChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
   {
-    return selectedUserChartDataHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + selectedYearHashMap.get(tokenId.toString()  + subMarketOwnerAddress + subMarketIndex.toString()))
+    return selectedChartDataHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + selectedChartNameHashMap.get(tokenId.toString()  + subMarketOwnerAddress + subMarketIndex.toString()))
   }
 
-  function getSelectedYearForOnMounted(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
+  function getSelectedChartName(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
   {
-    return selectedYearHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString())
+    return selectedChartNameHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString())
   }
 
   function startGradientAnimation()
@@ -1081,8 +1182,8 @@
         localStorage.setItem("selectedLendingAccountIndex" + connectedWallet.addressString, accountSelected.toString())
       }
 
-      resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
-      resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
+      resetSelectedChartNameHashMap(userMonthlyStatementStableCoinList.value)
+      resetSelectedChartNameHashMap(userMonthlyStatementCryptoCurrencyList.value)
       setLendingUserAccountList()
       checkForLendingUserAssets()
       setChartData()
@@ -1117,8 +1218,8 @@
     userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
     userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
 
-    resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementStableCoinList.value)
-    resetSelectedYearForTokenMintAddressHashMap(userMonthlyStatementCryptoCurrencyList.value)
+    resetSelectedChartNameHashMap(userMonthlyStatementStableCoinList.value)
+    resetSelectedChartNameHashMap(userMonthlyStatementCryptoCurrencyList.value)
     checkForLendingUserAssets()
     setChartData()
   }

@@ -49,8 +49,8 @@
           style="margin: 10px"
           v-model="chartSelect" 
           :options="yearList" 
-          optionLabel="yearAvailable" 
-          optionValue="yearAvailable" 
+          optionLabel="chartAvailable" 
+          optionValue="chartAvailable" 
           placeholder="Select Year"
           appendTo="self"
           @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, chartSelect)">
@@ -141,8 +141,8 @@
         class="chartSelect smallMarginBottom"
         v-model="chartSelect" 
         :options="yearList" 
-        optionLabel="yearAvailable" 
-        optionValue="yearAvailable" 
+        optionLabel="chartAvailable" 
+        optionValue="chartAvailable" 
         placeholder="Select Year"
         appendTo="self"
         @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, chartSelect)">
@@ -362,7 +362,7 @@
     'subMarketFee',
     'userTabIndex',
     'chartData',
-    'selectedYear'
+    'selectedChart'
   ])
 
   const emits = defineEmits(['interestEarned', 'changeYear', 'openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal'])
@@ -445,7 +445,7 @@
     }
     subMarketSelectOption.push(option)
     
-    chartSelect.value = props.selectedYear
+    chartSelect.value = props.selectedChart
 
     chartOptions.value = setChartOptions(true, chartTextColor.value)
     startGradientAnimation()
@@ -465,7 +465,7 @@
     setInitialBalance()
 
     yearList.value = getYearList()
-    chartSelect.value = props.selectedYear
+    chartSelect.value = props.selectedChart
   })
 
   watch(darkTheme,() =>
@@ -491,7 +491,7 @@
     userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
 
     yearList.value = getYearList()
-    chartSelect.value = yearList.value[yearList.value.length - 1].yearAvailable
+    chartSelect.value = yearList.value[yearList.value.length - 1].chartAvailable
   }))
 
   function getYearList()
@@ -514,7 +514,7 @@
       props.accountIndex.toString())
 
     var firstYear = undefined
-    var processedList = []
+    var processedList = [{chartAvailable: "All"}]
 
     if(initialList)
       var firstYear = initialList[0].yearAvailable
@@ -524,7 +524,7 @@
       {
         const availableYearObject =
         {
-          yearAvailable: year
+          chartAvailable: year.toString()
         }
 
         processedList.push(availableYearObject)
