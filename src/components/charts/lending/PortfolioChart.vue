@@ -480,6 +480,10 @@
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
   {
+    const tokenInfo = tokenReserveFontEndInfoHashMap.get(props.tokenId)
+    tokenName.value = tokenInfo.name
+    tokenSVG.value = tokenInfo.svg
+
     lendingUserTabAccount = cloneDeep(lendingUserTabAccountsHashMap.map.get(props.tokenId +
     props.subMarketOwnerAddress +
     props.subMarketIndex.toString() +
@@ -491,7 +495,7 @@
     userOriginalDebt.value = Number(lendingUserTabAccount.borrowedAmount / Math.pow(10, decimalAmount))//Convert from fixed point notation to decimal
 
     yearList.value = getYearList()
-    chartSelect.value = yearList.value[yearList.value.length - 1].chartAvailable
+    chartSelect.value = "All"
   }))
 
   function getYearList()
