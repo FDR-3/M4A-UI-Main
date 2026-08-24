@@ -838,7 +838,7 @@
   function updateSelectedChartNameHashMap(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number, selectedChart: string)
   {
     selectedChartNameHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString(), selectedChart)
-    chartReRenderKey.value += 1
+    chartReRenderKey.value++
   }
 
   function setChartData()
@@ -1203,16 +1203,20 @@
       window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + accountSelect.value)
     }, 100)
 
+    stableCoin7DayProjectionRateValueUnRounded.value = 0
     stableCoin7DayProjectionRateAmount.value = "0"
     stableCoin7DayProjectionRateValue.value = 0
+    stableCoinLifeTimeInterestEarnedValueUnRounded.value = 0
     stableCoinLifeTimeInterestEarnedAmount.value = "0"
     stableCoinLifeTimeInterestEarnedValue.value = 0
-
+    
+    crypto7DayProjectionRateValueUnRounded.value = 0
     crypto7DayProjectionRateAmount.value = "0"
     crypto7DayProjectionRateValue.value = 0
+    cryptoLifeTimeInterestEarnedValueUnRounded.value = 0
     cryptoLifeTimeInterestEarnedAmount.value = "0"
     cryptoLifeTimeInterestEarnedValue.value = 0
-
+    
     userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
     userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
     userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
