@@ -509,6 +509,7 @@
           const { ctx, chartArea } = chart
           return setPurpleBlueBarAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
@@ -534,6 +535,7 @@
           const { ctx, chartArea } = chart
           return setRainbowBarAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
@@ -559,60 +561,70 @@
           const { ctx, chartArea } = chart
           return setPoopBarAnimatedGradient(ctx, chartArea, gradientOffset.value)
         },
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Deposits',
         backgroundColor: "#39bd39",
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Withdrawals',
         backgroundColor: "#b5bbca",
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Borrows',
         backgroundColor: "#557fcc",
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Repays',
         backgroundColor: "#ffd700",
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Liquidator',
         backgroundColor: "#8a2be2",
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Liquidated',
         backgroundColor: "#ff0000",
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Collect Liq Fee',
         backgroundColor: "#ff00ff",
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Collect SB Fee',
         backgroundColor: "#ff8800",
+        maxBarThickness: 44,
         data: [] as any[]
       },
       {
         type: 'bar',
         label: 'Collect Sol Fee',
         backgroundColor: "#006400",
+        maxBarThickness: 44,
         data: [] as any[]
       }
     ]
