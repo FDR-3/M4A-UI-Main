@@ -23,8 +23,9 @@
           <a href="https://www.youtube.com/watch?v=ikA9KkiTH-c" target="_blank"><p>Louis Rossmann 1</p></a>
           <a href="https://www.youtube.com/watch?v=apMYh0a4qXo" target="_blank"><p>Louis Rossmann 2</p></a>
           <a href="https://www.youtube.com/watch?v=dibEZ9-Psss" target="_blank"><p>Louis Rossmann 3</p></a>
-          <a href="https://www.youtube.com/watch?v=qw2nx-I-jAA" target="_blank"><p>Mark Cuban</p></a>
-          <a href="https://youtu.be/1SjhXC43Pwk?t=718" target="_blank"><p>Okay, signing up for a nazi party is a bad look Mark<br>I'M A NEED YOU TO LOCK THE FUCK IN!!!!</p></a>
+          <a href="https://www.youtube.com/watch?v=qw2nx-I-jAA" target="_blank"><p><s>mark cuban</s></p></a>
+          <a href="https://youtu.be/1SjhXC43Pwk?t=718" target="_blank"><p>Okay, signing up for a nazi party is a bad look <s>mark</s><br>I'M A NEED YOU TO LOCK THE FUCK IN!!!!</p></a>
+          <a href="https://www.youtube.com/watch?v=qsjz7QSPrcA" target="_blank"><p>Yeah, hell no, FUCK <s>mark cuban</s></p></a>
 
           <a href="https://www.youtube.com/watch?v=uvHwyrem24M" target="_blank">
             <p>Dude literally looks like white Jesus<br>
