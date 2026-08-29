@@ -343,7 +343,8 @@
     getTokenReserveRemainingAccounts,
     getTempRemainingPriceAccount,
     closeTempOraclePriceData,
-    TEMP_PRICE_ACCOUNT_ALIVE_MSG } from '/src/assets/contracts/Solana/LendingProtocol.vue'
+    TEMP_PRICE_ACCOUNT_ALIVE_MSG,
+    getLendingStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import LendingLeaderBoardTable from '/src/components/tables/lending/LendingLeaderBoardTable.vue'
@@ -1453,11 +1454,19 @@
 
       const uniqueTokenReserveRemainingAccounts = getTokenReserveRemainingAccounts(uniqueTokenIds)
       const tempPriceRemainingAccount = getTempRemainingPriceAccount()
+      const lendingStatsPDA = getLendingStatsPDA()
+      const lendingStatsRemainingAccount = 
+      {
+        pubkey: lendingStatsPDA,
+        isSigner: false,
+        isWritable: true
+      }
 
       refreshingUserRemainingAccounts.push(tempPriceRemainingAccount)
       refreshingUserRemainingAccounts.push(...uniqueTokenReserveRemainingAccounts)
       refreshingUserRemainingAccounts.push(...lendingTabSubMarketAndMonthlyStatementRemainingAccounts)
       refreshingUserRemainingAccounts.push(adminAccounts.priceOracleRemainingAccount)
+      refreshingUserRemainingAccounts.push(lendingStatsRemainingAccount)
 
       const refreshUserHealthAndTokenReservesInstruction = await anchorPrograms.lending.lendingProgram.methods.refreshUserHealthChunkAndTokenReserves(accountSelect.value,
         uniqueTokenReserveRemainingAccounts.length,
