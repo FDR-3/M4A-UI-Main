@@ -13,10 +13,10 @@
   <!--<M4AProtocolTVLLongHTMLText/>-->
   <!--<M4AProtocolTVLShortHTMLText/>-->
   <h1 class="nLargeMarginTop nTinyMarginBottom">$<span class="rainbowText">{{ totalTVL }}</span></h1>
-  <ion-button color="lightOffDark" class="thinBorder4Rad mediumMarginBottom" @click="handleShowTVLHistory()">
+  <button class="lightOffDark thinBorder4Rad smallMarginBottom padding10" @click="handleShowTVLHistory()">
     <ion-label v-if="!showTVLHistory" color="green">Show History</ion-label>
     <ion-label v-else color="green">Hide History</ion-label>
-  </ion-button>
+  </button>
 
   <transition name="divSlide">
     <div v-if="showTVLHistory">

@@ -208,9 +208,9 @@
                     <ion-text class="wrapText">SubMarket Owner: {{ event.trimmedSubMarketOwnerAddress }}</ion-text><br>
                     <ion-text>SubMarket Index: {{ event.subMarketIndex }}</ion-text>
                     <ion-text>Fee on Interest Earned: {{ event.feeOnInterestEarnedRate }}</ion-text>
-                    <ion-button class="copyAddressButton thinBorder" color="light" @click="passByRefWrapperCopyTokenMintAddress()">
+                    <button class="light copyAddressButton thinBorder padding10" @click="passByRefWrapperCopyTokenMintAddress()">
                       <ion-label color="green">{{ copyTokenMintAddressButtonText }}</ion-label>
-                    </ion-button>
+                    </button>
                   </div>
                 </ion-popover>
               </div>

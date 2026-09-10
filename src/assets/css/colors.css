@@ -36,6 +36,22 @@
   color: var(--ion-color-purple)
 }
 
+.light
+{
+  background: light-dark(#ffffff, #000000) !important;
+}
+
+.lightOffDark
+{
+  background: light-dark(#ffffff, #202020) !important;
+}
+
+.offLightDark
+{
+  background: light-dark(#eeeeee, #000000) !important;
+}
+
+
 .ion-color-yellow
 {
   --ion-color-base: var(--ion-color-yellow)

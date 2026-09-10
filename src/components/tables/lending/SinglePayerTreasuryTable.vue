@@ -33,10 +33,10 @@
           </h2>
           <h2 class="nMediumLargeMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
-          <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowSinglePayerHistory()">
+          <button class="light thinBorder4Rad mediumMarginBottom padding10" @click="handleShowSinglePayerHistory()">
             <ion-label v-if="!showSinglePayerHistory" color="green">Show History</ion-label>
             <ion-label v-else color="green">Hide History</ion-label>
-          </ion-button>
+          </button>
 
           <transition name="divSlide">
             <div v-if="showSinglePayerHistory">

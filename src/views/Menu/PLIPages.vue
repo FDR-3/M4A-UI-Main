@@ -104,14 +104,14 @@
     {
       id: "hundredTenButton",
       labelClass: 'rainbowText',
-      text: "110%\r\nOpen Sourced",
+      text: "110%\nOpen Sourced",
       lilNavText: "110%",
       textColor: ""
     },
     {
       id: 'heartBeatButton',
       labelClass: '',
-      text: "Heart Beat",
+      text: "Heart\nBeat",
       lilNavText: "Heart",
       textColor: "blue"
     },

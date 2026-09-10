@@ -34,10 +34,10 @@
             <h2 class="nMediumMarginTop">Token Reserve Borrowed Value: $<span class="poopText">{{ totalBorrowedValue }}</span></h2>
           </div>
 
-          <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleshowTokenReserveHistory()">
+          <button class="light thinBorder4Rad mediumMarginBottom padding10" @click="handleshowTokenReserveHistory()">
             <ion-label v-if="!showTokenReserveHistory" color="green">Show History</ion-label>
             <ion-label v-else color="green">Hide History</ion-label>
-          </ion-button>
+          </button>
 
           <transition name="divSlide">
             <div v-if="showTokenReserveHistory">

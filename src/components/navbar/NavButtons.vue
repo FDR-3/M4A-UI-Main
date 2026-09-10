@@ -1,16 +1,16 @@
 <template>
   <div style="margin-bottom: 3px">
     <!--Big Nav Buttons-->
-    <ion-button 
-      v-for="(navButton, index) in navButtons"
-      color="offLightDark "
-      class="navButton bigNavButtons"
-      style="border-radius: 4px"
-      :class="{ selected: navigation.navBarIndex === index }"
-      @click="handleNavClick(index, navButton.url)"
-    >
-      <ion-label :class="navButton.labelClass" :color="navButton.textColor">{{ navButton.text }}</ion-label>
-    </ion-button>
+    <div class="flexCenterRow">
+      <button 
+        v-for="(navButton, index) in navButtons"
+        class="offLightDark thinBorder4Rad navButton bigNavButtons"
+        :class="{ selected: navigation.navBarIndex === index }"
+        @click="handleNavClick(index, navButton.url)"
+      >
+        <ion-label class="wrapText":class="navButton.labelClass" :color="navButton.textColor">{{ navButton.text }}</ion-label>
+      </button>
+    </div>
 
     <!--Lil Nav Buttons-->
     <ion-button
@@ -26,17 +26,16 @@
     </ion-button>
     <ion-popover :is-open="popoverOpen" :event="event" @didDismiss="popoverOpen=false" side="bottom" size="cover">
       <div class="flexCenterColumn">
-        <ion-button 
+        <button 
           v-for="(navButton, index) in navButtons"
-          color="offLightDark "
-          class="popOverButton tinyMarginTop"
+          class="offLightDark popOverButton tinyMarginTop padding10 thinBorder4Rad"
           :class="{ selected: navigation.navBarIndex === index,
             tinyMarginBottom: index === navButtons.length - 1 }"
-          :style="{ '--box-shadow': navigation.navBarIndex === index ? `0px 0px 5px 8px ${buttonShadow}`: '' }"
+          :style="{ 'box-shadow': navigation.navBarIndex === index ? `0px 0px 5px 7px ${buttonShadow}`: '' }"
           @click="handleNavClick(index, navButton.url)"
         >
-          <ion-label class="innerLilNavTextSize" :class="navButton.labelClass" :color="navButton.textColor">{{ navButton.lilNavText }}</ion-label>
-        </ion-button>
+          <ion-label class="innerLilNavTextSize noWrapText" :class="navButton.labelClass" :color="navButton.textColor">{{ navButton.lilNavText }}</ion-label>
+        </button>
       </div>
     </ion-popover>
   </div>
@@ -113,7 +112,7 @@
 </script>
 
 <style scoped>
-  ion-button
+  button
   { 
     --border-radius: 4px;
     --border-width: 1px;
@@ -131,9 +130,8 @@
     font-weight: bold
   }
 
-  ion-button:hover
+  button:hover
   {
-
     text-decoration: underline;
     text-decoration-color: var(--ion-color-dark);
     text-decoration-thickness: 2px
@@ -144,12 +142,12 @@
     width: 80px !important
   }
 
-  ion-button.selected
+  .selected
   {
     text-decoration: underline;
     text-decoration-color: var(--ion-color-dark);
     text-decoration-thickness: 2px;
-    --box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
+    box-shadow: 0px 0px 5px 8px v-bind(buttonShadow)
   }
 
   #lilNavSelector

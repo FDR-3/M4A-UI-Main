@@ -28,10 +28,10 @@
           </h2>
           <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
 
-          <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleShowSolvencyHistory()">
+          <button class="light thinBorder4Rad mediumMarginBottom padding10" @click="handleShowSolvencyHistory()">
             <ion-label v-if="!showSolvencyHistory" color="green">Show History</ion-label>
             <ion-label v-else color="green">Hide History</ion-label>
-          </ion-button>
+          </button>
 
           <transition name="divSlide">
             <div v-if="showSolvencyHistory">

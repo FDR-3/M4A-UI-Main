@@ -10,7 +10,7 @@
 
 .wrapText
 {
-  white-space: wrap !important
+  white-space: pre-line !important;
 }
 
 .noWrapText

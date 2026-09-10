@@ -1,8 +1,8 @@
 <template>
   <div v-if="isBrowsingAllUsers">
-    <ion-button color="lightOffDark" class="" style="margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false)">
+    <button class="lightOffDark thinBorder4Rad padding10" style="margin-bottom: -2px" @click="setIsBrowsingAllLendingUsers(false)">
       <ion-label color="green">Charts</ion-label>
-    </ion-button>
+    </button>
     <LendingLeaderBoardTable
     @viewPortfolio="viewPortfolio"
     @openLiquidationModal="emitOpenLiquidationModal"/>
@@ -25,17 +25,18 @@
     ></ion-input>
 
     <div class="smallMarginTop">
-      <ion-button
+      <button
       id="checkNewAddressButton"
+      class="lightOffDark thinBorder4Rad padding10"
       @click="isValidPublicKey=isValidSolanaPublicKey(addressToCheck); checkNewAddress()"
       color="lightOffDark" 
       >
         <ion-label color="green">Check New Address</ion-label>
-      </ion-button>
+      </button>
 
-      <ion-button color="lightOffDark" @click="setIsBrowsingAllLendingUsers(true)">
+      <button class="lightOffDark thinBorder4Rad padding10 smallMarginLeft" @click="setIsBrowsingAllLendingUsers(true)">
         <ion-label color="green">Browse All Users</ion-label>
-      </ion-button>
+      </button>
     </div>
   </div>
  
@@ -74,9 +75,9 @@
               <div class="nMediumMarginLeft">
                 <InfoButton :infoMessage="refreshAccountMSG"/>
               </div>
-              <ion-button  color="lightOffDark" @click="refreshUser()">
+              <button class="lightOffDark thinBorder4Rad padding10 smallMarginLeft" @click="refreshUser()">
                 <ion-label color="green">Refresh Account</ion-label>
-              </ion-button>
+              </button>
             </div>
 
             <div v-else class="flexCenterColumn">
@@ -125,9 +126,9 @@
           <div class="nMediumMarginLeft">
             <InfoButton :infoMessage="refreshAccountMSG"/>
           </div>
-          <ion-button color="lightOffDark" @click="refreshUser()">
+          <button class="lightOffDark thinBorder4Rad padding10 smallMarginLeft" @click="refreshUser()">
             <ion-label color="green">Refresh Account</ion-label>
-          </ion-button>
+          </button>
         </div>
 
         <div v-else class="flexCenterColumn">

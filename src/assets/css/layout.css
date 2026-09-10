@@ -280,6 +280,11 @@ h3, h4
   margin-bottom: -30px
 }
 
+.padding10
+{
+  padding: 10px
+}
+
 /* The "show" class is added to the filtered elements */
 .show 
 {
