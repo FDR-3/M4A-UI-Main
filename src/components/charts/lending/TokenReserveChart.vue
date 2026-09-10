@@ -14,14 +14,15 @@
         @change="switchChartData()">
         </Select>
 
-        <ion-button class="toggleButton smallMarginLeft" fill="clear" @click="handleShowValues()">
-          <ion-label v-if="showValues" color="dark">Toggle Amounts</ion-label>
+        <ion-button class="toggleButton smallMarginLeft" fill="clear" @click="handleToggleChart()">
+          <ion-label v-if="showValues==1" color="dark">Toggle Deposited Amounts</ion-label>
+          <ion-label v-else-if="showValues==2" color="dark">Toggle Borrowed Amounts</ion-label>
           <ion-label v-else color="dark">Toggle Values</ion-label>
         </ion-button>
       </div>
     </div>
 
-    <div v-if="showValues">
+    <div v-if="showValues==1">
       <div class="flexCenterColumn">
         <div class="chartLegend">
           <div 
@@ -49,33 +50,73 @@
       </div>
     </div>
 
-    <div v-else>
+    <div v-else-if="showValues==2">
       <div class="flexCenterColumn">
         <div class="chartLegend">
           <div 
-          v-for="(dataset, index) in amountChartData?.datasets" 
+          v-for="(dataset, index) in depositedAmountChartData?.datasets"
           :key="index" 
           class="legendItem"
           @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
             <div 
-              v-if="dataset.label=='USDS'" 
+              v-if="dataset.label=='Deposited USDS'" 
               class="swatch animatedUSDSX">
             </div>
             <div 
-              v-else-if="dataset.label=='USDC'" 
+              v-else-if="dataset.label=='Deposited USDC'" 
               class="swatch animatedUSDCX">
             </div>
             <div 
-              v-else-if="dataset.label=='SOL'" 
+              v-else-if="dataset.label=='Deposited SOL'" 
               class="swatch animatedSOLX">
             </div>
             <div 
-              v-else-if="dataset.label=='WEth'" 
+              v-else-if="dataset.label=='Deposited WEth'" 
               class="swatch animatedWEthX">
             </div>
             <div 
-              v-else-if="dataset.label=='WBtc'" 
+              v-else-if="dataset.label=='Deposited WBtc'" 
+              class="swatch animatedWBtcX">
+            </div>
+            <span 
+              class="legendLabel" 
+              :class="{'hiddenLabel': legenHiddenArray[index] }"
+            >
+              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else>
+      <div class="flexCenterColumn">
+        <div class="chartLegend">
+          <div 
+          v-for="(dataset, index) in borrowedAmountChartData?.datasets"
+          :key="index" 
+          class="legendItem"
+          @click="toggleDataset(index, chartRef, legenHiddenArray)"
+          >
+            <div 
+              v-if="dataset.label=='Borrowed USDS'" 
+              class="swatch animatedUSDSX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Borrowed USDC'" 
+              class="swatch animatedUSDCX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Borrowed SOL'" 
+              class="swatch animatedSOLX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Borrowed WEth'" 
+              class="swatch animatedWEthX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Borrowed WBtc'" 
               class="swatch animatedWBtcX">
             </div>
             <span 
@@ -90,15 +131,16 @@
     </div>
 
     <div ref="chartContainer">
-      <Chart v-if="showValues" type="line" ref="chartRef" :width="chartWidth" :data="valueChartData" :options="valueChartOptions"/>
-      <Chart v-else type="line" ref="chartRef" :width="chartWidth" :data="amountChartData" :options="amountChartOptions"/>
+      <Chart v-if="showValues==1" type="line" ref="chartRef" :width="chartWidth" :data="valueChartData" :options="valueChartOptions"/>
+      <Chart v-else-if="showValues==2" type="line" ref="chartRef" :width="chartWidth" :data="depositedAmountChartData" :options="amountChartOptions"/>
+      <Chart v-else type="line" ref="chartRef" :width="chartWidth" :data="borrowedAmountChartData" :options="amountChartOptions"/>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
   import { ref, onMounted, onUnmounted, watch } from 'vue'
-  import { IonLabel } from '@ionic/vue'
+  import { IonLabel, IonButton } from '@ionic/vue'
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
@@ -106,14 +148,20 @@
   import { lendingProtocolHistoryOptions } from './TVLHistory'
   import { TokenReserveDepositedValueHistoryHashMap,
     TokenReserveBorrowedValueHistoryHashMap,
-    TokenReserveUSDSHistoryHashMap,
-    TokenReserveUSDCHistoryHashMap,
-    TokenReserveSOLHistoryHashMap,
-    TokenReserveWEthHistoryHashMap,
-    TokenReserveWBtcHistoryHashMap } from './TokenReserveHistory'
+    TokenReserveUSDSDepositedHistoryHashMap,
+    TokenReserveUSDCDepositedHistoryHashMap,
+    TokenReserveSOLDepositedHistoryHashMap,
+    TokenReserveWEthDepositedHistoryHashMap,
+    TokenReserveWBtcDepositedHistoryHashMap,
+    TokenReserveUSDSBorrowedHistoryHashMap,
+    TokenReserveUSDCBorrowedHistoryHashMap,
+    TokenReserveSOLBorrowedHistoryHashMap,
+    TokenReserveWEthBorrowedHistoryHashMap,
+    TokenReserveWBtcBorrowedHistoryHashMap } from './TokenReserveHistory'
   import { sleep } from '/src/assets/helperFunctions/sleep.ts'
   import { tokenIds, tokenIdArray } from '/src/assets/constants/Addresses.ts'
-  import { getAmountBaseChart,
+  import { getDepositedAmountBaseChart,
+    getBorrowedAmountBaseChart,
     setChartOptions,
     toggleDataset,
     setRainbowLineAnimatedGradient,
@@ -121,10 +169,11 @@
   import cloneDeep from 'lodash/cloneDeep'
   import './Chart.css'
 
-  const props = defineProps(['depositedValue', 'borrowedValue', 'amountHistoryHashMap'])
+  const props = defineProps(['depositedValue', 'borrowedValue', 'depositedAmountHistoryHashMap', 'borrowedAmountHistoryHashMap'])
 
   var valueChartData: any
-  var amountChartData: any
+  var depositedAmountChartData: any
+  var borrowedAmountChartData: any
   var valueChartOptions = ref()
   var amountChartOptions = ref()
   var chartRef = ref<any>(null)
@@ -133,10 +182,11 @@
   var animationIntervalId: any
   var chartSelect = ref("All")
   var valueChartDataHashMap = new Map<string, any>()
-  var amountChartDataHashMap = new Map<string, any>()
+  var depositedAmountChartDataHashMap = new Map<string, any>()
+  var borrowedAmountChartDataHashMap = new Map<string, any>()
   var chartContainer = ref<any>(null)
   var chartWidth = ref(0)
-  var showValues = ref(true)
+  var showValues = ref(1)
 
   var gradientOffset = ref(0)
 
@@ -182,8 +232,8 @@
     valueChartOptions.value = setChartOptions(false, chartTextColor.value, true)
     amountChartOptions.value = setChartOptions(false, chartTextColor.value)
     valueChartData = valueChartDataHashMap.get(chartSelect.value)
-    amountChartData = amountChartDataHashMap.get(chartSelect.value)
-
+    depositedAmountChartData = depositedAmountChartDataHashMap.get(chartSelect.value)
+    borrowedAmountChartData = borrowedAmountChartDataHashMap.get(chartSelect.value)
     updateChartWidth() 
     startGradientAnimation()
     await sleep(100)
@@ -218,15 +268,27 @@
       valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-1] = props.borrowedValue
   }))
 
-  watch(() => [props.amountHistoryHashMap], (async() => 
+  watch(() => [props.depositedAmountHistoryHashMap], (async() => 
   {
     setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
 
-    ////amountChartData = amountChartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
+    ////depositedAmountChartData = depositedAmountChartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
 
     tokenIdArray.forEach((tokenId: number, index: number) =>
     {
-      amountChartData.datasets[index].data[amountChartData.datasets[index].data.length - 1] = props.amountHistoryHashMap.get(tokenId)
+      depositedAmountChartData.datasets[index].data[depositedAmountChartData.datasets[index].data.length - 1] = props.depositedAmountHistoryHashMap.get(tokenId)
+    })
+  }))
+
+  watch(() => [props.borrowedAmountHistoryHashMap], (async() => 
+  {
+    setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
+
+    ////borrowedAmountChartData = borrowedAmountChartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
+
+    tokenIdArray.forEach((tokenId: number, index: number) =>
+    {
+      borrowedAmountChartData.datasets[index].data[borrowedAmountChartData.datasets[index].data.length - 1] = props.borrowedAmountHistoryHashMap.get(tokenId)
     })
   }))
 
@@ -234,7 +296,8 @@
   {
     valueChartOptions.value.responsive = false
     amountChartOptions.value.responsive = false
-    amountChartData = amountChartDataHashMap.get(chartSelect.value)
+    depositedAmountChartData = depositedAmountChartDataHashMap.get(chartSelect.value)
+    borrowedAmountChartData = borrowedAmountChartDataHashMap.get(chartSelect.value)
     valueChartData = valueChartDataHashMap.get(chartSelect.value)
 
     resetHiddenArray()
@@ -244,13 +307,16 @@
     amountChartOptions.value.responsive = true
   }
 
-  async function handleShowValues()
+  async function handleToggleChart()
   {
     valueChartOptions.value.responsive = false //Needed this extra step to get initial animation when swithching only in Production for some reason
     amountChartOptions.value.responsive = false
 
     resetHiddenArray()
-    showValues.value =! showValues.value
+    if(showValues.value == 3)
+      showValues.value = 1
+    else
+      showValues.value++
 
     await sleep(40)
     valueChartOptions.value.responsive = true
@@ -309,18 +375,29 @@
     var allTokenReserveBorrowedValues = []
     var tempYearlyValueHashMap = new Map<string, any>()
     var tempAllValueChartData = cloneDeep(valueBaseChartData)
-    var tempYearlyAmountHashMap = new Map<string, any>()
-    var tempAllAmountChartData = getAmountBaseChart(gradientOffset)
+    var tempYearlyDepositedAmountHashMap = new Map<string, any>()
+    var tempYearlyBorrowedAmountHashMap = new Map<string, any>()
+    var tempAllDepositedAmountChartData = getDepositedAmountBaseChart(gradientOffset)
+    var tempAllBorrowedAmountChartData = getBorrowedAmountBaseChart(gradientOffset)
     var allLabels: string[] = []
 
     //Define token configs to loop over dynamically
-    const tokens =
+    const depositedTokens =
     [
-      { historyMap: TokenReserveUSDSHistoryHashMap, tokenId: tokenIds.usdsTokenId, allData: [] as any[] },
-      { historyMap: TokenReserveUSDCHistoryHashMap, tokenId: tokenIds.usdcTokenId, allData: [] as any[] },
-      { historyMap: TokenReserveSOLHistoryHashMap,  tokenId: tokenIds.solTokenId,  allData: [] as any[] },
-      { historyMap: TokenReserveWEthHistoryHashMap, tokenId: tokenIds.wethTokenId, allData: [] as any[] },
-      { historyMap: TokenReserveWBtcHistoryHashMap, tokenId: tokenIds.wbtcTokenId, allData: [] as any[] }
+      { historyMap: TokenReserveUSDSDepositedHistoryHashMap, tokenId: tokenIds.usdsTokenId, allData: [] as any[] },
+      { historyMap: TokenReserveUSDCDepositedHistoryHashMap, tokenId: tokenIds.usdcTokenId, allData: [] as any[] },
+      { historyMap: TokenReserveSOLDepositedHistoryHashMap,  tokenId: tokenIds.solTokenId,  allData: [] as any[] },
+      { historyMap: TokenReserveWEthDepositedHistoryHashMap, tokenId: tokenIds.wethTokenId, allData: [] as any[] },
+      { historyMap: TokenReserveWBtcDepositedHistoryHashMap, tokenId: tokenIds.wbtcTokenId, allData: [] as any[] }
+    ]
+
+    const borrowedTokens =
+    [
+      { historyMap: TokenReserveUSDSBorrowedHistoryHashMap, tokenId: tokenIds.usdsTokenId, allData: [] as any[] },
+      { historyMap: TokenReserveUSDCBorrowedHistoryHashMap, tokenId: tokenIds.usdcTokenId, allData: [] as any[] },
+      { historyMap: TokenReserveSOLBorrowedHistoryHashMap,  tokenId: tokenIds.solTokenId,  allData: [] as any[] },
+      { historyMap: TokenReserveWEthBorrowedHistoryHashMap, tokenId: tokenIds.wethTokenId, allData: [] as any[] },
+      { historyMap: TokenReserveWBtcBorrowedHistoryHashMap, tokenId: tokenIds.wbtcTokenId, allData: [] as any[] }
     ]
 
     for(var year = startYear; year <= currentYear; year++)
@@ -329,10 +406,12 @@
       var yearlyTokenReserveDepositedValues = []
       var yearlyTokenReserveBorrowedValues = []
       var yearlyTokenReserveValueChartData = cloneDeep(valueBaseChartData)
-      var yearlyTokenReserveAmountChartData = cloneDeep(getAmountBaseChart(gradientOffset))
+      var yearlyTokenReserveDepositedAmountChartData = cloneDeep(getDepositedAmountBaseChart(gradientOffset))
+      var yearlyTokenReserveBorrowedAmountChartData = cloneDeep(getBorrowedAmountBaseChart(gradientOffset))
 
       //Track yearly arrays for each token index
-      var yearlyDataLists: any[][] = tokens.map(() => [])
+      var yearlyDepositedAmountDataLists: any[][] = depositedTokens.map(() => [])
+      var yearlyBorrowedAmountDataLists: any[][] = borrowedTokens.map(() => [])
       const maxMonth = (year == currentYear) ? currentMonth : 12
 
       for(var month = 1; month <= maxMonth; month++)
@@ -389,26 +468,44 @@
             yearlyTokenReserveBorrowedValues.push(0)
         }
 
-        tokens.forEach((token, index) =>
+        depositedTokens.forEach((token, index) =>
         {
           const monthlyValue = token.historyMap.get(monthKey)
 
           if(monthlyValue != undefined)
           {
             token.allData.push(monthlyValue)
-            yearlyDataLists[index].push(monthlyValue)
+            yearlyDepositedAmountDataLists[index].push(monthlyValue)
           }
           else if(isCurrentOrPrevMonth)
           {
-            const val = props.amountHistoryHashMap.get(token.tokenId)
+            const val = props.depositedAmountHistoryHashMap.get(token.tokenId)
             
             token.allData.push(val)
-            yearlyDataLists[index].push(val)
+            yearlyDepositedAmountDataLists[index].push(val)
           }
           else
+            yearlyDepositedAmountDataLists[index].push(0)
+        })
+
+        borrowedTokens.forEach((token, index) =>
+        {
+          const monthlyValue = token.historyMap.get(monthKey)
+
+          if(monthlyValue != undefined)
           {
-            yearlyDataLists[index].push(0)
+            token.allData.push(monthlyValue)
+            yearlyBorrowedAmountDataLists[index].push(monthlyValue)
           }
+          else if(isCurrentOrPrevMonth)
+          {
+            const val = props.borrowedAmountHistoryHashMap.get(token.tokenId)
+            
+            token.allData.push(val)
+            yearlyBorrowedAmountDataLists[index].push(val)
+          }
+          else
+            yearlyBorrowedAmountDataLists[index].push(0)
         })
       }
 
@@ -418,17 +515,23 @@
       yearlyTokenReserveValueChartData.datasets[1].data = yearlyTokenReserveBorrowedValues
       tempYearlyValueHashMap.set(year.toString(), yearlyTokenReserveValueChartData)
 
-      //Assign Amount data for the year
-      yearlyTokenReserveAmountChartData.labels = yearlyLabels
-      tokens.forEach((_, i) =>
+      //Assign DepositedAmount data for the year
+      yearlyTokenReserveDepositedAmountChartData.labels = yearlyLabels
+      depositedTokens.forEach((_, i) =>
       {
-        if (yearlyTokenReserveAmountChartData.datasets[i])
-        {
-          yearlyTokenReserveAmountChartData.datasets[i].data = yearlyDataLists[i]
-        }
+        if(yearlyTokenReserveDepositedAmountChartData.datasets[i])
+          yearlyTokenReserveDepositedAmountChartData.datasets[i].data = yearlyDepositedAmountDataLists[i]
       })
-      
-      tempYearlyAmountHashMap.set(year.toString(), yearlyTokenReserveAmountChartData)
+      tempYearlyDepositedAmountHashMap.set(year.toString(), yearlyTokenReserveDepositedAmountChartData)
+
+      //Assign BorrowedAmount data for the year
+      yearlyTokenReserveBorrowedAmountChartData.labels = yearlyLabels
+      borrowedTokens.forEach((_, i) =>
+      {
+        if(yearlyTokenReserveBorrowedAmountChartData.datasets[i])
+          yearlyTokenReserveBorrowedAmountChartData.datasets[i].data = yearlyBorrowedAmountDataLists[i]
+      })
+      tempYearlyBorrowedAmountHashMap.set(year.toString(), yearlyTokenReserveBorrowedAmountChartData)
     }
 
     //Set Value "All" data
@@ -436,19 +539,27 @@
     tempAllValueChartData.datasets[0].data = allTokenReserveDepositedValues
     tempAllValueChartData.datasets[1].data = allTokenReserveBorrowedValues
 
-    //Set Amount "All" data
-    tempAllAmountChartData.labels = allLabels
-    tokens.forEach((token, i) =>
+    //Set Deposited Amount "All" data
+    tempAllDepositedAmountChartData.labels = allLabels
+    depositedTokens.forEach((token, i) =>
     {
-      if (tempAllAmountChartData.datasets[i])
-      {
-        tempAllAmountChartData.datasets[i].data = token.allData
-      }
+      if(tempAllDepositedAmountChartData.datasets[i])
+        tempAllDepositedAmountChartData.datasets[i].data = token.allData
+    })
+
+    //Set Borrowed Amount "All" data
+    tempAllBorrowedAmountChartData.labels = allLabels
+    borrowedTokens.forEach((token, i) =>
+    {
+      if(tempAllBorrowedAmountChartData.datasets[i])
+        tempAllBorrowedAmountChartData.datasets[i].data = token.allData
     })
 
     tempYearlyValueHashMap.set("All", tempAllValueChartData)
-    tempYearlyAmountHashMap.set("All", tempAllAmountChartData)
+    tempYearlyDepositedAmountHashMap.set("All", tempAllDepositedAmountChartData)
+    tempYearlyBorrowedAmountHashMap.set("All", tempAllBorrowedAmountChartData)
     valueChartDataHashMap = tempYearlyValueHashMap
-    amountChartDataHashMap = tempYearlyAmountHashMap
+    depositedAmountChartDataHashMap = tempYearlyDepositedAmountHashMap
+    borrowedAmountChartDataHashMap = tempYearlyBorrowedAmountHashMap
   }
 </script>

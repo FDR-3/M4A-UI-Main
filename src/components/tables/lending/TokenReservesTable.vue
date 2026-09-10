@@ -45,7 +45,11 @@
             <div v-if="showTokenReserveHistory">
               <div class="divSlideContent">
                 <div class="beamOverlay"></div>
-                <TokenReserveChart :depositedValue="Number(totalDepositedValue)" :borrowedValue="Number(totalBorrowedValue)" :amountHistoryHashMap="amountHistoryHashMap" />
+                <TokenReserveChart
+                :depositedValue="Number(totalDepositedValue)"
+                :borrowedValue="Number(totalBorrowedValue)"
+                :depositedAmountHistoryHashMap="depositedAmountHistoryHashMap"
+                :borrowedAmountHistoryHashMap="borrowedAmountHistoryHashMap"/>
               </div>
             </div>
           </transition>
@@ -357,7 +361,8 @@
   var tokenReserveATAPopoverOpen = ref(false)
   var totalDepositedValue = ref("0.00")
   var totalBorrowedValue = ref("0.00")
-  var amountHistoryHashMap = ref()
+  var depositedAmountHistoryHashMap = ref()
+  var borrowedAmountHistoryHashMap = ref()
   var copyTokenReserveATAButtonText = ref(copyTonkenReserveATAText)
 
   var inputFeeRefs = ref(new Map())
@@ -524,7 +529,8 @@
     var depositedValue = 0
     var borrowedValue = 0
     var processedTableData = []
-    var tempMap = new Map<number, string>()
+    var tempDepositedAmountMap = new Map<number, string>()
+    var tempBorrowedAmountMap = new Map<number, string>()
     var newTableData = cloneDeep(tokenReserves)
     
     if(!newTableData.data)
@@ -593,7 +599,8 @@
       borrowedValue += borrowCalculatedValue
 
       //Set TokenReserveHistory Current Data
-      tempMap.set(tokenId, processedTableData[i].depositedAmount)
+      tempDepositedAmountMap.set(tokenId, processedTableData[i].depositedAmount)
+      tempBorrowedAmountMap.set(tokenId, processedTableData[i].borrowedAmount)
 
       //Get SubMarket List And Count
       var tokenReserveSubMarketList = []
@@ -660,7 +667,8 @@
 
     totalDepositedValue.value = depositedValue.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
     totalBorrowedValue.value = borrowedValue.toLocaleString('en-US',{minimumFractionDigits: 2, maximumFractionDigits: 2})
-    amountHistoryHashMap.value = tempMap
+    depositedAmountHistoryHashMap.value = tempDepositedAmountMap
+    borrowedAmountHistoryHashMap.value = tempBorrowedAmountMap
     tokenReserveTableData.value = processedTableData
   }
 

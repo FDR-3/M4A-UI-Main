@@ -80,6 +80,166 @@ export function getAmountBaseChart(gradientOffset: Ref<number>) :any
   }
 }
 
+export function getDepositedAmountBaseChart(gradientOffset: Ref<number>) :any
+{
+  return{
+    labels: [],
+    datasets:
+    [
+      {
+        type: 'line',
+        label: 'Deposited USDS',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setUSDSLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Deposited USDC',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setUSDCLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Deposited SOL',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setSOLLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Deposited WEth',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setWEthLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Deposited WBtc',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setWBtcLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      }
+    ]
+  }
+}
+
+export function getBorrowedAmountBaseChart(gradientOffset: Ref<number>) :any
+{
+  return{
+    labels: [],
+    datasets:
+    [
+      {
+        type: 'line',
+        label: 'Borrowed USDS',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setUSDSLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Borrowed USDC',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setUSDCLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Borrowed SOL',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setSOLLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Borrowed WEth',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setWEthLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Borrowed WBtc',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setWBtcLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      }
+    ]
+  }
+}
+
 export function setChartOptions(responsive: boolean, chartTextColor: string, dollarSign = false)
 {
   return{

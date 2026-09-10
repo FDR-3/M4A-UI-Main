@@ -328,7 +328,7 @@
       var yearlySolvencyAmountChartData = getAmountBaseChart(gradientOffset)
       
       //Track yearly arrays for each token index
-      var yearlyDataLists: any[][] = tokens.map(() => [])
+      var yearlyAmountDataLists: any[][] = tokens.map(() => [])
       const maxMonth = (year == currentYear) ? currentMonth : 12
 
       for(var month = 1; month <= maxMonth; month++)
@@ -392,18 +392,18 @@
           if(monthlyValue != undefined)
           {
             token.allData.push(monthlyValue)
-            yearlyDataLists[index].push(monthlyValue)
+            yearlyAmountDataLists[index].push(monthlyValue)
           }
           else if(isCurrentOrPrevMonth)
           {
             const val = props.amountHistoryHashMap.get(token.tokenId)
             
             token.allData.push(val)
-            yearlyDataLists[index].push(val)
+            yearlyAmountDataLists[index].push(val)
           }
           else
           {
-            yearlyDataLists[index].push(0)
+            yearlyAmountDataLists[index].push(0)
           }
         })
       }
@@ -419,7 +419,7 @@
       tokens.forEach((_, i) =>
       {
         if(yearlySolvencyAmountChartData.datasets[i])
-          yearlySolvencyAmountChartData.datasets[i].data = yearlyDataLists[i]
+          yearlySolvencyAmountChartData.datasets[i].data = yearlyAmountDataLists[i]
       })
       tempYearlyAmountHashMap.set(year.toString(), yearlySolvencyAmountChartData)
     }
