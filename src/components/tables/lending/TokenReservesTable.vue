@@ -30,10 +30,8 @@
       <template #header>
         <div>
           <div>
-            <h2>Token Reserve Deposited Value: $<span class="rainbowText">{{ totalDepositedValue }}</span>
-            </h2>
-            <h2>Token Reserve Borrowed Value: $<span class="poopText">{{ totalBorrowedValue }}</span>
-            </h2>
+            <h2>Token Reserve Deposited Value: $<span class="rainbowText">{{ totalDepositedValue }}</span></h2>
+            <h2 class="nMediumMarginTop">Token Reserve Borrowed Value: $<span class="poopText">{{ totalBorrowedValue }}</span></h2>
           </div>
 
           <ion-button color="light" class="thinBorder4Rad mediumMarginBottom" @click="handleshowTokenReserveHistory()">

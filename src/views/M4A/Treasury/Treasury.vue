@@ -4,15 +4,15 @@
     <div class="flexCenterRow">
       
       <TVLLongSVG id="tvlLongSVG" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
-      <TVLShortSVG id="tvlShortSVG"  :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
-      <span id="infoButton" class=" infoButtonContainer nSmallMarginRight">
+      <TVLShortSVG id="tvlShortSVG" :fill="darkTheme.value ? '#FFFFFF' : '#000000'"/>
+      <span id="infoButton" class="infoButtonContainer nSmallMarginRight">
         <InfoButton :infoMessage="tvlInfoMSG"/>
       </span>
     </div>
   </div>
   <!--<M4AProtocolTVLLongHTMLText/>-->
   <!--<M4AProtocolTVLShortHTMLText/>-->
-  <h1 class="nSmallMarginTop nTinyMarginBottom">$<span class="rainbowText">{{ totalTVL }}</span></h1>
+  <h1 class="nLargeMarginTop nTinyMarginBottom">$<span class="rainbowText">{{ totalTVL }}</span></h1>
   <ion-button color="lightOffDark" class="thinBorder4Rad mediumMarginBottom" @click="handleShowTVLHistory()">
     <ion-label v-if="!showTVLHistory" color="green">Show History</ion-label>
     <ion-label v-else color="green">Hide History</ion-label>
@@ -39,7 +39,7 @@
       </div>
 
       <div class="backTable" ref="backTableRef" :style="{display: display2ndTable}">
-        <h1 class="nSmallMarginBottom">Reserves</h1>
+        <h1 class="nTinyMarginTop nSmallMarginBottom">Reserves</h1>
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Treasuries</ion-button>
         <TokenReservesTable @createSubMarketModal="(tokenMintAddress: PublicKey, tokenSVG: Component, tokenName:string) =>
           createSubMarketModal.openCreateSubMarketModal(tokenMintAddress, tokenSVG, tokenName)"
