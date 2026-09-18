@@ -192,7 +192,7 @@
 .swv-modal-wrapper
 {
   background: var(--ion-color-light);
-  color:v-bind(--ion-color-dark)
+  color: var(--ion-color-dark)
 }
 
 .swv-button:hover

@@ -496,6 +496,8 @@
 
     yearList.value = getYearList()
     chartSelect.value = "All"
+
+    legenHiddenArray.value = props.chartData.datasets.map((dataset: any) => dataset.hidden)
   }))
 
   function getYearList()

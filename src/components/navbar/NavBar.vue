@@ -41,7 +41,6 @@
 
   const { windowWidth } = useWindowResize() //Use the composable to get the reactive width
   const breakpoint = 655 //Define your breakpoint
-
 </script>
 
 <style scoped>

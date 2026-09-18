@@ -321,7 +321,7 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch, inject, type Component, markRaw } from 'vue'
+  import { ref, onMounted, /*onUnmounted,*/ watch, inject, type Component, shallowRef } from 'vue'
   import { IonLabel, IonIcon, IonInput, IonButton, IonPopover, IonText } from '@ionic/vue'
   import { search, download } from 'ionicons/icons'
   import DataTable from 'primevue/datatable'
@@ -338,7 +338,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { copyAddress, copyFullAddressText, copyTokenMintAddressText } from '/src/assets/contracts/WalletHelper.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import { tokenIds, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
   import { trimLendingAccountNameIfNeed } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
@@ -364,17 +364,14 @@
   }
 
   var tableRef = ref()
-  var tableData = ref()
+  var tableData = shallowRef<any[]>([])
   var subTableData = ref()
   var isLoading = ref(true)
   var previousSortField = "feesGeneratedValue"
   var sortField = ref("feesGeneratedValue")
   var sortOrder = ref(-1)
-  var totalNumberOfTopRows = 0
-  var totalNumberOfSubRows = 0
   var healthFactorHashMap: Map<string, HealthFactor>
   var tokenReservesHashMapCopy: Map<string, any>
-  var timeStampIntervalId: any
 
   const lendingLeaderBoardInfoMSG = "You can copy a User's address by clicking on them. You can view or liquidate an Account by clicking on them."
 
@@ -406,10 +403,10 @@
     }
   })
 
-  onUnmounted(() =>
+  /*onUnmounted(() =>
   {
-    stopTimeStampInterval()
-  })
+    stopInterestCalculation()
+  })*/
 
   watch(lendingLeaderBoardTable,() =>
   {
@@ -441,6 +438,9 @@
 
   function updateLeaderBoardValues(newTableData: boolean)
   {
+    if(!lendingLeaderBoardTable.data)
+        return
+
     var tempData
 
     if(!newTableData)
@@ -451,17 +451,10 @@
       tempData = tableData.value //Copy existing table when updating prices with no new data. Clone deep alone causes flickering on the rainbowtext when a row is opened
     }
     else
-    {
-      if(!lendingLeaderBoardTable.data)
-        return
-
       tempData = cloneDeep(lendingLeaderBoardTable.data)//Clone deep to avoid setting off watcher and running multiple times
-    }
 
     if(priceObjectMap.data)
     {
-      var topRowCount = 0
-      var subRowCount = 0
       var tempHealthFactorHashMap = new Map<string, HealthFactor>()
 
       calculateTokenReserveInterestChangeIndex(unixData.timeStamp)
@@ -479,17 +472,12 @@
         tempData[i].healthFactorCaution = false
         tempData[i].liquidatable = false
         tempData[i].liquidatableColorStep = 0
-        topRowCount += 1
 
         for(var j=0; j<tempData[i].accountList.length; j++)
         {
-          //Remarking SVG Raw to prevent overhead and warnings in console
-          tempData[i].accountList[j].tokenSVG = markRaw(tempData[i].accountList[j].tokenSVG)
-
           const decimalAmount = tokenDecimalHashMap.get(tempData[i].accountList[j].tokenId)
           var calculatedValue = 0
           var flooredValue = 0.00
-          subRowCount += 1
 
           const tokenMintAddressString = tokenIdHashMap.map.get(tempData[i].accountList[j].tokenId)
           const priceData = priceObjectMap.data[tokenMintAddressString]
@@ -745,8 +733,6 @@
         }
       }
 
-      totalNumberOfTopRows = topRowCount
-      totalNumberOfSubRows = subRowCount
       tableData.value = tempData
 
       if(isLoading.value)
@@ -1064,14 +1050,27 @@
     return interestAccrued
   }
 
-  function stopTimeStampInterval()
+  //Trying to update the table with the setInterval causes flickering it seems
+  /*function startInterestCalculation()
   {
-    if(timeStampIntervalId != undefined)
+    interestChangeIntervalId = setInterval(() =>
     {
-      clearInterval(timeStampIntervalId)
-      timeStampIntervalId = undefined
-    }
+      if(lendingLeaderBoardTable.data)
+      {
+        updateLeaderBoardValues(false)
+        sortTable()//Sort again incase price changes cause a change in the rankings
+      }
+    }, 4000)
   }
+
+  function stopInterestCalculation()
+  {
+    if(interestChangeIntervalId != undefined)
+    {
+      clearInterval(interestChangeIntervalId)
+      interestChangeIntervalId = undefined
+    }
+  }*/
 
   function openOwnerPopover(e: Event, rowData: any) 
   {
