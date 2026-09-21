@@ -129,7 +129,7 @@
     {
       id: "hundredTenButton",
       labelClass: "rainbowText",
-      text: "110%\nOpen Sourced",
+      text: "110%\nOpen\nSourced",
       lilNavText: "110%",
       textColor: "",
       url: "/M4A/110"
