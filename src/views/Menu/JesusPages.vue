@@ -67,7 +67,7 @@
   [{
     id: "hundredTenButton",
     labelClass: 'rainbowText',
-    text: "110%\r\nOpen Sourced",
+    text: "110%\nOpen\nSourced",
     lilNavText: "110%",
     textColor: ""
   },
