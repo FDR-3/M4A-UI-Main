@@ -53,7 +53,7 @@
   provide('colorHexValue', colorHexValue)
   provide('colorName', colorName)
 
-  const jesusTotalPages = 14
+  const jesusTotalPages = 15
   const pageContent = ref()
   const buttonShadow = "goldenrod"
 

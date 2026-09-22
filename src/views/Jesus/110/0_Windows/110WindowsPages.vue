@@ -13,8 +13,9 @@
   import Fired1_13 from "/src/views/Jesus/110/0_Windows/13_Fired1.vue"
   import Fired2_14 from "/src/views/Jesus/110/0_Windows/14_Fired2.vue"
   import OBS_Background_Remover_15 from "/src/views/Jesus/110/0_Windows/15_OBS_Background_Remover.vue"
-  import PastorDropKick_16 from "/src/views/Jesus/110/0_Windows/16_PastorDropKick.vue"
-  import ThisIsACall_17 from "/src/views/Jesus/110/0_Windows/17_ThisIsACall.vue"
+  import PlaywrightBot_16 from "/src/views/Jesus/110/0_Windows/16_PlaywrightBot.vue"
+  import PastorDropKick_17 from "/src/views/Jesus/110/0_Windows/17_PastorDropKick.vue"
+  import ThisIsACall_18 from "/src/views/Jesus/110/0_Windows/18_ThisIsACall.vue"
 
   export const Jesus110WindowsPages = 
   [
@@ -32,8 +33,9 @@
     Fired1_13,
     Fired2_14,
     OBS_Background_Remover_15,
-    PastorDropKick_16,
-    ThisIsACall_17
+    PlaywrightBot_16,
+    PastorDropKick_17,
+    ThisIsACall_18
   ]
 
   export default Jesus110WindowsPages

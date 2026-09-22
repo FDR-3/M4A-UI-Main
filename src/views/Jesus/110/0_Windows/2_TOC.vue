@@ -16,12 +16,13 @@
     <ion-button color="dark" @click="pageSelect(7)">6-Whisper-AI</ion-button>
     <ion-button color="dark" @click="pageSelect(8)">7-Radiant-Media-Player-Thumbnails</ion-button>
     <ion-button color="dark" @click="pageSelect(9)">8-Manual Youtube Scraping</ion-button>
-    <ion-button color="dark" @click="pageSelect(10)">9-Selenium Youtube Scraping</ion-button>
+    <ion-button color="dark" @click="pageSelect(10)">9-Selenium Youtube Scraping/View Bot</ion-button>
     <ion-button color="dark" @click="pageSelect(11)">10-API Youtube Scraping</ion-button>
     <ion-button color="dark" @click="pageSelect(12)">11-VSDC Video Editing Software</ion-button>
     <ion-button color="dark" @click="pageSelect(13)">12-Illegally Fired In Retaliation</ion-button>
     <ion-button color="dark" @click="pageSelect(14)">13-Patriot Software Is Lying To The Government On Me!🤬</ion-button>
     <ion-button color="dark" @click="pageSelect(15)">14-OBS Studio Background Remover</ion-button>
+    <ion-button color="dark" @click="pageSelect(16)">15-Playwright Youtube Scraping/View Bot</ion-button>
   </div>
 </template>
 
@@ -31,7 +32,7 @@
   import { IonButton } from '@ionic/vue'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
 
-  defineProps(['colorName'])
+  defineProps(['colorName', 'totalPages'])
 
   function nextPage()
   {
