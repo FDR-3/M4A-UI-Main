@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <UpdateNotice v-if="anchorPrograms.hasWebSiteBeenUpdated"/>
-    <HighJitTipWarning v-if="anchorPrograms.jitoTipWarning"/>
+    <HighJitoTipWarning v-if="anchorPrograms.jitoTipWarning"/>
     <Toast position="center" class="m4aToast">
       <template #message="slotProps">
         <div class="flexCenterColumn noClickEvent">
@@ -57,11 +57,13 @@
           <component 
             v-if="navigation.navBarIndex == 0 && 
             navigation.pageIndex >= 4"
+            :totalPages="m4aTotalPages"
             :is="M4A110PagesAfterPathSelection[navigation.operatingSystemIndex][navigation.frameWorkIndex][navigation.languageIndex][navigation.pageIndex-4]">
           </component>
           <!--Pages-->
           <component 
             v-else
+            :totalPages="m4aTotalPages"
             :is="pages[navigation.navBarIndex][navigation.pageIndex]"
             :colorHexValue="colorHexValue"
           >
@@ -84,7 +86,7 @@
   import { useRoute } from 'vue-router'
   import { IonContent, IonPage, IonText } from '@ionic/vue'
   import UpdateNotice from '/src/components/smart contracts/alert protocol/UpdateNotice.vue'
-  import HighJitTipWarning from '/src/components/smart contracts/lending protocol/HighJitoTipWarning.vue'
+  import HighJitoTipWarning from '/src/components/smart contracts/lending protocol/HighJitoTipWarning.vue'
   import Toast from 'primevue/toast'
   import {TOAST_TIME_LEN_SECONDS } from '/src/assets/contracts/WalletHelper.vue'
   import TimerProgressBar from '/src/components/fancy/TimerProgressBar.vue'
@@ -103,6 +105,7 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
+  const m4aTotalPages = 33
   const pageContent = ref()
   const route = useRoute()
   const colorName = "green"
@@ -129,7 +132,7 @@
     {
       id: "hundredTenButton",
       labelClass: "rainbowText",
-      text: "110%\nOpen\nSourced",
+      text: "110%\nOpen Sourced",
       lilNavText: "110%",
       textColor: "",
       url: "/M4A/110"

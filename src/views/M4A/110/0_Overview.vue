@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Overview 1/31</h1>
+    <h1>Overview 1/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/M4A/110/0_Overview/M4A Overview.mp4">
@@ -61,12 +61,13 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
-
   import { inject } from 'vue'
   import { IonButton } from '@ionic/vue'
   import { PublicKey, StakeProgram, LAMPORTS_PER_SOL, Transaction } from "@solana/web3.js"
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { confirmChatTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+
+  defineProps(['totalPages'])
 
   const toast = inject('toast')
 

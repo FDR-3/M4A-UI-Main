@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Menu And Theming 3/31</h1>
+    <h1>Menu And Theming 3/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/M4A/110/6_1MenuAndTheming/Menu And Theming.mp4">
@@ -31,4 +31,6 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
+
+  defineProps(['totalPages'])
 </script>

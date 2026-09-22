@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Chat Contract Walk Through 31/31</h1>
+    <h1>Chat Contract Walk Through 31/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <VideoFlipper
@@ -48,5 +48,7 @@
   import VideoFlipper from '/src/components/fancy/VideoFlipper.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
 
+  defineProps(['totalPages'])
+  
   var videoFlipper = ref()
 </script>

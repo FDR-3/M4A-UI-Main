@@ -41,6 +41,8 @@
     <ion-button color="dark" @click="pageSelect(61)">29-Clean Up & Not MarginFi</ion-button>
     <ion-button color="dark" @click="pageSelect(63)">30-M4A Contract Walk Through</ion-button>
     <ion-button color="dark" @click="pageSelect(65)">31-Chat Contract Walk Through</ion-button>
+    <ion-button color="dark" @click="pageSelect(66)">32-Lending Contract Walk Through Part 1</ion-button>
+    <ion-button color="dark" @click="pageSelect(67)">33-Lending Contract Walk Through Part 2</ion-button>
   </div>
 </template>
 
@@ -50,6 +52,8 @@
   import { IonButton } from '@ionic/vue'
   import { navigation } from '/src/assets/globalStates/Navigation.vue'
 
+  defineProps(['totalPages'])
+  
   function nextPage()
   {
     navigation.pageIndex++

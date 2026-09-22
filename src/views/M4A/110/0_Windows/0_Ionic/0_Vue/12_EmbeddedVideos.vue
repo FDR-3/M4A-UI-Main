@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Embedded Videos 9/31</h1>
+    <h1>Embedded Videos 9/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/M4A/110/12_1EmbeddedVideos/Embedded Videos.mp4">
@@ -49,4 +49,6 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
+
+  defineProps(['totalPages'])
 </script>

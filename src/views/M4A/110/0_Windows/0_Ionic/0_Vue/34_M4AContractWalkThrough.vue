@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>M4A Contract Walk Through 30/31</h1>
+    <h1>M4A Contract Walk Through 30/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/M4A/110/33_2SneakPeak/Season 2 Sneak Peak.mp4">
@@ -27,4 +27,6 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
+
+  defineProps(['totalPages'])
 </script>

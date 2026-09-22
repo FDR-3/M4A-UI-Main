@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Better Contract Example Part2 23/31</h1>
+    <h1>Better Contract Example Part2 23/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/M4A/110/27_1BetterContractExamplePart2/Better Contract Example Part2.mp4">
@@ -27,4 +27,6 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
+
+  defineProps(['totalPages'])
 </script>

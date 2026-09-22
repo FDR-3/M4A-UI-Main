@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Devnet & Fees 28/31</h1>
+    <h1>Devnet & Fees 28/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/M4A/110/32_1DevnetAndFees/Devnet And Fees.mp4">
@@ -32,4 +32,6 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
+
+  defineProps(['totalPages'])
 </script>

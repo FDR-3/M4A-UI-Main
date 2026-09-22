@@ -61,6 +61,8 @@
   import M4AContractWalkThrough_34_0_0_0 from "./34_M4AContractWalkThrough.vue"
   import SneakPeak from "/src/views/M4A/110/34_2SneakPeak.vue"
   import ChatContractWalkThrough_35_0_0_0 from "./35_ChatContractWalkThrough.vue"
+  import LendingContractWalkThroughPT1_36_0_0_0 from "./36_LendingContractWalkThroughPT1.vue"
+  import LendingContractWalkThroughPT2_37_0_0_0 from "./37_LendingContractWalkThroughPT2.vue"
   import Fascism from "/src/views/M4A/110/35_2Fascism.vue"
   import HeavenUpThere from "/src/views/M4A/110/36_2HeavenUpThere.vue"
   import EndGame from "/src/views/M4A/110/37_2EndGame.vue"
@@ -129,6 +131,8 @@
     M4AContractWalkThrough_34_0_0_0,
     SneakPeak,
     ChatContractWalkThrough_35_0_0_0,
+    LendingContractWalkThroughPT1_36_0_0_0,
+    LendingContractWalkThroughPT2_37_0_0_0,
     Fascism,
     HeavenUpThere,
     EndGame
@@ -198,6 +202,8 @@
     "M4AContractWalkThrough_34_0_0_0",
     "SneakPeak",
     "ChatContractWalkThrough_35_0_0_0",
+    "LendingContractWalkThroughPT1_36_0_0_0",
+    "LendingContractWalkThroughPT2_37_0_0_0",
     "Fascism",
     "HeavenUpThere",
     "EndGame"
@@ -267,6 +273,8 @@
     "https://www.youtube.com/watch?v=GUaYCxV6BIA",//"M4AContractWalkThrough_34_0_0_0"
     "https://www.youtube.com/watch?v=X6WmJKm2vnQ",//"SneakPeak_34_2"
     "https://www.youtube.com/watch?v=m_ZWiSUjym4",//"ChatContractWalkThrough_35_0_0_0"
+    "https://www.youtube.com/watch?v=gx9KW_6SBHk",//"LendingContractWalkThroughPT1_36_0_0_0"
+    "https://www.youtube.com/watch?v=LKzSMhj3NBQ",//"LendingContractWalkThroughPT2_37_0_0_0"
     "https://www.youtube.com/watch?v=-KuztwCLaeE",//"Fascism_35_2"
     "https://www.youtube.com/watch?v=V6D5vBzDu18",//"HeavenUpThere_36_2"
     ""//"EndGame_37_2"

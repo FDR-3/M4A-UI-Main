@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>LilNavBar 6/31</h1>
+    <h1>LilNavBar 6/{{ totalPages }}</h1>
     <div class="flexCenterRow">
       <PrevPageButton/>
       <!--<media-player class="videoContainer" src="src/assets/video/M4A/110/9_1LilNavBar/LilNavBar.mp4">
@@ -21,4 +21,6 @@
   import NextPageButton from '/src/components/pages/NextPageButton.vue'
   import PrevPageButton from '/src/components/pages/PrevPageButton.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
+
+  defineProps(['totalPages'])
 </script>

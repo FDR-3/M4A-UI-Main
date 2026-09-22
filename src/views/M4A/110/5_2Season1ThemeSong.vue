@@ -52,5 +52,7 @@
   import VideoFlipper from '/src/components/fancy/VideoFlipper.vue'
   import VideoVoter from '/src/components/pages/VideoVoter.vue'
 
+  defineProps(['totalPages'])
+  
   var videoFlipper = ref()
 </script>
