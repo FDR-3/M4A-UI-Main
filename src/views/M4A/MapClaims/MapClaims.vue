@@ -65,7 +65,7 @@
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
 
-  defineProps(['colorName', 'colorHexValue'])
+  defineProps(['colorName', 'colorHexValue', 'totalPages'])
 
   const submitClaim = ref()
   var showStateHospitalRecords = ref()

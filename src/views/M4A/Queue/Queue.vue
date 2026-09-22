@@ -89,7 +89,7 @@
   import { parseDollarAmountStringFromFixed2PointNotationNoDollarSign } from '/src/assets/contracts/WalletHelper.vue'
   import { INITIAL_INSURANCE_COMPANY_COUNT } from '/src/assets/contracts/Solana/M4AProtocol.vue'
 
-  defineProps(['colorHexValue'])//Putting this here to silence a warning
+  defineProps(['colorHexValue', 'totalPages'])//Putting this here to silence a warning
 
   var isClaimQueueOn = ref()
   var claimQueueTableData = ref()

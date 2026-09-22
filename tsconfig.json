@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
-    "types": [ "vidstack/vue" ],
+    //"types": [ "vidstack/vue" ],
     "typeRoots":
     [
       "./node_modules/@types",
@@ -11,7 +11,7 @@
     "allowJs": true,
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strict": true,
     "jsx": "preserve",
     "resolveJsonModule": true,

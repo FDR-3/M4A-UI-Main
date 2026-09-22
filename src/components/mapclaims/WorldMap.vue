@@ -8,7 +8,7 @@
   import 'maplibre-gl/dist/maplibre-gl.css'
   import { watch, onMounted, onUnmounted } from 'vue'
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
-  import maplibregl from 'maplibre-gl'
+  import * as maplibregl from 'maplibre-gl'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
 
@@ -26,10 +26,11 @@
   onMounted(() => 
   {
     if(localStorage.getItem("userTheme") === "darkTheme")
-      style = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"  
+      style = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json" //"https://tiles.openfreemap.org/styles/dark"
     else
-      style = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+      style = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" //"https://tiles.openfreemap.org/styles/bright"
 
+    //setupMap("https://demotiles.maplibre.org/style.json")
     setupMap(style)
 
     if(props.stateHospitalList)
@@ -52,9 +53,9 @@
   watch(darkTheme, () => 
   {
     if(darkTheme.value) 
-      map.setStyle("https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json") 
+      map.setStyle("https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json")  //map.setStyle("https://tiles.openfreemap.org/styles/dark") 
     else
-      map.setStyle("https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json")
+      map.setStyle("https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json")  //map.setStyle("https://tiles.openfreemap.org/styles/bright")
   })
 
   watch(() => props.stateHospitalList, () =>

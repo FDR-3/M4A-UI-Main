@@ -59,7 +59,7 @@
   import InfoButton from '/src/components/help/InfoButton.vue'
   import { startUnixTimeStampRefresh, startUnixChainTimeStampEstimation, stopUnixTimeStampRefresh } from '/src/assets/helperFunctions/UnixTimeStampHelper.ts'
   
-  defineProps(['colorName', 'colorHexValue'])//This just keeps a warning from going off since all pages get feed these props
+  defineProps(['colorName', 'colorHexValue', 'totalPages'])//This just keeps a warning from going off since all pages get feed these props
 
   var flipping = ref(false)
   var flipped = ""

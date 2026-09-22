@@ -80,7 +80,7 @@
   import M4AProtocolTVLLongHTMLText from './M4AProtocolTVLLongHTMLText.vue'
   import M4AProtocolTVLShortHTMLText from './M4AProtocolTVLShortHTMLText.vue'
 
-  defineProps(['colorName', 'colorHexValue'])
+  defineProps(['colorName', 'colorHexValue', 'totalPages'])
 
   var flipping = ref(false)
   var flipped = ""
