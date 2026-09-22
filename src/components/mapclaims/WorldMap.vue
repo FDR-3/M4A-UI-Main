@@ -67,13 +67,13 @@
   {
     map = new maplibregl.Map(
     {
-      container: "map", // container id
-      style: style, // style URL
-      center: [mapSelection.zoomLong, mapSelection.zoomLat], // starting position [lng, lat]
-      zoom: 6, // starting zoom
+      container: "map", //container id
+      style: style, //style URL
+      center: [mapSelection.zoomLong, mapSelection.zoomLat], //starting position [lng, lat]
+      zoom: 6, //starting zoom
     })
 
-    // Add the navigation control
+    //Add the navigation control
     map.addControl(new maplibregl.NavigationControl())
 
     map.on('idle',function()

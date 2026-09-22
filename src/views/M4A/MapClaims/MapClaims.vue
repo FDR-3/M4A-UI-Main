@@ -63,8 +63,7 @@
   import { stateHospitalListHashMap } from '/src/assets/globalStates/m4a/States.vue'
   import { countryStateCoordinatesArray } from '/src/components/mapclaims/arrays/CountryStateArrays.ts'
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
-  import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-
+  
   defineProps(['colorName', 'colorHexValue', 'totalPages'])
 
   const submitClaim = ref()

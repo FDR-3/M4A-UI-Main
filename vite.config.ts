@@ -43,6 +43,9 @@ export default defineConfig({
       ],
     }
   },*/
+  optimizeDeps: {
+    exclude: ['maplibre-gl', '@ionic/vue', '@ionic/core'] // Prevents Vite from breaking MapLibre's web worker
+  },
   //Fixes solana .all() method/buffer issues, and "Reached maximum depth for account resolution" Error in production when contracts are called
   build: {
     rollupOptions: {
