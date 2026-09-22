@@ -11,6 +11,7 @@
   import * as maplibregl from 'maplibre-gl'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
+  import { isProduction } from '/src/assets/helperFunctions/browserHelper.ts'
 
   const props = defineProps(['zoomLat', 'zoomLong', 'stateHospitalList'])
   const emits = defineEmits(['hospitalSelect'])
@@ -65,6 +66,9 @@
   
   function setupMap(style:string)
   {
+    if(isProduction())
+      maplibregl.config.WORKER_URL = "https://unpkg.com/maplibre-gl@6.10.0/dist/maplibre-gl-worker.mjs"
+
     map = new maplibregl.Map(
     {
       container: "map", //container id
