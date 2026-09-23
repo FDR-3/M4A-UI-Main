@@ -149,7 +149,7 @@
     lendingUserTabAccountListHashMap,
     lendingUserTabAccountsHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'

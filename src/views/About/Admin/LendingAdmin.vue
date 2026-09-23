@@ -163,7 +163,7 @@
   editTokenReserveModal.openEditTokenReserveModal(tokenId, tokenMintAddress, tokenSVG, tokenName, solvencyInsuranceFeeRate, baseBorrowAPY, useFixedBorrowApy, globalLimit)"/>
   <div v-if="connectedWallet.addressString==adminAccounts.lendingCEOAddressString && anchorPrograms.isLendingProtocolInitialized">
     <MintTestToken/>
-    <CloseTempPriceAccount/>
+    <SetPriceOracle/>
   </div>
 
   <EditTokenReserveModal ref="editTokenReserveModal"/>
@@ -186,7 +186,7 @@
   import TokenReservesTable from '/src/components/tables/lending/TokenReservesTable.vue'
   import AdminTokenReservesTable from '/src/components/tables/lending/admin/AdminTokenReservesTable.vue'
   import MintTestToken from '/src/components/smart contracts/lending protocol/admin/MintTestToken.vue'
-  import CloseTempPriceAccount from '/src/components/smart contracts/lending protocol/admin/CloseTempPriceAccount.vue'
+  import SetPriceOracle from '/src/components/smart contracts/lending protocol/admin/SetPriceOracle.vue'
   import EditTokenReserveModal from '/src/components/smart contracts/lending protocol/EditTokenReserveModal.vue'
   import CreateSubMarketModal from '/src/components/smart contracts/lending protocol/CreateSubMarketModal.vue'
   import CollectSubMarketFeesModal from '/src/components/smart contracts/lending protocol/CollectSubMarketFeesModal.vue'

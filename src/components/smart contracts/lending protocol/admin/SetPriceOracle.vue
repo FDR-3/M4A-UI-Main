@@ -4,16 +4,6 @@
       <h2 class="smallMarginTop">Price Oracle</h2>
       <div class="spaceRowEvenly mediumMarginBottom" style="width: 100%">
         <div class="smallMarginTop flexCenterRow" style="gap: 10px">
-          
-          <div class="flexCenterColumn">
-            <ion-text>Close Temp Price Account</ion-text>
-            <ion-input
-              v-model="userAddress"
-              fill="outline"
-              placeholder="Enter User Address">
-            </ion-input>
-            <ion-button :color="colorName" @click="closePriceAccount()">Close Price Account</ion-button>
-          </div>
 
           <div class="flexCenterColumn">
             <ion-text>Set New Price Oracle</ion-text>
@@ -33,37 +23,15 @@
 
 <script setup lang="ts">
   import { ref, inject } from 'vue'
-  import { IonButton, IonInput } from '@ionic/vue'
+  import { IonButton, IonInput, IonText } from '@ionic/vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
-  import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
-  import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
-  import { LegacyTokenProgramID } from '/src/assets/constants/Addresses.ts'
-  import { copyAddress, copyTokenMintAddressText, confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
-  import { PublicKey, Transaction, Keypair, SystemProgram } from '@solana/web3.js'
+  import { confirmLendingTransaction, toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
+  import { PublicKey } from '@solana/web3.js'
 
   const toast = inject('toast')
   const colorName = inject('colorName') as string
 
-  var userAddress = ref("")
   var oracleAddress = ref("")
-
-  async function closePriceAccount()
-  {
-    try
-    {
-      const tx = await anchorPrograms.lending.lendingProgram.methods.closeTempOraclePriceData()
-      .accounts({ lendingUserAddress: new PublicKey(userAddress.value) })
-      .remainingAccounts([adminAccounts.priceOracleRemainingAccount])
-      .rpc()
-    
-      await confirmLendingTransaction(tx, toast, "close_temp_oracle_price_data")
-    }
-    catch(error)
-    {
-      toastPreTransactionError(error, toast, "close_temp_oracle_price_data")
-    }
-  }
 
   async function setNewPriceOracle()
   {

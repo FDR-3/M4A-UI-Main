@@ -65,7 +65,7 @@
 
 <script setup lang="ts">
   import { ref, inject } from 'vue'
-  import { IonButton, IonText, IonInput } from '@ionic/vue'
+  import { IonButton, IonText, IonInput, IonLabel } from '@ionic/vue'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { LegacyTokenProgramID } from '/src/assets/constants/Addresses.ts'
