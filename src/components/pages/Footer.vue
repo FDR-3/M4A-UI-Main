@@ -83,7 +83,8 @@
 
   function openTwitter()
   {
-    window.open("/Twitter", "_blank")
+    //window.open("/Twitter", "_blank")
+    window.open("https://x.com/M4AProtocol", "_blank")
   }
 
   function openGithub()
