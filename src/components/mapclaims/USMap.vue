@@ -271,7 +271,7 @@
   </svg>
 
   <div class="nSmallMarginTop">
-    <p>SVG by: <a class="rainbowText" href="http://simplemaps.com" target="_blank">Simple Maps</a></p>
+    <p>SVG by: <a class="rainbowText" href="https://simplemaps.com/resources/" target="_blank">Simple Maps</a></p>
   </div>
 </template>
 
