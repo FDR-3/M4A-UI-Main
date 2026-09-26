@@ -9,6 +9,7 @@
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import * as anchor from "@coral-xyz/anchor"
 
+  const BASE_PRIORITY_FEE = 1000
   export const VOTE_COST = 0.04
   export const TOAST_TIME_LEN_SECONDS = 11
   export const TOAST_TIME_LEN_MILLISECONDS = 11000
@@ -75,14 +76,14 @@
       const recentFees = await connection.getRecentPrioritizationFees()
       //console.log("recentFees: ", recentFees)
       if(recentFees.length === 0)
-        return 1000
+        return BASE_PRIORITY_FEE
 
       const totalFee = recentFees.reduce((sum, item) => sum + item.prioritizationFee, 0)
       const averageFee = Math.round(totalFee / recentFees.length)
-      const targetFee = Math.max(averageFee, 1000)
+      const targetFee = Math.max(averageFee, BASE_PRIORITY_FEE)
 
       anchorPrograms.priorityFeeAmount = targetFee / LAMPORTS_PER_SOL
-      console.log("Average Priority Fee from last 150 blocks or 1000 (Which ever is higher): ", anchorPrograms.priorityFeeAmount.toFixed(9))
+      console.log(`Average Priority Fee from last 150 blocks or ${BASE_PRIORITY_FEE} (Which ever is higher): `, anchorPrograms.priorityFeeAmount.toFixed(9))
 
       const dontShowPriorityFeeWarning = localStorage.getItem("dontShowPriorityFeeWarning") == "true"
       if(!dontShowPriorityFeeWarning)
@@ -94,7 +95,7 @@
     catch(error)
     {
       console.error("Failed to get dynamic priority fee price:", error)
-      return 1000
+      return BASE_PRIORITY_FEE
     }
   }
 
