@@ -1,10 +1,13 @@
 <script lang="ts">
   import { Ref } from 'vue'
   import { metaMaskWalletConnected } from '/src/assets/globalStates/MetaMaskWalletConnected.vue'
-  import { Connection, PublicKey } from "@solana/web3.js"
+  import { Connection, PublicKey, SystemProgram, LAMPORTS_PER_SOL } from "@solana/web3.js"
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from "@solana/spl-token"
+  import { JITO_TIP_ACCOUNTS } from '/src/assets/constants/Addresses.ts'
+  import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
+  import * as anchor from "@coral-xyz/anchor"
 
   export const VOTE_COST = 0.04
   export const TOAST_TIME_LEN_SECONDS = 11
@@ -65,17 +68,102 @@
 
   export async function getDynamicPriorityFeePrice(connection: Connection, accountKeys: PublicKey[])
   {
-    //Returns an array of fees for the last 150 blocks
-    const recentFees = await connection.getRecentPrioritizationFees({lockedWritableAccounts: accountKeys})
+    try
+    {
+      //Returns an array of fees for the last 150 blocks
+      //const recentFees = await connection.getRecentPrioritizationFees({lockedWritableAccounts: accountKeys})
+      const recentFees = await connection.getRecentPrioritizationFees()
+      //console.log("recentFees: ", recentFees)
+      if(recentFees.length === 0)
+        return 1000
 
-    if(recentFees.length === 0)
-      return 5000
+      const totalFee = recentFees.reduce((sum, item) => sum + item.prioritizationFee, 0)
+      const averageFee = Math.round(totalFee / recentFees.length)
+      const targetFee = Math.max(averageFee, 1000)
 
-    const recentRecent = recentFees.slice(-20)
-    const medianFee = recentRecent.sort((a: { prioritizationFee: number }, b: { prioritizationFee: number }) =>
-    a.prioritizationFee - b.prioritizationFee)[Math.floor(recentRecent.length / 2)].prioritizationFee
+      anchorPrograms.priorityFeeAmount = targetFee / LAMPORTS_PER_SOL
+      console.log("Average Priority Fee from last 150 blocks or 1000 (Which ever is higher): ", anchorPrograms.priorityFeeAmount.toFixed(9))
 
-    return Math.max(medianFee, 5000)
+      const dontShowPriorityFeeWarning = localStorage.getItem("dontShowPriorityFeeWarning") == "true"
+      if(!dontShowPriorityFeeWarning)
+        if(anchorPrograms.priorityFeeAmount >= 0.000100000)
+          anchorPrograms.priorityFeeWarning = true
+
+      return targetFee
+    }
+    catch(error)
+    {
+      console.error("Failed to get dynamic priority fee price:", error)
+      return 1000
+    }
+  }
+
+  export async function createPriorityFeeInstruction(connection: Connection, accountKeys: PublicKey[])
+  {
+    anchorPrograms.priorityFeeAmount = await getDynamicPriorityFeePrice(connection, accountKeys)
+
+    return anchor.web3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: anchorPrograms.priorityFeeAmount })
+  }
+
+  interface TipFloorData
+  {
+    time: string;
+    landed_tips_25th_percentile: number;
+    landed_tips_50th_percentile: number;
+    landed_tips_75th_percentile: number;
+    landed_tips_95th_percentile: number;
+    landed_tips_99th_percentile: number;
+    ema_landed_tips_50th_percentile: number
+  }
+
+  async function getJitoTipFloor(): Promise<number>
+  {
+    const url = "https://m4a.io/JitoTipProxy"
+
+    try
+    {
+      //1. Send the GET request
+      const response = await fetch(url)
+
+      //2. Check if the response is successful (status 200-299)
+      if(!response.ok)
+        throw new Error(`HTTP error get Jito Tip Floor! Status: ${response.status}`)
+
+      //3. Parse the JSON body into our defined TypeScript interface
+      const data: TipFloorData[] = await response.json()
+
+      //4. Log current Jito tip floor
+      console.log("Current 50th Percentile Jito Tip:", Number(data[0].landed_tips_50th_percentile.toFixed(9)))
+      anchorPrograms.jitoTipFloorAmount = data[0].landed_tips_50th_percentile
+
+      const dontShowJitoWarning = localStorage.getItem("dontShowJitoWarning") == "true"
+      if(!dontShowJitoWarning)
+        if(anchorPrograms.jitoTipFloorAmount >= 0.000100000)
+          anchorPrograms.jitoTipWarning = true
+
+      return Math.floor(data[0].landed_tips_50th_percentile * LAMPORTS_PER_SOL)
+    }
+    catch(error)
+    {
+      console.error("Failed to fetch Jito tip floor:", error)
+      return 1000 //1,000 lamports is the minimum Jito Tip
+    }
+  }
+
+  export async function createJitoTipInstruction()
+  {
+    const randomTipAccount = new PublicKey(JITO_TIP_ACCOUNTS[Math.floor(Math.random() * JITO_TIP_ACCOUNTS.length)])
+
+    const tipAmount = await getJitoTipFloor()
+
+    const jitoTipInstruction = SystemProgram.transfer(
+    {
+      fromPubkey: connectedWallet.publicKey,
+      toPubkey: randomTipAccount,
+      lamports: tipAmount,
+    })
+
+    return jitoTipInstruction
   }
 
   export function toastPreTransactionError(error: string, toast: any, contractFunctionName: string)

@@ -1,6 +1,7 @@
 <template>
   <ion-page>
     <UpdateNotice v-if="anchorPrograms.hasWebSiteBeenUpdated"/>
+    <HighPriorityFeeWarning v-if="anchorPrograms.priorityFeeWarning"/>
     <HighJitoTipWarning v-if="anchorPrograms.jitoTipWarning"/>
     <Toast position="center" class="m4aToast">
       <template #message="slotProps">
@@ -86,7 +87,8 @@
   import { useRoute } from 'vue-router'
   import { IonContent, IonPage, IonText } from '@ionic/vue'
   import UpdateNotice from '/src/components/smart contracts/alert protocol/UpdateNotice.vue'
-  import HighJitoTipWarning from '/src/components/smart contracts/lending protocol/HighJitoTipWarning.vue'
+  import HighPriorityFeeWarning from '/src/assets/contracts/HighPriorityFeeWarning.vue'
+  import HighJitoTipWarning from '/src/assets/contracts/HighJitoTipWarning.vue'
   import Toast from 'primevue/toast'
   import {TOAST_TIME_LEN_SECONDS } from '/src/assets/contracts/WalletHelper.vue'
   import TimerProgressBar from '/src/components/fancy/TimerProgressBar.vue'

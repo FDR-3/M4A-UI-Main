@@ -1,28 +1,28 @@
 <template> 
-  <div id="siteUpdateModal" class="jitoWarning">
-    <div align="right" class="mediumMarginLeft jitoWarning">
-      <ion-button id="closeAlertButton" class="jitoWarning" fill="clear" color="dark" @click="anchorPrograms.jitoTipWarning=false">
+  <div id="warningModal" class="feeWarning">
+    <div align="right" class="mediumMarginLeft feeWarning">
+      <ion-button id="closeAlertButton" class="feeWarning" fill="clear" color="dark" @click="anchorPrograms.priorityFeeWarning=false">
         <ion-icon id="closeAlertIcon" class="noClickEvent" :src="closeCircle"></ion-icon>
       </ion-button>
     </div>
-    <div class="flexCenterColumn jitoWarning">
+    <div class="flexCenterColumn feeWarning">
       <div class="noClickEvent">
-        <ion-text color="dark" class="noClickEvent">Jito tips abnormally high</ion-text>
+        <ion-text color="dark" class="noClickEvent">Priority fee abnormally high</ion-text>
       </div>
 
       <div class="smallMarginTop noClickEvent">
-        <ion-label color="dark" class="noClickEvent">Amount: {{ anchorPrograms.jitoTipFloorAmount.toFixed(9) }} Sol </ion-label>
+        <ion-label color="dark" class="noClickEvent">Amount: {{ anchorPrograms.priorityFeeAmount.toFixed(9) }} Sol </ion-label>
       </div>
       <div class="noClickEvent">
-        <ion-label color="dark" class="noClickEvent">Value: {{ jitoTipValue }}</ion-label>
+        <ion-label color="dark" class="noClickEvent">Value: {{ priorityFeeValue }}</ion-label>
       </div>
 
       <ion-checkbox
-        class="smallMarginTop jitoWarning"
+        class="smallMarginTop feeWarning"
         label-placement="end"
         @ionChange="validateCheckbox"
       >
-        <ion-label color="dark" class="jitoWarning">Don't Show Again</ion-label>
+        <ion-label color="dark" class="feeWarning">Don't Show Again</ion-label>
       </ion-checkbox>
     </div>
   </div>
@@ -36,18 +36,18 @@
   import { priceObjectMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { tokenAddressStrings } from '/src/assets/constants/Addresses.ts'
 
-  var jitoTipValue = computed(() =>
+  var priorityFeeValue = computed(() =>
   {
     if(!priceObjectMap.data)
       return "$0.00"
 
     const price = priceObjectMap.data[tokenAddressStrings.solTokenMintAddress]?.usdPrice
-    return '$' + (Number(price) * anchorPrograms.jitoTipFloorAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+    return '$' + (Number(price) * anchorPrograms.priorityFeeAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
   })
 
   const validateCheckbox = (event: CheckboxCustomEvent<{ checked: boolean }>) =>
   {
-    localStorage.setItem("dontShowJitoWarning", event.detail.checked.toString())
+    localStorage.setItem("dontShowPriorityFeeWarning", event.detail.checked.toString())
   }
 </script>
 
@@ -74,7 +74,7 @@
     border: 2px solid light-dark(#000000, #eeeeee);
   }
 
-  #siteUpdateModal
+  #warningModal
   {
     width: min(90vw, 317px);
     position: fixed; /* Makes sure the modal is fixed in place on the screen */
@@ -100,7 +100,7 @@
     height: 25px
   }
 
-  #siteUpdateModal
+  #warningModal
   {
     animation: popup 0.7s
   }

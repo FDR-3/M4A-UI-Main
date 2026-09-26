@@ -164,7 +164,6 @@
   import { getLendingUserLookUpTableAddressAndInstructions, sendVersionedLendingProtocolTransaction } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
-  import { getDynamicPriorityFeePrice } from '/src/assets/contracts/WalletHelper.vue'
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
@@ -314,6 +313,7 @@
       (event?.target?.id != "newAccountButton") &&
       (event?.target?.id != "closeAccountNameEditButton") &&
       (event?.target?.id != "emojiBottomBar") &&
+      !event?.target?.classList.contains("feeWarning") &&
       !event?.target?.classList.contains("native-input") &&
       !event?.target?.classList.contains("emojiSearchContainer") &&
       !event?.target?.classList.contains("emojiSearchOptions") &&

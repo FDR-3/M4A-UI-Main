@@ -27,17 +27,17 @@
     doesKeyExistInLookUpTable,
     parseProgramErrorCode,
     confirmLendingTransaction,
-    toastPreTransactionError } from '/src/assets/contracts/WalletHelper.vue'
-  import { tokenDecimalHashMap, JITO_TIP_ACCOUNTS } from '/src/assets/constants/Addresses.ts'
+    toastPreTransactionError,
+    getDynamicPriorityFeePrice,
+    createJitoTipInstruction } from '/src/assets/contracts/WalletHelper.vue'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
   import { PublicKey,
     AddressLookupTableProgram,
     AddressLookupTableAccount,
     VersionedTransaction,
-    TransactionMessage,
-    SystemProgram,
-    LAMPORTS_PER_SOL } from "@solana/web3.js"
+    TransactionMessage } from "@solana/web3.js"
   import { connectedWallet } from '/src/assets/globalStates/ConnectedWallet.vue'
   import { LOCAL_PRICE_ORACLE, USE_JITO_BUNDLES } from '/src/assets/globalStates/EnvironmentSettings.ts'
   import cloneDeep from 'lodash/cloneDeep'
@@ -1536,12 +1536,19 @@
       const { blockhash } = await connection.getLatestBlockhash()
       const payerKey = connectedWallet.publicKey
 
+      //Extract all unique account keys from instructions to get an accurate priority fee
+      const allAccountKeys = instructionsToSend.flatMap(ix => ix.keys.map(k => k.pubkey))
+      const uniqueAccountKeys = Array.from(new Set(allAccountKeys.map(k => k.toBase58()))).map(k => new anchor.web3.PublicKey(k))
+      const priorityFeeMicroLamports = await getDynamicPriorityFeePrice(connection, uniqueAccountKeys)
+
       //Hard Solana MTU limit is 1232 bytes
       //We reserve a 64-byte buffer for the user's signature applied later
+      //We reserve a 42-byte buffer for setComputeUnitPrice Instruction (Priority Fee))
       //We reserve a 42-byte buffer for setComputeLimit Instruction
-      const MAX_UNSIGNED_SIZE = 1232 - 42 - 64
+      const MAX_UNSIGNED_SIZE = 1232 - 64 - 42 - 42
 
-      //Max cap placeholder used strictly for accurate serialization size testing
+      //Max cap placeholders used strictly for accurate serialization size testing
+      const placeholderUnitPriceIx = anchor.web3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityFeeMicroLamports })
       const placeholderLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
 
       //1. Run initial chunking without Jito Tip to determine sizes
@@ -1566,7 +1573,7 @@
       const unsignedTransactions: VersionedTransaction[] = []
       for(var i=0; i<chunks.length; i++)
       {
-        const finalizedTx = prependSetComputeLimitInstruction(chunks[i])
+        const finalizedTx = prependSetComputeInstructions(chunks[i])
         unsignedTransactions.push(finalizedTx)
       }
 
@@ -1593,7 +1600,7 @@
 
           try
           {
-            const testInstructions = [placeholderLimitIx, ...currentBatch, nextInstruction]
+            const testInstructions = [placeholderUnitPriceIx, placeholderLimitIx, ...currentBatch, nextInstruction]
             const testMessage = new TransactionMessage(
             {
               payerKey,
@@ -1628,7 +1635,7 @@
             {
               payerKey,
               recentBlockhash: blockhash,
-              instructions: [placeholderLimitIx, ...currentBatch]
+              instructions: [placeholderUnitPriceIx, placeholderLimitIx, ...currentBatch]
             }).compileToV0Message(lookUpTableAccounts)
             
             if(new VersionedTransaction(singleTxMessage).serialize().length > MAX_UNSIGNED_SIZE)
@@ -1642,13 +1649,13 @@
         return chunks
       }
 
-      function prependSetComputeLimitInstruction(batch: anchor.web3.TransactionInstruction[]): VersionedTransaction
+      function prependSetComputeInstructions(batch: anchor.web3.TransactionInstruction[]): VersionedTransaction
       {
         /*const simMessage = new TransactionMessage(
         {
           payerKey,
           recentBlockhash: blockhash,
-          instructions: [placeholderLimitIx, ...batch]
+          instructions: [placeholderUnitPriceIx, placeholderLimitIx, ...batch]
         }).compileToV0Message(lookUpTableAccounts)
 
         const simTx = new VersionedTransaction(simMessage)
@@ -1656,8 +1663,9 @@
 
         let batchWithCompute: anchor.web3.TransactionInstruction[] = []
 
+        const setComputeUnitPriceIx = anchor.web3.ComputeBudgetProgram.setComputeUnitPrice({ microLamports: priorityFeeMicroLamports })
         const setComputeUnitLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 1_400_000 })
-        batchWithCompute = [setComputeUnitLimitIx, ...batch]
+        batchWithCompute = [setComputeUnitPriceIx, setComputeUnitLimitIx, ...batch]
 
         /*if(simulation.value.err)
         {
@@ -1667,7 +1675,7 @@
           
           //Option B: Inject a generous hardcoded limit for safety (e.g., 900,000)
           const fallbackLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: 900_000 })
-          batchWithCompute = [fallbackLimitIx, ...batch]
+          batchWithCompute = [setComputeUnitPriceIx, fallbackLimitIx, ...batch]
         }
         else
         {
@@ -1683,12 +1691,12 @@
           {
             console.log(`Compute budget (${optimalLimit}) exceeds default. Injecting custom limit instruction.`)
             const optimizedLimitIx = anchor.web3.ComputeBudgetProgram.setComputeUnitLimit({ units: optimalLimit })
-            batchWithCompute = [optimizedLimitIx, ...batch]
+            batchWithCompute = [setComputeUnitPriceIx, optimizedLimitIx, ...batch]
           }
           else
           {
             console.log(`Compute budget (${optimalLimit}) is within standard limits. Omitting budget instruction.`)
-            batchWithCompute = [...batch]
+            batchWithCompute = [setComputeUnitPriceIx, ...batch]
           }
         }*/
 
@@ -1906,68 +1914,6 @@
       isSigner: false,
       isWritable: true
     }
-  }
-
-  interface TipFloorData
-  {
-    time: string;
-    landed_tips_25th_percentile: number;
-    landed_tips_50th_percentile: number;
-    landed_tips_75th_percentile: number;
-    landed_tips_95th_percentile: number;
-    landed_tips_99th_percentile: number;
-    ema_landed_tips_50th_percentile: number
-  }
-
-  async function getJitoTipFloor(): Promise<number>
-  {
-    const url = "https://m4a.io/JitoTipProxy"
-
-    try
-    {
-      //1. Send the GET request
-      const response = await fetch(url)
-
-      //2. Check if the response is successful (status 200-299)
-      if(!response.ok)
-        throw new Error(`HTTP error get Jito Tip Floor! Status: ${response.status}`)
-
-      //3. Parse the JSON body into our defined TypeScript interface
-      const data: TipFloorData[] = await response.json()
-
-      //4. Log or return the data
-      console.log("Current 50th Percentile Jito Tip:", Number(data[0].landed_tips_50th_percentile.toFixed(9)))
-      anchorPrograms.jitoTipFloorAmount = data[0].landed_tips_50th_percentile
-
-      const dontShowJitoWarning = localStorage.getItem("dontShowJitoWarning") == "true"
-      if(!dontShowJitoWarning)
-        if(anchorPrograms.jitoTipFloorAmount >= 0.000100000)
-          anchorPrograms.jitoTipWarning = true
-
-      return Math.floor((data[0].landed_tips_50th_percentile * LAMPORTS_PER_SOL))
-
-    }
-    catch(error)
-    {
-      console.error("Failed to fetch Jito tip floor:", error)
-      return 1000 //1,000 lamports is the minimum Jito Tip
-    }
-  }
-
-  export async function createJitoTipInstruction()
-  {
-    const randomTipAccount = new PublicKey(JITO_TIP_ACCOUNTS[Math.floor(Math.random() * JITO_TIP_ACCOUNTS.length)])
-
-    const tipAmount = await getJitoTipFloor()
-
-    const jitoTipInstruction = SystemProgram.transfer(
-    {
-      fromPubkey: connectedWallet.publicKey,
-      toPubkey: randomTipAccount,
-      lamports: tipAmount,
-    })
-
-    return jitoTipInstruction
   }
 
   export async function closeTempOraclePriceData(toast: any)

@@ -2,8 +2,6 @@
   import { reactive } from 'vue'
   import { PublicKey } from "@solana/web3.js"
 
-  const newDate = new Date()
-
   export const monthList = 
   [
     {
@@ -93,6 +91,8 @@
     isLendingProtocolReady: false,
     jitoTipFloorAmount: 0,
     jitoTipWarning: false,
+    priorityFeeAmount: 0,
+    priorityFeeWarning: false,
     blockChainTimeStamp: 0
   })
 
