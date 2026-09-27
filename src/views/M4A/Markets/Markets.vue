@@ -19,9 +19,9 @@
         <div class="flexCenterRow nMediumMarginTop">
           <div v-if="!isBrowingUsers" class="flexCenterRow">
             <InfoButton :infoMessage="portfolioChartInfoMSG"/>
-            <h1 id="flippedPortfolioHeader">Portfolios</h1>
+            <h1 id="portfolioHeader">Portfolios</h1>
           </div>
-          <h1 v-else id="flippedPortfolioHeader">All Lending Users</h1>
+          <h1 v-else>All Lending Users</h1>
         </div>
     
         <ion-button @click="flipTable()" color="dark" :disabled="flipping">Toggle Markets</ion-button>

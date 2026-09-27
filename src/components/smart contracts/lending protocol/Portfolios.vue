@@ -1280,7 +1280,10 @@
     cryptoLifeTimeInterestEarnedAmount.value = "0"
     cryptoLifeTimeInterestEarnedValue.value = 0
 
-    document.getElementById("portfolioHeader")?.scrollIntoView()
+    setTimeout(() =>
+    {
+      document.getElementById("portfolioHeader")?.scrollIntoView()
+    }, 10)
   }
 
   function emitOpenLiquidationModal(accountOwner: string, accountIndex: number)
