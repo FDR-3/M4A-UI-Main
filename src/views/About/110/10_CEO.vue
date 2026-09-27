@@ -40,8 +40,7 @@
           <p>Best Anime Arc of All Time: Chimera Ants<br>(Hunter x Hunter 2011)</p>
           <p>Don't even have to watch the previous arcs to appreciate it ^_^</p>
           <p>(Starts at episode 
-            <a href="https://hianimez.to/watch/hunter-x-hunter-2?ep=140" target="_blank">76</a>, Dub for English)
-            <br>(popups are worse on this site on the phone, it's better on the computer)
+            <a href="https://www.wco.tv/hunter-x-hunter-2011-episode-76-english-dubbed" target="_blank">76</a>)
           </p>
         </div>
         <h1>Unhonorable Mentions</h1>

@@ -20,7 +20,7 @@
       <p align="left">Links<br>
         <a href="https://www.youtube.com/watch?v=B7h1MGdfuHA" target="_blank">DrakeKaizoku: All Kaito Bad Rolls [Hunter X Hunter][CRAZY SLOTS]</a><br>
         <a href="https://www.pngfind.com/mpng/ibRhbho_memes-para-stickers-png-png-download-surprised-pikachu/" target="_blank">pngfind: suprised pikachu</a><br>
-        <a href="https://hianime.to/watch/hunter-x-hunter-2?ep=146" target="_blank">Hunter x Hunter(popups are worse on this site on the phone, it's better on the computer)</a><br>
+        <a href="https://www.wco.tv/hunter-x-hunter-2011-episode-82-english-dubbed" target="_blank">Hunter x Hunter</a><br>
         <a href="https://www.youtube.com/watch?v=4To-F6W1NT0" target="_blank">Louis Rossmann 1</a><br>
         <a href="https://www.youtube.com/watch?v=GQhNwlibeP8" target="_blank">Green Screen: Shia Labeouf</a><br>
         <a href="https://www.youtube.com/watch?v=QH5tDLHsgiI" target="_blank">Kevin Hart</a><br>
