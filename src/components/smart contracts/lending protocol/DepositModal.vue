@@ -210,7 +210,7 @@
   var totalDebtValue = ref(0)
   var modalRef = ref()
 
-  const depositInfoMSG = "The initial transaction fees for depositing a new Token for the first time are more expensive than normal to initialize your account data. You need different account data for each different Token you deposit into. You also need new account data when a new month comes for your monthly statement accounts. A new monthly statement account is only generated when you're executing a transaction during a new month.\n\nAn initial deposit transaction fee might be around 0.008491 SOL and 0.00008 SOL when no new data accounts are needed. Each monthly statement will cost 0.002394 SOL.\n\nYou can deposit an amount of 0 to manually refresh your monthly statement interest earned/accrued."
+  const depositInfoMSG = "The initial transaction fees for depositing a new Token for the first time are more expensive than normal to initialize your account data. You need different account data for each different Token you deposit into. You also need new account data when a new month comes for your monthly statement accounts. A new monthly statement account is only generated when you're executing a transaction during a new month.\n\nAn initial deposit transaction fee might be around 0.006198 SOL and 0.00008 SOL when no new data accounts are needed. Each monthly statement will cost 0.001748 SOL.\n\nYou can deposit an amount of 0 to manually refresh your monthly statement interest earned/accrued for a specific tab or refresh your account from the Portfolios page to refresh all of your tabs."
 
   var depositValue = computed(() =>
   {
