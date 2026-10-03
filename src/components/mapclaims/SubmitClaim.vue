@@ -5,7 +5,7 @@
     :is-open="addPatientAlertIsOpen"
     @didDismiss="addPatientAlertIsOpen=false"
     header="Enter Patient's Real First And Last Name"
-    sub-header="Can't call and pay their bill without it. Also the name can't be updated later so don't fuck up this part (✿◠‿◠) If the patient's name is ever legally changed (or misspelled), you will need to add a new patient. (The patient and the submitter don't have to be the same person)"
+    sub-header="Can't call and pay their bill without it. Also the name can't be updated later so don't fuck up this part (✿◠‿◠) If the patient's name is ever legally changed (or misspelled), you will need to add a new patient. The patient and the submitter don't have to be the same person. By submitting patient, bill, and disease info, you are agreeing to have it displayed publicly to fight hospital charge masters."
     :buttons="alertButtons"
     :inputs="alertInputs">
   </ion-alert>
