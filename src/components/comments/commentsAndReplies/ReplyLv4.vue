@@ -263,7 +263,7 @@
 
         <!--Quality Of Life Bar-->
         <div>
-          <div class="flexCenterRow">
+          <div class="flexCenterRow nMediumSmallMarginTop tinyMarginBottom">
             <ion-button fill="clear" @click="openReplyLv4InSolanaExplorer(commentSectionNamePrefix,
               commentSectionName,
               chatAccountPostCountIndex,
@@ -381,7 +381,8 @@
     </div>
 
     <!--Reply Section-->
-    <div v-if="replying && (connectedWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)" class="replyOrCancelContainer">
+    <div v-if="replying && (connectedWallet.addressString != SYSTEM_PROGRAM_ADDRESS_STRING)"
+    class="replyOrCancelContainer smallMarginTop smallMarginBottom">
       <ion-textarea 
         ref="postReplyTextArea"
         v-model="replyMessage"
@@ -400,28 +401,25 @@
       </ion-textarea>
 
       <div class="replyButtonsContainer">
-        <ion-button 
-          v-if="!connectedWallet.isChatAccountReady"
+        <button v-if="!connectedWallet.isChatAccountReady"
+          class="lightOffDark thinBorder4Rad padding20" 
           @click="createChatAccount()"
-          class="replyButtons"
-          color="lightOffDark"
         >
           <ion-label :color="colorName">Create Your Chat Account</ion-label>
-        </ion-button>
+        </button>
 
-        <ion-button
-          v-else
+        <button v-else class=" lightOffDark thinBorder4Rad padding20" 
           @click="postLv4Reply()" 
-          class="replyButtons" 
           color="lightOffDark"
-          :disabled="overReplyByteSizeLimit || replyMessage==''"
-        >
+          :disabled="overReplyByteSizeLimit || replyMessage==''">
           <ion-label :color="colorName">Reply</ion-label>
-        </ion-button>
+        </button>
 
-        <ion-button @click="replying=false; replyMessage=''" class="replyButtons" color="lightOffDark">
+        <button class="lightOffDark thinBorder4Rad padding20" style="margin-bottom: 0px" 
+          @click="replying=false; replyMessage=''"
+        >
           <ion-label :color="colorName">Cancel</ion-label>
-        </ion-button>
+        </button>
       </div>
     </div>
     

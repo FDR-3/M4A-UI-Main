@@ -91,6 +91,9 @@
     "minimatch": "^9.0.8",
     "toml": "^4.2.0",
     "fflate": "^0.8.2",
-    "image-size": "^2.0.3"
+    "image-size": "^2.0.3",
+    "braces": "^3.0.3",
+    "postcss-selector-parser": "^7.1.6",
+    "sprintf-js": "^1.1.3"
   }
 }

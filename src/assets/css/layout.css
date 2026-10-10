@@ -285,6 +285,11 @@ h3, h4
   padding: 10px
 }
 
+.padding20
+{
+  padding: 20px
+}
+
 /* The "show" class is added to the filtered elements */
 .show 
 {
