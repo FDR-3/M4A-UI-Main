@@ -93,17 +93,17 @@
             </ion-popover> 
 
             <div v-if="embeddedYouTubeLink && !isDeleted">
-              <ion-button v-if="showVideoMessage" fill="clear" @click="setShowVideoMessage(false)">
+              <ion-button v-if="showVideoMessage" fill="clear" class="tightIonButton" @click="setShowVideoMessage(false)">
                 <YoutubeSVG class="videoReplyButton"/>
                 <ion-label color="dark">Hide Video Reply</ion-label>
               </ion-button>
-              <ion-button v-else-if="!editMode" fill="clear" @click="setShowVideoMessage(true)">
+              <ion-button v-else-if="!editMode" fill="clear" class="tightIonButton" @click="setShowVideoMessage(true)">
                 <YoutubeSVG class="videoReplyButton"/>
                 <ion-label color="dark">Show Video Reply</ion-label>
               </ion-button>
             </div>
 
-            <ion-label v-if="isFed" color="dark" title="Federal Agent!" style="font-size: 55px !important" @click="openFEDPopover($event)">🕴🏻</ion-label>
+            <ion-label v-if="isFed" color="dark" title="Federal Agent!" style="font-size: 55px !important" class="nTinyMarginLeft" @click="openFEDPopover($event)">🕴🏻</ion-label>
             <ion-popover 
               :is-open="fedPopoverOpen" 
               :event="event" 
@@ -287,17 +287,17 @@
             </ion-popover> 
 
             <div v-if="embeddedYouTubeLink && !isDeleted">
-              <ion-button v-if="showVideoMessage" fill="clear" @click="setShowVideoMessage(false)">
+              <ion-button v-if="showVideoMessage" fill="clear" class="tightIonButton" @click="setShowVideoMessage(false)">
                 <YoutubeSVG class="videoReplyButton"/>
-                <ion-label align="left" class="videoReplyLabel" color="dark">Hide Video Reply</ion-label>
+                <ion-label align="center" class="videoReplyLabel" color="dark">Hide Video Reply</ion-label>
               </ion-button>
-              <ion-button v-else-if="!editMode" fill="clear" @click="setShowVideoMessage(true)">
+              <ion-button v-else-if="!editMode" fill="clear" class="tightIonButton" @click="setShowVideoMessage(true)">
                 <YoutubeSVG class="videoReplyButton"/>
-                <ion-label align="left" class="videoReplyLabel" color="dark">Show Video Reply</ion-label>
+                <ion-label align="center" class="videoReplyLabel" color="dark">Show Video Reply</ion-label>
               </ion-button>
             </div>
 
-            <ion-label v-if="isFed" color="dark" title="Federal Agent!" style="font-size: 55px !important" @click="openFEDPopover($event)">🕴🏻</ion-label>
+            <ion-label v-if="isFed" color="dark" title="Federal Agent!" style="font-size: 55px !important" class="nTinyMarginLeft" @click="openFEDPopover($event)">🕴🏻</ion-label>
             <ion-popover 
               :is-open="fedPopoverOpen" 
               :event="event" 
