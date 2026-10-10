@@ -80,10 +80,13 @@
     //Add the navigation control
     map.addControl(new maplibregl.NavigationControl())
 
-    map.on('idle',function()
+    //This seeemed to be necessary on older version of map libre when resizing the map, but doesn't seem necessary anymore
+    //Also there was an issue with the map not being responsive at all with the newer version when clicking on it
+    //But removing this fixed it
+    /*map.on('idle',function()
     {
       map.resize()
-    })
+    })*/
   }
 
   function updateMarkersOnMap()
