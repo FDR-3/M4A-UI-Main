@@ -95,7 +95,7 @@ td, th
   font-size: min(4vw, 15px)
 }
 
-ion-textarea, ion-input, .p-select, .p-select-label
+ion-textarea, ion-input
 {
   font-size: min(5vw, 15px) !important
 }
