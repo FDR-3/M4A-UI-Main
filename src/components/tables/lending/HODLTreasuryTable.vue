@@ -176,6 +176,30 @@
     </DataTable>
   </div>
 
+  <div class="mobileContainer thinBorder smallMarginTop">
+    <h2>HODL Treasury Value: $<span class="rainbowText">{{ tvl.hodlTreasury.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 }) }}</span>
+    </h2>
+    <h2 class="nMediumMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
+
+    <button class="light thinBorder4Rad mediumMarginBottom padding10" @click="handleShowHODLHistory()">
+      <ion-label v-if="!showHODLHistory" color="green">Show History</ion-label>
+      <ion-label v-else color="green">Hide History</ion-label>
+    </button>
+
+    <transition name="divSlide">
+      <div v-if="showHODLHistory">
+        <div class="divSlideContent">
+          <div class="beamOverlay"></div>
+          <HODLChart :currentTreasuryValue="tvl.hodlTreasury"
+          :current7DayProjection="Number(sevenDayProjectionRate.replace(/,/g, ''))"
+          :amountHistoryHashMap="amountHistoryHashMap"/>
+        </div>
+      </div>
+    </transition>
+  </div>
+
   <ion-popover 
   :is-open="treasuryATAPopoverOpen" 
   :event="event" 
@@ -644,5 +668,31 @@
   ion-input
   {
     --highlight-color: var(--ion-color-green)
+  }
+
+  @media screen and (min-width: 777px)  
+  { 
+    .tableContainer
+    {
+      display: block
+    }
+
+    .mobileContainer
+    {
+      display: none
+    }
+  }
+
+  @media screen and (max-width: 776.9px) 
+  { 
+    .tableContainer
+    {
+      display: none
+    }
+
+    .mobileContainer
+    {
+      display: block
+    }
   }
 </style>

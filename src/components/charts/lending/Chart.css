@@ -7,7 +7,7 @@
 
 .chartSelect
 {
-  width: 130px;
+  width: min(120px, 50vw);
   padding-left: 20px
 }
 
@@ -126,5 +126,21 @@
   to
   {
     background-position: center 200%
+  }
+}
+
+@media screen and (min-width: 380px)  
+{ 
+  .chartLegend
+  {
+    flex-direction: row;
+  }
+}
+
+@media screen and (max-width: 379.9px) 
+{ 
+  .chartLegend
+  {
+    flex-direction: column;
   }
 }

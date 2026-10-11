@@ -297,6 +297,31 @@
       </Column>
     </DataTable>
   </div>
+
+  <div class="mobileContainer thinBorder tinyMarginRight">
+    <div>
+      <h2>Token Reserve Deposited Value: $<span class="rainbowText">{{ totalDepositedValue }}</span></h2>
+      <h2 class="nMediumMarginTop">Token Reserve Borrowed Value: $<span class="poopText">{{ totalBorrowedValue }}</span></h2>
+    </div>
+
+    <button class="light thinBorder4Rad mediumMarginBottom padding10" @click="handleshowTokenReserveHistory()">
+      <ion-label v-if="!showTokenReserveHistory" color="green">Show History</ion-label>
+      <ion-label v-else color="green">Hide History</ion-label>
+    </button>
+
+    <transition name="divSlide">
+      <div v-if="showTokenReserveHistory">
+        <div class="divSlideContent">
+          <div class="beamOverlay"></div>
+          <TokenReserveChart
+          :depositedValue="Number(totalDepositedValue)"
+          :borrowedValue="Number(totalBorrowedValue)"
+          :depositedAmountHistoryHashMap="depositedAmountHistoryHashMap"
+          :borrowedAmountHistoryHashMap="borrowedAmountHistoryHashMap"/>
+        </div>
+      </div>
+    </transition>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -937,5 +962,31 @@
   .p-inputtext:focus-within
   {
     --p-inputtext-focus-border-color: v-bind(publicKeyCheckColor) !important
+  }
+
+  @media screen and (min-width: 777px)  
+  { 
+    .tableContainer
+    {
+      display: block
+    }
+
+    .mobileContainer
+    {
+      display: none
+    }
+  }
+
+  @media screen and (max-width: 776.9px) 
+  { 
+    .tableContainer
+    {
+      display: none
+    }
+
+    .mobileContainer
+    {
+      display: block
+    }
   }
 </style>

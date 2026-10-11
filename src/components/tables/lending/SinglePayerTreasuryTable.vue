@@ -175,6 +175,35 @@
     </DataTable>
   </div>
 
+  <div class="mobileContainer thinBorder ">
+    <div class="nLargeMarginBottom"><InfoButton :infoMessage="payoutMSG"/></div>
+    <h2 style="line-height: 40px">Single Payer Treasury Value
+      <div class="flexCenterRow nSmallMarginTop">
+        <div>Amount Available For Claim Payouts: $<span class="rainbowText">{{ tvl.singlePayerPayOuts.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 }) }}</span>
+        </div>
+      </div>
+    </h2>
+    <h2 class="nMediumLargeMarginTop">7 Day Projection Rate: $<span class="rainbowText">{{ sevenDayProjectionRate }}</span></h2>
+
+    <button class="light thinBorder4Rad mediumMarginBottom padding10" @click="handleShowSinglePayerHistory()">
+      <ion-label v-if="!showSinglePayerHistory" color="green">Show History</ion-label>
+      <ion-label v-else color="green">Hide History</ion-label>
+    </button>
+
+    <transition name="divSlide">
+      <div v-if="showSinglePayerHistory">
+        <div class="divSlideContent">
+          <div class="beamOverlay"></div>
+          <SinglePayerChart :currentPayoutAmount="tvl.singlePayerPayOuts"
+          :current7DayProjection="Number(sevenDayProjectionRate.replace(/,/g, ''))"
+          :amountHistoryHashMap="amountHistoryHashMap"/>
+        </div>
+      </div>
+    </transition>
+  </div>
+
   <ion-popover 
   :is-open="tokenPopoverOpen" 
   :event="event" 
@@ -603,5 +632,31 @@
     opacity: 0;
     background-image: radial-gradient(circle, var(--ion-color-green) 1.5px, transparent 2px);
     background-size: 24px 24px
+  }
+
+  @media screen and (min-width: 777px)  
+  { 
+    .tableContainer
+    {
+      display: block
+    }
+
+    .mobileContainer
+    {
+      display: none
+    }
+  }
+
+  @media screen and (max-width: 776.9px) 
+  { 
+    .tableContainer
+    {
+      display: none
+    }
+
+    .mobileContainer
+    {
+      display: block
+    }
   }
 </style>
