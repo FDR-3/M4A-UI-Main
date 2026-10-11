@@ -24,7 +24,7 @@
 
     <div v-if="showValues==1">
       <div class="flexCenterColumn">
-        <div class="chartLegend">
+        <div class="tokenReserveChartLegend">
           <div 
           v-for="(dataset, index) in valueChartData?.datasets" 
           :key="index" 
@@ -52,7 +52,7 @@
 
     <div v-else-if="showValues==2">
       <div class="flexCenterColumn">
-        <div class="chartLegend">
+        <div class="tokenReserveChartLegend">
           <div 
           v-for="(dataset, index) in depositedAmountChartData?.datasets"
           :key="index" 
@@ -92,7 +92,7 @@
 
     <div v-else>
       <div class="flexCenterColumn">
-        <div class="chartLegend">
+        <div class="tokenReserveChartLegend">
           <div 
           v-for="(dataset, index) in borrowedAmountChartData?.datasets"
           :key="index" 

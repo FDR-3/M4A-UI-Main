@@ -1,8 +1,13 @@
-.chartLegend
+.chartLegend, .tokenReserveChartLegend
 {
   display: flex;
   justify-content: center;
   gap: 10px
+}
+
+.tokenReserveChartLegend
+{
+  margin-left: 10px
 }
 
 .chartSelect
@@ -133,14 +138,28 @@
 { 
   .chartLegend
   {
-    flex-direction: row;
+    flex-direction: row
   }
 }
-
 @media screen and (max-width: 379.9px) 
 { 
   .chartLegend
   {
-    flex-direction: column;
+    flex-direction: column
+  }
+}
+
+@media screen and (min-width: 644px)  
+{ 
+  .tokenReserveChartLegend
+  {
+    flex-direction: row
+  }
+}
+@media screen and (max-width: 643.9px) 
+{ 
+  .tokenReserveChartLegend
+  {
+    flex-direction: column
   }
 }
