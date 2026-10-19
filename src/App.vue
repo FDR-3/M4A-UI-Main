@@ -38,7 +38,7 @@
           
             <!--The ion-menu-toggle tag is used when you want elements to close the menu when they are clicked-->
             <ion-menu-toggle>
-              <ion-button v-if="connectedWallet.hasHadCustomName" :color="colorName" @click="moveToCommentSectionJumper()" router-link="/M4A/CommentSectionJumper" router-direction="root">
+              <ion-button v-if="connectedWallet.hasHadCustomName" :color="colorName" @click="moveToPage('EndGame', MenuIndex.M4A)" router-link="/M4A/CommentSectionJumper" router-direction="root">
                 <ion-label color="dark">Comment Section Jumper</ion-label>
               </ion-button>
             </ion-menu-toggle>
@@ -46,6 +46,10 @@
             <div :style="{display: navigation.menuIndex==MenuIndex.Jesus ? 'none':'block'}" class="flexCenterColumn">
               <ContractSwitcher :colorName="colorName" :buttonShadow="buttonShadow"/>
             </div>
+
+            <ion-button color="colorName" @click="moveToPage('CEO', MenuIndex.About)" router-link="/About" router-direction="root">
+              <ion-label color="blue">Contact Info</ion-label>
+            </ion-button>
 
           </div>
         </ion-content>
@@ -236,11 +240,11 @@
     localStorage.setItem("navigationPageIndex", "0")
   }
 
-  function moveToCommentSectionJumper()
+  function moveToPage(pageName: string, menuIndex: number)
   {
-    navigation.menuIndex = MenuIndex.M4A
+    navigation.menuIndex = menuIndex
 
-    const navbarAndPageValues = commentSectionNameHashTable.get("EndGame")
+    const navbarAndPageValues = commentSectionNameHashTable.get(pageName)
     if(navbarAndPageValues)
     {
       navigation.navBarIndex = navbarAndPageValues[0]

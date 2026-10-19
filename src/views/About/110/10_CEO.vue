@@ -17,6 +17,7 @@
           <p>CEO Name: fdr-3</p>
           <p>Real Name: Xavier Dillard</p>
           <p>Email: fdr3@m4a.io</p>
+          <p>Telegram: @fdrr_3</p>
           <a href="https://www.facebook.com/61578948853626/videos/757643450009117" target="_blank"><p>How I was illegally fired in retaliation<br>(Patriot put a privacy claim on my youtube video complaining
           about the video showing their crime, so had to upload to facebook)</p></a>
           <p>Ideology: <a href="https://youtu.be/J5LidElyknY?list=PLKRByY3ha6Vx9kb7GT8TQ3CuoaxMt7KIk&t=625"  target="_blank">Social Capitalist</a></p>
