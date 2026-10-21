@@ -15,12 +15,11 @@
   import { anchorPrograms } from '/src/assets/globalStates/AnchorPrograms.vue'
   import DeadMansBreakCheck from './DeadMansBreakCheck.vue'
   import { sleep, MAX_RETRY_FETCH, RETRY_TIME_OUT, RETRY_MESSAGE, ERROR_429 } from '/src/assets/helperFunctions/sleep.ts'
+  import { SITE_UPDATE_NUMBER } from '/src/assets/globalStates/EnvironmentSettings.ts'
 
   var deadMansBreakWatchId: any
   var siteUpdateAlertWatcherId: any
   var alertProtocolCEOAccountWatcherId: any
-
-  var alertCounter: any = undefined //This is used to prevent false positives on website update alerts. Sometimes the listner just goes off, so we want to be sure there was actually an update.
 
   onMounted(async() =>
   {
@@ -37,7 +36,9 @@
     //WebSite Update Notice
     const siteUpdateAlertAccount = await getSiteUpdateAlertAccount()
     if(siteUpdateAlertAccount)
-      alertCounter = siteUpdateAlertAccount.siteUpdateCount
+      anchorPrograms.siteUpdateNumber = siteUpdateAlertAccount.siteUpdateCount.toNumber()
+    if(SITE_UPDATE_NUMBER < anchorPrograms.siteUpdateNumber)
+      anchorPrograms.hasWebSiteBeenUpdated = true
     await listenForWebSiteUpdateNotices()
 
     //Alert Protocol CEO Account
@@ -122,13 +123,10 @@
         {
           //Handle account change..
           const siteUpdateAlertAccount = anchorPrograms.alert.alertProgram.account.siteUpdateAlert.coder.accounts.decode("siteUpdateAlert", accountInfo.data)
-          if(alertCounter == undefined)
-            alertCounter = siteUpdateAlertAccount.siteUpdateCount
-          else if(alertCounter.lt(siteUpdateAlertAccount.siteUpdateCount))
-          {
-            alertCounter = siteUpdateAlertAccount.siteUpdateCount
+          
+          anchorPrograms.siteUpdateNumber = siteUpdateAlertAccount.siteUpdateCount.toNumber()
+          if(SITE_UPDATE_NUMBER < anchorPrograms.siteUpdateNumber)
             anchorPrograms.hasWebSiteBeenUpdated = true
-          }
         })
 
         break

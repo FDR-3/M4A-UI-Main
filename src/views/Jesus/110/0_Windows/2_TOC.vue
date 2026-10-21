@@ -23,6 +23,7 @@
     <ion-button color="dark" @click="pageSelect(14)">13-Patriot Software Is Lying To The Government On Me!🤬</ion-button>
     <ion-button color="dark" @click="pageSelect(15)">14-OBS Studio Background Remover</ion-button>
     <ion-button color="dark" @click="pageSelect(16)">15-Playwright Youtube Scraping/View Bot</ion-button>
+    <br>
   </div>
 </template>
 

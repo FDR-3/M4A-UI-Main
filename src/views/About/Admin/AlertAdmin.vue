@@ -1,7 +1,7 @@
 <template>
   <div v-if="connectedWallet.addressString==adminAccounts.chatCEOAddress" class="thickBorder smallMarginTop">
     <div class="smallMarginTop">
-      <ion-text>Trigger Website Update Notice</ion-text>
+      <ion-text>Website Update Count: {{ anchorPrograms.siteUpdateNumber }}</ion-text>
     </div>
     <div class=" flexCenterRow">
       <div style="width: 90%">

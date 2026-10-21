@@ -1,6 +1,7 @@
 <script lang="ts">
   import { reactive } from 'vue'
   import { PublicKey } from "@solana/web3.js"
+  import * as anchor from "@coral-xyz/anchor"
 
   export const monthList = 
   [
@@ -63,6 +64,7 @@
     secondsUntilDeadMansBreakTrips: 3_888_000, //86,400 seconds/day * 45 days = 3,888,000 seconds.
     deadMansBreakTimeStamp: 0,
     isDeadMansBreakTripped: false,
+    siteUpdateNumber: 0,
     hasWebSiteBeenUpdated: false,
     areM4AProtocolStatsReady: false,
     areChatQOLAccountsReady: false,

@@ -261,15 +261,16 @@
   {
     if(commentSections.data)
     {
-      tableData.value = commentSections.data
+      const tempTable = commentSections.data
+      tableData.value = tempTable.filter((section: { commentSectionName: string }) => section.commentSectionName !== "USI")
       isLoading.value = false
     }
   })
 
   watch(commentSections, () =>
   {
-    tableData.value = commentSections.data
-
+    const tempTable = commentSections.data
+    tableData.value = tempTable.filter((section: { commentSectionName: string }) => section.commentSectionName !== "USI")
     if(isLoading.value)
       isLoading.value = false
   })

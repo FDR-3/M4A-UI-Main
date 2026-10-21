@@ -102,10 +102,10 @@ export  const commentSectionNameHashTable = new Map<string, [number, number]>(
   ["TYABTE", [0,5]],
   ["TYABTEx2", [0,6]],
   ["Epstein", [0,7]],
-  ["USI", [0,8]],
-  ["Handful", [0,9]],
-  ["CEO", [0,10]],
-  ["LegalFrameWork", [0,11]],
+  //["USI", [0,8]],
+  ["Handful", [0,8]],
+  ["CEO", [0,9]],
+  ["LegalFrameWork", [0,10]],
   ["Stats", [1,0]],
   ["Admin", [2,0]]
 ])

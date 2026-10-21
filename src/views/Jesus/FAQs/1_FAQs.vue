@@ -12,7 +12,7 @@
         src="https://www.youtube.com/embed/cSXJ09tDR9Q?cc_load_policy=1&cc_lang_pref=en"
         allowfullscreen
       ></iframe>
-      <NextPageButton/>
+      <NextPageButton :lastPage="true"/>
     </div>
     <div class="sources">
       <h1>Sources</h1>
