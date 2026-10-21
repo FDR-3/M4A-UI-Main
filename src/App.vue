@@ -51,6 +51,8 @@
               <ion-label color="blue">Contact Info</ion-label>
             </ion-button>
 
+            <ion-text>UI Version: 0.{{ SITE_UPDATE_NUMBER }}</ion-text>
+
           </div>
         </ion-content>
       </ion-menu>
@@ -96,7 +98,7 @@
   import Shield from '/src/assets/svg/shield-svg.vue'
   import HelpCircle from '/src/assets/svg/help-circle-sharp-svg.vue'
   import { useWindowResize } from './assets/globalStates/WindowWidth.ts'
-  import { MAINTENANCE_MODE } from './assets/globalStates/EnvironmentSettings.ts'
+  import { MAINTENANCE_MODE, SITE_UPDATE_NUMBER } from './assets/globalStates/EnvironmentSettings.ts'
   import ContractSwitcher from '/src/components/smart contracts/ContractSwitcher.vue'
   import AlertProtocolRunner from '/src/components/smart contracts/alert protocol/AlertProtocolRunner.vue'
   import LendingProtocolRunner from '/src/components/smart contracts/lending protocol/LendingProtocolRunner.vue'

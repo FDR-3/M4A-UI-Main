@@ -1,4 +1,4 @@
-export const SITE_UPDATE_NUMBER = 54
+export const SITE_UPDATE_NUMBER = 55
 export const DEV_MODE = false
 export const LOCAL_PRICE_ORACLE = false
 export const USE_JITO_BUNDLES = true //if LOCAL_PRICE_ORACLE is true, USE_JITO_BUNDLES should be false, can't use jito bundles on the local network, only testnet and mainnet https://docs.jito.wtf/lowlatencytxnsend/#api
