@@ -362,6 +362,10 @@
       connectedWallet.selectedLendingUserAccountIndex.toString() +
       "selectedMainSubMarketIndex")) || 0
 
+    const isIndexContained = subMarkets.some(item => item.subMarketIndex === subMarketSelect.value)
+    if(!isIndexContained)
+      subMarketSelect.value = subMarkets[0].subMarketIndex
+
     accountSelect.value = connectedWallet.selectedLendingUserAccountIndex
     
     if(lendingUserAccountsHashMap.map)

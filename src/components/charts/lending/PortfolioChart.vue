@@ -443,8 +443,8 @@
       subMarketFeeName: (subMarket.feeOnInterestEarnedRate).toString() + "% Fee Market",
       subMarketIndex: subMarket.subMarketIndex
     }
-    subMarketSelectOption.push(option)
-    
+    subMarketSelectOption = [option]
+
     chartSelect.value = props.selectedChart
 
     chartOptions.value = setChartOptions(true, chartTextColor.value)
@@ -498,6 +498,15 @@
     chartSelect.value = "All"
 
     legenHiddenArray.value = props.chartData.datasets.map((dataset: any) => dataset.hidden)
+
+    //Updates the subMarket Option that's sent to the lending popup
+    const subMarket = subMarketsHashMap.map.get(props.tokenId + props.subMarketOwnerAddress + props.subMarketIndex)
+    const option = 
+    {
+      subMarketFeeName: (subMarket.feeOnInterestEarnedRate).toString() + "% Fee Market",
+      subMarketIndex: subMarket.subMarketIndex
+    }
+    subMarketSelectOption = [option]
   }))
 
   function getYearList()
