@@ -147,7 +147,7 @@
     lendingUserTabAccountsHashMap,
     lendingUserTabAccountListHashMap,
     lendingUserRemainingTabAccountListHashMap, } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
@@ -181,7 +181,7 @@
   var userHasDebt = false
   var selectedTokenId = 0
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
-  var tokenDecimalAmount: number
+  var tokenDecimalAmount = 0
   var tokenProgram: PublicKey
   var interestEarnedIntervalId: any
   var healthFactorIntervalId: any

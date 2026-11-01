@@ -178,7 +178,7 @@
   var maxBorrowAmount = 0
   var selectedTokenId = 0
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
-  var tokenDecimalAmount: number
+  var tokenDecimalAmount = 0
   var tokenProgram: PublicKey
   var healthFactorIntervalId: any
 

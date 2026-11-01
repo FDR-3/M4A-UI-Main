@@ -152,7 +152,7 @@
     lendingUserTabAccountsHashMap,
     lendingUserTabAccountListHashMap,
     lendingUserRemainingTabAccountListHashMap } from '/src/assets/globalStates/lending/LendingUsers.vue'
-  import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import * as anchor from "@coral-xyz/anchor"
   import cloneDeep from 'lodash/cloneDeep'
@@ -185,7 +185,7 @@
   var userOriginalDebt = 0
   var selectedTokenId = 0
   var selectedTokenMintAddress = new PublicKey(SYSTEM_PROGRAM_ADDRESS_STRING)
-  var tokenDecimalAmount: number
+  var tokenDecimalAmount = 0
   var tokenProgram: PublicKey
   var interestAccruedIntervalId: any
   var healthFactorIntervalId: any
@@ -647,17 +647,17 @@
 
       //Get Lending User Look Up Table Account
       lookUpTableAccounts.push(connectedWallet.lendingUserLookUpTableAccount)
-
+      console.log("here0.1")
       const signedTransactions = await userSignsLendingTransactions(instructionsToSend, lookUpTableAccounts)
-
+      console.log("here0.2")
       for(var i=0; i<signedTransactions.length; i++)
       {
         const size = signedTransactions[i].serialize().length
         console.log(`Signed Transaction Size: ${size} bytes`)
       }
-
+      console.log("here1")
       await bundleProtocolPriceTransactions([...uniqueTokenIds], signedTransactions)
-
+      console.log("here2")
       var userTxs = []
   
       for(var i=0; i<signedTransactions.length; i++)

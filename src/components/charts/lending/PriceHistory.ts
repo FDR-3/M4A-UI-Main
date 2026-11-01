@@ -4,7 +4,8 @@ export const SOLPriceHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0],
   ["7-2026", 0],
   ["8-2026", 0],
-  ["9-2026", 118.38]
+  ["9-2026", 118.38],
+  ["10-2026", 94.68]
 ])
 
 export const WEthPriceHistoryHashMap: Map<string, number> = new Map(
@@ -13,7 +14,8 @@ export const WEthPriceHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0],
   ["7-2026", 0],
   ["8-2026", 0],
-  ["9-2026", 2_692.90]
+  ["9-2026", 2_692.90],
+  ["10-2026", 2_266.92]
 ])
 
 export const WBtcPriceHistoryHashMap: Map<string, number> = new Map(
@@ -22,5 +24,6 @@ export const WBtcPriceHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0],
   ["7-2026", 0],
   ["8-2026", 0],
-  ["9-2026", 83_771.39]
+  ["9-2026", 83_771.39],
+  ["10-2026", 77_849.20]
 ])

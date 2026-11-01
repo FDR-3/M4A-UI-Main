@@ -258,7 +258,7 @@
     closeTempOraclePriceData,
     TEMP_PRICE_ACCOUNT_ALIVE_MSG } from '/src/assets/contracts/Solana/LendingProtocol.vue'
   import { getCustomOrTrimmedUserDisplayName } from '/src/assets/contracts/Solana/ChatProtocol.vue'
-  import { tokenAddressStrings, tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
   import InfoButton from '/src/components/help/InfoButton.vue'
   import HealthFactorSmall from '/src/components/smart contracts/lending protocol/HealthFactorSmall.vue'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
@@ -282,7 +282,7 @@
   var selectedDepositedAmount = ref()
   var repayAmount = ref(0)
   var payableUserDebt = ref()
-  var repaymentTokenDecimalAmount: number
+  var repaymentTokenDecimalAmount = 0
   var repayIncrementAmount = ref()
   var repayMax = ref(false)
   var repayHalf = ref(false)

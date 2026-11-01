@@ -4,7 +4,8 @@ export const SinglePayerPayoutHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0.00],
   ["7-2026", 0.04],
   ["8-2026", 0.29],
-  ["9-2026", 0.83]
+  ["9-2026", 0.83],
+  ["10-2026", 1.59]
 ])
 
 export const SinglePayer7DayProjectionHistoryHashMap: Map<string, number> = new Map(
@@ -13,7 +14,8 @@ export const SinglePayer7DayProjectionHistoryHashMap: Map<string, number> = new 
   ["6-2026", 0],
   ["7-2026", 0.04],
   ["8-2026", 0.09],
-  ["9-2026", 0.17]
+  ["9-2026", 0.17],
+  ["10-2026", 0.21]
 ])
 
 export const SinglePayerUSDSHistoryHashMap: Map<string, number> = new Map(
@@ -22,7 +24,8 @@ export const SinglePayerUSDSHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0],
   ["7-2026", 0.01203],
   ["8-2026", 0.064146],
-  ["9-2026", 0.212348]
+  ["9-2026", 0.212348],
+  ["10-2026", 0.434451]
 ])
 
 export const SinglePayerUSDCHistoryHashMap: Map<string, number> = new Map(
@@ -31,7 +34,8 @@ export const SinglePayerUSDCHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0],
   ["7-2026", 0.015524],
   ["8-2026", 0.110226],
-  ["9-2026", 0.284824]
+  ["9-2026", 0.284824],
+  ["10-2026", 0.507479]
 ])
 
 export const SinglePayerSOLHistoryHashMap: Map<string, number> = new Map(
@@ -40,7 +44,8 @@ export const SinglePayerSOLHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0],
   ["7-2026", 0.000170262],
   ["8-2026", 0.000891564],
-  ["9-2026", 0.001988725]
+  ["9-2026", 0.001988725],
+  ["10-2026", 0.004386726]
 ])
 
 export const SinglePayerWEthHistoryHashMap: Map<string, number> = new Map(
@@ -49,7 +54,8 @@ export const SinglePayerWEthHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0],
   ["7-2026", 0.00000113],
   ["8-2026", 0.00001107],
-  ["9-2026", 0.00003172]
+  ["9-2026", 0.00003172],
+  ["10-2026", 0.00008524]
 ])
 
 export const SinglePayerWBtcHistoryHashMap: Map<string, number> = new Map(
@@ -58,5 +64,6 @@ export const SinglePayerWBtcHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0],
   ["7-2026", 0],
   ["8-2026", 0.00000002],
-  ["9-2026", 0.00000019]
+  ["9-2026", 0.00000019],
+  ["10-2026", 0.00000061]
 ])
