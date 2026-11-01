@@ -187,6 +187,7 @@
   var chartContainer = ref<any>(null)
   var chartWidth = ref(0)
   var showValues = ref(1)
+  var previousMonthDataMissing = false
 
   var gradientOffset = ref(0)
 
@@ -262,10 +263,20 @@
     setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
 
     //valueChartData = valueChartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
+    //It also interrupts the screen when you are holding your mouse over a chart value
     if(valueChartData?.datasets?.[0])
+    {
       valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-1] = props.depositedValue
+      if(previousMonthDataMissing && valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-2]) //Set the previous month with the current value if it was missing
+        valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-2] = props.depositedValue
+      
+    }
     if(valueChartData?.datasets?.[1])
+    {
       valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-1] = props.borrowedValue
+      if(previousMonthDataMissing && valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-2]) //Set the previous month with the current value if it was missing
+        valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-2] = props.borrowedValue
+    }
   }))
 
   watch(() => [props.depositedAmountHistoryHashMap], (async() => 
@@ -373,10 +384,10 @@
     const currentMonth = newDate.getMonth() + 1
     var allTokenReserveDepositedValues = []
     var allTokenReserveBorrowedValues = []
-    var tempYearlyValueHashMap = new Map<string, any>()
+    var tempChartDataValueHashMap = new Map<string, any>()
     var tempAllValueChartData = cloneDeep(valueBaseChartData)
-    var tempYearlyDepositedAmountHashMap = new Map<string, any>()
-    var tempYearlyBorrowedAmountHashMap = new Map<string, any>()
+    var tempChartDataDepositedAmountHashMap = new Map<string, any>()
+    var tempChartDataBorrowedAmountHashMap = new Map<string, any>()
     var tempAllDepositedAmountChartData = getDepositedAmountBaseChart(gradientOffset)
     var tempAllBorrowedAmountChartData = getBorrowedAmountBaseChart(gradientOffset)
     var allLabels: string[] = []
@@ -436,7 +447,7 @@
           yearlyTokenReserveDepositedValues.push(tokenReserveDepositedValue)
         }
         else
-        {
+        { //This fills in the current month and previous month with current values.This helps if the previous month data isn't available yet.
           if(year == currentYear && (month == currentMonth || month == currentMonth-1))
           {
             if(!labelAddedToAll)
@@ -449,6 +460,9 @@
           }
           else
             yearlyTokenReserveDepositedValues.push(0)
+
+          if(year == currentYear && month == currentMonth-1)
+            previousMonthDataMissing = true
         }
 
         const tokenReserveBorrowedValue = TokenReserveBorrowedValueHistoryHashMap.get(month.toString() + '-' + year.toString())
@@ -466,6 +480,9 @@
           }
           else
             yearlyTokenReserveBorrowedValues.push(0)
+
+          if(year == currentYear && month == currentMonth-1)
+            previousMonthDataMissing = true
         }
 
         depositedTokens.forEach((token, index) =>
@@ -513,7 +530,7 @@
       yearlyTokenReserveValueChartData.labels = yearlyLabels
       yearlyTokenReserveValueChartData.datasets[0].data = yearlyTokenReserveDepositedValues
       yearlyTokenReserveValueChartData.datasets[1].data = yearlyTokenReserveBorrowedValues
-      tempYearlyValueHashMap.set(year.toString(), yearlyTokenReserveValueChartData)
+      tempChartDataValueHashMap.set(year.toString(), yearlyTokenReserveValueChartData)
 
       //Assign DepositedAmount data for the year
       yearlyTokenReserveDepositedAmountChartData.labels = yearlyLabels
@@ -522,7 +539,7 @@
         if(yearlyTokenReserveDepositedAmountChartData.datasets[i])
           yearlyTokenReserveDepositedAmountChartData.datasets[i].data = yearlyDepositedAmountDataLists[i]
       })
-      tempYearlyDepositedAmountHashMap.set(year.toString(), yearlyTokenReserveDepositedAmountChartData)
+      tempChartDataDepositedAmountHashMap.set(year.toString(), yearlyTokenReserveDepositedAmountChartData)
 
       //Assign BorrowedAmount data for the year
       yearlyTokenReserveBorrowedAmountChartData.labels = yearlyLabels
@@ -531,7 +548,7 @@
         if(yearlyTokenReserveBorrowedAmountChartData.datasets[i])
           yearlyTokenReserveBorrowedAmountChartData.datasets[i].data = yearlyBorrowedAmountDataLists[i]
       })
-      tempYearlyBorrowedAmountHashMap.set(year.toString(), yearlyTokenReserveBorrowedAmountChartData)
+      tempChartDataBorrowedAmountHashMap.set(year.toString(), yearlyTokenReserveBorrowedAmountChartData)
     }
 
     //Set Value "All" data
@@ -555,11 +572,11 @@
         tempAllBorrowedAmountChartData.datasets[i].data = token.allData
     })
 
-    tempYearlyValueHashMap.set("All", tempAllValueChartData)
-    tempYearlyDepositedAmountHashMap.set("All", tempAllDepositedAmountChartData)
-    tempYearlyBorrowedAmountHashMap.set("All", tempAllBorrowedAmountChartData)
-    valueChartDataHashMap = tempYearlyValueHashMap
-    depositedAmountChartDataHashMap = tempYearlyDepositedAmountHashMap
-    borrowedAmountChartDataHashMap = tempYearlyBorrowedAmountHashMap
+    tempChartDataValueHashMap.set("All", tempAllValueChartData)
+    tempChartDataDepositedAmountHashMap.set("All", tempAllDepositedAmountChartData)
+    tempChartDataBorrowedAmountHashMap.set("All", tempAllBorrowedAmountChartData)
+    valueChartDataHashMap = tempChartDataValueHashMap
+    depositedAmountChartDataHashMap = tempChartDataDepositedAmountHashMap
+    borrowedAmountChartDataHashMap = tempChartDataBorrowedAmountHashMap
   }
 </script>

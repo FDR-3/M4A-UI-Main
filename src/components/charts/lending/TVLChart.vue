@@ -40,7 +40,7 @@
       </div>
     </div>
 
-    <div ref="chartContainer">
+    <div>
       <Chart type="line" ref="chartRef" :width="chartWidth" :data="chartData" :options="chartOptions"/>
     </div>
   </div>
@@ -71,8 +71,8 @@
   var animationIntervalId: any
   var chartSelect = ref("All")
   var chartDataHashMap = new Map<string, any>()
-  var chartContainer = ref<any>(null)
   var chartWidth = ref(0)
+  var previousMonthDataMissing = false
 
   var gradientOffset = ref(0)
  
@@ -128,8 +128,13 @@
     setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
 
     //chartData = chartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
+    //It also interrupts the screen when you are holding your mouse over a chart value
     if(chartData?.datasets?.[0])
+    { 
       chartData.datasets[0].data[chartData.datasets[0].data.length-1] = props.currentTVL.replace(/,/g, '')
+      if(previousMonthDataMissing && chartData.datasets[0].data[chartData.datasets[0].data.length-2]) //Set the previous month with the current value if it was missing
+        chartData.datasets[0].data[chartData.datasets[0].data.length-2] = props.currentTVL.replace(/,/g, '')
+    }
   }))
 
   async function switchChartData()
@@ -202,7 +207,7 @@
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
     const currentMonth = newDate.getMonth() + 1
-    var tempYearlyHashMap = new Map<string, any>()
+    var tempChartDataHashMap = new Map<string, any>()
     var tempAllChartData = cloneDeep(baseChartData)
     var allLabels = []
     var allTVLs = []
@@ -229,26 +234,29 @@
           yearlyTVLs.push(tvlMonthlyStatementValue)
         }
         else
-        {
+        { //This fills in the current month and previous month with current values.This helps if the previous month data isn't available yet.
           if(year == currentYear && (month == currentMonth || month == currentMonth-1))
           {
             allLabels.push(monthList[month-1].monthName + ' ' + year.toString())
-            allTVLs.push(props.currentTVL.replace(/,/g, ''))
-            yearlyTVLs.push(props.currentTVL.replace(/,/g, ''))
+            allTVLs.push(Number(props.currentTVL.replace(/,/g, '')))
+            yearlyTVLs.push(Number(props.currentTVL.replace(/,/g, '')))
           }
           else
             yearlyTVLs.push(0)
+
+          if(year == currentYear && month == currentMonth-1)
+            previousMonthDataMissing = true
         }
       }
 
       tempYearlyChartData.labels = yearlyLabels
       tempYearlyChartData.datasets[0].data = yearlyTVLs
-      tempYearlyHashMap.set(year.toString(), tempYearlyChartData)
+      tempChartDataHashMap.set(year.toString(), tempYearlyChartData)
     }
 
     tempAllChartData.labels = allLabels
     tempAllChartData.datasets[0].data = allTVLs
-    tempYearlyHashMap.set("All", tempAllChartData)
-    chartDataHashMap = tempYearlyHashMap
+    tempChartDataHashMap.set("All", tempAllChartData)
+    chartDataHashMap = tempChartDataHashMap
   }
 </script>

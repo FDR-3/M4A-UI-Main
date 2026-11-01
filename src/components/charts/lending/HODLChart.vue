@@ -137,6 +137,7 @@
   var chartContainer = ref<any>(null)
   var chartWidth = ref(0)
   var showValues = ref(true)
+  var previousMonthDataMissing = false
 
   var gradientOffset = ref(0)
  
@@ -210,10 +211,20 @@
     setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
 
     //valueChartData = valueChartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
+    //It also interrupts the screen when you are holding your mouse over a chart value
     if(valueChartData?.datasets?.[0])
+    {
       valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-1] = props.currentTreasuryValue
+      if(previousMonthDataMissing && valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-2]) //Set the previous month with the current value if it was missing
+        valueChartData.datasets[0].data[valueChartData.datasets[0].data.length-2] = props.currentTreasuryValue
+      
+    }
     if(valueChartData?.datasets?.[1])
+    {
       valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-1] = props.current7DayProjection
+      if(previousMonthDataMissing && valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-2]) //Set the previous month with the current value if it was missing
+        valueChartData.datasets[1].data[valueChartData.datasets[1].data.length-2] = props.current7DayProjection
+    }
   }))
 
   watch(() => props.amountHistoryHashMap, (async() => 
@@ -303,9 +314,9 @@
     const currentMonth = newDate.getMonth() + 1
     var allHODLTreasuryValues = []
     var allHODL7DayProjections = []
-    var tempYearlyValueHashMap = new Map<string, any>()
+    var tempChartDataValueHashMap = new Map<string, any>()
     var tempAllValueChartData = cloneDeep(valueBaseChartData)
-    var tempYearlyAmountHashMap = new Map<string, any>()
+    var tempChartDataAmountHashMap = new Map<string, any>()
     var tempAllAmountChartData = getAmountBaseChart(gradientOffset)
     var allLabels: string[] = []
 
@@ -353,7 +364,7 @@
           yearlyHODLTreasuryValues.push(hodlTreasuryValue)
         }
         else
-        {
+        { //This fills in the current month and previous month with current values.This helps if the previous month data isn't available yet.
           if(year == currentYear && (month == currentMonth || month == currentMonth-1))
           {
             if(!labelAddedToAll)
@@ -366,6 +377,9 @@
           }
           else
             yearlyHODLTreasuryValues.push(0)
+
+          if(year == currentYear && month == currentMonth-1)
+            previousMonthDataMissing = true
         }
 
         const hodlProjectionMonthlyValue = HODL7DayProjectionHistoryHashMap.get(month.toString() + '-' + year.toString())
@@ -383,6 +397,9 @@
           }
           else
             yearlyHODL7DayProjections.push(0)
+
+          if(year == currentYear && month == currentMonth-1)
+            previousMonthDataMissing = true
         }
 
         tokens.forEach((token, index) =>
@@ -412,7 +429,7 @@
       yearlyHODLValueChartData.labels = yearlyLabels
       yearlyHODLValueChartData.datasets[0].data = yearlyHODLTreasuryValues
       yearlyHODLValueChartData.datasets[1].data = yearlyHODL7DayProjections
-      tempYearlyValueHashMap.set(year.toString(), yearlyHODLValueChartData)
+      tempChartDataValueHashMap.set(year.toString(), yearlyHODLValueChartData)
 
       //Assign Amount data for the year
       yearlyHODLAmountChartData.labels = yearlyLabels
@@ -421,7 +438,7 @@
         if(yearlyHODLAmountChartData.datasets[i])
           yearlyHODLAmountChartData.datasets[i].data = yearlyAmountDataLists[i]
       })
-      tempYearlyAmountHashMap.set(year.toString(), yearlyHODLAmountChartData)
+      tempChartDataAmountHashMap.set(year.toString(), yearlyHODLAmountChartData)
     }
 
     //Set Value "All" data
@@ -437,9 +454,9 @@
         tempAllAmountChartData.datasets[i].data = token.allData
     })
 
-    tempYearlyValueHashMap.set("All", tempAllValueChartData)
-    tempYearlyAmountHashMap.set("All", tempAllAmountChartData)
-    valueChartDataHashMap = tempYearlyValueHashMap
-    amountChartDataHashMap = tempYearlyAmountHashMap
+    tempChartDataValueHashMap.set("All", tempAllValueChartData)
+    tempChartDataAmountHashMap.set("All", tempAllAmountChartData)
+    valueChartDataHashMap = tempChartDataValueHashMap
+    amountChartDataHashMap = tempChartDataAmountHashMap
   }
 </script>
