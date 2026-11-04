@@ -6,15 +6,17 @@
 
 <script setup lang="ts">
   import 'maplibre-gl/dist/maplibre-gl.css'
+  import 'maplibre-gl'
   import { watch, onMounted, onUnmounted } from 'vue'
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
-  import * as maplibregl from 'maplibre-gl'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { isProduction } from '/src/assets/helperFunctions/browserHelper.ts'
 
   const props = defineProps(['zoomLat', 'zoomLong', 'stateHospitalList'])
   const emits = defineEmits(['hospitalSelect'])
+
+  const maplibregl = (window as any).maplibregl
 
   var map: maplibregl.Map 
   var style: string
@@ -27,9 +29,9 @@
   onMounted(() => 
   {
     if(localStorage.getItem("userTheme") === "darkTheme")
-      style = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json" //"https://tiles.openfreemap.org/styles/dark"
+      style = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"//"https://tiles.openfreemap.org/styles/dark"// 
     else
-      style = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" //"https://tiles.openfreemap.org/styles/bright"
+      style = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json" //"https://tiles.openfreemap.org/styles/bright"//
 
     //setupMap("https://demotiles.maplibre.org/style.json")
     setupMap(style)
