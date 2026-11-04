@@ -6,17 +6,14 @@
 
 <script setup lang="ts">
   import 'maplibre-gl/dist/maplibre-gl.css'
-  import 'maplibre-gl'
   import { watch, onMounted, onUnmounted } from 'vue'
   import { mapSelection } from '/src/assets/globalStates/MapSelection.vue'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
   import { HospitalTypes } from '/src/types/HospitalTypes.ts'
   import { isProduction } from '/src/assets/helperFunctions/browserHelper.ts'
-
+  import * as maplibregl from 'maplibre-gl'
   const props = defineProps(['zoomLat', 'zoomLong', 'stateHospitalList'])
   const emits = defineEmits(['hospitalSelect'])
-
-  const maplibregl = (window as any).maplibregl
 
   var map: maplibregl.Map 
   var style: string
@@ -69,7 +66,7 @@
   function setupMap(style:string)
   {
     if(isProduction())
-      maplibregl.config.WORKER_URL = "https://unpkg.com/maplibre-gl@6.10.0/dist/maplibre-gl-worker.mjs"
+      maplibregl.config.WORKER_URL = "https://unpkg.com/maplibre-gl@6.16.0/dist/maplibre-gl-worker.mjs"
 
     map = new maplibregl.Map(
     {
@@ -85,10 +82,10 @@
     //This seeemed to be necessary on older version of map libre when resizing the map, but doesn't seem necessary anymore
     //Also there was an issue with the map not being responsive at all with the newer version when clicking on it
     //But removing this fixed it
-    map.on('idle',function()
+    /*map.on('idle',function()
     {
       map.resize()
-    })
+    })*/
   }
 
   function updateMarkersOnMap()
