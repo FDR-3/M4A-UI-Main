@@ -591,7 +591,7 @@
       setTimeout(() => 
       {
         document.getElementById(props.id)?.scrollIntoView() // Revert to the initial value
-      }, 20) // 2000 milliseconds = 2 seconds
+      }, 20) // 20 milliseconds = 0.02 seconds
     }
   }
 

@@ -748,6 +748,13 @@
     const tokenFrontEndProperties = tokenReserveFontEndInfoHashMap.get(selectedTokenId)
     subMarketTokenSVG.value = tokenFrontEndProperties.svg
     subMarketTokenName.value = tokenFrontEndProperties.name
+
+    setTimeout(() => 
+    {
+      document.getElementById("tokenReserveSubMarketsTable")?.scrollIntoView({ //Scroll to top of the table
+        behavior: 'smooth', 
+        block: 'start' })
+    }, 10) // 10 milliseconds = 0.01 seconds
   }
 
   function unShowSubMarkets()

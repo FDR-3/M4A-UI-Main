@@ -392,6 +392,13 @@
     subMarketOwnerDisplayName.value = subMarketOwner.displayName
 
     showOwnerSubMarkets.value = true
+
+    setTimeout(() => 
+    {
+      document.getElementById("submarketOwnersInnerTable")?.scrollIntoView({ //Scroll to top of the table
+        behavior: 'smooth', 
+        block: 'start' })
+    }, 400) // 400 milliseconds = 0.4 seconds
   }
 
   function closeOwnerSubMarkets()
