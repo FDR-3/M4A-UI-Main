@@ -1025,7 +1025,7 @@
   {
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
-    const currentMonth = newDate.getMonth() + 2
+    const currentMonth = newDate.getMonth() + 1
     var tempHashMap = new Map<string, any>()
     userTotalValueChartDataHashMap.value = new Map<string, any>()
 
