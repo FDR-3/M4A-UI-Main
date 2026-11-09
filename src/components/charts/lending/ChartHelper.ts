@@ -460,6 +460,46 @@ export function setPurpleBlueBarAnimatedGradient(ctx: any, chartArea:any, gradie
   return gradient
 }
 
+export function setDepositLineAnimatedGradient(ctx: any, chartArea:any, gradientOffset: number)
+{
+  if(!chartArea)
+    return
+
+  const gradient = createWidthGradient(ctx, chartArea, gradientOffset)
+
+  //Two full cycles of the USDC colors
+  gradient.addColorStop(0.00, '#39bd39')
+  gradient.addColorStop(0.20, '#39bd39')
+  gradient.addColorStop(0.25, '#fff')
+  gradient.addColorStop(0.30, '#39bd39')
+  gradient.addColorStop(0.70, '#39bd39')
+  gradient.addColorStop(0.75, '#fff')
+  gradient.addColorStop(0.80, '#39bd39')
+  gradient.addColorStop(1.00, '#39bd39')
+
+  return gradient
+}
+
+export function setBorrowLineAnimatedGradient(ctx: any, chartArea:any, gradientOffset: number)
+{
+  if(!chartArea)
+    return
+
+  const gradient = createWidthGradient(ctx, chartArea, gradientOffset)
+
+  //Two full cycles of the USDC colors
+  gradient.addColorStop(0.00, '#557fcc')
+  gradient.addColorStop(0.20, '#557fcc')
+  gradient.addColorStop(0.25, '#fff')
+  gradient.addColorStop(0.30, '#557fcc')
+  gradient.addColorStop(0.70, '#557fcc')
+  gradient.addColorStop(0.75, '#fff')
+  gradient.addColorStop(0.80, '#557fcc')
+  gradient.addColorStop(1.00, '#557fcc')
+
+  return gradient
+}
+
 export function setUSDSLineAnimatedGradient(ctx: any, chartArea:any, gradientOffset: number)
 {
   if(!chartArea)

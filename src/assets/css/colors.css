@@ -107,6 +107,11 @@
   --ion-color-base: var(--ion-color-off-light-dark)
 }
 
+.offLightDark
+{
+  color: light-dark(var(--ion-color-off-white), var(--ion-color-black));
+}
+
 a
 {
   text-decoration:none;

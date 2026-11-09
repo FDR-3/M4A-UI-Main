@@ -83,6 +83,20 @@
   animation: yAnimation 1.8s linear infinite
 }
 
+.animatedDepositValueX
+{
+  background: repeating-linear-gradient(90deg, #39bd39 0%, #fff 16%, #39bd39 33%, #39bd39 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
+.animatedBorrowValueX
+{
+  background: repeating-linear-gradient(90deg, #557fcc 0%, #fff 16%, #557fcc 33%, #557fcc 50.0%);
+  background-size: 150% auto;
+  animation: xAnimation 1.8s linear infinite
+}
+
 .animatedUSDSX
 {
   background: repeating-linear-gradient(90deg, #ff6d6d 0%, #ffd232 16%, #ffd232 33%, #ff6d6d 50.0%);

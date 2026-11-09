@@ -1,0 +1,16 @@
+.depositText 
+{
+  background: repeating-linear-gradient(90deg, #39bd39 0%, #39bd39 16%, #fff 33%, #39bd39 50.0%);
+  background-size: 150% auto;
+  background-clip: text;
+  color: transparent;
+  animation: depositAnimation 1.8s linear infinite
+}
+
+@keyframes depositAnimation 
+{
+  to 
+  {
+    background-position: 150% center
+  }
+}

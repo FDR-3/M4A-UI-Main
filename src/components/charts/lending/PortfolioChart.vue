@@ -24,23 +24,45 @@
           <ion-text>Borrow APY: {{ borrowAPY }}%</ion-text>
         </div>
 
-        <ion-text>Balance:
-          <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
-            minimumFractionDigits: decimalAmount,
-            maximumFractionDigits: decimalAmount }) }}
-          </span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span>
-        </ion-text>
-        <ion-text class="smallMarginBottom">Debt:
-          <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
-            minimumFractionDigits: decimalAmount,
-            maximumFractionDigits: decimalAmount }) }}
-          </span> Value: $<span class="poopText"> {{ debtValueString }} </span>
-        </ion-text>
+        <div v-if="showValues" class="flexCenterColumn">
+          <ion-text>Total:
+            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="rainbowText"> {{ totalValueString }} </span>
+          </ion-text>
+          <ion-text>Deposit:
+            <span class="depositText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="depositText"> {{ balanceValueString }} </span>
+          </ion-text>
+          <ion-text class="smallMarginBottom">Borrow:
+            <span class="borrowText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="borrowText"> {{ debtValueString }} </span>
+          </ion-text>
+        </div>
+        <div v-else class="flexCenterColumn">
+          <ion-text>Balance:
+            <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span>
+          </ion-text>
+          <ion-text class="smallMarginBottom">Debt:
+            <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="poopText"> {{ debtValueString }} </span>
+          </ion-text>
+        </div>
 
-        <ion-label >Last Action: {{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount?.toLocaleString('en-US', {
+        <ion-label >Last Action: {{ activityDescriptions[amountChartData?.lastActionType] + ' ' + amountChartData?.lastActionAmount?.toLocaleString('en-US', {
             minimumFractionDigits: decimalAmount,
             maximumFractionDigits: decimalAmount }) + ' ' + tokenName}}
-          <br>{{ convertUnixTimeToLocalDate(chartData?.lastActionTimeStamp) + ' ' + convertUnixTimeToLocalTime(chartData?.lastActionTimeStamp)}}
+          <br>{{ convertUnixTimeToLocalDate(amountChartData?.lastActionTimeStamp) + ' ' + convertUnixTimeToLocalTime(amountChartData?.lastActionTimeStamp)}}
         </ion-label>
 
         <div class="flexCenterRow">
@@ -56,13 +78,7 @@
           @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, chartSelect); resetHiddenArray()">
           </Select>
 
-          <div v-if="ownerAddress==connectedWallet.addressString">
-            <ion-button v-if="!hasDeposits" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-            $emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption)">
-              <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
-            </ion-button>
-            <ion-button v-else fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
-          </div>
+          <ion-button fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
         </div>
       </div>
 
@@ -88,39 +104,89 @@
       <ion-text>Borrow APY: {{ borrowAPY }}%</ion-text>
 
       <div class="unStackedBalanceDebt">
-        <br><ion-text>Balance:
-          <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
-            minimumFractionDigits: decimalAmount,
-            maximumFractionDigits: decimalAmount }) }}
-          </span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br>
-        <ion-text class="smallMarginBottom">Debt:
-          <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
-            minimumFractionDigits: decimalAmount,
-            maximumFractionDigits: decimalAmount }) }}
-          </span> Value: $<span class="poopText"> {{ debtValueString }} </span>
-        </ion-text>
+        <br>
+        <div v-if="showValues" class="flexCenterColumn">
+          <ion-text>Total:
+            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="rainbowText"> {{ totalValueString }} </span>
+          </ion-text>
+          <ion-text>Deposit:
+            <span class="depositText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="depositText"> {{ balanceValueString }} </span>
+          </ion-text>
+          <ion-text class="smallMarginBottom">Borrow:
+            <span class="borrowText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="borrowText"> {{ debtValueString }} </span>
+          </ion-text>
+        </div>
+        <div v-else class="flexCenterColumn">
+          <ion-text>Balance:
+            <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="rainbowText"> {{ balanceValueString }} </span>
+          </ion-text>
+          <ion-text class="smallMarginBottom">Debt:
+            <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="poopText"> {{ debtValueString }} </span>
+          </ion-text>
+        </div>
       </div>
 
       <div class="stackedBalanceDebt">
-        <br><ion-text>Balance:
-          <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
-            minimumFractionDigits: decimalAmount,
-            maximumFractionDigits: decimalAmount }) }}
-          </span>
-        <br>Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br><br>
-        <ion-text class="smallMarginBottom">Debt:
-          <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
-            minimumFractionDigits: decimalAmount,
-            maximumFractionDigits: decimalAmount }) }}
-          </span>
-        <br>Value: $<span class="poopText"> {{ debtValueString }} </span></ion-text>
+        <br>
+        <div v-if="showValues" class="flexCenterColumn">
+          <ion-text>Total:
+            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span>
+            <br>Value: $<span class="rainbowText"> {{ totalValueString }} </span>
+          </ion-text>
+          <ion-text>Deposit:
+            <span class="depositText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span>
+            <br>Value: $<span class="depositText"> {{ balanceValueString }} </span>
+          </ion-text>
+          <ion-text class="smallMarginBottom">Borrow:
+            <span class="borrowText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span>
+            <br>Value: $<span class="borrowText"> {{ debtValueString }} </span>
+          </ion-text>
+        </div>
+        <div v-else class="">
+          <ion-text>Balance:
+            <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span>
+          <br>Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br><br>
+          <ion-text class="smallMarginBottom">Debt:
+            <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span>
+          <br>Value: $<span class="poopText"> {{ debtValueString }} </span></ion-text>
+        </div>
       </div>
 
       <div class="mediumSmallMarginTop">
-        <ion-label>Last Action: <br>{{ activityDescriptions[chartData?.lastActionType] + ' ' + chartData?.lastActionAmount?.toLocaleString('en-US', {
+        <ion-label>Last Action: <br>{{ activityDescriptions[amountChartData?.lastActionType] + ' ' + amountChartData?.lastActionAmount?.toLocaleString('en-US', {
             minimumFractionDigits: decimalAmount,
             maximumFractionDigits: decimalAmount }) + ' ' + tokenName}}
-          <br>{{ convertUnixTimeToLocalTime(chartData?.lastActionTimeStamp) }}<br>{{ convertUnixTimeToLocalDate(chartData?.lastActionTimeStamp) }}
+          <br>{{ convertUnixTimeToLocalTime(amountChartData?.lastActionTimeStamp) }}<br>{{ convertUnixTimeToLocalDate(amountChartData?.lastActionTimeStamp) }}
         </ion-label>
       </div>
       
@@ -147,100 +213,48 @@
         appendTo="self"
         @change="$emit('changeYear', tokenId, subMarketOwnerAddress, subMarketIndex, chartSelect)">
         </Select>
-        <div v-if="ownerAddress==connectedWallet.addressString" class="nSmallMarginTop">
-          <ion-button v-if="!hasDeposits" class="lendingActionButton" fill="clear" @click="$emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption)">
-            <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
-          </ion-button>
-          <ion-button v-else fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
-        </div>
+
+        <ion-button fill="clear" @click="openActionsPopover"><ion-label color="dark">Actions</ion-label></ion-button>
       </div>
     </div>
 
     <div class="normalChartLegend">
-      <!--Render First 5 Legend Items-->
-      <div class="flexCenterRow" style="gap: 10px">
-        <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(0, 5)" 
-        :key="index" 
-        class="legendItem"
-        @click="toggleDataset(index, chartRef, legenHiddenArray)"
-        >
+      <!--Values Legend-->
+      <div v-if="showValues">
+        <div class="flexCenterRow" style="gap: 10px">
           <div 
-            v-if="dataset.label=='Fees Generated'" 
-            class="swatch animatedPurpleBlueY">
-          </div>
-          <div 
-            v-else-if="dataset.label=='Balance'" 
-            class="swatch animatedRainbowX">
-          </div>
-          <div 
-            v-else-if="dataset.label=='Interest Earned'" 
-            class="swatch animatedRainbowY">
-          </div>
-          <div 
-            v-else-if="dataset.label=='Debt'" 
-            class="swatch animatedPoopX">
-          </div>
-          <div 
-            v-else="dataset.label=='Interest Accrued'" 
-            class="swatch animatedPoopY">
-          </div>
-          <span 
-            class="legendLabel" 
-            :class="{'hiddenLabel': legenHiddenArray[index] }"
+          v-for="(dataset, index) in valueChartData?.datasets" 
+          :key="index" 
+          class="legendItem"
+          @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
-            <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
-          </span>
+            <div 
+              v-if="dataset.label=='Total Value'" 
+              class="swatch animatedRainbowX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Deposit Value'" 
+              class="swatch animatedDepositValueX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Borrow Value'" 
+              class="swatch animatedBorrowValueX">
+            </div>
+            <span 
+              class="legendLabel" 
+              :class="{'hiddenLabel': legenHiddenArray[index] }"
+            >
+              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+            </span>
+          </div>
         </div>
       </div>
-      <!--Render Next 4 Legend Items, Skipping First 5-->
-      <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
-        <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(5, 9)" 
-        :key="index + 5" 
-        class="legendItem"
-        @click="toggleDataset(index+5, chartRef, legenHiddenArray)"
-        >
+      <!--Amounts Legend-->
+      <div v-else>
+        <!--Render First 5 Legend Items-->
+        <div class="flexCenterRow" style="gap: 10px">
           <div 
-            class="swatch" 
-            :style="{ backgroundColor: dataset.backgroundColor }">
-          </div>
-      
-          <span 
-            class="legendLabel" 
-            :class="{'hiddenLabel': legenHiddenArray[index+5] }"
-          >
-            <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
-          </span>
-        </div>
-      </div>
-      <!--Render Remaining Legend Items, Skipping First 8-->
-      <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
-        <div 
-        v-for="(dataset, index) in chartData?.datasets.slice(9)" 
-        :key="index + 9" 
-        class="legendItem"
-        @click="toggleDataset(index+9, chartRef, legenHiddenArray)"
-        >  
-          <div 
-            class="swatch" 
-            :style="{ backgroundColor: dataset.backgroundColor }">
-          </div>
-          <span 
-            class="legendLabel" 
-            :class="{'hiddenLabel': legenHiddenArray[index+9] }"
-          >
-            <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <div class="mobileChartLegend">
-      <div class="flexCenterColumn">
-        <div class="chartLegend">
-          <div 
-          v-for="(dataset, index) in chartData?.datasets" 
+          v-for="(dataset, index) in amountChartData?.datasets.slice(0, 5)" 
           :key="index" 
           class="legendItem"
           @click="toggleDataset(index, chartRef, legenHiddenArray)"
@@ -262,13 +276,82 @@
               class="swatch animatedPoopX">
             </div>
             <div 
-              v-else-if="dataset.label=='Interest Accrued'" 
+              v-else="dataset.label=='Interest Accrued'" 
               class="swatch animatedPoopY">
             </div>
+            <span 
+              class="legendLabel" 
+              :class="{'hiddenLabel': legenHiddenArray[index] }"
+            >
+              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+            </span>
+          </div>
+        </div>
+        <!--Render Next 4 Legend Items, Skipping First 5-->
+        <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
+          <div 
+          v-for="(dataset, index) in amountChartData?.datasets.slice(5, 9)" 
+          :key="index + 5" 
+          class="legendItem"
+          @click="toggleDataset(index+5, chartRef, legenHiddenArray)"
+          >
             <div 
-              v-else 
               class="swatch" 
               :style="{ backgroundColor: dataset.backgroundColor }">
+            </div>
+        
+            <span 
+              class="legendLabel" 
+              :class="{'hiddenLabel': legenHiddenArray[index+5] }"
+            >
+              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+            </span>
+          </div>
+        </div>
+        <!--Render Remaining Legend Items, Skipping First 8-->
+        <div class="flexCenterRow tinyMarginTop" style="gap: 10px">
+          <div 
+          v-for="(dataset, index) in amountChartData?.datasets.slice(9)" 
+          :key="index + 9" 
+          class="legendItem"
+          @click="toggleDataset(index+9, chartRef, legenHiddenArray)"
+          >  
+            <div 
+              class="swatch" 
+              :style="{ backgroundColor: dataset.backgroundColor }">
+            </div>
+            <span 
+              class="legendLabel" 
+              :class="{'hiddenLabel': legenHiddenArray[index+9] }"
+            >
+              <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobileChartLegend">
+      <!--Values Legend-->
+      <div v-if="showValues">
+        <div class="flexCenterColumn">
+          <div 
+          v-for="(dataset, index) in valueChartData?.datasets" 
+          :key="index" 
+          class="legendItem"
+          @click="toggleDataset(index, chartRef, legenHiddenArray)"
+          >
+            <div 
+              v-if="dataset.label=='Total Value'" 
+              class="swatch animatedRainbowX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Deposit Value'" 
+              class="swatch animatedDepositValueX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Borrow Value'" 
+              class="swatch animatedBorrowValueX">
             </div>
             <span 
               class="legendLabel" 
@@ -279,10 +362,56 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="card">
-      <Chart type="line" ref="chartRef" :data="chartData" :options="chartOptions"/>
+      <!--Amounts Legend-->
+      <div v-else>
+        <div class="flexCenterColumn">
+          <div class="chartLegend">
+            <div 
+            v-for="(dataset, index) in amountChartData?.datasets" 
+            :key="index" 
+            class="legendItem"
+            @click="toggleDataset(index, chartRef, legenHiddenArray)"
+            >
+              <div 
+                v-if="dataset.label=='Fees Generated'" 
+                class="swatch animatedPurpleBlueY">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Balance'" 
+                class="swatch animatedRainbowX">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Interest Earned'" 
+                class="swatch animatedRainbowY">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Debt'" 
+                class="swatch animatedPoopX">
+              </div>
+              <div 
+                v-else-if="dataset.label=='Interest Accrued'" 
+                class="swatch animatedPoopY">
+              </div>
+              <div 
+                v-else 
+                class="swatch" 
+                :style="{ backgroundColor: dataset.backgroundColor }">
+              </div>
+              <span 
+                class="legendLabel" 
+                :class="{'hiddenLabel': legenHiddenArray[index] }"
+              >
+                <ion-label color="dark" style="margin-left: -6px; letter-spacing: -1px">{{ dataset.label }}</ion-label>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div ref="chartContainer">
+      <Chart v-if="showValues" type="line" ref="chartRef" :width="chartWidth" :data="valueChartData" :options="valueChartOptions"/>
+      <Chart v-else type="line" ref="chartRef" :width="chartWidth" :data="amountChartData" :options="amountChartOptions"/>
     </div>
   </div>
 
@@ -306,30 +435,36 @@
   alignment="center"
   >
     <div class=" flexCenterColumn lendingActionPopoverContainer">
-      <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-      $emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
-        <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
+      <ion-button class="toggleButton smallMarginLeft" fill="clear" @click="handleShowValues()">
+        <ion-label v-if="showValues" color="dark">Toggle Amounts</ion-label>
+        <ion-label v-else color="dark">Toggle Values</ion-label>
       </ion-button>
-      <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-      $emit('openWithdrawalModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
-        <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
-      </ion-button>
-      <ion-button v-if="(connectedWallet.addressString!=adminAccounts.hodlTreasuryAddress.toString() &&
-      connectedWallet.addressString!=adminAccounts.singlePayerTreasuryAddress.toString())"
-      class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-      $emit('openBorrowModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
-        <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
-      </ion-button>
-      <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
-      $emit('openRepayModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
-        <ion-label class="noClickEvent" color="dark">Repay</ion-label>
-      </ion-button>
+      <div v-if="ownerAddress==connectedWallet.addressString">
+        <ion-button class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+        $emit('openDepositModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
+          <ion-label class="noClickEvent" color="dark">Deposit</ion-label>
+        </ion-button>
+        <ion-button v-if="userCalculatedBalance" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+        $emit('openWithdrawalModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
+          <ion-label class="noClickEvent" color="dark">Withdraw</ion-label>
+        </ion-button>
+        <ion-button v-if="(connectedWallet.addressString!=adminAccounts.hodlTreasuryAddress.toString() &&
+        connectedWallet.addressString!=adminAccounts.singlePayerTreasuryAddress.toString())"
+        class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+        $emit('openBorrowModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
+          <ion-label class="noClickEvent" color="dark">Borrow</ion-label>
+        </ion-button>
+        <ion-button v-if="userCalculatedDebt" class="lendingActionButton" fill="clear" @click="updateStoredSelectedSubMarketIndex();
+        $emit('openRepayModal', tokenId, tokenMintAddressString, subMarketSelectOption); actionsPopoverOpen=false">
+          <ion-label class="noClickEvent" color="dark">Repay</ion-label>
+        </ion-button>
+      </div>
     </div>
   </ion-popover>
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onUnmounted, watch } from 'vue'
+  import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
   import { IonButton, IonLabel, IonPopover, IonText } from '@ionic/vue'
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
@@ -347,6 +482,7 @@
   import { adminAccounts } from '/src/assets/globalStates/AdminAccounts.vue'
   import { setChartOptions, toggleDataset } from './ChartHelper'
   import cloneDeep from 'lodash/cloneDeep'
+  import { sleep } from '/src/assets/helperFunctions/sleep.ts'
   import './Chart.css'
   
   const props = defineProps(
@@ -361,13 +497,15 @@
     'accountIndex',
     'subMarketFee',
     'userTabIndex',
-    'chartData',
+    'valueChartData',
+    'amountChartData',
     'selectedChart'
   ])
 
   const emits = defineEmits(['interestEarned', 'changeYear', 'openDepositModal', 'openWithdrawalModal', 'openBorrowModal', 'openRepayModal'])
 
-  var chartOptions = ref()
+  var valueChartOptions = ref()
+  var amountChartOptions = ref()
   var chartRef = ref<any>(null)
   var legenHiddenArray = ref([false, false, false])
   var chartTextColor = ref(darkTheme.value ? "#ffffff" : "#000000")
@@ -382,7 +520,7 @@
   var tokenName = ref()
   var tokenSVG = ref()
 
-  var chartSelect = ref()
+  var chartSelect = ref("All")
   var yearList = ref()
 
   var subMarketSelectOption: any[] = []
@@ -393,6 +531,8 @@
   var tokenMintAddressString: string
   var decimalAmount: number
   var lendingUserTabAccount: any
+  var userCalculatedTotal = computed(() => userCalculatedBalance.value - userCalculatedDebt.value)
+  var totalValueString = ref()
   var userOriginalBalance = 0
   var userCalculatedBalance = ref(0)
   var balanceValueString = ref()
@@ -404,7 +544,10 @@
   var userOriginalDebt = ref()
   var userCalculatedDebt = ref(0)
   var debtValueString = ref()
- 
+  var chartContainer = ref<any>(null)
+  var chartWidth = ref(0)
+  var showValues = ref(true)
+
   var activityDescriptions =
   [
     "Deposited",
@@ -447,11 +590,16 @@
 
     chartSelect.value = props.selectedChart
 
-    chartOptions.value = setChartOptions(true, chartTextColor.value)
+    valueChartOptions.value = setChartOptions(false, chartTextColor.value, true)
+    amountChartOptions.value = setChartOptions(true, chartTextColor.value)
+    updateChartWidth() 
     startGradientAnimation()
+    //await sleep(100)
+    valueChartOptions.value.responsive = true
+    amountChartOptions.value.responsive = true
     
-    if(props.chartData && props.chartData.datasets)
-      legenHiddenArray.value = props.chartData.datasets.map((dataset: any) => dataset.hidden)
+    if(props.amountChartData && props.amountChartData.datasets)
+      legenHiddenArray.value = props.amountChartData.datasets.map((dataset: any) => dataset.hidden)
   })
 
   onUnmounted(() =>
@@ -475,7 +623,8 @@
     else
       chartTextColor.value = "#000000"
 
-    chartOptions.value = setChartOptions(true, chartTextColor.value)
+    valueChartOptions.value = setChartOptions(false, chartTextColor.value, true)
+    amountChartOptions.value = setChartOptions(true, chartTextColor.value)
   })
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
@@ -497,7 +646,7 @@
     yearList.value = getYearList()
     chartSelect.value = "All"
 
-    legenHiddenArray.value = props.chartData.datasets.map((dataset: any) => dataset.hidden)
+    legenHiddenArray.value = props.amountChartData.datasets.map((dataset: any) => dataset.hidden)
 
     //Updates the subMarket Option that's sent to the lending popup
     const subMarket = subMarketsHashMap.map.get(props.tokenId + props.subMarketOwnerAddress + props.subMarketIndex)
@@ -704,49 +853,76 @@
     const price = priceObjectMap.data[tokenMintAddressString].usdPrice
     if(price)
     {
-      var flooredValue = Math.floor(userCalculatedBalance.value * Number(price) * 100) / 100
-      balanceValueString.value = flooredValue.toLocaleString('en-US', {
+      const roundToCents = (value: number) => Number((Math.round((value + Number.EPSILON) * 100) / 100).toFixed(2))
+
+      const liveBalanceValue = roundToCents(userCalculatedBalance.value * Number(price))
+      const liveDebtValue = roundToCents(userCalculatedDebt.value * Number(price))
+      const liveTotalValue = roundToCents((userCalculatedBalance.value - userCalculatedDebt.value) * Number(price))
+
+      totalValueString.value = liveTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      flooredValue = Math.floor(userCalculatedDebt.value * Number(price) * 100) / 100
-      debtValueString.value = flooredValue.toLocaleString('en-US', {
+      balanceValueString.value = liveBalanceValue.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2 })
+
+      debtValueString.value = liveDebtValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
       unRoundedInterestEarnedValue = calculatedUserInterestEarned.value * Number(price)
-      flooredValue = Math.floor(unRoundedInterestEarnedValue * 100) / 100
-      interestEarnedValueString.value = flooredValue.toLocaleString('en-US', {
+      const roundedInterestValue = roundToCents(unRoundedInterestEarnedValue)
+      interestEarnedValueString.value = roundedInterestValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
       unRoundedSevenDayInterestEarnedValue = sevenDayCalculatedUserInterestEarned.value * Number(price)
-      flooredValue = Math.floor(unRoundedSevenDayInterestEarnedValue * 100) / 100
-      sevenDayInterestEarnedValueString.value = flooredValue.toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2 })
-    }
-    else
-    {
-      const zeroValueString = (0).toLocaleString('en-US', {
+      const roundedSevenDayInterestValue = roundToCents(unRoundedSevenDayInterestEarnedValue)
+      sevenDayInterestEarnedValueString.value = roundedSevenDayInterestValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
 
-      balanceValueString.value = zeroValueString
-      debtValueString.value = zeroValueString
-      interestEarnedValueString.value = zeroValueString
-      sevenDayInterestEarnedValueString.value = zeroValueString
-
-      unRoundedInterestEarnedValue = 0
-      unRoundedSevenDayInterestEarnedValue = 0
+      emits('interestEarned',
+      props.userTabIndex,
+      Number(sevenDayCalculatedUserInterestEarned.value.replace(/,/g, '')),
+      unRoundedSevenDayInterestEarnedValue,
+      Number(calculatedUserInterestEarned.value.replace(/,/g, '')),
+      unRoundedInterestEarnedValue,
+      props.tokenId,
+      props.subMarketOwnerAddress,
+      props.subMarketIndex,
+      liveBalanceValue,
+      liveDebtValue,
+      liveTotalValue)
+      return
     }
+
+    const zeroValueString = (0).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2 })
+
+    totalValueString.value = zeroValueString
+    balanceValueString.value = zeroValueString
+    debtValueString.value = zeroValueString
+    interestEarnedValueString.value = zeroValueString
+    sevenDayInterestEarnedValueString.value = zeroValueString
+
+    unRoundedInterestEarnedValue = 0
+    unRoundedSevenDayInterestEarnedValue = 0
 
     emits('interestEarned',
     props.userTabIndex,
     Number(sevenDayCalculatedUserInterestEarned.value.replace(/,/g, '')),
     unRoundedSevenDayInterestEarnedValue,
     Number(calculatedUserInterestEarned.value.replace(/,/g, '')),
-    unRoundedInterestEarnedValue)
+    unRoundedInterestEarnedValue,
+    props.tokenId,
+    props.subMarketOwnerAddress,
+    props.subMarketIndex,
+    0,
+    0,
+    0)
   }
 
   function startInterestCalculation()
@@ -773,6 +949,31 @@
     connectedWallet.addressString +
     connectedWallet.selectedLendingUserAccountIndex.toString() +
     "selectedMainSubMarketIndex", props.subMarketIndex)
+  }
+
+  async function handleShowValues()
+  {
+    valueChartOptions.value.responsive = false //Needed this extra step to get initial animation when swithching only in Production for some reason
+    amountChartOptions.value.responsive = false
+
+    resetHiddenArray()
+    actionsPopoverOpen.value = false
+    showValues.value =! showValues.value
+
+    await sleep(40)
+    valueChartOptions.value.responsive = true
+    amountChartOptions.value.responsive = true
+  }
+
+  function updateChartWidth() 
+  {
+    if(chartContainer.value) 
+    {
+      const currentWidth = chartContainer.value.clientWidth
+
+      if (currentWidth > 0) 
+        chartWidth.value = currentWidth
+    }
   }
 </script>
 

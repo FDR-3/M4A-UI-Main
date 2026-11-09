@@ -29,6 +29,8 @@ import '/src/assets/css/poopText.css'
 import '/src/assets/css/primeVue.css'
 import '/src/assets/css/rainbowText.css'
 import '/src/assets/css/purpleBlueText.css'
+import '/src/assets/css/depositText.css'
+import '/src/assets/css/borrowText.css'
 import '/src/assets/css/style.css'
 import '/src/assets/css/slideTransition.css'
 

@@ -15,7 +15,7 @@
 
       <div class="flexCenterRow">
         <ion-text>Vote or reply for just a</ion-text>
-        <ion-button fill="clear" style="width: 15%" class="nTinyMarginLeft" @click="giveUXWingTreeCredit()">
+        <ion-button fill="clear" style="width: 15%" @click="giveUXWingTreeCredit()">
           <Tree class="svgSize"/>
         </ion-button>
         <ion-text>+</ion-text>

@@ -227,7 +227,8 @@
         :accountIndex="accountSelect"
         :subMarketFee="monthlyStatement.subMarketFee"
         :userTabIndex="userTabIndex"
-        :chartData="monthlyStatement.chartData"
+        :valueChartData="monthlyStatement.valueChartData"
+        :amountChartData="monthlyStatement.amountChartData"
         :selectedChart="monthlyStatement.selectedChart"
         @changeYear="updateSelectedChartNameHashMap"
         @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
@@ -304,7 +305,8 @@
         :accountIndex="accountSelect"
         :subMarketFee="monthlyStatement.subMarketFee"
         :userTabIndex="userTabIndex"
-        :chartData="monthlyStatement.chartData"
+        :valueChartData="monthlyStatement.valueChartData"
+        :amountChartData="monthlyStatement.amountChartData"
         :selectedChart="monthlyStatement.selectedChart"
         @changeYear="updateSelectedChartNameHashMap"
         @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
@@ -346,8 +348,10 @@
     closeTempOraclePriceData,
     TEMP_PRICE_ACCOUNT_ALIVE_MSG,
     getLendingStatsPDA } from '/src/assets/contracts/Solana/LendingProtocol.vue'
-  import { tokenDecimalHashMap } from '/src/assets/constants/Addresses.ts'
+  import { tokenDecimalHashMap, tokenIds } from '/src/assets/constants/Addresses.ts'
+  import { priceObjectMap, tokenIdHashMap } from '/src/assets/globalStates/lending/TokenReserves.vue'
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
+  import { SOLPriceHistoryHashMap, WEthPriceHistoryHashMap, WBtcPriceHistoryHashMap } from '/src/components/charts/lending/PriceHistory.ts'
   import LendingLeaderBoardTable from '/src/components/tables/lending/LendingLeaderBoardTable.vue'
   import PortfolioChart from '/src/components/charts/lending/PortfolioChart.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
@@ -360,7 +364,9 @@
     setRainbowBarAnimatedGradient,
     setPoopLineAnimatedGradient,
     setPoopBarAnimatedGradient,
-    setPurpleBlueBarAnimatedGradient } from '/src/components/charts/lending/ChartHelper.ts'
+    setPurpleBlueBarAnimatedGradient,
+    setDepositLineAnimatedGradient,
+    setBorrowLineAnimatedGradient } from '/src/components/charts/lending/ChartHelper.ts'
   import * as bs58 from 'bs58'
   
   const toast = inject('toast')
@@ -418,6 +424,7 @@
   var cryptoLifeTimeInterestEarnedValueUnRounded = ref(0)
 
   var gradientOffset = ref(0)
+  var previousMonthDataMissing = false
 
   const refreshAccountMSG = "This will create new monthly statements if they need to be created and update user Balance/Debt and Interest Earned/Accrued.\n\nFor tax purposes, interest is not considered Earned/Accrued until it appears in your monthly statement."
 
@@ -447,7 +454,13 @@
         ...monthlyStatement,
         
         //Calculate these ONCE per reactivity cycle, not on every template render
-        chartData: getChartData
+        amountChartData: getAmountChartData
+        (
+          monthlyStatement.tokenId, 
+          monthlyStatement.subMarketOwnerAddress, 
+          monthlyStatement.subMarketIndex
+        ),
+        valueChartData: getValueChartData
         (
           monthlyStatement.tokenId, 
           monthlyStatement.subMarketOwnerAddress, 
@@ -478,7 +491,13 @@
         ...monthlyStatement,
         
         // Calculate these ONCE per reactivity cycle, not on every template render
-        chartData: getChartData
+        amountChartData: getAmountChartData
+        (
+          monthlyStatement.tokenId, 
+          monthlyStatement.subMarketOwnerAddress, 
+          monthlyStatement.subMarketIndex
+        ),
+        valueChartData: getValueChartData
         (
           monthlyStatement.tokenId, 
           monthlyStatement.subMarketOwnerAddress, 
@@ -494,7 +513,60 @@
     })
   })
 
-  const baseChartData =
+  const baseValueChartData =
+  {
+    lastActionType: 0,
+    lastActionAmount: 0,
+    lastActionTimeStamp: 0,
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    datasets:
+    [
+      {
+        type: 'line',
+        label: 'Total Value',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setRainbowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Deposit Value',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setDepositLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Borrow Value',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setBorrowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      }
+    ]
+  }
+
+  const baseAmountChartData =
   {
     lastActionType: 0,
     lastActionAmount: 0,
@@ -632,7 +704,14 @@
     ]
   }
 
-  enum ChartIndex
+  enum ValueChartIndex
+  {
+    TotalValue = 0,
+    DepositValue = 1,
+    BorrowValue = 2
+  }
+
+  enum AmountChartIndex
   {
     FeesGenerated = 0,
     Balances = 1,
@@ -822,6 +901,31 @@
     startGradientAnimation()
   })
 
+  function getTokenHistoricPrice(tokenId: number, month: number, year: number)
+  {
+    const monthKey = month.toString() + '-' + year.toString()
+
+    let price = 0
+
+    switch(tokenId)
+    {
+      case tokenIds.solTokenId:
+        price = SOLPriceHistoryHashMap.get(monthKey) ?? Number(priceObjectMap.data?.[tokenIdHashMap.map.get(tokenId)]?.usdPrice ?? 0)
+        break
+      case tokenIds.wethTokenId:
+        price = WEthPriceHistoryHashMap.get(monthKey) ?? Number(priceObjectMap.data?.[tokenIdHashMap.map.get(tokenId)]?.usdPrice ?? 0)
+        break
+      case tokenIds.wbtcTokenId:
+        price = WBtcPriceHistoryHashMap.get(monthKey) ?? Number(priceObjectMap.data?.[tokenIdHashMap.map.get(tokenId)]?.usdPrice ?? 0)
+        break
+      default:
+        price = 1
+        break
+    }
+
+    return price
+  }
+
   watch(customUserNameHashMap,() =>
   {
     displayName.value = getUserDisplayName(searchAddress.value)
@@ -866,6 +970,48 @@
       searchAddress.value == adminAccounts.hodlTreasuryAddress.toString() ||
       searchAddress.value == adminAccounts.solvencyTreasuryAddress.toString()
 
+    function getTokenHistoricPrice(tokenId: number, month: number, year: number)
+    {
+      const monthKey = month.toString() + '-' + year.toString()
+
+      let price = 0
+
+      switch(tokenId)
+      {
+        case tokenIds.solTokenId:
+          price = SOLPriceHistoryHashMap.get(monthKey) ?? Number(priceObjectMap.data?.[tokenIdHashMap.map.get(tokenId)]?.usdPrice ?? 0)
+          break
+        case tokenIds.wethTokenId:
+          price = WEthPriceHistoryHashMap.get(monthKey) ?? Number(priceObjectMap.data?.[tokenIdHashMap.map.get(tokenId)]?.usdPrice ?? 0)
+          break
+        case tokenIds.wbtcTokenId:
+          price = WBtcPriceHistoryHashMap.get(monthKey) ?? Number(priceObjectMap.data?.[tokenIdHashMap.map.get(tokenId)]?.usdPrice ?? 0)
+          break
+        default:
+          price = 1
+          break
+      }
+      
+      return price
+    }
+
+    function hasHistoricPriceDataForMonth(tokenId: number, month: number, year: number)
+    {
+      const monthKey = month.toString() + '-' + year.toString()
+
+      switch(tokenId)
+      {
+        case tokenIds.solTokenId:
+          return SOLPriceHistoryHashMap.has(monthKey)
+        case tokenIds.wethTokenId:
+          return WEthPriceHistoryHashMap.has(monthKey)
+        case tokenIds.wbtcTokenId:
+          return WBtcPriceHistoryHashMap.has(monthKey)
+        default:
+          return true
+      }
+    }
+
     function processStatementList(statementList: any, availableYearsHashMap: any)
     {
       if(statementList.value)
@@ -905,10 +1051,13 @@
           var allCollectedLiquidationFees = []
           var allCollectedSubMarketFees = []
           var allCollectedSolvencyFees = []
+          var allTotalValues = []
+          var allDepositValues = []
+          var allBorrowValues = []
 
-          var allChartData = cloneDeep(baseChartData)
+          var allChartData = cloneDeep(baseAmountChartData)
+          var allValueChartData = cloneDeep(baseValueChartData)
           
-          //Track the first index where actual user data appears
           var firstValidDataIndex = -1 
 
           for(var year=userAvailableYearsByTokenMintAddressList[0].yearAvailable; year<=currentYear; year++)
@@ -928,10 +1077,13 @@
             var collectedLiquidationFees = []
             var collectedSubMarketFees = []
             var collectedSolvencyFees = []
+            var totalValues = []
+            var depositValues = []
+            var borrowValues = []
 
-            var yearlyChartData = cloneDeep(baseChartData)
+            var yearlyAmountChartData = cloneDeep(baseAmountChartData)
+            var yearlyValueChartData = cloneDeep(baseValueChartData)
             
-            //If current year, go up until the current month, otherwise cover the whole year
             const maxMonth = (year == currentYear) ? currentMonth : 12
 
             for(var month=1; month<=maxMonth; month++)
@@ -948,14 +1100,22 @@
               searchAddress.value +
               accountSelect.value.toString())
 
+              const decimalAmount = tokenDecimalHashMap.get(tokenId)
+              const divisor = Math.pow(10, decimalAmount)
+              const tokenPrice = getTokenHistoricPrice(tokenId, month, year)
+              const isPreviousMonthMissingPrice = !previousMonthDataMissing &&
+                year === currentYear &&
+                month === currentMonth - 1 &&
+                !hasHistoricPriceDataForMonth(tokenId, month, year)
+
+              if(isPreviousMonthMissingPrice && month === currentMonth - 1)
+                previousMonthDataMissing = true
+
               if(userMonthlyStatement)
               {
                 //If this is the first statement we've found, record its index in the "All" array
                 if(firstValidDataIndex === -1)
                   firstValidDataIndex = allLabels.length - 1
-
-                const decimalAmount = tokenDecimalHashMap.get(tokenId)
-                const divisor = Math.pow(10, decimalAmount)
 
                 lastKnownActionType = userMonthlyStatement.lastLendingActivityType
                 lastKnownActionAmount = Number(userMonthlyStatement.lastLendingActivityAmount) / divisor
@@ -969,10 +1129,14 @@
                   allChartData.lastActionAmount = lastKnownActionAmount
                   allChartData.lastActionTimeStamp = lastKnownActionTimeStamp
 
-                  yearlyChartData.lastActionType = lastKnownActionType
-                  yearlyChartData.lastActionAmount = lastKnownActionAmount
-                  yearlyChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                  yearlyAmountChartData.lastActionType = lastKnownActionType
+                  yearlyAmountChartData.lastActionAmount = lastKnownActionAmount
+                  yearlyAmountChartData.lastActionTimeStamp = lastKnownActionTimeStamp
                 }
+
+                const totalValue = Number(((previousBalance - previousDebt) * tokenPrice).toFixed(2))
+                const depositValue = Number((previousBalance * tokenPrice).toFixed(2))
+                const borrowValue = Number((previousDebt * tokenPrice).toFixed(2))
 
                 allFeesGenerated.push(Number(userMonthlyStatement.feesGeneratedAmount) / divisor)
                 allBalances.push(previousBalance)
@@ -988,6 +1152,9 @@
                 allCollectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / divisor)
                 allCollectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / divisor)
                 allCollectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / divisor)
+                allTotalValues.push(totalValue)
+                allDepositValues.push(depositValue)
+                allBorrowValues.push(borrowValue)
 
                 feesGenerated.push(Number(userMonthlyStatement.feesGeneratedAmount) / divisor)
                 balances.push(previousBalance)
@@ -1003,6 +1170,9 @@
                 collectedLiquidationFees.push(Number(userMonthlyStatement.monthlyLiquidationFeesCollectedAmount) / divisor)
                 collectedSubMarketFees.push(Number(userMonthlyStatement.monthlySubMarketFeesCollectedAmount) / divisor)
                 collectedSolvencyFees.push(Number(userMonthlyStatement.monthlySolvencyInsuranceFeesCollectedAmount) / divisor)
+                totalValues.push(totalValue)
+                depositValues.push(depositValue)
+                borrowValues.push(borrowValue)
               }
               else
               {
@@ -1012,10 +1182,14 @@
                   allChartData.lastActionAmount = lastKnownActionAmount
                   allChartData.lastActionTimeStamp = lastKnownActionTimeStamp
 
-                  yearlyChartData.lastActionType = lastKnownActionType
-                  yearlyChartData.lastActionAmount = lastKnownActionAmount
-                  yearlyChartData.lastActionTimeStamp = lastKnownActionTimeStamp
+                  yearlyAmountChartData.lastActionType = lastKnownActionType
+                  yearlyAmountChartData.lastActionAmount = lastKnownActionAmount
+                  yearlyAmountChartData.lastActionTimeStamp = lastKnownActionTimeStamp
                 }
+
+                const totalValue = Number(((previousBalance - previousDebt) * tokenPrice).toFixed(2))
+                const depositValue = Number((previousBalance * tokenPrice).toFixed(2))
+                const borrowValue = Number((previousDebt * tokenPrice).toFixed(2))
 
                 allFeesGenerated.push(0)
                 allBalances.push(previousBalance)
@@ -1031,6 +1205,9 @@
                 allCollectedLiquidationFees.push(0)
                 allCollectedSubMarketFees.push(0)
                 allCollectedSolvencyFees.push(0)
+                allTotalValues.push(totalValue)
+                allDepositValues.push(depositValue)
+                allBorrowValues.push(borrowValue)
 
                 feesGenerated.push(0)
                 balances.push(previousBalance)
@@ -1046,39 +1223,49 @@
                 collectedLiquidationFees.push(0)
                 collectedSubMarketFees.push(0)
                 collectedSolvencyFees.push(0)
+                totalValues.push(totalValue)
+                depositValues.push(depositValue)
+                borrowValues.push(borrowValue)
               }
             }
 
-            yearlyChartData.labels = labels
-            yearlyChartData.datasets[ChartIndex.FeesGenerated].data = feesGenerated
-            yearlyChartData.datasets[ChartIndex.Balances].data = balances
-            yearlyChartData.datasets[ChartIndex.InterestEarned].data = earnedInterests
-            yearlyChartData.datasets[ChartIndex.Debts].data = debts
-            yearlyChartData.datasets[ChartIndex.InterestAccrued].data = accruedInterests
-            yearlyChartData.datasets[ChartIndex.Deposits].data = deposits
-            yearlyChartData.datasets[ChartIndex.Withdrawals].data = withdrawals
-            yearlyChartData.datasets[ChartIndex.Borrows].data = borrows
-            yearlyChartData.datasets[ChartIndex.Repays].data = repays
-            yearlyChartData.datasets[ChartIndex.Liquidator].data = liquidator
-            yearlyChartData.datasets[ChartIndex.Liquidated].data = liquidated
-            yearlyChartData.datasets[ChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees 
-            yearlyChartData.datasets[ChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
-            yearlyChartData.datasets[ChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
+            yearlyAmountChartData.labels = labels
+            yearlyAmountChartData.datasets[AmountChartIndex.FeesGenerated].data = feesGenerated
+            yearlyAmountChartData.datasets[AmountChartIndex.Balances].data = balances
+            yearlyAmountChartData.datasets[AmountChartIndex.InterestEarned].data = earnedInterests
+            yearlyAmountChartData.datasets[AmountChartIndex.Debts].data = debts
+            yearlyAmountChartData.datasets[AmountChartIndex.InterestAccrued].data = accruedInterests
+            yearlyAmountChartData.datasets[AmountChartIndex.Deposits].data = deposits
+            yearlyAmountChartData.datasets[AmountChartIndex.Withdrawals].data = withdrawals
+            yearlyAmountChartData.datasets[AmountChartIndex.Borrows].data = borrows
+            yearlyAmountChartData.datasets[AmountChartIndex.Repays].data = repays
+            yearlyAmountChartData.datasets[AmountChartIndex.Liquidator].data = liquidator
+            yearlyAmountChartData.datasets[AmountChartIndex.Liquidated].data = liquidated
+            yearlyAmountChartData.datasets[AmountChartIndex.CollectedLiquidationFees].data = collectedLiquidationFees 
+            yearlyAmountChartData.datasets[AmountChartIndex.CollectedSubMarketFees].data = collectedSubMarketFees
+            yearlyAmountChartData.datasets[AmountChartIndex.CollectedSolvencyFees].data = collectedSolvencyFees
+
+            yearlyValueChartData.labels = labels
+            yearlyValueChartData.datasets[ValueChartIndex.TotalValue].data = totalValues
+            yearlyValueChartData.datasets[ValueChartIndex.DepositValue].data = depositValues
+            yearlyValueChartData.datasets[ValueChartIndex.BorrowValue].data = borrowValues
             
             if(!isTreasuryAddress)
             {
-              yearlyChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
-              yearlyChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
-              yearlyChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+              yearlyAmountChartData.datasets[AmountChartIndex.CollectedLiquidationFees].hidden = true
+              yearlyAmountChartData.datasets[AmountChartIndex.CollectedSubMarketFees].hidden = true
+              yearlyAmountChartData.datasets[AmountChartIndex.CollectedSolvencyFees].hidden = true
             }
 
-            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(), yearlyChartData)
+            tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(),
+            {
+              amountChartData: yearlyAmountChartData,
+              valueChartData: yearlyValueChartData
+            })
           }
 
-          //Slice the "All" arrays to start 1 month before the first valid entry
           if(firstValidDataIndex !== -1)
           {
-            //Math.max ensures we don't try to use a negative index if their first statement is the very first month
             const startIndex = Math.max(0, firstValidDataIndex - 1)
             
             allLabels = allLabels.slice(startIndex)
@@ -1096,32 +1283,44 @@
             allCollectedLiquidationFees = allCollectedLiquidationFees.slice(startIndex)
             allCollectedSubMarketFees = allCollectedSubMarketFees.slice(startIndex)
             allCollectedSolvencyFees = allCollectedSolvencyFees.slice(startIndex)
+            allTotalValues = allTotalValues.slice(startIndex)
+            allDepositValues = allDepositValues.slice(startIndex)
+            allBorrowValues = allBorrowValues.slice(startIndex)
           }
 
           allChartData.labels = allLabels
-          allChartData.datasets[ChartIndex.FeesGenerated].data = allFeesGenerated
-          allChartData.datasets[ChartIndex.Balances].data = allBalances
-          allChartData.datasets[ChartIndex.InterestEarned].data = allEarnedInterests
-          allChartData.datasets[ChartIndex.Debts].data = allDebts
-          allChartData.datasets[ChartIndex.InterestAccrued].data = allAccruedInterests
-          allChartData.datasets[ChartIndex.Deposits].data = allDeposits
-          allChartData.datasets[ChartIndex.Withdrawals].data = allWithdrawals
-          allChartData.datasets[ChartIndex.Borrows].data = allBorrows
-          allChartData.datasets[ChartIndex.Repays].data = allRepays
-          allChartData.datasets[ChartIndex.Liquidator].data = allLiquidator
-          allChartData.datasets[ChartIndex.Liquidated].data = allLiquidated
-          allChartData.datasets[ChartIndex.CollectedLiquidationFees].data = allCollectedLiquidationFees 
-          allChartData.datasets[ChartIndex.CollectedSubMarketFees].data = allCollectedSubMarketFees
-          allChartData.datasets[ChartIndex.CollectedSolvencyFees].data = allCollectedSolvencyFees
-          
+          allChartData.datasets[AmountChartIndex.FeesGenerated].data = allFeesGenerated
+          allChartData.datasets[AmountChartIndex.Balances].data = allBalances
+          allChartData.datasets[AmountChartIndex.InterestEarned].data = allEarnedInterests
+          allChartData.datasets[AmountChartIndex.Debts].data = allDebts
+          allChartData.datasets[AmountChartIndex.InterestAccrued].data = allAccruedInterests
+          allChartData.datasets[AmountChartIndex.Deposits].data = allDeposits
+          allChartData.datasets[AmountChartIndex.Withdrawals].data = allWithdrawals
+          allChartData.datasets[AmountChartIndex.Borrows].data = allBorrows
+          allChartData.datasets[AmountChartIndex.Repays].data = allRepays
+          allChartData.datasets[AmountChartIndex.Liquidator].data = allLiquidator
+          allChartData.datasets[AmountChartIndex.Liquidated].data = allLiquidated
+          allChartData.datasets[AmountChartIndex.CollectedLiquidationFees].data = allCollectedLiquidationFees 
+          allChartData.datasets[AmountChartIndex.CollectedSubMarketFees].data = allCollectedSubMarketFees
+          allChartData.datasets[AmountChartIndex.CollectedSolvencyFees].data = allCollectedSolvencyFees
+
+          allValueChartData.labels = allLabels
+          allValueChartData.datasets[ValueChartIndex.TotalValue].data = allTotalValues
+          allValueChartData.datasets[ValueChartIndex.DepositValue].data = allDepositValues
+          allValueChartData.datasets[ValueChartIndex.BorrowValue].data = allBorrowValues
+
           if(!isTreasuryAddress)
           {
-            allChartData.datasets[ChartIndex.CollectedLiquidationFees].hidden = true
-            allChartData.datasets[ChartIndex.CollectedSubMarketFees].hidden = true
-            allChartData.datasets[ChartIndex.CollectedSolvencyFees].hidden = true
+            allChartData.datasets[AmountChartIndex.CollectedLiquidationFees].hidden = true
+            allChartData.datasets[AmountChartIndex.CollectedSubMarketFees].hidden = true
+            allChartData.datasets[AmountChartIndex.CollectedSolvencyFees].hidden = true
           }
 
-          tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + "All", allChartData)
+          tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + "All",
+          {
+            amountChartData: allChartData,
+            valueChartData: allValueChartData
+          })
         }
     }
 
@@ -1134,9 +1333,14 @@
     selectedChartDataHashMap = tempHashMap
   }
 
-  function getChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
+  function getAmountChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
   {
-    return selectedChartDataHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + selectedChartNameHashMap.get(tokenId.toString()  + subMarketOwnerAddress + subMarketIndex.toString()))
+    return selectedChartDataHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + selectedChartNameHashMap.get(tokenId.toString()  + subMarketOwnerAddress + subMarketIndex.toString()))?.amountChartData
+  }
+
+  function getValueChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
+  {
+    return selectedChartDataHashMap.get(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + selectedChartNameHashMap.get(tokenId.toString()  + subMarketOwnerAddress + subMarketIndex.toString()))?.valueChartData
   }
 
   function getSelectedChartName(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
@@ -1333,16 +1537,68 @@
     hasDeposits.value = assetAmount
   }
 
+  function syncLiveValuePointToChart(statementList: any[] | undefined,
+  tokenId: number,
+  subMarketOwnerAddress: string,
+  subMarketIndex: number,
+  liveTotalValue: number,
+  liveBalanceValue: number,
+  liveDebtValue: number)
+  {
+    if(!statementList)
+      return
+
+    const key = tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString()
+    const selectedChart = selectedChartNameHashMap.get(key) ?? 'All'
+    const chartEntry = selectedChartDataHashMap.get(key + selectedChart)
+
+    if(!chartEntry?.valueChartData)
+      return
+
+    const datasets = chartEntry.valueChartData.datasets
+    const lastIndex = datasets[ValueChartIndex.TotalValue].data.length - 1
+
+    if(lastIndex < 0)
+      return
+
+    datasets[ValueChartIndex.TotalValue].data[lastIndex] = Number(liveTotalValue.toFixed(2))
+    datasets[ValueChartIndex.DepositValue].data[lastIndex] = Number(liveBalanceValue.toFixed(2))
+    datasets[ValueChartIndex.BorrowValue].data[lastIndex] = Number(liveDebtValue.toFixed(2))
+
+    if(previousMonthDataMissing)
+    {
+      const secondLastIndex = lastIndex - 1
+      if(secondLastIndex >= 0)
+      {
+        datasets[ValueChartIndex.TotalValue].data[secondLastIndex] = Number(liveTotalValue.toFixed(2))
+        datasets[ValueChartIndex.DepositValue].data[secondLastIndex] = Number(liveBalanceValue.toFixed(2))
+        datasets[ValueChartIndex.BorrowValue].data[secondLastIndex] = Number(liveDebtValue.toFixed(2))
+      }
+    }
+
+    chartReRenderKey.value++
+  }
+
   function updateStableCoinRealTimeValues(userTabIndex: number,
   sevenDayCalculatedUserInterestEarned: number,
   sevenDayInterestEarnedValue: number,
   calculatedUserInterestEarned: number,
-  interestEarnedValue: number)
+  interestEarnedValue: number,
+  tokenId?: number,
+  subMarketOwnerAddress?: string,
+  subMarketIndex?: number,
+  liveBalanceValue?: number,
+  liveDebtValue?: number,
+  liveTotalValue?: number)
   {
     userStableCoinInterestHelper[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
     userStableCoinInterestHelper[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
     userStableCoinInterestHelper[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned
     userStableCoinInterestHelper[userTabIndex].interestEarnedValue = interestEarnedValue
+
+    if(tokenId !== undefined && subMarketOwnerAddress !== undefined && subMarketIndex !== undefined &&
+      liveBalanceValue !== undefined && liveDebtValue !== undefined && liveTotalValue !== undefined)
+      syncLiveValuePointToChart(userMonthlyStatementStableCoinList.value, tokenId, subMarketOwnerAddress, subMarketIndex, liveTotalValue, liveBalanceValue, liveDebtValue)
 
     var highestTokenDecimalAmount = 0
     var sevenDayCalculatedUserInterestEarned = 0
@@ -1380,12 +1636,22 @@
   sevenDayCalculatedUserInterestEarned: number,
   sevenDayInterestEarnedValue: number,
   calculatedUserInterestEarned: number,
-  interestEarnedValue: number)
+  interestEarnedValue: number,
+  tokenId?: number,
+  subMarketOwnerAddress?: string,
+  subMarketIndex?: number,
+  liveBalanceValue?: number,
+  liveDebtValue?: number,
+  liveTotalValue?: number)
   {
     userCryptoCurrencyInterestHelper[userTabIndex].sevenDayCalculatedUserInterestEarned = sevenDayCalculatedUserInterestEarned
     userCryptoCurrencyInterestHelper[userTabIndex].sevenDayInterestEarnedValue = sevenDayInterestEarnedValue
     userCryptoCurrencyInterestHelper[userTabIndex].calculatedUserInterestEarned = calculatedUserInterestEarned
     userCryptoCurrencyInterestHelper[userTabIndex].interestEarnedValue = interestEarnedValue
+
+    if(tokenId !== undefined && subMarketOwnerAddress !== undefined && subMarketIndex !== undefined &&
+      liveBalanceValue !== undefined && liveDebtValue !== undefined && liveTotalValue !== undefined)
+      syncLiveValuePointToChart(userMonthlyStatementCryptoCurrencyList.value, tokenId, subMarketOwnerAddress, subMarketIndex, liveTotalValue, liveBalanceValue, liveDebtValue)
 
     var highestTokenDecimalAmount = 0
     var sevenDayCalculatedUserInterestEarned = 0
@@ -1543,13 +1809,6 @@
     font-size: min(4vw, 25px)
   }
 
-  .custom-chart-legend
-  {
-    display: flex;
-    justify-content: center;
-    gap: 20px
-  }
-
   .accountSelect
   {
     height: 38px; 
@@ -1557,51 +1816,6 @@
     max-width: 270px;
     padding-left: 15px;
     align-self: center
-  }
-
-  .legend-item
-  {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px
-  }
-
-  .swatch
-  {
-    width: 27px; /* Standard swatch width */
-    height: 12px; /* Standard swatch height */
-    margin-right: 8px;
-    border: 1px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center
-  }
-
-  .rainbowGradient
-  {
-    background: linear-gradient(to right, #14ffe9 0%, #ffc800 25%, #ff00e0 50%, #14ffe9 100%);
-    background-size: 150% auto
-  }
-
-  .animatedRainbow
-  {
-    background: repeating-linear-gradient(90deg, #14ffe9 0%, #ffc800 16%, #ff00e0 33%, #14ffe9 50.0%);
-    background-size: 150% auto;
-    animation: rainbowAnimation 1.8s linear infinite
-  }
-
-  @keyframes rainbowAnimation
-  {
-    to
-    {
-      background-position: 150% center
-    }
-  }
-
-  .hiddenLabel
-  {
-    text-decoration: line-through
   }
 
   ion-input
