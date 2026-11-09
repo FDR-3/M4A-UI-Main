@@ -104,9 +104,9 @@
 
       <HealthFactorBig :accountOwnerAddress="searchAddress" :accountIndex="accountSelect"/>
 
-      <UserTotalValueChart
+      <!--<UserTotalValueChart
         :userTotalValueChartDataHashMap="userTotalValueChartDataHashMap"
-        :previousMonthDataMissing="previousMonthDataMissing"/>
+        :previousMonthDataMissing="previousMonthDataMissing"/>-->
     </div>
 
     <div class="topVHeaderDisplay thinBorderBottom" style="justify-content:space-around !important">
@@ -167,9 +167,9 @@
       <div class="nTinyMarginTop">
         <HealthFactorBig :accountOwnerAddress="searchAddress" :accountIndex="accountSelect"/>
 
-        <UserTotalValueChart
+        <!--<UserTotalValueChart
           :userTotalValueChartDataHashMap="userTotalValueChartDataHashMap"
-          :previousMonthDataMissing="previousMonthDataMissing"/>
+          :previousMonthDataMissing="previousMonthDataMissing"/>-->
       </div>
     </div>
 
