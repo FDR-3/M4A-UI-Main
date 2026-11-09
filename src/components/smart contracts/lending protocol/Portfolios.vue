@@ -174,7 +174,7 @@
     </div>
 
     <!--Stable Coin Charts-->
-    <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay">
+    <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="hHeaderDisplay">
       <div>
         <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value:
@@ -195,11 +195,11 @@
           </span>
         </h5>
         <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
-      </div>  
+      </div>
     </div>
 
     <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="smallMarginTop vHeaderDisplay">
-      <div>
+      <div class="nMediumSmallMarginTop">
         <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value:
           $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toLocaleString('en-US', {
@@ -222,8 +222,10 @@
       </div>
     </div>
 
-    <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
-      <div v-for="(monthlyStatement, userTabIndex) in enrichedStableCoinMonthlyStatementList">
+    <div class="horizontalLine nSmallMarginTop"></div>
+
+    <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="mediumSmallMarginBottom">
+      <div v-for="(monthlyStatement, userTabIndex) in enrichedStableCoinMonthlyStatementList" class="nSmallMarginTop">
         <PortfolioChart
         :isStableCoin="true"
         :hasDeposits="hasDeposits"
@@ -244,13 +246,15 @@
         @openBorrowModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketOption)"
         @openRepayModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenId, tokenMintAddress, subMarketOption)"
         @interestEarned="updateStableCoinRealTimeValues"/>
+
+         <div class="horizontalLine"></div>
       </div>
     </div>
 
     <!--Crypto Charts-->
-    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="smallMarginTop nLargeMarginBottom hHeaderDisplay" :class="userMonthlyStatementStableCoinList?.length > 0 ? 'thinBorderTop' : ''"
+    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nLargeMarginTop nMediumMarginBottom hHeaderDisplay" 
       :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '14px' : '0px'}">
-      <div>
+      <div class="">
         <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value:
           $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
@@ -273,10 +277,10 @@
       </div>
     </div>
 
-    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="smallMarginTop vHeaderDisplay" :class="userMonthlyStatementStableCoinList?.length > 0 ? 'thinBorderTop' : ''"
+    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nMediumSmallMarginTop vHeaderDisplay"
       :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '4px' : '0px'}">
       
-      <div>
+      <div class="nSmallMarginTop">
         <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
         <h5 class="nMediumLargeMarginTop">Value:
           $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
@@ -300,8 +304,11 @@
 
     </div>
 
-    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nMediumMarginTop mediumSmallMarginBottom">
-      <div v-for="(monthlyStatement, userTabIndex) in enrichedCryptoMonthlyStatementList">
+    <div class="horizontalLine smallMarginTop hHeaderDisplay"></div>
+    <div class="horizontalLine nSmallMarginTop vHeaderDisplay"></div>
+
+    <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="mediumSmallMarginBottom">
+      <div v-for="(monthlyStatement, userTabIndex) in enrichedCryptoMonthlyStatementList" class="nSmallMarginTop">
         <PortfolioChart
         :isStableCoin="false"
         :hasDeposits="hasDeposits"
@@ -322,6 +329,8 @@
         @openBorrowModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketOption)"
         @openRepayModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenId, tokenMintAddress, subMarketOption)"
         @interestEarned="updateCryptoRealTimeValues"/>
+
+        <div class="horizontalLine"></div>
       </div>
     </div>
   </div>
