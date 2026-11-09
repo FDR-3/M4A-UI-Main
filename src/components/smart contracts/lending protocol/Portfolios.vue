@@ -1733,14 +1733,14 @@
       }
     }
 
-    syncUserTotalValueChartAggregate(selectedChart,
+    /*syncUserTotalValueChartAggregate(selectedChart,
       previousTotalValue,
       previousBalanceValue,
       previousDebtValue,
       liveTotalValue,
       liveBalanceValue,
       liveDebtValue,
-      lastIndex)
+      lastIndex)*/
 
     chartReRenderKey.value++
   }
