@@ -26,8 +26,16 @@
           @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
             <div 
-              v-if="dataset.label=='TVL'" 
+              v-if="dataset.label=='Overall Value'" 
               class="swatch animatedRainbowX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Total Deposit Value'" 
+              class="swatch animatedDepositValueX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Total Borrow Value'" 
+              class="swatch animatedBorrowValueX">
             </div>
             <span 
               class="legendLabel" 
@@ -52,16 +60,17 @@
   import Select from 'primevue/select'
   import Chart from 'primevue/chart'
   import { darkTheme } from '/src/assets/globalStates/DarkTheme.vue'
-  import { monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { lendingProtocolHistoryOptions, TVLHistoryHashMap } from './TVLHistory'
   import { sleep } from '/src/assets/helperFunctions/sleep.ts'
   import { setChartOptions,
     toggleDataset,
-    setRainbowLineAnimatedGradient } from './ChartHelper'
+    setRainbowLineAnimatedGradient,
+    setDepositLineAnimatedGradient,
+    setBorrowLineAnimatedGradient } from './ChartHelper'
   import cloneDeep from 'lodash/cloneDeep'
   import './Chart.css'
 
-  const props = defineProps(['currentTVL'])
+  const props = defineProps(['userTotalValueChartDataHashMap', 'previousMonthDataMissing'])
 
   var chartData: any
   var chartOptions = ref()
@@ -72,35 +81,12 @@
   var chartSelect = ref("All")
   var chartDataHashMap = new Map<string, any>()
   var chartWidth = ref(0)
-  var previousMonthDataMissing = false
 
   var gradientOffset = ref(0)
- 
-  const baseChartData =
-  {
-    labels: [],
-    datasets:
-    [
-      {
-        type: 'line',
-        label: 'Total Value',
-        borderColor: function(context: any)
-        { 
-          const chart = context.chart
-          const { ctx, chartArea } = chart
-          return setRainbowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
-        },
-        borderWidth: 4,
-        fill: false,
-        tension: 0.4,
-        data: [] as any[]
-      }
-    ]
-  }
 
   onMounted(async() =>
   {
-    setChartData()
+    chartDataHashMap = props.userTotalValueChartDataHashMap
     chartOptions.value = setChartOptions(true, chartTextColor.value, true)
     chartData = chartDataHashMap.get(chartSelect.value)
 
@@ -123,23 +109,23 @@
     chartOptions.value = setChartOptions(true, chartTextColor.value, true)
   })
 
-  watch(() => [props.currentTVL], (async() => 
+  /*watch(() => [props.userTotalValueChartDataHashMap], (async() => 
   {
-    setChartData() //Updating chart hash map so that the last value is already valid for when the user switches
+    chartDataHashMap = props.userTotalValueChartDataHashMap
+    chartData = chartDataHashMap.get(chartSelect.value)
 
-    //chartData = chartDataHashMap.get(chartSelect.value) //Setting the whole chart can cause it to re-render every time the price changes in some cases. Specifically seems like right after watching a video in full screen on the website and then looking at the Treasury, or atleast that's what I did, lol.
-    //It also interrupts the screen when you are holding your mouse over a chart value
-    if(chartData?.datasets?.[0])
-    { 
-      chartData.datasets[0].data[chartData.datasets[0].data.length-1] = props.currentTVL.replace(/,/g, '')
-      if(previousMonthDataMissing && chartData.datasets[0].data[chartData.datasets[0].data.length-2]) //Set the previous month with the current value if it was missing
-        chartData.datasets[0].data[chartData.datasets[0].data.length-2] = props.currentTVL.replace(/,/g, '')
+    if(chartData?.datasets?.[0] && chartData.datasets[0].data.length > 0)
+    {
+      const lastIndex = chartData.datasets[0].data.length - 1
+      if(props.previousMonthDataMissing && chartData.datasets[0].data[lastIndex - 1] !== undefined)
+        chartData.datasets[0].data[lastIndex - 1] = chartData.datasets[0].data[lastIndex]
     }
-  }))
+  }))*/
 
   async function switchChartData()
   {
     chartOptions.value.responsive = false
+    chartDataHashMap = props.userTotalValueChartDataHashMap
     chartData = chartDataHashMap.get(chartSelect.value)
     resetHiddenArray()
   
@@ -200,63 +186,5 @@
       clearInterval(animationIntervalId)
       animationIntervalId = undefined
     }
-  }
-
-  function setChartData()
-  {
-    const newDate = new Date()
-    const currentYear = newDate.getFullYear()
-    const currentMonth = newDate.getMonth() + 1
-    var tempChartDataHashMap = new Map<string, any>()
-    var tempAllChartData = cloneDeep(baseChartData)
-    var allLabels = []
-    var allTVLs = []
-
-    for(var year=Number(lendingProtocolHistoryOptions[1].historyOption); year<=currentYear; year++)
-    {
-      var yearlyLabels = []
-      var yearlyTVLs = []
-
-      var tempYearlyChartData = cloneDeep(baseChartData)
-      
-      const maxMonth = (year == currentYear) ? currentMonth : 12
-
-      for(var month=1; month<=maxMonth; month++)
-      {
-        yearlyLabels.push(monthList[month-1].monthName)
-
-        const tvlMonthlyStatementValue = TVLHistoryHashMap.get(month.toString() + '-' + year.toString())
-
-        if(tvlMonthlyStatementValue != undefined)
-        {
-          allLabels.push(monthList[month-1].monthName + ' ' + year.toString())
-          allTVLs.push(tvlMonthlyStatementValue)
-          yearlyTVLs.push(tvlMonthlyStatementValue)
-        }
-        else
-        { //This fills in the current month and previous month with current values.This helps if the previous month data isn't available yet.
-          if(year == currentYear && (month == currentMonth || month == currentMonth-1))
-          {
-            allLabels.push(monthList[month-1].monthName + ' ' + year.toString())
-            allTVLs.push(Number(props.currentTVL.replace(/,/g, '')))
-            yearlyTVLs.push(Number(props.currentTVL.replace(/,/g, '')))
-          }
-          else
-            yearlyTVLs.push(0)
-
-          if(year == currentYear && month == currentMonth-1)
-            previousMonthDataMissing = true
-        }
-      }
-
-      tempYearlyChartData.labels = yearlyLabels
-      tempYearlyChartData.datasets[0].data = yearlyTVLs
-      tempChartDataHashMap.set(year.toString(), tempYearlyChartData)
-    }
-
-    tempAllChartData.labels = allLabels
-    tempAllChartData.datasets[0].data = allTVLs
-    tempChartDataHashMap.set("All", tempAllChartData)
-    chartDataHashMap = tempChartDataHashMap
   }
 </script>

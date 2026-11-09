@@ -103,6 +103,10 @@
       </div>
 
       <HealthFactorBig :accountOwnerAddress="searchAddress" :accountIndex="accountSelect"/>
+
+      <UserTotalValueChart
+        :userTotalValueChartDataHashMap="userTotalValueChartDataHashMap"
+        :previousMonthDataMissing="previousMonthDataMissing"/>
     </div>
 
     <div class="topVHeaderDisplay thinBorderBottom" style="justify-content:space-around !important">
@@ -162,6 +166,10 @@
 
       <div class="nTinyMarginTop">
         <HealthFactorBig :accountOwnerAddress="searchAddress" :accountIndex="accountSelect"/>
+
+        <UserTotalValueChart
+          :userTotalValueChartDataHashMap="userTotalValueChartDataHashMap"
+          :previousMonthDataMissing="previousMonthDataMissing"/>
       </div>
     </div>
 
@@ -353,6 +361,7 @@
   import { SYSTEM_PROGRAM_ADDRESS_STRING } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { SOLPriceHistoryHashMap, WEthPriceHistoryHashMap, WBtcPriceHistoryHashMap } from '/src/components/charts/lending/PriceHistory.ts'
   import LendingLeaderBoardTable from '/src/components/tables/lending/LendingLeaderBoardTable.vue'
+  import UserTotalValueChart from '/src/components/charts/lending/UserTotalValueChart.vue'
   import PortfolioChart from '/src/components/charts/lending/PortfolioChart.vue'
   import { anchorPrograms, monthList } from '/src/assets/globalStates/AnchorPrograms.vue'
   import { customUserNameHashMap }  from '/src/assets/globalStates/chat/ChatAccounts.vue'
@@ -388,6 +397,9 @@
   var searchAddress = ref()
   var addressToCheck = ref()
   var isValidPublicKey = ref(false)
+
+  var userTotalValueChartData = ref()
+  var userTotalValueChartDataHashMap = ref(new Map<string, any>())
 
   var userMonthlyStatementStableCoinList = ref()
   var userStableCoinInterestHelper: string | any[]
@@ -512,6 +524,56 @@
       }
     })
   })
+
+  const baseUserTotalValueChartData =
+  {
+    labels: [],
+    datasets:
+    [
+      {
+        type: 'line',
+        label: 'Overall Value',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setRainbowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Total Deposit Value',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setDepositLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      },
+      {
+        type: 'line',
+        label: 'Total Borrow Value',
+        borderColor: function(context: any)
+        { 
+          const chart = context.chart
+          const { ctx, chartArea } = chart
+          return setBorrowLineAnimatedGradient(ctx, chartArea, gradientOffset.value)
+        },
+        borderWidth: 4,
+        fill: false,
+        tension: 0.4,
+        data: [] as any[]
+      }
+    ]
+  }
 
   const baseValueChartData =
   {
@@ -963,8 +1025,9 @@
   {
     const newDate = new Date()
     const currentYear = newDate.getFullYear()
-    const currentMonth = newDate.getMonth() + 1
+    const currentMonth = newDate.getMonth() + 2
     var tempHashMap = new Map<string, any>()
+    userTotalValueChartDataHashMap.value = new Map<string, any>()
 
     const isTreasuryAddress = searchAddress.value == adminAccounts.singlePayerTreasuryAddress.toString() ||
       searchAddress.value == adminAccounts.hodlTreasuryAddress.toString() ||
@@ -1010,6 +1073,29 @@
         default:
           return true
       }
+    }
+
+    function aggregateUserTotalValueChartData(chartKey: string, incomingValueChartData: any)
+    {
+      const existingChartData = userTotalValueChartDataHashMap.value.get(chartKey) ?? cloneDeep(baseUserTotalValueChartData)
+
+      if(existingChartData.labels.length == 0)
+        existingChartData.labels = incomingValueChartData.labels
+
+      for(var datasetIndex = 0; datasetIndex < incomingValueChartData.datasets.length; datasetIndex++)
+      {
+        const incomingData = incomingValueChartData.datasets[datasetIndex].data
+        const existingData = existingChartData.datasets[datasetIndex].data
+
+        for(var i=0; i<incomingData.length; i++)
+        {
+          const currentValue = Number(existingData[i] ?? 0)
+          const incomingValue = Number(incomingData[i] ?? 0)
+          existingData[i] = Number((currentValue + incomingValue).toFixed(2))
+        }
+      }
+
+      userTotalValueChartDataHashMap.value.set(chartKey, existingChartData)
     }
 
     function processStatementList(statementList: any, availableYearsHashMap: any)
@@ -1257,6 +1343,8 @@
               yearlyAmountChartData.datasets[AmountChartIndex.CollectedSolvencyFees].hidden = true
             }
 
+            aggregateUserTotalValueChartData(year.toString(), yearlyValueChartData)
+
             tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + year.toString(),
             {
               amountChartData: yearlyAmountChartData,
@@ -1316,6 +1404,8 @@
             allChartData.datasets[AmountChartIndex.CollectedSolvencyFees].hidden = true
           }
 
+          aggregateUserTotalValueChartData("All", allValueChartData)
+
           tempHashMap.set(tokenId.toString() + subMarketOwnerAddress + subMarketIndex.toString() + "All",
           {
             amountChartData: allChartData,
@@ -1331,6 +1421,7 @@
     processStatementList(userMonthlyStatementCryptoCurrencyList, lendingUserAvailableCryptoCurrencyYearsBySubMarketHashMap)
 
     selectedChartDataHashMap = tempHashMap
+    userTotalValueChartData.value = userTotalValueChartDataHashMap.value.get("All") ?? cloneDeep(baseUserTotalValueChartData)
   }
 
   function getAmountChartData(tokenId: number, subMarketOwnerAddress: string, subMarketIndex: number)
@@ -1537,6 +1628,68 @@
     hasDeposits.value = assetAmount
   }
 
+  function syncUserTotalValueChartAggregate(selectedChart: string,
+  previousTotalValue: number,
+  previousBalanceValue: number,
+  previousDebtValue: number,
+  liveTotalValue: number,
+  liveBalanceValue: number,
+  liveDebtValue: number,
+  lastIndex: number)
+  {
+    const deltaTotal = Number((liveTotalValue - previousTotalValue).toFixed(2))
+    const deltaDeposit = Number((liveBalanceValue - previousBalanceValue).toFixed(2))
+    const deltaBorrow = Number((liveDebtValue - previousDebtValue).toFixed(2))
+
+    const aggregateKeys = new Set<string>([selectedChart, 'All'])
+
+    for(const chartKey of aggregateKeys)
+    {
+      const aggregateChart = userTotalValueChartDataHashMap.value.get(chartKey)
+      if(!aggregateChart?.datasets)
+        continue
+
+      const totalDataset = aggregateChart.datasets[ValueChartIndex.TotalValue]
+      const depositDataset = aggregateChart.datasets[ValueChartIndex.DepositValue]
+      const borrowDataset = aggregateChart.datasets[ValueChartIndex.BorrowValue]
+
+      if(!totalDataset || !depositDataset || !borrowDataset)
+        continue
+
+      const indexList = [lastIndex, lastIndex - 1, lastIndex - 2].filter(index => index >= 0)
+
+      for(const index of indexList)
+      {
+        const currentTotalValue = Number(totalDataset.data[index] ?? 0)
+        const currentDepositValue = Number(depositDataset.data[index] ?? 0)
+        const currentBorrowValue = Number(borrowDataset.data[index] ?? 0)
+
+        totalDataset.data[index] = Number((currentTotalValue + deltaTotal).toFixed(2))
+        depositDataset.data[index] = Number((currentDepositValue + deltaDeposit).toFixed(2))
+        borrowDataset.data[index] = Number((currentBorrowValue + deltaBorrow).toFixed(2))
+      }
+    }
+
+    if(userTotalValueChartData.value?.datasets)
+    {
+      const allTotalDataset = userTotalValueChartData.value.datasets[ValueChartIndex.TotalValue]
+      const allDepositDataset = userTotalValueChartData.value.datasets[ValueChartIndex.DepositValue]
+      const allBorrowDataset = userTotalValueChartData.value.datasets[ValueChartIndex.BorrowValue]
+
+      if(allTotalDataset && allDepositDataset && allBorrowDataset)
+      {
+        const trailingIndexes = [lastIndex, lastIndex - 1, lastIndex - 2].filter(index => index >= 0)
+
+        for(const index of trailingIndexes)
+        {
+          allTotalDataset.data[index] = Number((Number(allTotalDataset.data[index] ?? 0) + deltaTotal).toFixed(2))
+          allDepositDataset.data[index] = Number((Number(allDepositDataset.data[index] ?? 0) + deltaDeposit).toFixed(2))
+          allBorrowDataset.data[index] = Number((Number(allBorrowDataset.data[index] ?? 0) + deltaBorrow).toFixed(2))
+        }
+      }
+    }
+  }
+
   function syncLiveValuePointToChart(statementList: any[] | undefined,
   tokenId: number,
   subMarketOwnerAddress: string,
@@ -1561,6 +1714,10 @@
     if(lastIndex < 0)
       return
 
+    const previousTotalValue = Number(datasets[ValueChartIndex.TotalValue].data[lastIndex] ?? 0)
+    const previousBalanceValue = Number(datasets[ValueChartIndex.DepositValue].data[lastIndex] ?? 0)
+    const previousDebtValue = Number(datasets[ValueChartIndex.BorrowValue].data[lastIndex] ?? 0)
+
     datasets[ValueChartIndex.TotalValue].data[lastIndex] = Number(liveTotalValue.toFixed(2))
     datasets[ValueChartIndex.DepositValue].data[lastIndex] = Number(liveBalanceValue.toFixed(2))
     datasets[ValueChartIndex.BorrowValue].data[lastIndex] = Number(liveDebtValue.toFixed(2))
@@ -1575,6 +1732,15 @@
         datasets[ValueChartIndex.BorrowValue].data[secondLastIndex] = Number(liveDebtValue.toFixed(2))
       }
     }
+
+    syncUserTotalValueChartAggregate(selectedChart,
+      previousTotalValue,
+      previousBalanceValue,
+      previousDebtValue,
+      liveTotalValue,
+      liveBalanceValue,
+      liveDebtValue,
+      lastIndex)
 
     chartReRenderKey.value++
   }
