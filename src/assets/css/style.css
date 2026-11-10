@@ -129,6 +129,13 @@ ion-textarea
   background-color: light-dark(#000000, #ffffff)
 }
 
+.verticalLine
+{
+  width: 1px;
+  min-height: 100%;
+  background-color: light-dark(#000000, #ffffff)
+}
+
 .lendingActionPopoverContainer
 {
   border: thin solid var(--ion-color-dark);

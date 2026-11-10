@@ -109,18 +109,15 @@
     chartOptions.value = setChartOptions(true, chartTextColor.value, true)
   })
 
-  /*watch(() => [props.userTotalValueChartDataHashMap], (async() => 
+  watch(() => props.userTotalValueChartDataHashMap, () =>
   {
+    if(!props.userTotalValueChartDataHashMap)
+      return
+
     chartDataHashMap = props.userTotalValueChartDataHashMap
     chartData = chartDataHashMap.get(chartSelect.value)
-
-    if(chartData?.datasets?.[0] && chartData.datasets[0].data.length > 0)
-    {
-      const lastIndex = chartData.datasets[0].data.length - 1
-      if(props.previousMonthDataMissing && chartData.datasets[0].data[lastIndex - 1] !== undefined)
-        chartData.datasets[0].data[lastIndex - 1] = chartData.datasets[0].data[lastIndex]
-    }
-  }))*/
+    resetHiddenArray()
+  })
 
   async function switchChartData()
   {

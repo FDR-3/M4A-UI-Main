@@ -37,7 +37,7 @@
   import { calculateNewBalance, calculateNewDebtBalance, healthFactorInfo } from './InterestCalcHelpers.ts'
   import { unixData } from '/src/assets/globalStates/AnchorPrograms.vue'
   
-  const props = defineProps(['accountOwnerAddress', 'accountIndex'])
+  const props = defineProps(['accountOwnerAddress', 'accountIndex', 'userTotalValueChartDataHashMap'])
 
   var assetValue = ref()
   var debtValue = ref()
@@ -58,6 +58,53 @@
 
   function calculateHealthFactorValues(timeStamp: number)
   {
+    /*const aggregateChart = props.userTotalValueChartDataHashMap?.get('All')
+
+    if(aggregateChart?.datasets && aggregateChart.datasets.length >= 3)
+    {
+      const totalDataset = aggregateChart.datasets[0]
+      const depositDataset = aggregateChart.datasets[1]
+      const borrowDataset = aggregateChart.datasets[2]
+
+      if(totalDataset?.data?.length && depositDataset?.data?.length && borrowDataset?.data?.length)
+      {
+        const lastIndex = totalDataset.data.length - 1
+        const calculatedAssetValue = Number(depositDataset.data[lastIndex] ?? 0)
+        const calculatedDebtValue = Number(borrowDataset.data[lastIndex] ?? 0)
+        const calculatedOverallValue = Number(totalDataset.data[lastIndex] ?? 0)
+
+        assetValue.value = '$' + calculatedAssetValue.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+        debtValue.value = '$' + calculatedDebtValue.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+        overallValue.value = '$' + calculatedOverallValue.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2 })
+
+        if(calculatedAssetValue != 0)
+        {
+          healthFactor.value = (((calculatedAssetValue * 0.8 - calculatedDebtValue)/(calculatedAssetValue * 0.8)) * 100).toFixed(2)
+          if(Number(healthFactor.value) < 0)
+            healthFactor.value = (0).toFixed(2)
+        }
+        else if(calculatedDebtValue == 0)
+          healthFactor.value = (100).toFixed(2)
+        else
+          healthFactor.value = (0).toFixed(2)
+
+        if(healthFactor.value >= 70)
+          barColor.value = "#39bd39"
+        else if(healthFactor.value >= 30)
+          barColor.value = "#ffd700"
+        else
+          barColor.value = "#ff0000"
+
+        return
+      }
+    }*/
+
     if(!lendingUserTabAccountListHashMap.map)
       return
 
