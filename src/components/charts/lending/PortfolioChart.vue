@@ -105,7 +105,7 @@
 
       <div class="unStackedBalanceDebt">
         <br>
-        <div v-if="showValues" class="flexCenterColumn">
+        <div v-if="showValues" class="flexCenterColumn nTinyMarginTop">
           <ion-text>Total:
             <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
@@ -141,9 +141,8 @@
         </div>
       </div>
 
-      <div class="stackedBalanceDebt">
-        <br>
-        <div v-if="showValues" class="flexCenterColumn">
+      <div class="stackedBalanceDebt ">
+        <div v-if="showValues" class="flexCenterColumn smallMarginTop">
           <ion-text>Total:
             <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
@@ -182,7 +181,7 @@
         </div>
       </div>
 
-      <div class="mediumSmallMarginTop">
+      <div>
         <ion-label>Last Action: <br>{{ activityDescriptions[amountChartData?.lastActionType] + ' ' + amountChartData?.lastActionAmount?.toLocaleString('en-US', {
             minimumFractionDigits: decimalAmount,
             maximumFractionDigits: decimalAmount }) + ' ' + tokenName}}

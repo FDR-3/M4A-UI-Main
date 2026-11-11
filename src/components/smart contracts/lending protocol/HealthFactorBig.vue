@@ -2,17 +2,17 @@
   <div class="horizontalValues">
     <h3 class="nTinyMarginBottom yellow" style="margin-top: 0">Health Factor</h3>
     <div>
-      <ion-text>Asset Value: {{ assetValue }}</ion-text>
-      <ion-text> Debt Value: {{ debtValue }}</ion-text>
+      <ion-text>Asset Value: $<span class="depositText">{{ assetValue }}</span></ion-text>
+      <ion-text> Debt Value: $<span class="borrowText">{{ debtValue }}</span></ion-text>
     </div>
-    <ion-text>Overall Value: {{ overallValue }}</ion-text>
+    <ion-text>Overall Value: $<span class="rainbowText">{{ overallValue }}</span></ion-text>
   </div>
 
   <div class="verticalValues">
     <h3 class="nTinyMarginBottom yellow" style="margin-top: 0">Health Factor</h3>
-    <ion-text>Asset Value: {{ assetValue }}</ion-text><br>
-    <ion-text>Debt Value: {{ debtValue }}</ion-text><br>
-    <ion-text>Overall Value: {{ overallValue }}</ion-text>
+    <ion-text>Overall Value: $<span class="rainbowText">{{ overallValue }}</span></ion-text><br>
+    <ion-text>Asset Value: $<span class="depositText">{{ assetValue }}</span></ion-text><br>
+    <ion-text>Debt Value: $<span class="borrowText">{{ debtValue }}</span></ion-text>
   </div>
 
   <div class="flexCenterRow nTinyMarginTop">
@@ -140,13 +140,13 @@
       calculatedDebtValue += userDebtWithInterestAccrued / Math.pow(10, decimalAmount) * Number(price)
     }
 
-    assetValue.value = '$' + calculatedAssetValue.toLocaleString('en-US', {
+    assetValue.value = calculatedAssetValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
-    debtValue.value = '$' + calculatedDebtValue.toLocaleString('en-US', {
+    debtValue.value = calculatedDebtValue.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 })
-    overallValue.value = '$' + (calculatedAssetValue - calculatedDebtValue).toLocaleString('en-US', {
+    overallValue.value = (calculatedAssetValue - calculatedDebtValue).toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2 }) 
 
