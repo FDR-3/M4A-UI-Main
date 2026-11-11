@@ -33,200 +33,202 @@
     </div>
   </div>
 
-  <h1 >Submit {{stateName}} Claims</h1>
-  <SubmitClaimProgressBar
-    v-if="!anchorPrograms.areM4AProtocolStatsReady ||
-    !anchorPrograms.isM4AProtocolReady ||
-    !connectedWallet.isSubmitterAccountReady ||
-    !(patientList?.length>0)"
-    :colorHexValue="colorHexValue"
-    :areM4AProtocolStatsReady="anchorPrograms.areM4AProtocolStatsReady"
-    :isM4AProtocolReady="anchorPrograms.isM4AProtocolReady"
-    :isSubmitterAccountReady="connectedWallet.isSubmitterAccountReady"
-    :hasPatientList="patientList?.length>0"
-  />
-  <div v-if="!anchorPrograms.isM4AFeeTokenAccountReady">
-    <ion-text color="dark">No token account for fees initialized yet</ion-text>
-  </div>
-  <div v-else-if="!anchorPrograms.areM4AProtocolStatsReady" class="mediumSmallMarginTop mediumSmallMarginBottom">
-    <ion-text color="dark">South Carolina BETA hasn't started yet</ion-text>
-  </div>
-  <ion-label v-else-if="!connectedWallet.isConnected">
-    Connect wallet to submit claim for $0.04 USDC
-  </ion-label>
-  <ion-button v-else-if="!anchorPrograms.isM4AProtocolReady" @click="initializeM4AProtocol()" color="green">
-    <ion-label color="dark">Init M4A Protocol</ion-label>
-  </ion-button>
-  <div v-else-if="!isClaimQueueOn">
-    <ion-text color="dark">Claim Queue is currently disabled</ion-text>
-  </div>
-  
-  <ion-button v-else-if="!connectedWallet.isSubmitterAccountReady" @click="initSubmitterAccount()" color="green">
-    <ion-label color="dark">Init Submitter Account</ion-label>
-  </ion-button>
-
-  <div v-else-if="patientList?.length==0">
-    <ion-button @click="addPatientAlertIsOpen=true" color="green">
-      <ion-label color="dark">No Patients Detected, Add Patient</ion-label>
-    </ion-button> 
-  </div>
-
-  <div v-else-if="isClaimAlreadySubmitted">
-    <ion-label color="dark">Your Claim Is In The Queue</ion-label>
-  </div>
-
-  <div v-else>
-    <ion-button color="dark" @click="clearInputs()">Clear</ion-button>
-    <div>
-      <Select 
-        ref="patientSelectRef"
-        id="patientSelect"
-        class="standardFontSize mediumMarginTop"
-        v-model="patientSelect" 
-        :options="activePatientList" 
-        optionLabel="name" 
-        optionValue="submitterPatientIndex" 
-        placeholder="Select Patient"
-        appendTo="self"
-        :invalid="patientSelectInvalid"
-      >
-        <template #footer>
-          <div class="flexCenterColumn">
-            <div>
-              <ion-button id="editPatientVisibilityButton" @click="isEditingPatientList=true; patientSelectRef.hide()" color="dark">
-                <ion-label class="noClickEvent" color="light">Edit Visibility</ion-label>
-              </ion-button>
-            </div>
-            <div>
-              <ion-button @click="addPatientAlertIsOpen=true" color="dark">
-                <ion-label color="light">Add Patient</ion-label>
-              </ion-button>
-            </div>
-          </div>
-        </template>
-      </Select>
+  <div class="thickBorder" style="margin-top: -7px; padding-left: 44px; padding-right: 44px">
+    <h1 >Submit {{stateName}} Claims</h1>
+    <SubmitClaimProgressBar
+      v-if="!anchorPrograms.areM4AProtocolStatsReady ||
+      !anchorPrograms.isM4AProtocolReady ||
+      !connectedWallet.isSubmitterAccountReady ||
+      !(patientList?.length>0)"
+      :colorHexValue="colorHexValue"
+      :areM4AProtocolStatsReady="anchorPrograms.areM4AProtocolStatsReady"
+      :isM4AProtocolReady="anchorPrograms.isM4AProtocolReady"
+      :isSubmitterAccountReady="connectedWallet.isSubmitterAccountReady"
+      :hasPatientList="patientList?.length>0"
+    />
+    <div v-if="!anchorPrograms.isM4AFeeTokenAccountReady">
+      <ion-text color="dark">No token account for fees initialized yet</ion-text>
     </div>
-    <Select 
-      id="hospitalTypeSelect"
-      class="standardFontSize mediumMarginTop"
-      v-model="hospitalTypeSelect" 
-      :options="hospitalTypeOptions" 
-      optionLabel="hospitalTypeName" 
-      optionValue="index" 
-      placeholder="Hospital Type"
-      appendTo="self"
-      :invalid="hospitalTypeSelectInvalid"
-      :disabled="preFillInputs">
-    </Select>
-    <div class="flexCenterRow row1">
-      <FloatLabel>
-        <InputText v-model="hospitalName" class="formInput" id="hospitalName" :invalid="hospitalNameInvalid" :disabled="preFillInputs" maxlength="100"/>
-        <label id="hospitalNameLabel" for="hospitalName">Hospital Name</label>
-      </FloatLabel>
-
-      <FloatLabel>
-        <InputText v-model="hospitalAddress" class="formInput" id="hospitalAddress" :invalid="hospitalAddressInvalid" :disabled="preFillInputs" maxlength="100"/>
-        <label id="hospitalAddressLabel" for="hospitalAddress">Hospital Street Address</label>
-      </FloatLabel>
-
-      <FloatLabel>
-        <InputText v-model="hospitalCity" class="formInput" id="hospitalCity" :invalid="hospitalCityInvalid" :disabled="preFillInputs" maxlength="40"/>
-        <label id="hospitalCityLabel" for="hospitalCity">Hospital City</label>
-      </FloatLabel>
-
-      <FloatLabel>
-        <InputText v-model="hospitalState" class="formInput" id="hospitalState" disabled/>
-        <label id="hospitalStateLabel" for="hospitalState">Hospital State</label>
-      </FloatLabel> 
+    <div v-else-if="!anchorPrograms.areM4AProtocolStatsReady" class="mediumSmallMarginTop mediumSmallMarginBottom">
+      <ion-text color="dark">South Carolina BETA hasn't started yet</ion-text>
     </div>
-
-    <div class="flexCenterRow row2">
-      <FloatLabel>
-        <InputMask v-model="hospitalZipCode" class="formInput" id="hospitalZipCode" :invalid="hospitalZipCodeInvalid" mask="99999" fluid :disabled="preFillInputs"/>
-        <label id="hospitalZipCodeLabel" for="hospitalZipCode">Hospital Zip Code</label>
-      </FloatLabel>  
-
-      <FloatLabel>
-        <InputMask v-model="hospitalPhoneNumber" class="formInput" id="hospitalPhoneNumber" :invalid="hospitalPhoneNumberInvalid" mask="(999) 999-9999" fluid :disabled="preFillInputs"/>
-        <label id="hospitalPhoneNumberLabel" for="hospitalPhoneNumber">Hospital Phone Number</label>
-      </FloatLabel>
-
-      <FloatLabel>
-        <InputText v-model="billInvoiceNumber" class="formInput" id="billInvoiceNumber" maxlength="20"/>
-        <label id="billInvoiceNumberLabel" for="billInvoiceNumber">Bill Invoice Number?</label>
-      </FloatLabel>
-      
-      <FloatLabel>
-        <InputNumber v-model="claimAmount" :inputStyle="{'text-align': 'center'}" class="formInput" id="claimAmount" :invalid="claimAmountInvalid" inputId="currency-us" mode="currency" currency="USD" locale="en-US" fluid/>
-        <label id="claimAmountLabel" for="claimAmount">Claim Amount</label>
-      </FloatLabel>
+    <ion-label v-else-if="!connectedWallet.isConnected">
+      Connect wallet to submit claim for $0.04 USDC
+    </ion-label>
+    <ion-button v-else-if="!anchorPrograms.isM4AProtocolReady" @click="initializeM4AProtocol()" color="green">
+      <ion-label color="dark">Init M4A Protocol</ion-label>
+    </ion-button>
+    <div v-else-if="!isClaimQueueOn">
+      <ion-text color="dark">Claim Queue is currently disabled</ion-text>
     </div>
+    
+    <ion-button v-else-if="!connectedWallet.isSubmitterAccountReady" @click="initSubmitterAccount()" color="green">
+      <ion-label color="dark">Init Submitter Account</ion-label>
+    </ion-button>
 
-    <div class="flexCenterRow row2">
-    <FloatLabel>
-      <InputText v-model="ailment" class="formInput" id="ailment" :invalid="ailmentInvalid" maxlength="45"/>
-      <label id="ailmentLabel" for="ailment">Ailment or Procedure</label>
-    </FloatLabel>
-    </div>
-
-    <div v-if="!newInsuranceToggle" class="flexCenterRow">
-      <Select 
-          id="insuranceSelect"
-          class="standardFontSize"
-          v-model="insuranceSelect" 
-          :options="insuranceCompanyList" 
-          optionLabel="insuranceCompanyName" 
-          optionValue="insuranceCompanyIndex" 
-          placeholder="Have Insurance?"
-          appendTo="self"
-          :invalid="insuranceSelectInvalid"
-      >
-        <template #footer>
-          <div class="flexCenterRow">
-            <ion-button @click="newInsuranceToggle=true" color="dark">
-              <ion-label color="light">Other Insurance</ion-label>
-            </ion-button>
-          </div>
-        </template>
-      </Select>
-    </div>
-
-    <div v-if="newInsuranceToggle" class="flexCenterRow">
-      <FloatLabel>
-        <InputText v-model="newInsuranceCompany" class="formInput" id="newInsuranceCompany" :invalid="newInsuranceCompanyInvalid" maxlength="35" :counter="true"/>
-        <label id="newInsuranceCompanyButtonLabel" for="newInsuranceCompany">New Insurance Company</label>
-      </FloatLabel>
-    </div>
-    <div v-if="newInsuranceToggle" class="flexCenterRow">
-      <ion-button id="insuranceReturnButton" @click="newInsuranceToggle=false" fill="clear">
-        <ion-label color="dark">Return To<br>Insurance Select</ion-label>
-      </ion-button>
-    </div>
-
-    <ion-textarea 
-    ref="addClaimNoteTextArea" 
-    class="emojiTextSmaller"
-    label-placement="stacked"
-    v-model="note"
-    placeholder="  Optional Note" 
-    :maxlength=M4A_MAX_NOTE_LENGTH 
-    :counter="true" 
-    :spellcheck="true"
-    :counter-formatter="customFormatter"> 
-      <EmojiButton 
-        :colorHexValue="colorHexValue"
-        @emojiSelected="(emoji: String) => insertEmoji(emoji)"
-      /> 
-    </ion-textarea>
-    <div class="flexCenterColumn">
-      <ion-label v-if="invalidInputs" color="red" >Fill in required inputs</ion-label>
-    </div>  
-      <ion-button id="claimSubmitButton" color="green" @click="submitClaimToQueue()" :disabled=overByteSizeLimit>
-        <span class="flexCenterRow">
-          <ion-text color="dark" >Submit a Claim for just $0.04</ion-text>
-          <USDCSVG class="svgSize tinyMarginLeft"/>
-        </span>
+    <div v-else-if="patientList?.length==0">
+      <ion-button @click="addPatientAlertIsOpen=true" color="green">
+        <ion-label color="dark">No Patients Detected, Add Patient</ion-label>
       </ion-button> 
+    </div>
+
+    <div v-else-if="isClaimAlreadySubmitted">
+      <ion-label color="dark">Your Claim Is In The Queue</ion-label>
+    </div>
+
+    <div v-else>
+      <ion-button color="dark" @click="clearInputs()">Clear</ion-button>
+      <div>
+        <Select 
+          ref="patientSelectRef"
+          id="patientSelect"
+          class="standardFontSize mediumMarginTop"
+          v-model="patientSelect" 
+          :options="activePatientList" 
+          optionLabel="name" 
+          optionValue="submitterPatientIndex" 
+          placeholder="Select Patient"
+          appendTo="self"
+          :invalid="patientSelectInvalid"
+        >
+          <template #footer>
+            <div class="flexCenterColumn">
+              <div>
+                <ion-button id="editPatientVisibilityButton" @click="isEditingPatientList=true; patientSelectRef.hide()" color="dark">
+                  <ion-label class="noClickEvent" color="light">Edit Visibility</ion-label>
+                </ion-button>
+              </div>
+              <div>
+                <ion-button @click="addPatientAlertIsOpen=true" color="dark">
+                  <ion-label color="light">Add Patient</ion-label>
+                </ion-button>
+              </div>
+            </div>
+          </template>
+        </Select>
+      </div>
+      <Select 
+        id="hospitalTypeSelect"
+        class="standardFontSize mediumMarginTop"
+        v-model="hospitalTypeSelect" 
+        :options="hospitalTypeOptions" 
+        optionLabel="hospitalTypeName" 
+        optionValue="index" 
+        placeholder="Hospital Type"
+        appendTo="self"
+        :invalid="hospitalTypeSelectInvalid"
+        :disabled="preFillInputs">
+      </Select>
+      <div class="flexCenterRow row1">
+        <FloatLabel>
+          <InputText v-model="hospitalName" class="formInput" id="hospitalName" :invalid="hospitalNameInvalid" :disabled="preFillInputs" maxlength="100"/>
+          <label id="hospitalNameLabel" for="hospitalName">Hospital Name</label>
+        </FloatLabel>
+
+        <FloatLabel>
+          <InputText v-model="hospitalAddress" class="formInput" id="hospitalAddress" :invalid="hospitalAddressInvalid" :disabled="preFillInputs" maxlength="100"/>
+          <label id="hospitalAddressLabel" for="hospitalAddress">Hospital Street Address</label>
+        </FloatLabel>
+
+        <FloatLabel>
+          <InputText v-model="hospitalCity" class="formInput" id="hospitalCity" :invalid="hospitalCityInvalid" :disabled="preFillInputs" maxlength="40"/>
+          <label id="hospitalCityLabel" for="hospitalCity">Hospital City</label>
+        </FloatLabel>
+
+        <FloatLabel>
+          <InputText v-model="hospitalState" class="formInput" id="hospitalState" disabled/>
+          <label id="hospitalStateLabel" for="hospitalState">Hospital State</label>
+        </FloatLabel> 
+      </div>
+
+      <div class="flexCenterRow row2">
+        <FloatLabel>
+          <InputMask v-model="hospitalZipCode" class="formInput" id="hospitalZipCode" :invalid="hospitalZipCodeInvalid" mask="99999" fluid :disabled="preFillInputs"/>
+          <label id="hospitalZipCodeLabel" for="hospitalZipCode">Hospital Zip Code</label>
+        </FloatLabel>  
+
+        <FloatLabel>
+          <InputMask v-model="hospitalPhoneNumber" class="formInput" id="hospitalPhoneNumber" :invalid="hospitalPhoneNumberInvalid" mask="(999) 999-9999" fluid :disabled="preFillInputs"/>
+          <label id="hospitalPhoneNumberLabel" for="hospitalPhoneNumber">Hospital Phone Number</label>
+        </FloatLabel>
+
+        <FloatLabel>
+          <InputText v-model="billInvoiceNumber" class="formInput" id="billInvoiceNumber" maxlength="20"/>
+          <label id="billInvoiceNumberLabel" for="billInvoiceNumber">Bill Invoice Number?</label>
+        </FloatLabel>
+        
+        <FloatLabel>
+          <InputNumber v-model="claimAmount" :inputStyle="{'text-align': 'center'}" class="formInput" id="claimAmount" :invalid="claimAmountInvalid" inputId="currency-us" mode="currency" currency="USD" locale="en-US" fluid/>
+          <label id="claimAmountLabel" for="claimAmount">Claim Amount</label>
+        </FloatLabel>
+      </div>
+
+      <div class="flexCenterRow row2">
+      <FloatLabel>
+        <InputText v-model="ailment" class="formInput" id="ailment" :invalid="ailmentInvalid" maxlength="45"/>
+        <label id="ailmentLabel" for="ailment">Ailment or Procedure</label>
+      </FloatLabel>
+      </div>
+
+      <div v-if="!newInsuranceToggle" class="flexCenterRow">
+        <Select 
+            id="insuranceSelect"
+            class="standardFontSize"
+            v-model="insuranceSelect" 
+            :options="insuranceCompanyList" 
+            optionLabel="insuranceCompanyName" 
+            optionValue="insuranceCompanyIndex" 
+            placeholder="Have Insurance?"
+            appendTo="self"
+            :invalid="insuranceSelectInvalid"
+        >
+          <template #footer>
+            <div class="flexCenterRow">
+              <ion-button @click="newInsuranceToggle=true" color="dark">
+                <ion-label color="light">Other Insurance</ion-label>
+              </ion-button>
+            </div>
+          </template>
+        </Select>
+      </div>
+
+      <div v-if="newInsuranceToggle" class="flexCenterRow">
+        <FloatLabel>
+          <InputText v-model="newInsuranceCompany" class="formInput" id="newInsuranceCompany" :invalid="newInsuranceCompanyInvalid" maxlength="35" :counter="true"/>
+          <label id="newInsuranceCompanyButtonLabel" for="newInsuranceCompany">New Insurance Company</label>
+        </FloatLabel>
+      </div>
+      <div v-if="newInsuranceToggle" class="flexCenterRow">
+        <ion-button id="insuranceReturnButton" @click="newInsuranceToggle=false" fill="clear">
+          <ion-label color="dark">Return To<br>Insurance Select</ion-label>
+        </ion-button>
+      </div>
+
+      <ion-textarea 
+      ref="addClaimNoteTextArea" 
+      class="emojiTextSmaller"
+      label-placement="stacked"
+      v-model="note"
+      placeholder="  Optional Note" 
+      :maxlength=M4A_MAX_NOTE_LENGTH 
+      :counter="true" 
+      :spellcheck="true"
+      :counter-formatter="customFormatter"> 
+        <EmojiButton 
+          :colorHexValue="colorHexValue"
+          @emojiSelected="(emoji: String) => insertEmoji(emoji)"
+        /> 
+      </ion-textarea>
+      <div class="flexCenterColumn">
+        <ion-label v-if="invalidInputs" color="red" >Fill in required inputs</ion-label>
+      </div>  
+        <ion-button id="claimSubmitButton" color="green" @click="submitClaimToQueue()" :disabled=overByteSizeLimit>
+          <span class="flexCenterRow">
+            <ion-text color="dark" >Submit a Claim for just $0.04</ion-text>
+            <USDCSVG class="svgSize tinyMarginLeft"/>
+          </span>
+        </ion-button> 
+    </div>
   </div>
 </template>
 

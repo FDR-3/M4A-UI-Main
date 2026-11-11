@@ -178,136 +178,138 @@
       </div>
 
       <div class="thickBorder smallMarginTop">
-      <!--Stable Coin Charts-->
-      <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="hHeaderDisplay">
-        <div>
-          <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
-          <h5 class="nMediumLargeMarginTop">Value:
-            $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span> A Week
-          </h5>
-          <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
+        <!--Stable Coin Charts-->
+        <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="hHeaderDisplay nTinyMarginTop">
+          <div>
+            <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
+            <h5 class="nMediumLargeMarginTop">Value:
+              $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span> A Week
+            </h5>
+            <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
+          </div>
+
+          <div>
+            <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
+            <h5 class="nMediumLargeMarginTop">Value:
+              $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span>
+            </h5>
+            <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
+          </div>
         </div>
 
-        <div>
-          <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>Life Time Interest Earned</h4>
-          <h5 class="nMediumLargeMarginTop">Value:
-            $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span>
-          </h5>
-          <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
-        </div>
-      </div>
+        <div v-if="userMonthlyStatementStableCoinList?.length > 0" class=" vHeaderDisplay">
+          <div class="nTinyMarginTop">
+            <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
+            <h5 class="nMediumLargeMarginTop">Value:
+              $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span> A Week
+            </h5>
+            <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
+          </div>
 
-      <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="smallMarginTop vHeaderDisplay">
-        <div class="nMediumSmallMarginTop">
-          <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
-          <h5 class="nMediumLargeMarginTop">Value:
-            $<span class="rainbowText">{{ stableCoin7DayProjectionRateValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span> A Week
-          </h5>
-          <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoin7DayProjectionRateAmount }}</span> A Week</h5>
-        </div>
-
-        <div class="nMediumMarginTop">
-          <h4 class="underLine green" style="line-height: 27px">Life Time Interest Earned</h4>
-          <h5 class="nMediumLargeMarginTop">Value:
-            $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span>
-          </h5>
-          <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
-        </div>
-      </div>
-
-      <div class="horizontalLine nSmallMarginTop"></div>
-
-      <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="mediumSmallMarginBottom">
-        <div v-for="(monthlyStatement, userTabIndex) in enrichedStableCoinMonthlyStatementList" class="nSmallMarginTop">
-          <PortfolioChart
-          :isStableCoin="true"
-          :hasDeposits="hasDeposits"
-          :tokenId="monthlyStatement.tokenId"
-          :subMarketOwnerAddress="monthlyStatement.subMarketOwnerAddress"
-          :subMarketOwnerAddressTrimmed="monthlyStatement.subMarketOwnerAddressTrimmed"
-          :subMarketIndex="monthlyStatement.subMarketIndex"
-          :ownerAddress="searchAddress"
-          :accountIndex="accountSelect"
-          :subMarketFee="monthlyStatement.subMarketFee"
-          :userTabIndex="userTabIndex"
-          :valueChartData="monthlyStatement.valueChartData"
-          :amountChartData="monthlyStatement.amountChartData"
-          :selectedChart="monthlyStatement.selectedChart"
-          @changeYear="updateSelectedChartNameHashMap"
-          @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
-          @openWithdrawalModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketOption)"
-          @openBorrowModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketOption)"
-          @openRepayModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenId, tokenMintAddress, subMarketOption)"
-          @interestEarned="updateStableCoinRealTimeValues"/>
-
-          <div class="horizontalLine"></div>
-        </div>
-      </div>
-
-      <!--Crypto Charts-->
-      <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nLargeMarginTop nMediumMarginBottom hHeaderDisplay" 
-        :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '14px' : '0px'}">
-        <div class="">
-          <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
-          <h5 class="nMediumLargeMarginTop">Value:
-            $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span> A Week
-          </h5>
-          <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
+          <div class="nMediumMarginTop">
+            <h4 class="underLine green" style="line-height: 27px">Life Time Interest Earned</h4>
+            <h5 class="nMediumLargeMarginTop">Value:
+              $<span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span>
+            </h5>
+            <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ stableCoinLifeTimeInterestEarnedAmount }}</span></h5>
+          </div>
         </div>
 
-        <div>
-          <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
-          <h5 class="nMediumLargeMarginTop">Value:
-            $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span>
-          </h5>
-          <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
+        <div class="horizontalLine nSmallMarginTop"></div>
+
+        <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="mediumSmallMarginBottom">
+          <div v-for="(monthlyStatement, userTabIndex) in enrichedStableCoinMonthlyStatementList" class="nSmallMarginTop">
+            <PortfolioChart
+            :isStableCoin="true"
+            :hasDeposits="hasDeposits"
+            :tokenId="monthlyStatement.tokenId"
+            :subMarketOwnerAddress="monthlyStatement.subMarketOwnerAddress"
+            :subMarketOwnerAddressTrimmed="monthlyStatement.subMarketOwnerAddressTrimmed"
+            :subMarketIndex="monthlyStatement.subMarketIndex"
+            :ownerAddress="searchAddress"
+            :accountIndex="accountSelect"
+            :subMarketFee="monthlyStatement.subMarketFee"
+            :userTabIndex="userTabIndex"
+            :valueChartData="monthlyStatement.valueChartData"
+            :amountChartData="monthlyStatement.amountChartData"
+            :selectedChart="monthlyStatement.selectedChart"
+            @changeYear="updateSelectedChartNameHashMap"
+            @openDepositModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openDepositModal', tokenId, tokenMintAddress, subMarketOption)"
+            @openWithdrawalModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openWithdrawalModal', tokenId, tokenMintAddress, subMarketOption)"
+            @openBorrowModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openBorrowModal', tokenId, tokenMintAddress, subMarketOption)"
+            @openRepayModal="(tokenId: number, tokenMintAddress: string, subMarketOption: any[]) => $emit('openRepayModal', tokenId, tokenMintAddress, subMarketOption)"
+            @interestEarned="updateStableCoinRealTimeValues"/>
+
+            <div class="horizontalLine"></div>
+          </div>
         </div>
       </div>
+      
+      <div class="thickBorder smallMarginTop">
+        <!--Crypto Charts-->
+        <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nMediumMarginTop nMediumMarginBottom hHeaderDisplay" 
+          :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '14px' : '0px'}">
+          <div class="">
+            <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
+            <h5 class="nMediumLargeMarginTop">Value:
+              $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span> A Week
+            </h5>
+            <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
+          </div>
 
-      <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nMediumSmallMarginTop vHeaderDisplay"
-        :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '4px' : '0px'}">
-        
-        <div class="nSmallMarginTop">
-          <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
-          <h5 class="nMediumLargeMarginTop">Value:
-            $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span> A Week
-          </h5>
-          <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
+          <div>
+            <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>Life Time Interest Earned</h4>
+            <h5 class="nMediumLargeMarginTop">Value:
+              $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span>
+            </h5>
+            <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
+          </div>
         </div>
 
-        <div class="nMediumMarginTop">
-          <h4 class="underLine green" style="line-height: 27px">Life Time Interest Earned</h4>
-          <h5 class="nMediumLargeMarginTop">Value:
-            $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span>
-          </h5>
-          <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
-        </div>
+        <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="vHeaderDisplay"
+          :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '4px' : '0px'}">
+          
+          <div class="nSmallMarginTop">
+            <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
+            <h5 class="nMediumLargeMarginTop">Value:
+              $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span> A Week
+            </h5>
+            <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ crypto7DayProjectionRateAmount }}</span> A Week</h5>
+          </div>
 
-      </div>
+          <div class="nMediumMarginTop">
+            <h4 class="underLine green" style="line-height: 27px">Life Time Interest Earned</h4>
+            <h5 class="nMediumLargeMarginTop">Value:
+              $<span class="rainbowText">{{ cryptoLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span>
+            </h5>
+            <h5 class="nLargeMarginTop">Amount: <span class="rainbowText">{{ cryptoLifeTimeInterestEarnedAmount }}</span></h5>
+          </div>
+
+        </div>
 
       <div class="horizontalLine smallMarginTop hHeaderDisplay"></div>
       <div class="horizontalLine nSmallMarginTop vHeaderDisplay"></div>
