@@ -115,71 +115,71 @@
       <div style="justify-content:space-around !important">
         <div class="mediumMarginTop">
           <ion-label>Account Name</ion-label>
-        </div>
-        <Select
-        v-if="!editingAccountName"
-        class="accountSelect "
-        v-model="accountSelect" 
-        :options="accountList" 
-        optionLabel="accountName" 
-        optionValue="userAccountIndex" 
-        placeholder="Select Account"
-        appendTo="self"
-        @change="updateStoredSelectedAccount()">
-        </Select>
+          </div>
+          <Select
+          v-if="!editingAccountName"
+          class="accountSelect "
+          v-model="accountSelect" 
+          :options="accountList" 
+          optionLabel="accountName" 
+          optionValue="userAccountIndex" 
+          placeholder="Select Account"
+          appendTo="self"
+          @change="updateStoredSelectedAccount()">
+          </Select>
 
-        <div v-if="connectedWallet.addressString==searchAddress">
-          <div v-if="!connectedWallet.isTempPriceAccountAlive" class="flexCenterRow">
-            <div class="nMediumMarginLeft">
-              <InfoButton :infoMessage="refreshAccountMSG"/>
+          <div v-if="connectedWallet.addressString==searchAddress">
+            <div v-if="!connectedWallet.isTempPriceAccountAlive" class="flexCenterRow">
+              <div class="nMediumMarginLeft">
+                <InfoButton :infoMessage="refreshAccountMSG"/>
+              </div>
+              <button class="lightOffDark thinBorder4Rad padding10 smallMarginLeft" @click="refreshUser()">
+                <ion-label color="green">Refresh Account</ion-label>
+              </button>
             </div>
-            <button class="lightOffDark thinBorder4Rad padding10 smallMarginLeft" @click="refreshUser()">
-              <ion-label color="green">Refresh Account</ion-label>
-            </button>
+
+            <div v-else class="flexCenterColumn">
+              <br>
+              <ion-text style="margin: 10px">{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
+              <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
+                Close Temp Price Account
+              </ion-button>
+            </div>
           </div>
 
-          <div v-else class="flexCenterColumn">
-            <br>
-            <ion-text style="margin: 10px">{{ TEMP_PRICE_ACCOUNT_ALIVE_MSG }}</ion-text>
-            <ion-button :color="colorName" @click="closeTempOraclePriceData(toast)">
-              Close Temp Price Account
-            </ion-button>
+          <div>
+            <h2 class="underLine yellow">7 Day Projection Rate</h2>
+            <h3 class="nMediumMarginTop">Value:
+              $<span class="rainbowText">{{ total7DayProjectionRateValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span> A Week
+            </h3>
+          </div>
+
+          <div>
+            <h2 class="underLine nSmallMarginTop yellow">Life Time Interest Earned</h2>
+            <h3 class="nMediumMarginTop">Value:
+              $<span class="rainbowText">{{ totalLifeTimeInterestEarnedValue.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 }) }}
+              </span>
+            </h3>
+          </div>   
+
+          <div class="nTinyMarginTop">
+            <HealthFactorBig :accountOwnerAddress="searchAddress" :accountIndex="accountSelect" :userTotalValueChartDataHashMap="userTotalValueChartDataHashMap"/>
+
+            <!--<UserTotalValueChart
+              :userTotalValueChartDataHashMap="userTotalValueChartDataHashMap"
+              :previousMonthDataMissing="previousMonthDataMissing"/>-->
           </div>
         </div>
-
-        <div>
-          <h2 class="underLine yellow">7 Day Projection Rate</h2>
-          <h3 class="nMediumMarginTop">Value:
-            $<span class="rainbowText">{{ total7DayProjectionRateValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span> A Week
-          </h3>
-        </div>
-
-        <div>
-          <h2 class="underLine nSmallMarginTop yellow">Life Time Interest Earned</h2>
-          <h3 class="nMediumMarginTop">Value:
-            $<span class="rainbowText">{{ totalLifeTimeInterestEarnedValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2 }) }}
-            </span>
-          </h3>
-        </div>   
-
-        <div class="nTinyMarginTop">
-          <HealthFactorBig :accountOwnerAddress="searchAddress" :accountIndex="accountSelect" :userTotalValueChartDataHashMap="userTotalValueChartDataHashMap"/>
-
-          <!--<UserTotalValueChart
-            :userTotalValueChartDataHashMap="userTotalValueChartDataHashMap"
-            :previousMonthDataMissing="previousMonthDataMissing"/>-->
-        </div>
-      </div>
       </div>
 
-      <div class="thickBorder smallMarginTop">
+      <div v-if="userMonthlyStatementStableCoinList?.length > 0"class="thickBorder smallMarginTop">
         <!--Stable Coin Charts-->
-        <div v-if="userMonthlyStatementStableCoinList?.length > 0" class="hHeaderDisplay nTinyMarginTop">
+        <div  class="hHeaderDisplay nTinyMarginTop">
           <div>
             <h4 class="underLine green" style="line-height: 27px">Stable Coin<br>7 Day Projection Rate</h4>
             <h5 class="nMediumLargeMarginTop">Value:
@@ -257,11 +257,10 @@
         </div>
       </div>
       
-      <div class="thickBorder smallMarginTop">
+      <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="thickBorder smallMarginTop" style="padding-top:">
         <!--Crypto Charts-->
-        <div v-if="userMonthlyStatementCryptoCurrencyList?.length > 0" class="nMediumMarginTop nMediumMarginBottom hHeaderDisplay" 
-          :style="{paddingTop: userMonthlyStatementStableCoinList?.length > 0 ? '14px' : '0px'}">
-          <div class="">
+        <div class="nTinyMarginTop nMediumMarginBottom hHeaderDisplay">
+          <div>
             <h4 class="underLine green" style="line-height: 27px">Crypto Currency<br>7 Day Projection Rate</h4>
             <h5 class="nMediumLargeMarginTop">Value:
               $<span class="rainbowText">{{ crypto7DayProjectionRateValue.toLocaleString('en-US', {
@@ -1256,7 +1255,7 @@
                 totalValues.push(totalValue)
                 depositValues.push(depositValue)
                 borrowValues.push(borrowValue)
-                console.log("depositValue:  ", depositValue)
+                //console.log("depositValue:  ", depositValue)
               }
               else
               {
@@ -1309,7 +1308,7 @@
                 collectedSolvencyFees.push(0)
                 totalValues.push(totalValue)
                 depositValues.push(depositValue)
-                console.log("depositValue:  ", depositValue)
+                //console.log("depositValue:  ", depositValue)
                 borrowValues.push(borrowValue)
               }
             }
@@ -1511,6 +1510,21 @@
       window.history.pushState({}, '', "/M4A/Markets-Portfolios-" + addressToCheck.value + '-' + accountSelect.value)
     }, 100)
 
+    resetUserTotals()
+    
+    userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
+    userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
+    userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
+
+    resetSelectedChartNameHashMap(userMonthlyStatementStableCoinList.value)
+    resetSelectedChartNameHashMap(userMonthlyStatementCryptoCurrencyList.value)
+    checkForLendingUserAssets()
+    setChartData()
+  }
+
+  function resetUserTotals()
+  {
     stableCoin7DayProjectionRateValueUnRounded.value = 0
     stableCoin7DayProjectionRateAmount.value = "0"
     stableCoin7DayProjectionRateValue.value = 0
@@ -1524,16 +1538,6 @@
     cryptoLifeTimeInterestEarnedValueUnRounded.value = 0
     cryptoLifeTimeInterestEarnedAmount.value = "0"
     cryptoLifeTimeInterestEarnedValue.value = 0
-    
-    userMonthlyStatementStableCoinList.value = lendingUserAvailableStableCoinStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    userStableCoinInterestHelper = cloneDeep(userMonthlyStatementStableCoinList.value)
-    userMonthlyStatementCryptoCurrencyList.value = lendingUserAvailableCryptoCurrencyStatementsBySubMarketsHashMap.map.get(searchAddress.value + accountSelect.value.toString())
-    userCryptoCurrencyInterestHelper = cloneDeep(userMonthlyStatementCryptoCurrencyList.value)
-
-    resetSelectedChartNameHashMap(userMonthlyStatementStableCoinList.value)
-    resetSelectedChartNameHashMap(userMonthlyStatementCryptoCurrencyList.value)
-    checkForLendingUserAssets()
-    setChartData()
   }
 
   function setLendingUserAccountList()
@@ -1564,15 +1568,7 @@
     checkNewAddress(accountIndex)
     isValidPublicKey.value = isValidSolanaPublicKey(owner)
 
-    stableCoin7DayProjectionRateAmount.value = "0"
-    stableCoin7DayProjectionRateValue.value = 0
-    stableCoinLifeTimeInterestEarnedAmount.value = "0"
-    stableCoinLifeTimeInterestEarnedValue.value = 0
-
-    crypto7DayProjectionRateAmount.value = "0"
-    crypto7DayProjectionRateValue.value = 0
-    cryptoLifeTimeInterestEarnedAmount.value = "0"
-    cryptoLifeTimeInterestEarnedValue.value = 0
+    resetUserTotals()
 
     setTimeout(() =>
     {
