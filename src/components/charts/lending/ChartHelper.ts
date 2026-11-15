@@ -240,7 +240,7 @@ export function getBorrowedAmountBaseChart(gradientOffset: Ref<number>) :any
   }
 }
 
-export function setChartOptions(responsive: boolean, chartTextColor: string, dollarSign = false)
+export function setChartOptions(responsive: boolean, chartTextColor: string, dollarSign = false, dynamicFastNumbers = false, minDecimals = 2)
 {
   return{
     responsive: responsive,
@@ -279,7 +279,10 @@ export function setChartOptions(responsive: boolean, chartTextColor: string, dol
             if(context.parsed.y !== null)
             {
               const value = context.parsed.y
-              label += value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 9 })
+              if(dynamicFastNumbers)
+                label += value.toLocaleString('en-US', { minimumFractionDigits: minDecimals, maximumFractionDigits: minDecimals })
+              else
+                label += value.toLocaleString('en-US', { minimumFractionDigits: minDecimals, maximumFractionDigits: 9 })
             }
             return label;
           }

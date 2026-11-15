@@ -26,16 +26,16 @@
           @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
             <div 
-              v-if="dataset.label=='Overall Value'" 
-              class="swatch animatedRainbowX">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Total Deposit Value'" 
+              v-if="dataset.label=='Total Deposit Value'" 
               class="swatch animatedDepositValueX">
             </div>
             <div 
               v-else-if="dataset.label=='Total Borrow Value'" 
               class="swatch animatedBorrowValueX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Overall Value'" 
+              class="swatch animatedRainbowX">
             </div>
             <span 
               class="legendLabel" 
@@ -71,6 +71,7 @@
   import './Chart.css'
 
   const props = defineProps(['userTotalValueChartDataHashMap', 'previousMonthDataMissing'])
+  const emits = defineEmits(['chartSelect'])
 
   var chartData: any
   var chartOptions = ref()
@@ -125,6 +126,7 @@
     chartDataHashMap = props.userTotalValueChartDataHashMap
     chartData = chartDataHashMap.get(chartSelect.value)
     resetHiddenArray()
+    emits('chartSelect', chartSelect.value)
   
     await sleep(40)
     chartOptions.value.responsive = true

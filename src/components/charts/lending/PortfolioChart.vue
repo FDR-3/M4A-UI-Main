@@ -24,24 +24,24 @@
           <ion-text>Borrow APY: {{ borrowAPY }}%</ion-text>
         </div>
 
-        <div v-if="showValues" class="flexCenterColumn">
-          <ion-text>Total:
-            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
-              minimumFractionDigits: decimalAmount,
-              maximumFractionDigits: decimalAmount }) }}
-            </span> Value: $<span class="rainbowText"> {{ totalValueString }} </span>
-          </ion-text>
+        <div v-if="showValues" class="flexCenterColumn smallMarginBottom">
           <ion-text>Deposit:
             <span class="depositText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
               maximumFractionDigits: decimalAmount }) }}
             </span> Value: $<span class="depositText"> {{ balanceValueString }} </span>
           </ion-text>
-          <ion-text class="smallMarginBottom">Borrow:
+          <ion-text>Borrow:
             <span class="borrowText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
               maximumFractionDigits: decimalAmount }) }}
             </span> Value: $<span class="borrowText"> {{ debtValueString }} </span>
+          </ion-text>
+          <ion-text>Total:
+            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="rainbowText"> {{ totalValueString }} </span>
           </ion-text>
         </div>
         <div v-else class="flexCenterColumn">
@@ -103,26 +103,26 @@
       <ion-text>Supply APY: {{ supplyAPY }}%</ion-text><br>
       <ion-text>Borrow APY: {{ borrowAPY }}%</ion-text>
 
-      <div class="unStackedBalanceDebt">
+      <div class="unStackedBalanceDebt nTinyMarginTop">
         <br>
-        <div v-if="showValues" class="flexCenterColumn nTinyMarginTop">
-          <ion-text>Total:
-            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
-              minimumFractionDigits: decimalAmount,
-              maximumFractionDigits: decimalAmount }) }}
-            </span> Value: $<span class="rainbowText"> {{ totalValueString }} </span>
-          </ion-text>
+        <div v-if="showValues" class="flexCenterColumn smallMarginBottom">
           <ion-text>Deposit:
             <span class="depositText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
               maximumFractionDigits: decimalAmount }) }}
             </span> Value: $<span class="depositText"> {{ balanceValueString }} </span>
           </ion-text>
-          <ion-text class="smallMarginBottom">Borrow:
+          <ion-text>Borrow:
             <span class="borrowText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
               maximumFractionDigits: decimalAmount }) }}
             </span> Value: $<span class="borrowText"> {{ debtValueString }} </span>
+          </ion-text>
+          <ion-text>Total:
+            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span> Value: $<span class="rainbowText"> {{ totalValueString }} </span>
           </ion-text>
         </div>
         <div v-else class="flexCenterColumn">
@@ -142,14 +142,7 @@
       </div>
 
       <div class="stackedBalanceDebt ">
-        <div v-if="showValues" class="flexCenterColumn smallMarginTop">
-          <ion-text>Total:
-            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
-              minimumFractionDigits: decimalAmount,
-              maximumFractionDigits: decimalAmount }) }}
-            </span>
-            <br>Value: $<span class="rainbowText"> {{ totalValueString }} </span>
-          </ion-text>
+        <div v-if="showValues" class="flexCenterColumn smallMarginTop smallMarginBottom">
           <ion-text>Deposit:
             <span class="depositText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
@@ -157,21 +150,28 @@
             </span>
             <br>Value: $<span class="depositText"> {{ balanceValueString }} </span>
           </ion-text>
-          <ion-text class="smallMarginBottom">Borrow:
+          <ion-text>Borrow:
             <span class="borrowText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
               maximumFractionDigits: decimalAmount }) }}
             </span>
             <br>Value: $<span class="borrowText"> {{ debtValueString }} </span>
           </ion-text>
+          <ion-text>Total:
+            <span class="rainbowText">{{ Number(userCalculatedTotal)?.toLocaleString('en-US', {
+              minimumFractionDigits: decimalAmount,
+              maximumFractionDigits: decimalAmount }) }}
+            </span>
+            <br>Value: $<span class="rainbowText"> {{ totalValueString }} </span>
+          </ion-text>
         </div>
-        <div v-else class="">
+        <div v-else class="smallMarginTop smallMarginBottom">
           <ion-text>Balance:
             <span class="rainbowText">{{ Number(userCalculatedBalance)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
               maximumFractionDigits: decimalAmount }) }}
             </span>
-          <br>Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br><br>
+          <br>Value: $<span class="rainbowText"> {{ balanceValueString }} </span></ion-text><br>
           <ion-text class="smallMarginBottom">Debt:
             <span class="poopText">{{ Number(userCalculatedDebt)?.toLocaleString('en-US', {
               minimumFractionDigits: decimalAmount,
@@ -228,16 +228,16 @@
           @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
             <div 
-              v-if="dataset.label=='Total Value'" 
-              class="swatch animatedRainbowX">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Deposit Value'" 
+              v-if="dataset.label=='Deposit Value'" 
               class="swatch animatedDepositValueX">
             </div>
             <div 
               v-else-if="dataset.label=='Borrow Value'" 
               class="swatch animatedBorrowValueX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Total Value'" 
+              class="swatch animatedRainbowX">
             </div>
             <span 
               class="legendLabel" 
@@ -341,16 +341,16 @@
           @click="toggleDataset(index, chartRef, legenHiddenArray)"
           >
             <div 
-              v-if="dataset.label=='Total Value'" 
-              class="swatch animatedRainbowX">
-            </div>
-            <div 
-              v-else-if="dataset.label=='Deposit Value'" 
+              v-if="dataset.label=='Deposit Value'" 
               class="swatch animatedDepositValueX">
             </div>
             <div 
               v-else-if="dataset.label=='Borrow Value'" 
               class="swatch animatedBorrowValueX">
+            </div>
+            <div 
+              v-else-if="dataset.label=='Total Value'" 
+              class="swatch animatedRainbowX">
             </div>
             <span 
               class="legendLabel" 
@@ -590,7 +590,7 @@
     chartSelect.value = props.selectedChart
 
     valueChartOptions.value = setChartOptions(false, chartTextColor.value, true)
-    amountChartOptions.value = setChartOptions(true, chartTextColor.value)
+    amountChartOptions.value = setChartOptions(true, chartTextColor.value, false, true, decimalAmount)
     updateChartWidth() 
     startGradientAnimation()
     //await sleep(100)
@@ -623,7 +623,7 @@
       chartTextColor.value = "#000000"
 
     valueChartOptions.value = setChartOptions(false, chartTextColor.value, true)
-    amountChartOptions.value = setChartOptions(true, chartTextColor.value)
+    amountChartOptions.value = setChartOptions(true, chartTextColor.value, false, true, decimalAmount)
   })
 
   watch(() => [props.ownerAddress, props.accountIndex], (() => 
@@ -858,6 +858,9 @@
       const liveDebtValue = roundToCents(userCalculatedDebt.value * Number(price))
       const liveTotalValue = roundToCents((userCalculatedBalance.value - userCalculatedDebt.value) * Number(price))
 
+      const liveBalanceAmount= userCalculatedBalance.value
+      const liveDebtAmount = userCalculatedDebt.value
+
       totalValueString.value = liveTotalValue.toLocaleString('en-US', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2 })
@@ -893,7 +896,9 @@
       props.subMarketIndex,
       liveBalanceValue,
       liveDebtValue,
-      liveTotalValue)
+      liveTotalValue,
+      liveBalanceAmount,
+      liveDebtAmount)
       return
     }
 
