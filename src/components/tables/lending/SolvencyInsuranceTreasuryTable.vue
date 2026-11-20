@@ -386,7 +386,6 @@
         tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
       }
 
-      treasuryValue += treasuryCalculatedValue
       var flooredValue = Math.floor(treasuryCalculatedValue * 100) / 100
 
       treasuryValue += treasuryCalculatedValue
@@ -470,7 +469,6 @@
         tvlContributionCalculatedValue = tvlContributionTotalAmount * priceData.usdPrice
       }
 
-      treasuryValue += treasuryCalculatedValue
       var flooredValue = Math.floor(treasuryCalculatedValue * 100) / 100
 
       treasuryValue += treasuryCalculatedValue

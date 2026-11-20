@@ -4,8 +4,8 @@ export const SolvencyValueHistoryHashMap: Map<string, number> = new Map(
   ["6-2026", 0.00],
   ["7-2026", 0.00],
   ["8-2026", 0.01],
-  ["9-2026", 0.02],
-  ["10-2026", 0.05]
+  ["9-2026", 0.01],
+  ["10-2026", 0.02]
 ])
 
 export const Solvency7DayProjectionHistoryHashMap: Map<string, number> = new Map(
